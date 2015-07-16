@@ -72,7 +72,9 @@ public class EventGapVerification extends AbstractSensorVerification {
         }
 
         final int count = mEventGaps.size();
-        int eventGapTolerance = (int) Math.min(EVENT_GAP_TOLERANCE_COUNT, 0.01 * mIndex);
+        // Ensure that eventGapTolerance is at least 1.
+        int eventGapTolerance = (int)Math.max(1, Math.min(EVENT_GAP_TOLERANCE_COUNT,
+                    EVENT_GAP_TOLERANCE_PERCENT * mIndex));
         stats.addValue(PASSED_KEY, count <= eventGapTolerance);
         stats.addValue(SensorStats.EVENT_GAP_COUNT_KEY, count);
         stats.addValue(SensorStats.EVENT_GAP_POSITIONS_KEY, getIndexArray(mEventGaps));

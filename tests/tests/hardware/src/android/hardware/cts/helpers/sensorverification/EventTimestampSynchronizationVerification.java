@@ -71,11 +71,10 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
         long fifoMaxEventCount = environment.getSensor().getFifoMaxEventCount();
         int maximumExpectedSamplingPeriodUs = environment.getMaximumExpectedSamplingPeriodUs();
         if (fifoMaxEventCount > 0 && maximumExpectedSamplingPeriodUs != Integer.MAX_VALUE) {
-            long fifoBasedReportLatencyUs =
-                    fifoMaxEventCount * maximumExpectedSamplingPeriodUs;
-            reportLatencyUs = Math.min(reportLatencyUs, fifoBasedReportLatencyUs) +
-                (long)(2.5 * maximumExpectedSamplingPeriodUs);
-            // of each event will be equal to the time it takes to fill up the FIFO.
+            long fifoBasedReportLatencyUs = fifoMaxEventCount * maximumExpectedSamplingPeriodUs;
+            // If the device goes into suspend mode and the sensor is a non wake-up sensor, the
+            // FIFO will keep overwriting itself and the reportLatency will be equal to the time
+            // it takes to fill up the FIFO.
             if (environment.isDeviceSuspendTest() && !environment.getSensor().isWakeUpSensor()) {
                 reportLatencyUs = fifoBasedReportLatencyUs;
             } else {
@@ -86,7 +85,9 @@ public class EventTimestampSynchronizationVerification extends AbstractSensorVer
                 reportLatencyUs = Math.min(reportLatencyUs, fifoBasedReportLatencyUs);
             }
         }
-        long expectedSyncLatencyNs = TimeUnit.MICROSECONDS.toNanos(reportLatencyUs);
+        // Add an additional filter delay which is a function of the samplingPeriod.
+        long filterDelayUs = (long)(2.5 * maximumExpectedSamplingPeriodUs);
+        long expectedSyncLatencyNs = TimeUnit.MICROSECONDS.toNanos(reportLatencyUs + filterDelayUs);
         return new EventTimestampSynchronizationVerification(DEFAULT_THRESHOLD_NS,
                                                               expectedSyncLatencyNs);
     }
