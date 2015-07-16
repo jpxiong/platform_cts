@@ -2395,4 +2395,66 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
             Log.i(TAG, "Deleted " + (latestImportedEntryNumber + 1) + " keys");
         }
     }
+
+    public void testKeyStore_OnlyOneDigestCanBeAuthorized_HMAC() throws Exception {
+        mKeyStore.load(null);
+
+        for (String algorithm : KeyGeneratorTest.EXPECTED_ALGORITHMS) {
+            if (!TestUtils.isHmacAlgorithm(algorithm)) {
+                continue;
+            }
+            try {
+                String digest = TestUtils.getHmacAlgorithmDigest(algorithm);
+                assertNotNull(digest);
+                SecretKeySpec keyBeingImported = new SecretKeySpec(new byte[16], algorithm);
+
+                KeyProtection.Builder goodSpec =
+                        new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN);
+
+                // Digests authorization not specified in import parameters
+                assertFalse(goodSpec.build().isDigestsSpecified());
+                mKeyStore.setEntry(TEST_ALIAS_1,
+                        new KeyStore.SecretKeyEntry(keyBeingImported),
+                        goodSpec.build());
+                SecretKey key = (SecretKey) mKeyStore.getKey(TEST_ALIAS_1, null);
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(TestUtils.getKeyInfo(key).getDigests()), digest);
+
+                // The same digest is specified in import parameters
+                mKeyStore.setEntry(TEST_ALIAS_1,
+                        new KeyStore.SecretKeyEntry(keyBeingImported),
+                        TestUtils.buildUpon(goodSpec).setDigests(digest).build());
+                key = (SecretKey) mKeyStore.getKey(TEST_ALIAS_1, null);
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(TestUtils.getKeyInfo(key).getDigests()), digest);
+
+                // Empty set of digests specified in import parameters
+                try {
+                    mKeyStore.setEntry(TEST_ALIAS_1,
+                            new KeyStore.SecretKeyEntry(keyBeingImported),
+                            TestUtils.buildUpon(goodSpec).setDigests().build());
+                    fail();
+                } catch (KeyStoreException expected) {}
+
+                // A different digest specified in import parameters
+                String anotherDigest = "SHA-256".equalsIgnoreCase(digest) ? "SHA-384" : "SHA-256";
+                try {
+                    mKeyStore.setEntry(TEST_ALIAS_1,
+                            new KeyStore.SecretKeyEntry(keyBeingImported),
+                            TestUtils.buildUpon(goodSpec).setDigests(anotherDigest).build());
+                    fail();
+                } catch (KeyStoreException expected) {}
+                try {
+                    mKeyStore.setEntry(TEST_ALIAS_1,
+                            new KeyStore.SecretKeyEntry(keyBeingImported),
+                            TestUtils.buildUpon(goodSpec)
+                                    .setDigests(digest, anotherDigest)
+                                    .build());
+                    fail();
+                } catch (KeyStoreException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
 }
