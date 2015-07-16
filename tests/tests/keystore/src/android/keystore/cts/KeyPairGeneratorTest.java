@@ -297,7 +297,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         }
     }
 
-    public void testGenerateHonorsAuthorizations() throws Exception {
+    public void testGenerateHonorsRequestedAuthorizations() throws Exception {
         Date keyValidityStart = new Date(System.currentTimeMillis() - TestUtils.DAY_IN_MILLIS);
         Date keyValidityForOriginationEnd =
                 new Date(System.currentTimeMillis() + TestUtils.DAY_IN_MILLIS);

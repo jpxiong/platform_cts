@@ -46,7 +46,7 @@ import javax.crypto.SecretKey;
 public class KeyGeneratorTest extends TestCase {
     private static final String EXPECTED_PROVIDER_NAME = TestUtils.EXPECTED_PROVIDER_NAME;
 
-    private static final String[] EXPECTED_ALGORITHMS = {
+    static final String[] EXPECTED_ALGORITHMS = {
         "AES",
         "HmacSHA1",
         "HmacSHA224",
@@ -291,6 +291,60 @@ public class KeyGeneratorTest extends TestCase {
         }
     }
 
+    public void testHmacKeyOnlyOneDigestCanBeAuthorized() throws Exception {
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            if (!TestUtils.isHmacAlgorithm(algorithm)) {
+                continue;
+            }
+
+            try {
+                String digest = TestUtils.getHmacAlgorithmDigest(algorithm);
+                assertNotNull(digest);
+
+                KeyGenParameterSpec.Builder goodSpec = new KeyGenParameterSpec.Builder(
+                        "test1", KeyProperties.PURPOSE_SIGN);
+
+                KeyGenerator keyGenerator = getKeyGenerator(algorithm);
+
+                // Digests authorization not specified in algorithm parameters
+                assertFalse(goodSpec.build().isDigestsSpecified());
+                keyGenerator.init(goodSpec.build());
+                SecretKey key = keyGenerator.generateKey();
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(TestUtils.getKeyInfo(key).getDigests()), digest);
+
+                // The same digest is specified in algorithm parameters
+                keyGenerator.init(TestUtils.buildUpon(goodSpec).setDigests(digest).build());
+                key = keyGenerator.generateKey();
+                TestUtils.assertContentsInAnyOrder(
+                        Arrays.asList(TestUtils.getKeyInfo(key).getDigests()), digest);
+
+                // No digests specified in algorithm parameters
+                try {
+                    keyGenerator.init(TestUtils.buildUpon(goodSpec).setDigests().build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+
+                // A different digest specified in algorithm parameters
+                String anotherDigest = "SHA-256".equalsIgnoreCase(digest) ? "SHA-384" : "SHA-256";
+                try {
+                    keyGenerator.init(TestUtils.buildUpon(goodSpec)
+                            .setDigests(anotherDigest)
+                            .build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+                try {
+                    keyGenerator.init(TestUtils.buildUpon(goodSpec)
+                            .setDigests(digest, anotherDigest)
+                            .build());
+                    fail();
+                } catch (InvalidAlgorithmParameterException expected) {}
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + algorithm, e);
+            }
+        }
+    }
+
     public void testInitWithUnknownBlockModeFails() {
         for (String algorithm : EXPECTED_ALGORITHMS) {
             try {
@@ -402,7 +456,7 @@ public class KeyGeneratorTest extends TestCase {
         }
     }
 
-    public void testGenerateHonorsAuthorizations() throws Exception {
+    public void testGenerateHonorsRequestedAuthorizations() throws Exception {
         Date keyValidityStart = new Date(System.currentTimeMillis() - TestUtils.DAY_IN_MILLIS);
         Date keyValidityForOriginationEnd =
                 new Date(System.currentTimeMillis() + TestUtils.DAY_IN_MILLIS);
@@ -418,13 +472,12 @@ public class KeyGeneratorTest extends TestCase {
                 String[] digests;
                 int purposes;
                 if (TestUtils.isHmacAlgorithm(algorithm)) {
-                    String digest = TestUtils.getHmacAlgorithmDigest(algorithm);
-                    String anotherDigest = KeyProperties.DIGEST_SHA256.equalsIgnoreCase(digest)
-                            ? KeyProperties.DIGEST_SHA512 : KeyProperties.DIGEST_SHA256;
-                    digests = new String[] {anotherDigest, digest};
+                    // HMAC key can only be authorized for one digest, the one implied by the key's
+                    // JCA algorithm name.
+                    digests = new String[] {TestUtils.getHmacAlgorithmDigest(algorithm)};
                     purposes = KeyProperties.PURPOSE_SIGN;
                 } else {
-                    digests = new String[] {KeyProperties.DIGEST_SHA384};
+                    digests = new String[] {KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA1};
                     purposes = KeyProperties.PURPOSE_DECRYPT;
                 }
                 KeyGenerator keyGenerator = getKeyGenerator(algorithm);
