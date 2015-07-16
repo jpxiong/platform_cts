@@ -84,8 +84,9 @@ public class EventOrderingVerification extends AbstractSensorVerification {
             sb.append(count).append(" events out of order: ");
             for (int i = 0; i < Math.min(count, TRUNCATE_MESSAGE_LENGTH); i++) {
                 IndexedEventPair info = mOutOfOrderEvents.get(i);
-                sb.append(String.format("position=%d, previous=%d, timestamp=%d; ", info.index,
-                        info.previousEvent.timestamp, info.event.timestamp));
+                sb.append(String.format("position=%d, previous_ts=%.2fms, current_ts=%.2fms",
+                            info.index, nanosToMillis(info.previousEvent.timestamp),
+                            nanosToMillis(info.event.timestamp)));
             }
             if (count > TRUNCATE_MESSAGE_LENGTH) {
                 sb.append(count - TRUNCATE_MESSAGE_LENGTH).append(" more");
