@@ -378,6 +378,7 @@
     <string name="nfc_pee_2_pee">Peer-to-Peer Data Exchange</string>
     <string name="nfc_ndef_push_sender">NDEF Push Sender</string>
     <string name="nfc_ndef_push_receiver">NDEF Push Receiver</string>
+    <string name="nfc_llcp_version_check">LLCP version check</string>
 
     <string name="nfc_tag_verification">Tag Verification</string>
     <string name="nfc_ndef">NDEF</string>
@@ -399,6 +400,13 @@
     <string name="nfc_ndef_push_receive_failure">Failed to receive the correct NDEF push
         message.</string>
 
+    <string name="nfc_llcp_version_check_info">This test requires two candidate devices
+       with NFC enabled to exchange P2P messages. Start the \"LLCP version check\" test on
+       the other candidate device also, and touch the devices back to back. This test
+       then verifies that the candidate device correctly advises the LLCP version as 1.2</string>
+    <string name="nfc_llcp_version_check_failure">The candidate devices does not report LLCP
+       version 1.2 or higher.</string>
+    <string name="nfc_llcp_version_check_success">The candidate device has a valid LLCP version.</string>
     <string name="nfc_tag_verifier">NFC Tag Verifier</string>
     <string name="nfc_tag_verifier_info">Follow the on-screen instructions to write and read
         a tag of the chosen technology.</string>

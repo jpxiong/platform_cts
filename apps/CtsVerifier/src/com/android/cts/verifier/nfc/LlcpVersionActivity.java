@@ -19,12 +19,14 @@ package com.android.cts.verifier.nfc;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.nfc.NfcManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -33,25 +35,25 @@ import java.nio.charset.Charset;
 /**
  * Test activity that sends a particular NDEF Push message to another NFC device.
  */
-public class NdefPushSenderActivity extends PassFailButtons.Activity implements
+public class LlcpVersionActivity extends PassFailButtons.Activity implements
         NfcAdapter.CreateNdefMessageCallback {
-
-    static final NdefMessage TEST_MESSAGE = getTestMessage();
 
     private static final int NFC_NOT_ENABLED_DIALOG_ID = 1;
     private static final int NDEF_PUSH_NOT_ENABLED_DIALOG_ID = 2;
 
     private NfcAdapter mNfcAdapter;
+    private TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pass_fail_text);
-        setInfoResources(R.string.nfc_ndef_push_sender, R.string.nfc_ndef_push_sender_info, 0);
+        setInfoResources(R.string.nfc_llcp_version_check, R.string.nfc_llcp_version_check_info, 0);
         setPassFailButtonClickListeners();
+        getPassButton().setEnabled(false);
 
-        TextView text = (TextView) findViewById(R.id.text);
-        text.setText(R.string.nfc_ndef_push_sender_instructions);
+        mTextView = (TextView) findViewById(R.id.text);
+        mTextView.setText(R.string.nfc_llcp_version_check_info);
 
         NfcManager nfcManager = (NfcManager) getSystemService(NFC_SERVICE);
         mNfcAdapter = nfcManager.getDefaultAdapter();
@@ -100,6 +102,22 @@ public class NdefPushSenderActivity extends PassFailButtons.Activity implements
 
     @Override
     public NdefMessage createNdefMessage(NfcEvent event) {
-        return getTestMessage();
+        if (event.peerLlcpMajorVersion <= 1 && event.peerLlcpMinorVersion < 2) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mTextView.setText(R.string.nfc_llcp_version_check_failure);
+                }
+            });
+        } else {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getPassButton().setEnabled(true);
+                    mTextView.setText(R.string.nfc_llcp_version_check_success);
+                }
+            });
+        }
+        return null;
     }
 }
