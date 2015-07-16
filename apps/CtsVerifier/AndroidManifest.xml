@@ -429,6 +429,10 @@
                 android:label="@string/nfc_ndef_push_receiver"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <activity android:name=".nfc.LlcpVersionActivity"
+                android:label="@string/nfc_llcp_version_check"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <activity android:name=".nfc.TagVerifierActivity"
                 android:label="@string/nfc_tag_verifier"
                 android:configChanges="keyboardHidden|orientation|screenSize" />
