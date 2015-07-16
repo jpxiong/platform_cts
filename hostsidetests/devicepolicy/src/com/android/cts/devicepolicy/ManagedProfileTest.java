@@ -45,11 +45,19 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String CERT_INSTALLER_PKG = "com.android.cts.certinstaller";
     private static final String CERT_INSTALLER_APK = "CtsCertInstallerApp.apk";
 
+    private static final String WIFI_CONFIG_CREATOR_PKG = "com.android.cts.wificonfigcreator";
+    private static final String WIFI_CONFIG_CREATOR_APK = "CtsWifiConfigCreator.apk";
+
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
     private static final String FEATURE_BLUETOOTH = "android.hardware.bluetooth";
     private static final String FEATURE_CAMERA = "android.hardware.camera";
+    private static final String FEATURE_WIFI = "android.hardware.wifi";
+
+    private static final int USER_OWNER = 0;
+
+    // ID of the profile we'll create. This will always be a profile of USER_OWNER.
     private int mUserId;
     private String mPackageVerifier;
 
@@ -124,6 +132,29 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             removeUser(newUserId);
             fail(mHasFeature ? "Device must allow creating only one managed profile"
                     : "Device must not allow creating a managed profile");
+        }
+    }
+
+    /**
+     * Verify that removing a managed profile will remove all networks owned by that profile.
+     */
+    public void testProfileWifiCleanup() throws Exception {
+        if (!mHasFeature || !hasDeviceFeature(FEATURE_WIFI)) {
+            return;
+        }
+        assertTrue("WiFi config already exists and could not be removed", runDeviceTestsAsUser(
+                MANAGED_PROFILE_PKG, ".WifiTest", "testRemoveWifiNetworkIfExists", USER_OWNER));
+        try {
+            installApp(WIFI_CONFIG_CREATOR_APK);
+            assertTrue("Failed to add WiFi config", runDeviceTestsAsUser(
+                    MANAGED_PROFILE_PKG, ".WifiTest", "testAddWifiNetwork", mUserId));
+
+            // Now delete the user - should undo the effect of testAddWifiNetwork.
+            removeUser(mUserId);
+            assertTrue("WiFi config not removed after deleting profile", runDeviceTestsAsUser(
+                    MANAGED_PROFILE_PKG, ".WifiTest", "testWifiNetworkDoesNotExist", USER_OWNER));
+        } finally {
+            getDevice().uninstallPackage(WIFI_CONFIG_CREATOR_APK);
         }
     }
 

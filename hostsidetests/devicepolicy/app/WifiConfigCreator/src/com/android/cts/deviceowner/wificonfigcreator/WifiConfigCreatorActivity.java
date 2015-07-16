@@ -22,14 +22,14 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.android.compatibility.common.util.WifiConfigCreator;
-import static com.android.compatibility.common.util.WifiConfigCreator.CREATE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_CREATE_WIFI_CONFIG;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_NETID;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_PASSWORD;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_SECURITY_TYPE;
 import static com.android.compatibility.common.util.WifiConfigCreator.EXTRA_SSID;
-import static com.android.compatibility.common.util.WifiConfigCreator.REMOVE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_REMOVE_WIFI_CONFIG;
 import static com.android.compatibility.common.util.WifiConfigCreator.SECURITY_TYPE_NONE;
-import static com.android.compatibility.common.util.WifiConfigCreator.UPDATE_WIFI_CONFIG_ACTION;
+import static com.android.compatibility.common.util.WifiConfigCreator.ACTION_UPDATE_WIFI_CONFIG;
 
 /**
  * A simple activity to create and manage wifi configurations.
@@ -45,18 +45,18 @@ public class WifiConfigCreatorActivity extends Activity {
         try {
             Intent intent = getIntent();
             String action = intent.getAction();
-            if (CREATE_WIFI_CONFIG_ACTION.equals(action)) {
+            if (ACTION_CREATE_WIFI_CONFIG.equals(action)) {
                 String ssid = intent.getStringExtra(EXTRA_SSID);
                 int securityType = intent.getIntExtra(EXTRA_SECURITY_TYPE, SECURITY_TYPE_NONE);
                 String password = intent.getStringExtra(EXTRA_PASSWORD);
                 configCreator.addNetwork(ssid, false, securityType, password);
-            } else if (UPDATE_WIFI_CONFIG_ACTION.equals(action)) {
+            } else if (ACTION_UPDATE_WIFI_CONFIG.equals(action)) {
                 int netId = intent.getIntExtra(EXTRA_NETID, -1);
                 String ssid = intent.getStringExtra(EXTRA_SSID);
                 int securityType = intent.getIntExtra(EXTRA_SECURITY_TYPE, SECURITY_TYPE_NONE);
                 String password = intent.getStringExtra(EXTRA_PASSWORD);
                 configCreator.updateNetwork(netId, ssid, false, securityType, password);
-            } else if (REMOVE_WIFI_CONFIG_ACTION.equals(action)) {
+            } else if (ACTION_REMOVE_WIFI_CONFIG.equals(action)) {
                 int netId = intent.getIntExtra(EXTRA_NETID, -1);
                 if (netId != -1) {
                     configCreator.removeNetwork(netId);
