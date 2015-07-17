@@ -117,7 +117,8 @@ public class CtsApiCoverage {
          */
 
         ApiCoverage apiCoverage = getEmptyApiCoverage(apiXmlPath);
-        apiCoverage.removeEmptyAbstractClasses();
+        // Add superclass information into api coverage.
+        apiCoverage.resolveSuperClasses();
         for (File testApk : testApks) {
             addApiCoverage(apiCoverage, testApk, dexDeps);
         }

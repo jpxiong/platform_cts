@@ -66,7 +66,7 @@ class XmlReport {
                         + "\" numCovered=\"" + pkgTotalCovered
                         + "\" numTotal=\"" + pkgTotal
                         + "\" coveragePercentage=\""
-                            + Math.round(pkg.getCoveragePercentage())
+                        + Math.round(pkg.getCoveragePercentage())
                         + "\">");
 
                 List<ApiClass> classes = new ArrayList<ApiClass>(pkg.getClasses());
@@ -103,6 +103,10 @@ class XmlReport {
                             out.println("<method name=\"" + method.getName()
                                     + "\" returnType=\"" + method.getReturnType()
                                     + "\" deprecated=\"" + method.isDeprecated()
+                                    + "\" static=\"" + method.isStaticMethod()
+                                    + "\" final=\"" + method.isFinalMethod()
+                                    + "\" visibility=\"" + method.getVisibility()
+                                    + "\" abstract=\"" + method.isAbstractMethod()
                                     + "\" covered=\"" + method.isCovered() + "\">");
                             if (method.isDeprecated()) {
                                 if (method.isCovered()) {

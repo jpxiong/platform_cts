@@ -103,7 +103,18 @@ class TextReport {
     private static void printMethod(ApiMethod method, PrintStream out) {
         StringBuilder builder = new StringBuilder("    [")
                 .append(method.isCovered() ? "X" : " ")
-                .append("] ").append(method.getReturnType()).append(" ")
+                .append("] ")
+                .append(method.getVisibility()).append(" ");
+        if (method.isAbstractMethod()) {
+            builder.append("abstract ");
+        }
+        if (method.isStaticMethod()) {
+            builder.append("static ");
+        }
+        if (method.isFinalMethod()) {
+            builder.append("final ");
+        }
+        builder.append(method.getReturnType()).append(" ")
                 .append(method.getName()).append("(");
         List<String> parameterTypes = method.getParameterTypes();
         int numParameterTypes = parameterTypes.size();
