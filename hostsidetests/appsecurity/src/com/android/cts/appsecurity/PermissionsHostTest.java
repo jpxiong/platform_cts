@@ -87,6 +87,7 @@ public class PermissionsHostTest extends DeviceTestCase implements IAbiReceiver,
 
     public void testGranted() throws Exception {
         assertNull(getDevice().installPackage(mCtsBuild.getTestApp(APK), false, false));
+        grantPermission(PKG, "android.permission.READ_EXTERNAL_STORAGE");
         grantPermission(PKG, "android.permission.WRITE_EXTERNAL_STORAGE");
         runDeviceTests(PKG, ".UsePermissionTest", "testGranted");
     }
