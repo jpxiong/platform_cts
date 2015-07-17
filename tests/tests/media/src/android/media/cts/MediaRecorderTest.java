@@ -174,13 +174,29 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
     }
 
     public void testRecorderCamera() throws Exception {
+        int width;
+        int height;
+        Camera camera = null;
         if (!hasCamera()) {
             return;
+        }
+        // Try to get camera first supported resolution.
+        // If we fail for any reason, set the video size to default value.
+        try {
+            camera = Camera.open();
+            width = camera.getParameters().getSupportedPreviewSizes().get(0).width;
+            height = camera.getParameters().getSupportedPreviewSizes().get(0).height;
+        } catch (Exception e) {
+            width = VIDEO_WIDTH;
+            height = VIDEO_HEIGHT;
+        }
+        if (camera != null) {
+            camera.release();
         }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
+        mMediaRecorder.setVideoSize(width, height);
         mMediaRecorder.setVideoEncodingBitRate(VIDEO_BIT_RATE_IN_BPS);
         mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
         mMediaRecorder.prepare();
