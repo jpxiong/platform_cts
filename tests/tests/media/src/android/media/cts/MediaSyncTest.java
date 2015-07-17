@@ -33,6 +33,8 @@ import android.media.MediaSync;
 import android.media.MediaTimestamp;
 import android.media.PlaybackParams;
 import android.media.SyncParams;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 import android.view.Surface;
@@ -554,6 +556,9 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
             }
         }
 
+        private HandlerThread mHandlerThread;
+        private Handler mHandler;
+
         Decoder(MediaSyncTest test, MediaSync sync, boolean isAudio) {
             mMediaSyncTest = test;
             mMediaSync = sync;
@@ -563,6 +568,10 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
         public boolean setup(int inputResourceId, Surface surface, long lastBufferTimestampUs) {
             if (!mIsAudio) {
                 mSurface = surface;
+                // handle video callback in a separate thread as releaseOutputBuffer is blocking
+                mHandlerThread = new HandlerThread("SyncViewVidDec");
+                mHandlerThread.start();
+                mHandler = new Handler(mHandlerThread.getLooper());
             }
             mLastBufferTimestampUs = lastBufferTimestampUs;
             try {
@@ -581,7 +590,7 @@ public class MediaSyncTest extends ActivityInstrumentationTestCase2<MediaStubAct
                 }
                 mDecoder = MediaCodec.createDecoderByType(mimeType);
                 mDecoder.configure(mediaFormat, mSurface, null, 0);
-                mDecoder.setCallback(this);
+                mDecoder.setCallback(this, mHandler);
 
                 return true;
             } catch (IOException e) {
