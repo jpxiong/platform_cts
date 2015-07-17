@@ -21,12 +21,6 @@ import android.cts.util.CtsAndroidTestCase;
 import android.util.Log;
 
 public class AudioNativeTest extends CtsAndroidTestCase {
-    private static final String TAG = "AudioNativeTest";
-
-    static {
-        System.loadLibrary("audio_jni");
-    }
-
     public void testAppendixBBufferQueue() {
         nativeAppendixBBufferQueue();
     }
@@ -37,6 +31,104 @@ public class AudioNativeTest extends CtsAndroidTestCase {
             return;
         }
         nativeAppendixBRecording();
+    }
+
+    public void testStereo16Playback() {
+        assertTrue(AudioTrackNative.test(
+                2 /* numChannels */, 48000 /* sampleRate */, false /* useFloat */,
+                20 /* msecPerBuffer */, 8 /* numBuffers */));
+    }
+
+    public void testPlayStreamData() throws Exception {
+        final String TEST_NAME = "testPlayStreamData";
+        final boolean TEST_FLOAT_ARRAY[] = {
+                false,
+                true,
+        };
+        // due to downmixer algorithmic latency, source channels greater than 2 may
+        // sound shorter in duration at 4kHz sampling rate.
+        final int TEST_SR_ARRAY[] = {
+                /* 4000, */ // below limit of OpenSL ES
+                12345, // irregular sampling rate
+                44100,
+                48000,
+                96000,
+                192000,
+        };
+        // OpenSL ES Bug: MNC does not support channel counts of 3, 5, 7.
+        final int TEST_CHANNELS_ARRAY[] = {
+                1,
+                2,
+                // 3,
+                4,
+                // 5,
+                6,
+                // 7,
+                // 8  // can fail due to memory issues
+        };
+        final float TEST_SWEEP = 0; // sine wave only
+        final int TEST_TIME_IN_MSEC = 300;
+        final int TOLERANCE_MSEC = 20;
+
+        for (boolean TEST_FLOAT : TEST_FLOAT_ARRAY) {
+            double frequency = 400; // frequency changes for each test
+            for (int TEST_SR : TEST_SR_ARRAY) {
+                for (int TEST_CHANNELS : TEST_CHANNELS_ARRAY) {
+                    // OpenSL ES BUG: we run out of AudioTrack memory for this config on MNC
+                    // Log.d(TEST_NAME, "open channels:" + TEST_CHANNELS + " sr:" + TEST_SR);
+                    if (TEST_FLOAT == true && TEST_CHANNELS >= 6 && TEST_SR >= 192000) {
+                        continue;
+                    }
+                    AudioTrackNative track = new AudioTrackNative();
+                    assertTrue(TEST_NAME,
+                            track.open(TEST_CHANNELS, TEST_SR, TEST_FLOAT, 1 /* numBuffers */));
+                    assertTrue(TEST_NAME, track.start());
+
+                    final int sourceSamples =
+                            (int)((long)TEST_SR * TEST_TIME_IN_MSEC * TEST_CHANNELS / 1000);
+                    final double testFrequency = frequency / TEST_CHANNELS;
+                    if (TEST_FLOAT) {
+                        float data[] = AudioHelper.createSoundDataInFloatArray(
+                                sourceSamples, TEST_SR,
+                                testFrequency, TEST_SWEEP);
+                        assertEquals(sourceSamples,
+                                track.write(data, 0 /* offset */, sourceSamples,
+                                        AudioTrackNative.WRITE_FLAG_BLOCKING));
+                    } else {
+                        short data[] = AudioHelper.createSoundDataInShortArray(
+                                sourceSamples, TEST_SR,
+                                testFrequency, TEST_SWEEP);
+                        assertEquals(sourceSamples,
+                                track.write(data, 0 /* offset */, sourceSamples,
+                                        AudioTrackNative.WRITE_FLAG_BLOCKING));
+                    }
+
+                    while (true) {
+                        // OpenSL ES BUG: getPositionInMsec returns 0 after a data underrun.
+
+                        long position = track.getPositionInMsec();
+                        //Log.d(TEST_NAME, "position: " + position[0]);
+                        if (position >= (long)(TEST_TIME_IN_MSEC - TOLERANCE_MSEC)) {
+                            break;
+                        }
+
+                        // It is safer to use a buffer count of 0 to determine termination
+                        if (track.getBuffersPending() == 0) {
+                            break;
+                        }
+                        Thread.sleep(5 /* millis */);
+                    }
+                    track.stop();
+                    track.close();
+                    Thread.sleep(40 /* millis */);  // put a gap in the tone sequence
+                    frequency += 50; // increment test tone frequency
+                }
+            }
+        }
+    }
+
+    static {
+        System.loadLibrary("audio_jni");
     }
 
     private boolean hasMicrophone() {
