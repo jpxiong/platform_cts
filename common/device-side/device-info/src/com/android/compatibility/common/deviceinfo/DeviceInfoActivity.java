@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -43,6 +44,9 @@ public abstract class DeviceInfoActivity extends Activity {
     private static final int DEVICE_INFO_RESULT_STARTED = 0;
     /** Device info result code: collector completed success. */
     private static final int DEVICE_INFO_RESULT_OK = 1;
+
+    private static final int MAX_STRING_VALUE_LENGTH = 1000;
+    private static final int MAX_ARRAY_LENGTH = 1000;
 
     private static final String LOG_TAG = "DeviceInfoActivity";
 
@@ -252,7 +256,7 @@ public abstract class DeviceInfoActivity extends Activity {
     public void addResult(String name, String value) {
         checkName(name);
         try {
-            mJsonWriter.name(name).value(value);
+            mJsonWriter.name(name).value(checkString(value));
         } catch (Exception e) {
             error("Failed to add result for type String: " + e.getMessage());
         }
@@ -266,7 +270,7 @@ public abstract class DeviceInfoActivity extends Activity {
         try {
             mJsonWriter.name(name);
             mJsonWriter.beginArray();
-            for (double value : list) {
+            for (double value : checkArray(list)) {
                 mJsonWriter.value(value);
             }
             mJsonWriter.endArray();
@@ -280,12 +284,12 @@ public abstract class DeviceInfoActivity extends Activity {
      */
     public void addArray(String name, long[] list) {
         checkName(name);
-            try {
-            mJsonWriter.name(name);
-            mJsonWriter.beginArray();
-            for (long value : list) {
-                mJsonWriter.value(value);
-            }
+        try {
+        mJsonWriter.name(name);
+        mJsonWriter.beginArray();
+        for (long value : checkArray(list)) {
+            mJsonWriter.value(value);
+        }
             mJsonWriter.endArray();
         } catch (Exception e) {
             error("Failed to add result array for type long: " + e.getMessage());
@@ -300,7 +304,7 @@ public abstract class DeviceInfoActivity extends Activity {
         try {
             mJsonWriter.name(name);
             mJsonWriter.beginArray();
-            for (int value : list) {
+            for (int value : checkArray(list)) {
                 mJsonWriter.value((Number) value);
             }
             mJsonWriter.endArray();
@@ -317,7 +321,7 @@ public abstract class DeviceInfoActivity extends Activity {
         try {
             mJsonWriter.name(name);
             mJsonWriter.beginArray();
-            for (boolean value : list) {
+            for (boolean value : checkArray(list)) {
                 mJsonWriter.value(value);
             }
             mJsonWriter.endArray();
@@ -334,13 +338,60 @@ public abstract class DeviceInfoActivity extends Activity {
         try {
             mJsonWriter.name(name);
             mJsonWriter.beginArray();
-            for (String value : list) {
-                mJsonWriter.value(value);
+            for (String value : checkArray(list)) {
+                mJsonWriter.value(checkString(value));
             }
             mJsonWriter.endArray();
         } catch (Exception e) {
             error("Failed to add result array for type Sting: " + e.getMessage());
         }
+    }
+
+    private static boolean[] checkArray(boolean[] values) {
+        if (values.length > MAX_ARRAY_LENGTH) {
+            return Arrays.copyOf(values, MAX_ARRAY_LENGTH);
+        } else {
+            return values;
+        }
+    }
+
+    private static double[] checkArray(double[] values) {
+        if (values.length > MAX_ARRAY_LENGTH) {
+            return Arrays.copyOf(values, MAX_ARRAY_LENGTH);
+        } else {
+            return values;
+        }
+    }
+
+    private static int[] checkArray(int[] values) {
+        if (values.length > MAX_ARRAY_LENGTH) {
+            return Arrays.copyOf(values, MAX_ARRAY_LENGTH);
+        } else {
+            return values;
+        }
+    }
+
+    private static long[] checkArray(long[] values) {
+        if (values.length > MAX_ARRAY_LENGTH) {
+            return Arrays.copyOf(values, MAX_ARRAY_LENGTH);
+        } else {
+            return values;
+        }
+    }
+
+    private static String[] checkArray(String[] values) {
+        if (values.length > MAX_ARRAY_LENGTH) {
+            return Arrays.copyOf(values, MAX_ARRAY_LENGTH);
+        } else {
+            return values;
+        }
+    }
+
+    private static String checkString(String value) {
+        if (value.length() > MAX_STRING_VALUE_LENGTH) {
+            return value.substring(0, MAX_STRING_VALUE_LENGTH);
+        }
+        return value;
     }
 
     private static String checkName(String value) {

@@ -17,6 +17,8 @@ package com.android.compatibility.common.deviceinfo;
 
 import android.os.Bundle;
 
+import java.lang.StringBuilder;
+
 /**
  * Sample device info collector.
  */
@@ -55,6 +57,16 @@ public class SampleDeviceInfo extends DeviceInfoActivity {
         addResult("foo_int", Integer.MAX_VALUE);
         addResult("foo_long", Long.MAX_VALUE);
         addResult("foo_string", "foo-string");
+
+        StringBuilder sb = new StringBuilder();
+        int[] arr = new int[1001];
+        for (int i = 0; i < 1001; i++) {
+            sb.append("a");
+            arr[i] = i;
+        }
+        addResult("long_string", sb.toString());
+        addArray("long_int_array", arr);
+
         endGroup(); // foo
     }
 }

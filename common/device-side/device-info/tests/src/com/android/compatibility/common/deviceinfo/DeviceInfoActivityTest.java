@@ -29,38 +29,6 @@ public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<Sam
 
     private static final String EXPECTED_FILE_PATH =
             "/storage/emulated/0/device-info-files/SampleDeviceInfo.deviceinfo.json";
-    private static final String EXPECTED_JSON_CONTENT = "{\n" +
-      "  \"foo\": {\n" +
-      "    \"foo_boolean\": true,\n" +
-      "    \"bar\": {\n" +
-      "      \"bar_string\": [\n" +
-      "        \"bar-string-1\",\n" +
-      "        \"bar-string-2\",\n" +
-      "        \"bar-string-3\"\n" +
-      "      ],\n" +
-      "      \"bar_boolean\": [\n" +
-      "        true,\n" +
-      "        false\n" +
-      "      ],\n" +
-      "      \"bar_double\": [\n" +
-      "        1.7976931348623157E308,\n" +
-      "        4.9E-324\n" +
-      "      ],\n" +
-      "      \"bar_int\": [\n" +
-      "        2147483647,\n" +
-      "        -2147483648\n" +
-      "      ],\n" +
-      "      \"bar_long\": [\n" +
-      "        9223372036854775807,\n" +
-      "        -9223372036854775808\n" +
-      "      ]\n" +
-      "    },\n" +
-      "    \"foo_double\": 1.7976931348623157E308,\n" +
-      "    \"foo_int\": 2147483647,\n" +
-      "    \"foo_long\": 9223372036854775807,\n" +
-      "    \"foo_string\": \"foo-string\"\n" +
-      "  }\n" +
-      "}\n";
 
     private SampleDeviceInfo mActivity;
 
@@ -91,7 +59,7 @@ public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<Sam
         assertEquals("Incorrect file path", EXPECTED_FILE_PATH, resultFilePath);
         // Check json file content
         String jsonContent = readFile(resultFilePath);
-        assertEquals("Incorrect json output", EXPECTED_JSON_CONTENT, jsonContent);
+        assertEquals("Incorrect json output", ExampleObjects.sampleDeviceInfoJson(), jsonContent);
     }
 
     private String readFile(String filePath) throws IOException {
