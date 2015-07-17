@@ -84,7 +84,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
         Log.i(TAG, "in onGetSupportedCommands");
         for (int idx = 0; idx < commands.length; idx++) {
             results[idx] = Utils.TEST_COMMAND.equals(commands[idx]);
-            Log.i(TAG, "command is " + commands[idx]);
+            Log.i(TAG, "command " + commands[idx] + ", support = " + results[idx]);
         }
         return results;
     }

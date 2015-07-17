@@ -91,7 +91,7 @@ public class VoiceInteractionTest extends ActivityInstrumentationTestCase2<TestS
                 verifySingleTestcaseResult(t, singleResult);
             }
         }
-        assertEquals(2, numFails);
+        assertEquals(0, numFails);
         mTestActivity.finish();
     }
 
@@ -127,6 +127,9 @@ public class VoiceInteractionTest extends ActivityInstrumentationTestCase2<TestS
               break;
           case PICKOPTION_REQUEST_TEST:
               assertTrue(result.equals(Utils.PICKOPTION_REQUEST_SUCCESS));
+              break;
+          case SUPPORTS_COMMANDS_TEST:
+              assertTrue(result.equals(Utils.SUPPORTS_COMMANDS_SUCCESS));
               break;
           default:
               Log.wtf(TAG, "not expected");

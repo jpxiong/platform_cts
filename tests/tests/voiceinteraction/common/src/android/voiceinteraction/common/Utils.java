@@ -34,6 +34,7 @@ public class Utils {
         PICKOPTION_REQUEST_CANCEL_TEST,
         COMMANDREQUEST_TEST,
         COMMANDREQUEST_CANCEL_TEST,
+        SUPPORTS_COMMANDS_TEST,
     }
     public static final String TESTCASE_TYPE = "testcase_type";
     public static final String TESTINFO = "testinfo";
@@ -51,6 +52,7 @@ public class Utils {
     public static final String ABORT_REQUEST_SUCCESS = "abort ok";
     public static final String PICKOPTION_REQUEST_SUCCESS = "pickoption ok";
     public static final String COMMANDREQUEST_SUCCESS = "commandrequest ok";
+    public static final String SUPPORTS_COMMANDS_SUCCESS = "supportsCommands ok";
 
     public static final String CONFIRMATION_REQUEST_CANCEL_SUCCESS = "confirm cancel ok";
     public static final String COMPLETION_REQUEST_CANCEL_SUCCESS = "completion canel ok";
