@@ -62,12 +62,15 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
     static final String COMMAND_SET_GLOBAL_SETTING = "set-global-setting";
     static final String COMMAND_SET_STATUSBAR_DISABLED = "set-statusbar-disabled";
     static final String COMMAND_SET_KEYGUARD_DISABLED = "set-keyguard-disabled";
+    static final String COMMAND_CHECK_PERMISSION_LOCKDOWN = "check-permission-lockdown";
     static final String EXTRA_SETTING = "extra-setting";
 
     private static final String CHECK_DEVICE_OWNER_TEST_ID = "CHECK_DEVICE_OWNER";
     private static final String WIFI_LOCKDOWN_TEST_ID = WifiLockdownTestActivity.class.getName();
     private static final String DISABLE_STATUS_BAR_TEST_ID = "DISABLE_STATUS_BAR";
     private static final String DISABLE_KEYGUARD_TEST_ID = "DISABLE_KEYGUARD";
+    private static final String CHECK_PERMISSION_LOCKDOWN_TEST_ID =
+            PermissionLockdownTestActivity.class.getName();
     private static final String REMOVE_DEVICE_OWNER_TEST_ID = "REMOVE_DEVICE_OWNER";
 
     @Override
@@ -163,6 +166,11 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
                                 R.string.device_owner_reenable_keyguard_button,
                                 createDeviceOwnerIntentWithBooleanParameter(
                                         COMMAND_SET_KEYGUARD_DISABLED, false))}));
+
+        // setPermissionGrantState
+        adapter.add(createTestItem(this, CHECK_PERMISSION_LOCKDOWN_TEST_ID,
+                R.string.device_profile_owner_permission_lockdown_test,
+                new Intent(PermissionLockdownTestActivity.ACTION_CHECK_PERMISSION_LOCKDOWN)));
 
         // removeDeviceOwner
         adapter.add(createInteractiveTestItem(this, REMOVE_DEVICE_OWNER_TEST_ID,

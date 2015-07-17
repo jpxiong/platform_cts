@@ -1664,6 +1664,33 @@ You should be prompted to select credentials; choose the ones you just installed
     </string>
     <string name="device_owner_disable_keyguard_button">Disable keyguard</string>
     <string name="device_owner_reenable_keyguard_button">Reenable keyguard</string>
+    <string name="device_profile_owner_permission_lockdown_test">Permissions lockdown</string>
+    <string name="device_profile_owner_permission_lockdown_test_instructions">
+            Select each of the three grant states for the permission shown below in turn.\n
+            Now open application settings, select Permissions, and verify if the following behaviour is observed.\n
+            <b>Allow:</b> Permission is granted to the app and cannot be changed through the settings UI.\n
+            <b>Let user decide:</b> Permission state can be changed through the settings UI.\n
+            <b>Deny:</b> Permission is denied to the app and cannot be changed through the settings UI.\n
+            Please mark the test accordingly.
+    </string>
+    <string name="device_owner_permission_lockdown_test_info">
+        This test checks if the permissions state in settings UI is locked down according to the state set by the device owner.
+    </string>
+    <string name="profile_owner_permission_lockdown_test_info">
+        <b>
+        Before proceeding, check if com.android.cts.permissionapp (aka CtsPermissionApp) is installed in work profile by going to Settings &gt; Apps. If not, please install the app before proceeding.\n\n
+        </b>
+        This test checks if the permissions state in settings UI is locked down correctly depending on the state set by the profile owner.
+    </string>
+    <string name="package_not_found">You must install %s (aka CtsPermissionApp).</string>
+    <string name="permission_allow">Grant</string>
+    <string name="permission_default">Let user decide</string>
+    <string name="permission_deny">Deny</string>
+    <string name="not_profile_owner">%s is not profile owner.</string>
+    <string name="not_device_owner">%s is not device owner.</string>
+    <string name="activity_not_found">No activity found to handle intent: %s</string>
+    <string name="open_settings_button_label">Open Application Settings</string>
+    <string name="finish_button_label">Finish</string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>

@@ -34,7 +34,7 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
     protected static final String ADMIN_RECEIVER_TEST_CLASS
             = ".BaseDeviceAdminTest$BasicAdminReceiver";
 
-    private static final String PERMISSIONS_APP_PKG = "com.android.cts.permission.permissionapp";
+    private static final String PERMISSIONS_APP_PKG = "com.android.cts.permissionapp";
     private static final String PERMISSIONS_APP_APK = "CtsPermissionApp.apk";
 
     private static final String SIMPLE_PRE_M_APP_PKG = "com.android.cts.launcherapps.simplepremapp";
