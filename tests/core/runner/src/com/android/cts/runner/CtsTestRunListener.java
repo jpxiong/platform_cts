@@ -123,19 +123,27 @@ public class CtsTestRunListener extends InstrumentationRunListener {
         Log.d(TAG, "Free memory   : " + free);
 
         String tempdir = System.getProperty("java.io.tmpdir", "");
+        // TODO: Remove these extra Logs added to debug a specific timeout problem.
+        Log.d(TAG, "java.io.tmpdir is:" + tempdir);
+
         if (!TextUtils.isEmpty(tempdir)) {
             String[] commands = {"df", tempdir};
             BufferedReader in = null;
             try {
+                Log.d(TAG, "About to .exec df");
                 Process proc = runtime.exec(commands);
+                Log.d(TAG, ".exec returned");
                 in = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                Log.d(TAG, "Stream reader created");
                 String line;
                 while ((line = in.readLine()) != null) {
                     Log.d(TAG, line);
                 }
             } catch (IOException e) {
+                Log.d(TAG, "Exception: " + e.toString());
                 // Well, we tried
             } finally {
+                Log.d(TAG, "In finally");
                 if (in != null) {
                     try {
                         in.close();
