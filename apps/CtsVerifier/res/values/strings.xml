@@ -1450,10 +1450,10 @@
 
     <!-- String for the bundled TV app Tests -->
 
-    <string name="tv_input_discover_test">Third-party TV input test</string>
+    <string name="tv_input_discover_test">3rd-party TV input test</string>
     <string name="tv_input_discover_test_info">
     Verify that the bundled TV app launches via Intent and calls the proper API to discover
-    third-party TV inputs.
+    3rd-party TV inputs.
     </string>
     <string name="tv_input_discover_test_go_to_setup">
     Select the \"Launch TV app\" button and set up the newly installed TV input:
@@ -1474,7 +1474,7 @@
     to the \"Dummy\" channel.
     </string>
     <string name="tv_input_discover_test_verify_global_search">
-    Verify the TV app provides query results for third-party input\'s channels and programs in
+    Verify the TV app provides query results for 3rd-party input\'s channels and programs in
     global search results.
     </string>
     <string name="tv_input_discover_test_go_to_epg">
