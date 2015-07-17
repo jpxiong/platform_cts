@@ -18,42 +18,62 @@ package com.android.cts.usepermission;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.logCommand;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.os.Process;
 import android.test.InstrumentationTestCase;
 
-import com.android.cts.externalstorageapp.CommonExternalStorageTest;
+import java.io.File;
 
 public class UsePermissionCompatTest extends InstrumentationTestCase {
     private static final String TAG = "UsePermissionTest";
 
     public void testCompatDefault() throws Exception {
+        final Context context = getInstrumentation().getContext();
         logCommand("/system/bin/cat", "/proc/self/mountinfo");
 
         // Legacy permission model is granted by default
         assertEquals(PackageManager.PERMISSION_GRANTED,
-                getInstrumentation().getContext().checkPermission(
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Process.myPid(),
-                        Process.myUid()));
+                context.checkPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Process.myPid(), Process.myUid()));
+        assertEquals(PackageManager.PERMISSION_GRANTED,
+                context.checkPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Process.myPid(), Process.myUid()));
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirReadWriteAccess(Environment.getExternalStorageDirectory());
-        assertDirReadWriteAccess(getInstrumentation().getContext().getExternalCacheDir());
+        for (File path : getAllPackageSpecificPaths(context)) {
+            if (path != null) {
+                assertDirReadWriteAccess(path);
+            }
+        }
     }
 
     public void testCompatRevoked() throws Exception {
-        CommonExternalStorageTest.logCommand("/system/bin/cat", "/proc/self/mountinfo");
+        final Context context = getInstrumentation().getContext();
+        logCommand("/system/bin/cat", "/proc/self/mountinfo");
 
         // Legacy permission model appears granted, but storage looks and
         // behaves like it's ejected
         assertEquals(PackageManager.PERMISSION_GRANTED,
-                getInstrumentation().getContext().checkPermission(
-                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE, Process.myPid(),
-                        Process.myUid()));
+                context.checkPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Process.myPid(), Process.myUid()));
+        assertEquals(PackageManager.PERMISSION_GRANTED,
+                context.checkPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Process.myPid(), Process.myUid()));
         assertEquals(Environment.MEDIA_UNMOUNTED, Environment.getExternalStorageState());
         assertDirNoAccess(Environment.getExternalStorageDirectory());
-        assertNull(getInstrumentation().getContext().getExternalCacheDir());
+        for (File dir : getAllPackageSpecificPaths(context)) {
+            if (dir != null) {
+                assertDirNoAccess(dir);
+            }
+        }
+
+        // Just to be sure, poke explicit path
+        assertDirNoAccess(new File(Environment.getExternalStorageDirectory(),
+                "/Android/data/" + getInstrumentation().getContext().getPackageName()));
     }
 }

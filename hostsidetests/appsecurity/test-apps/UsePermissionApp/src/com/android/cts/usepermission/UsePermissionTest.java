@@ -46,6 +46,8 @@ public class UsePermissionTest extends InstrumentationTestCase {
 
         // New permission model is denied by default
         assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE));
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
                 .checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirNoAccess(Environment.getExternalStorageDirectory());
@@ -55,6 +57,8 @@ public class UsePermissionTest extends InstrumentationTestCase {
     public void testGranted() throws Exception {
         logCommand("/system/bin/cat", "/proc/self/mountinfo");
 
+        assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE));
         assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
                 .checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
@@ -66,6 +70,8 @@ public class UsePermissionTest extends InstrumentationTestCase {
         logCommand("/system/bin/cat", "/proc/self/mountinfo");
 
         // Start out without permission
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE));
         assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
                 .checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
@@ -79,6 +85,7 @@ public class UsePermissionTest extends InstrumentationTestCase {
         mDevice.waitForIdle();
 
         mActivity.requestPermissions(new String[] {
+                android.Manifest.permission.READ_EXTERNAL_STORAGE,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE }, 42);
         mDevice.waitForIdle();
 
@@ -86,14 +93,18 @@ public class UsePermissionTest extends InstrumentationTestCase {
                 .resourceId("com.android.packageinstaller:id/permission_allow_button")).click();
         mDevice.waitForIdle();
 
-        final MyActivity.Result result = mActivity.getResult();
+        MyActivity.Result result = mActivity.getResult();
         assertEquals(42, result.requestCode);
-        assertEquals(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, result.permissions[0]);
+        assertEquals(android.Manifest.permission.READ_EXTERNAL_STORAGE, result.permissions[0]);
+        assertEquals(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, result.permissions[1]);
         assertEquals(PackageManager.PERMISSION_GRANTED, result.grantResults[0]);
+        assertEquals(PackageManager.PERMISSION_GRANTED, result.grantResults[1]);
 
         logCommand("/system/bin/cat", "/proc/self/mountinfo");
 
         // We should have permission now!
+        assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE));
         assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
                 .checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE));
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
