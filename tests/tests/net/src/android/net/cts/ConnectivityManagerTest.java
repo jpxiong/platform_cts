@@ -23,10 +23,12 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.NetworkConfig;
 import android.net.NetworkInfo;
 import android.net.NetworkInfo.DetailedState;
 import android.net.NetworkInfo.State;
+import android.net.NetworkRequest;
 import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
@@ -310,6 +312,51 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Exercises both registerNetworkCallback and unregisterNetworkCallback. This checks to
+     * see if we get a callback for the TRANSPORT_WIFI transport type being available.
+     *
+     * <p>In order to test that a NetworkCallback occurs, we need some change in the network
+     * state (either a transport or capability is now available). The most straightforward is
+     * WiFi. We could add a version that uses the telephony data connection but it's not clear
+     * that it would increase test coverage by much (how many devices have 3G radio but not Wifi?).
+     */
+    public void testRegisterNetworkCallback() {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+            Log.i(TAG, "testRegisterNetworkCallback cannot execute unless devices supports WiFi");
+            return;
+        }
+
+        // We will register for a WIFI network being available or lost.
+        NetworkRequest request = new NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .build();
+        TestNetworkCallback callback = new TestNetworkCallback();
+        mCm.registerNetworkCallback(request, callback);
+
+        boolean previousWifiEnabledState = mWifiManager.isWifiEnabled();
+
+        try {
+            // Make sure WiFi is connected to an access point to start with.
+            if (!previousWifiEnabledState) {
+                connectToWifi();
+            }
+
+            // Now we should expect to get a network callback about availability of the wifi
+            // network even if it was already connected as a state-based action when the callback
+            // is registered.
+            assertTrue("Did not receive NetworkCallback.onAvailable for TRANSPORT_WIFI",
+                    callback.waitForAvailable());
+        } catch (InterruptedException e) {
+            fail("Broadcast receiver or NetworkCallback wait was interrupted.");
+        } finally {
+            mCm.unregisterNetworkCallback(callback);
+
+            // Return WiFI to its original enabled/disabled state.
+            mWifiManager.setWifiEnabled(previousWifiEnabledState);
+        }
+    }
+
     private void connectToWifi() throws InterruptedException {
         ConnectivityActionReceiver receiver =
                 new ConnectivityActionReceiver(ConnectivityManager.TYPE_WIFI);
@@ -348,6 +395,23 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
         public boolean waitForConnection() throws InterruptedException {
             return mReceiveLatch.await(30, TimeUnit.SECONDS);
+        }
+    }
+
+    /**
+     * Callback used in testRegisterNetworkCallback that allows caller to block on
+     * {@code onAvailable}.
+     */
+    private class TestNetworkCallback extends ConnectivityManager.NetworkCallback {
+        private final CountDownLatch mAvailableLatch = new CountDownLatch(1);
+
+        public boolean waitForAvailable() throws InterruptedException {
+            return mAvailableLatch.await(30, TimeUnit.SECONDS);
+        }
+
+        @Override
+        public void onAvailable(Network network) {
+            mAvailableLatch.countDown();
         }
     }
 }
