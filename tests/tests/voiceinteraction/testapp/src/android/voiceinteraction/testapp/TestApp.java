@@ -92,6 +92,19 @@ public class TestApp extends Activity {
 
           case COMMANDREQUEST_TEST:
           case COMMANDREQUEST_CANCEL_TEST:
+              commandRequest();
+              break;
+
+          case SUPPORTS_COMMANDS_TEST:
+              String[] commands = {Utils.TEST_COMMAND};
+              boolean[] supported = mInteractor.supportsCommands(commands);
+              Log.i(TAG, "from supportsCommands: " + supported);
+              if (supported.length == 1 && supported[0]) {
+                addTestResult(Utils.SUPPORTS_COMMANDS_SUCCESS);
+              } else {
+                addTestResult(Utils.TEST_ERROR + " supported commands failure!");
+              }
+              saveTestResults();
               continueTests();
               break;
         }
@@ -234,10 +247,6 @@ public class TestApp extends Activity {
     }
 
     private void commandRequest() {
-        // uncomment these lines once CommandRequest is working. b/22124996
-//        Log.i(TAG, "from supportsCommands: " + mInteractor.supportsCommands(commands));
-//        String[] commands = {Utils.TEST_COMMAND};
-
         CommandRequest req = new VoiceInteractor.CommandRequest(Utils.TEST_COMMAND, mTestinfo) {
             @Override
             public void onCancel() {
