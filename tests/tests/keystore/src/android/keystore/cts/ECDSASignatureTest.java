@@ -16,38 +16,37 @@
 
 package android.keystore.cts;
 
-import android.security.keystore.KeyGenParameterSpec;
-import android.security.keystore.KeyProperties;
+import android.content.Context;
+import android.security.keystore.KeyProtection;
+import android.test.AndroidTestCase;
 
-import junit.framework.TestCase;
+import com.android.cts.keystore.R;
 
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.Security;
 import java.security.Signature;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class ECDSASignatureTest extends TestCase {
+public class ECDSASignatureTest extends AndroidTestCase {
 
     public void testNONEwithECDSATruncatesInputToFieldSize() throws Exception {
-        assertNONEwithECDSATruncatesInputToFieldSize(224);
-        assertNONEwithECDSATruncatesInputToFieldSize(256);
-        assertNONEwithECDSATruncatesInputToFieldSize(384);
-        assertNONEwithECDSATruncatesInputToFieldSize(521);
+        for (ImportedKey key : importKatKeyPairs("NONEwithECDSA")) {
+            try {
+                assertNONEwithECDSATruncatesInputToFieldSize(key.getKeystoreBackedKeyPair());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + key.getAlias(), e);
+            }
+        }
     }
 
-    private void assertNONEwithECDSATruncatesInputToFieldSize(int keySizeBits) throws Exception {
+    private void assertNONEwithECDSATruncatesInputToFieldSize(KeyPair keyPair)
+            throws Exception {
+        int keySizeBits = TestUtils.getKeySizeBits(keyPair.getPublic());
         byte[] message = new byte[(keySizeBits * 3) / 8];
         for (int i = 0; i < message.length; i++) {
             message[i] = (byte) (i + 1);
         }
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", "AndroidKeyStore");
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                "test1",
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setKeySize(keySizeBits)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
 
         Signature signature = Signature.getInstance("NONEwithECDSA");
         signature.initSign(keyPair.getPrivate());
@@ -73,26 +72,23 @@ public class ECDSASignatureTest extends TestCase {
     }
 
     public void testNONEwithECDSASupportsMessagesShorterThanFieldSize() throws Exception {
-        assertNONEwithECDSASupportsMessagesShorterThanFieldSize(224);
-        assertNONEwithECDSASupportsMessagesShorterThanFieldSize(256);
-        assertNONEwithECDSASupportsMessagesShorterThanFieldSize(384);
-        assertNONEwithECDSASupportsMessagesShorterThanFieldSize(521);
+        for (ImportedKey key : importKatKeyPairs("NONEwithECDSA")) {
+            try {
+                assertNONEwithECDSASupportsMessagesShorterThanFieldSize(
+                        key.getKeystoreBackedKeyPair());
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for " + key.getAlias(), e);
+            }
+        }
     }
 
-    private void assertNONEwithECDSASupportsMessagesShorterThanFieldSize(
-            int keySizeBits) throws Exception {
+    private void assertNONEwithECDSASupportsMessagesShorterThanFieldSize(KeyPair keyPair)
+            throws Exception {
+        int keySizeBits = TestUtils.getKeySizeBits(keyPair.getPublic());
         byte[] message = new byte[(keySizeBits * 3 / 4) / 8];
         for (int i = 0; i < message.length; i++) {
             message[i] = (byte) (i + 1);
         }
-        KeyPairGenerator generator = KeyPairGenerator.getInstance("EC", "AndroidKeyStore");
-        generator.initialize(new KeyGenParameterSpec.Builder(
-                "test1",
-                KeyProperties.PURPOSE_SIGN)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setKeySize(keySizeBits)
-                .build());
-        KeyPair keyPair = generator.generateKeyPair();
 
         Signature signature = Signature.getInstance("NONEwithECDSA");
         signature.initSign(keyPair.getPrivate());
@@ -112,5 +108,26 @@ public class ECDSASignatureTest extends TestCase {
         byte[] fullLengthMessage = TestUtils.leftPadWithZeroBytes(message, keySizeBits / 8);
         signature.update(fullLengthMessage);
         assertTrue(signature.verify(sigBytes));
+    }
+
+    private Collection<ImportedKey> importKatKeyPairs(String signatureAlgorithm)
+            throws Exception {
+        KeyProtection params =
+                TestUtils.getMinimalWorkingImportParametersForSigningingWith(signatureAlgorithm);
+        return importKatKeyPairs(getContext(), params);
+    }
+
+    static Collection<ImportedKey> importKatKeyPairs(
+            Context context, KeyProtection importParams) throws Exception {
+        return Arrays.asList(new ImportedKey[] {
+                TestUtils.importIntoAndroidKeyStore("testECsecp224r1", context,
+                        R.raw.ec_key3_secp224r1_pkcs8, R.raw.ec_key3_secp224r1_cert, importParams),
+                TestUtils.importIntoAndroidKeyStore("testECsecp256r1", context,
+                        R.raw.ec_key4_secp256r1_pkcs8, R.raw.ec_key4_secp256r1_cert, importParams),
+                TestUtils.importIntoAndroidKeyStore("testECsecp384r1", context,
+                        R.raw.ec_key5_secp384r1_pkcs8, R.raw.ec_key5_secp384r1_cert, importParams),
+                TestUtils.importIntoAndroidKeyStore("testECsecp521r1", context,
+                        R.raw.ec_key6_secp521r1_pkcs8, R.raw.ec_key6_secp521r1_cert, importParams),
+                });
     }
 }
