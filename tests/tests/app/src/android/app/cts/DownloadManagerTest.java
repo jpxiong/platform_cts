@@ -130,7 +130,7 @@ public class DownloadManagerTest extends AndroidTestCase {
 
             assertDownloadQueryableById(id);
 
-            receiver.waitForDownloadComplete(SHORT_TIMEOUT, id);
+            receiver.waitForDownloadComplete(LONG_TIMEOUT, id);
 
             assertDownloadQueryableByStatus(DownloadManager.STATUS_SUCCESSFUL);
 
@@ -158,7 +158,7 @@ public class DownloadManagerTest extends AndroidTestCase {
 
             assertDownloadQueryableById(id);
 
-            receiver.waitForDownloadComplete(SHORT_TIMEOUT, id);
+            receiver.waitForDownloadComplete(LONG_TIMEOUT, id);
 
             assertDownloadQueryableByStatus(DownloadManager.STATUS_SUCCESSFUL);
 
