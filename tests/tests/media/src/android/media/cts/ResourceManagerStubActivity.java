@@ -100,6 +100,7 @@ public class ResourceManagerStubActivity extends Activity {
         };
         thread.start();
         thread.join(20000 /* millis */);
+        System.gc();
         Thread.sleep(5000);  // give the gc a chance to release test activities.
 
         boolean result = true;
