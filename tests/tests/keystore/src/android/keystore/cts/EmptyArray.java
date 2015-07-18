@@ -20,4 +20,5 @@ abstract class EmptyArray {
     private EmptyArray() {}
 
     public static final byte[] BYTE = new byte[0];
+    public static final String[] STRING = new String[0];
 }

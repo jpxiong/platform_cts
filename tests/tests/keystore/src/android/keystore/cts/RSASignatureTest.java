@@ -167,7 +167,7 @@ public class RSASignatureTest extends AndroidTestCase {
                         R.raw.rsa_key8_2048_pkcs8, R.raw.rsa_key8_2048_cert, importParams),
                 TestUtils.importIntoAndroidKeyStore("testRSA3072", context,
                         R.raw.rsa_key7_3072_pksc8, R.raw.rsa_key7_3072_cert, importParams),
-                TestUtils.importIntoAndroidKeyStore("testRsa4096", context,
+                TestUtils.importIntoAndroidKeyStore("testRSA4096", context,
                         R.raw.rsa_key4_4096_pkcs8, R.raw.rsa_key4_4096_cert, importParams),
                 });
     }
