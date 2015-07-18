@@ -141,6 +141,27 @@ public class MacTest extends TestCase {
         }
     }
 
+    public void testMacGeneratedForEmptyMessage() throws Exception {
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String algorithm : EXPECTED_ALGORITHMS) {
+            try {
+                SecretKey key = importDefaultKatKey(algorithm);
+
+                // Generate a MAC
+                Mac mac = Mac.getInstance(algorithm, provider);
+                mac.init(key);
+                byte[] macBytes = mac.doFinal();
+                assertNotNull(macBytes);
+                if (macBytes.length == 0) {
+                    fail("Empty MAC");
+                }
+            } catch (Throwable e) {
+                throw new RuntimeException(algorithm + " failed", e);
+            }
+        }
+    }
+
     public void testMacGeneratedByAndroidKeyStoreVerifiesByAndroidKeyStore() throws Exception {
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
         assertNotNull(provider);
