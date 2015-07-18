@@ -27,7 +27,6 @@ import junit.framework.Assert;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -53,7 +52,6 @@ import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -442,29 +440,13 @@ abstract class TestUtils extends Assert {
                     + " Public: " + originalPublicKey.getAlgorithm()
                     + ", private: " + originalPrivateKey.getAlgorithm());
         }
-        String keyAlgorithm = originalPublicKey.getAlgorithm();
-        if (KeyProperties.KEY_ALGORITHM_EC.equalsIgnoreCase(keyAlgorithm)) {
-            ECParameterSpec publicKeyParams = ((ECKey) originalPublicKey).getParams();
-            ECParameterSpec privateKeyParams = ((ECKey) originalPrivateKey).getParams();
-            assertECParameterSpecEqualsIgnoreSeedIfNotPresent(
-                    publicKeyParams, privateKeyParams);
-        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
-            BigInteger publicKeyModulus = ((RSAKey) originalPublicKey).getModulus();
-            BigInteger privateKeyModulus = ((RSAKey) originalPrivateKey).getModulus();
-            if (!publicKeyModulus.equals(privateKeyModulus)) {
-                throw new IllegalArgumentException("RSA key pair modulus mismatch."
-                        + " Public (" + publicKeyModulus.bitLength() + " bit): "
-                        + publicKeyModulus.toString(16)
-                        + ", private (" + privateKeyModulus.bitLength() + " bit): "
-                        + privateKeyModulus.toString(16));
-            }
-        } else {
-            throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
-        }
+        assertKeyPairSelfConsistent(originalPublicKey, originalPrivateKey);
 
         KeyPair keystoreBacked = TestUtils.importIntoAndroidKeyStore(
                 alias, originalPrivateKey, originalCert,
                 params);
+        assertKeyPairSelfConsistent(keystoreBacked);
+        assertKeyPairSelfConsistent(keystoreBacked.getPublic(), originalPrivateKey);
         return new ImportedKey(
                 alias,
                 new KeyPair(originalCert.getPublicKey(), originalPrivateKey),

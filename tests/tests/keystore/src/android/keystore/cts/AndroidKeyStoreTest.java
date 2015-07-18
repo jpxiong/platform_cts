@@ -62,7 +62,6 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.security.auth.x500.X500Principal;
 
 public class AndroidKeyStoreTest extends AndroidTestCase {
@@ -1888,7 +1887,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
                 0x00, 0x05, (byte) 0xAA, (byte) 0x0A5, (byte) 0xFF, 0x55, 0x0A
         };
 
-        SecretKey expectedSecret = new SecretKeySpec(expectedKey, "AES");
+        SecretKey expectedSecret = new TransparentSecretKey(expectedKey, "AES");
 
         byte[] wrappedExpected = c.wrap(expectedSecret);
 
@@ -2231,15 +2230,15 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
         long testStartTimeMillis = System.currentTimeMillis();
 
-        SecretKey key1 =
-                new SecretKeySpec(HexEncoding.decode("010203040506070809fafbfcfdfeffcc"), "AES");
+        SecretKey key1 = new TransparentSecretKey(
+                HexEncoding.decode("010203040506070809fafbfcfdfeffcc"), "AES");
         String entryName1 = "test0";
 
-        SecretKey key2 =
-                new SecretKeySpec(HexEncoding.decode("808182838485868788897a7b7c7d7e7f"), "AES");
+        SecretKey key2 = new TransparentSecretKey(
+                HexEncoding.decode("808182838485868788897a7b7c7d7e7f"), "AES");
 
-        SecretKey key3 =
-                new SecretKeySpec(HexEncoding.decode("33333333333333333333777777777777"), "AES");
+        SecretKey key3 = new TransparentSecretKey(
+                HexEncoding.decode("33333333333333333333777777777777"), "AES");
 
         mKeyStore.load(null);
         int latestImportedEntryNumber = 0;
@@ -2322,14 +2321,14 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
 
         long testStartTimeMillis = System.currentTimeMillis();
 
-        SecretKey key1 = new SecretKeySpec(
+        SecretKey key1 = new TransparentSecretKey(
                 HexEncoding.decode("010203040506070809fafbfcfdfeffcc"), "HmacSHA256");
         String entryName1 = "test0";
 
-        SecretKey key2 = new SecretKeySpec(
+        SecretKey key2 = new TransparentSecretKey(
                 HexEncoding.decode("808182838485868788897a7b7c7d7e7f"), "HmacSHA256");
 
-        SecretKey key3 = new SecretKeySpec(
+        SecretKey key3 = new TransparentSecretKey(
                 HexEncoding.decode("33333333333333333333777777777777"), "HmacSHA256");
 
         mKeyStore.load(null);
@@ -2406,7 +2405,7 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
             try {
                 String digest = TestUtils.getHmacAlgorithmDigest(algorithm);
                 assertNotNull(digest);
-                SecretKeySpec keyBeingImported = new SecretKeySpec(new byte[16], algorithm);
+                SecretKey keyBeingImported = new TransparentSecretKey(new byte[16], algorithm);
 
                 KeyProtection.Builder goodSpec =
                         new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN);
@@ -2455,6 +2454,123 @@ public class AndroidKeyStoreTest extends AndroidTestCase {
             } catch (Throwable e) {
                 throw new RuntimeException("Failed for " + algorithm, e);
             }
+        }
+    }
+
+    public void testKeyStore_ImportSupportedSizes_AES() throws Exception {
+        mKeyStore.load(null);
+
+        KeyProtection params = new KeyProtection.Builder(
+                KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .build();
+        String alias = "test1";
+        mKeyStore.deleteEntry(alias);
+        assertFalse(mKeyStore.containsAlias(alias));
+        for (int keySizeBytes = 0; keySizeBytes <= 512 / 8; keySizeBytes++) {
+            int keySizeBits = keySizeBytes * 8;
+            try {
+                KeyStore.SecretKeyEntry entry = new KeyStore.SecretKeyEntry(
+                        new TransparentSecretKey(new byte[keySizeBytes], "AES"));
+                if (TestUtils.contains(KeyGeneratorTest.AES_SUPPORTED_KEY_SIZES, keySizeBits)) {
+                    mKeyStore.setEntry(alias, entry, params);
+                    SecretKey key = (SecretKey) mKeyStore.getKey(alias, null);
+                    assertEquals("AES", key.getAlgorithm());
+                    assertEquals(keySizeBits, TestUtils.getKeyInfo(key).getKeySize());
+                } else {
+                    mKeyStore.deleteEntry(alias);
+                    assertFalse(mKeyStore.containsAlias(alias));
+                    try {
+                        mKeyStore.setEntry(alias, entry, params);
+                        fail();
+                    } catch (KeyStoreException expected) {}
+                    assertFalse(mKeyStore.containsAlias(alias));
+                }
+            } catch (Throwable e) {
+                throw new RuntimeException("Failed for key size " + keySizeBits, e);
+            }
+        }
+    }
+
+    public void testKeyStore_ImportSupportedSizes_HMAC() throws Exception {
+        mKeyStore.load(null);
+
+        KeyProtection params = new KeyProtection.Builder(KeyProperties.PURPOSE_SIGN).build();
+        String alias = "test1";
+        mKeyStore.deleteEntry(alias);
+        assertFalse(mKeyStore.containsAlias(alias));
+        for (String algorithm : KeyGeneratorTest.EXPECTED_ALGORITHMS) {
+            if (!TestUtils.isHmacAlgorithm(algorithm)) {
+                continue;
+            }
+            for (int keySizeBytes = 0; keySizeBytes <= 1024 / 8; keySizeBytes++) {
+                try {
+                    KeyStore.SecretKeyEntry entry = new KeyStore.SecretKeyEntry(
+                            new TransparentSecretKey(new byte[keySizeBytes], algorithm));
+                    if (keySizeBytes > 0) {
+                        mKeyStore.setEntry(alias, entry, params);
+                        SecretKey key = (SecretKey) mKeyStore.getKey(alias, null);
+                        assertEquals(algorithm, key.getAlgorithm());
+                        assertEquals(keySizeBytes * 8, TestUtils.getKeyInfo(key).getKeySize());
+                    } else {
+                        mKeyStore.deleteEntry(alias);
+                        assertFalse(mKeyStore.containsAlias(alias));
+                        try {
+                            mKeyStore.setEntry(alias, entry, params);
+                            fail();
+                        } catch (KeyStoreException expected) {}
+                    }
+                } catch (Throwable e) {
+                    throw new RuntimeException(
+                            "Failed for " + algorithm + " with key size " + (keySizeBytes * 8), e);
+                }
+            }
+        }
+    }
+
+    public void testKeyStore_ImportSupportedSizes_EC() throws Exception {
+        mKeyStore.load(null);
+        KeyProtection params =
+                TestUtils.getMinimalWorkingImportParametersForSigningingWith("SHA256withECDSA");
+        checkKeyPairImportSucceeds(
+                "secp224r1", R.raw.ec_key3_secp224r1_pkcs8, R.raw.ec_key3_secp224r1_cert, params);
+        checkKeyPairImportSucceeds(
+                "secp256r1", R.raw.ec_key4_secp256r1_pkcs8, R.raw.ec_key4_secp256r1_cert, params);
+        checkKeyPairImportSucceeds(
+                "secp384r1", R.raw.ec_key5_secp384r1_pkcs8, R.raw.ec_key5_secp384r1_cert, params);
+        checkKeyPairImportSucceeds(
+                "secp512r1", R.raw.ec_key6_secp521r1_pkcs8, R.raw.ec_key6_secp521r1_cert, params);
+    }
+
+    public void testKeyStore_ImportSupportedSizes_RSA() throws Exception {
+        mKeyStore.load(null);
+        KeyProtection params =
+                TestUtils.getMinimalWorkingImportParametersForSigningingWith("SHA256withRSA");
+        checkKeyPairImportSucceeds(
+                "512", R.raw.rsa_key5_512_pkcs8, R.raw.rsa_key5_512_cert, params);
+        checkKeyPairImportSucceeds(
+                "768", R.raw.rsa_key6_768_pkcs8, R.raw.rsa_key6_768_cert, params);
+        checkKeyPairImportSucceeds(
+                "1024", R.raw.rsa_key3_1024_pkcs8, R.raw.rsa_key3_1024_cert, params);
+        checkKeyPairImportSucceeds(
+                "2048", R.raw.rsa_key8_2048_pkcs8, R.raw.rsa_key8_2048_cert, params);
+        checkKeyPairImportSucceeds(
+                "3072", R.raw.rsa_key7_3072_pksc8, R.raw.rsa_key7_3072_cert, params);
+        checkKeyPairImportSucceeds(
+                "4096", R.raw.rsa_key4_4096_pkcs8, R.raw.rsa_key4_4096_cert, params);
+    }
+
+    private void checkKeyPairImportSucceeds(
+            String alias, int privateResId, int certResId, KeyProtection params) throws Exception {
+        try {
+            mKeyStore.deleteEntry(alias);
+            TestUtils.importIntoAndroidKeyStore(
+                    alias, getContext(), privateResId, certResId, params);
+        } catch (Throwable e) {
+            throw new RuntimeException("Failed for " + alias, e);
+        } finally {
+            try {
+                mKeyStore.deleteEntry(alias);
+            } catch (Exception ignored) {}
         }
     }
 }

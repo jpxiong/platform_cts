@@ -66,7 +66,7 @@ public class KeyGeneratorTest extends TestCase {
         DEFAULT_KEY_SIZES.put("HmacSHA512", 512);
     }
 
-    private static final int[] AES_SUPPORTED_KEY_SIZES = new int[] {128, 192, 256};
+    static final int[] AES_SUPPORTED_KEY_SIZES = new int[] {128, 192, 256};
 
     public void testAlgorithmList() {
         // Assert that Android Keystore Provider exposes exactly the expected KeyGenerator
@@ -244,7 +244,7 @@ public class KeyGeneratorTest extends TestCase {
                     assertEquals(0, rng.getOutputSizeBytes());
                 }
             } catch (Throwable e) {
-                throw new RuntimeException("Failed to key size " + i, e);
+                throw new RuntimeException("Failed for key size " + i, e);
             }
         }
     }
