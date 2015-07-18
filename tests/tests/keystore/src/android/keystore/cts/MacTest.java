@@ -470,7 +470,7 @@ public class MacTest extends TestCase {
         return TestUtils.importIntoAndroidKeyStore(
                 "test1",
                 getDefaultKatKey(keyAlgorithm),
-                keyProtection);
+                keyProtection).getKeystoreBackedSecretKey();
     }
 
     private static KeyProtection.Builder getWorkingImportParams(

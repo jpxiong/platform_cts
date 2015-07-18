@@ -38,6 +38,15 @@ public class ImportedKey {
         mKeystoreBackedSecretKey = null;
     }
 
+    public ImportedKey(String alias, SecretKey original, SecretKey keystoreBacked) {
+        mAlias = alias;
+        mSymmetric = true;
+        mOriginalKeyPair = null;
+        mKeystoreBackedKeyPair = null;
+        mOriginalSecretKey = original;
+        mKeystoreBackedSecretKey = keystoreBacked;
+    }
+
     public String getAlias() {
         return mAlias;
     }
@@ -134,7 +143,7 @@ public class ImportedKey {
     }
 
     private void checkIsSecretKey() {
-        if (mSymmetric) {
+        if (!mSymmetric) {
             throw new IllegalStateException("Not a SecretKey");
         }
     }
