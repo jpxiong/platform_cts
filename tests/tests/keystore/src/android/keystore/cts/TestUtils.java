@@ -53,6 +53,7 @@ import java.security.spec.EllipticCurve;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -414,7 +415,7 @@ abstract class TestUtils extends Assert {
                 (PrivateKey) keyStore.getKey(alias, null));
     }
 
-    static SecretKey importIntoAndroidKeyStore(
+    static ImportedKey importIntoAndroidKeyStore(
             String alias,
             SecretKey key,
             KeyProtection keyProtection) throws Exception {
@@ -423,7 +424,7 @@ abstract class TestUtils extends Assert {
         keyStore.setEntry(alias,
                 new KeyStore.SecretKeyEntry(key),
                 keyProtection);
-        return (SecretKey) keyStore.getKey(alias, null);
+        return new ImportedKey(alias, key, (SecretKey) keyStore.getKey(alias, null));
     }
 
     static ImportedKey importIntoAndroidKeyStore(
@@ -634,6 +635,76 @@ abstract class TestUtils extends Assert {
         return result;
     }
 
+    static String getCipherKeyAlgorithm(String transformation) {
+        String transformationUpperCase = transformation.toUpperCase(Locale.US);
+        if (transformationUpperCase.startsWith("AES/")) {
+            return KeyProperties.KEY_ALGORITHM_AES;
+        } else if (transformationUpperCase.startsWith("RSA/")) {
+            return KeyProperties.KEY_ALGORITHM_RSA;
+        } else {
+            throw new IllegalArgumentException("Unsupported transformation: " + transformation);
+        }
+    }
+
+    static boolean isCipherSymmetric(String transformation) {
+        String transformationUpperCase = transformation.toUpperCase(Locale.US);
+        if (transformationUpperCase.startsWith("AES/")) {
+            return true;
+        } else if (transformationUpperCase.startsWith("RSA/")) {
+            return false;
+        } else {
+            throw new IllegalArgumentException("Unsupported transformation: " + transformation);
+        }
+    }
+
+    static String getCipherDigest(String transformation) {
+        String transformationUpperCase = transformation.toUpperCase(Locale.US);
+        if (transformationUpperCase.contains("/OAEP")) {
+            if (transformationUpperCase.endsWith("/OAEPPADDING")) {
+                return KeyProperties.DIGEST_SHA1;
+            } else if (transformationUpperCase.endsWith(
+                    "/OAEPWITHSHA-1ANDMGF1PADDING")) {
+                return KeyProperties.DIGEST_SHA1;
+            } else if (transformationUpperCase.endsWith(
+                    "/OAEPWITHSHA-224ANDMGF1PADDING")) {
+                return KeyProperties.DIGEST_SHA224;
+            } else if (transformationUpperCase.endsWith(
+                    "/OAEPWITHSHA-256ANDMGF1PADDING")) {
+                return KeyProperties.DIGEST_SHA256;
+            } else if (transformationUpperCase.endsWith(
+                    "/OAEPWITHSHA-384ANDMGF1PADDING")) {
+                return KeyProperties.DIGEST_SHA384;
+            } else if (transformationUpperCase.endsWith(
+                    "/OAEPWITHSHA-512ANDMGF1PADDING")) {
+                return KeyProperties.DIGEST_SHA512;
+            } else {
+                throw new RuntimeException("Unsupported OAEP padding scheme: "
+                        + transformation);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    static String getCipherEncryptionPadding(String transformation) {
+        String transformationUpperCase = transformation.toUpperCase(Locale.US);
+        if (transformationUpperCase.endsWith("/NOPADDING")) {
+            return KeyProperties.ENCRYPTION_PADDING_NONE;
+        } else if (transformationUpperCase.endsWith("/PKCS7PADDING")) {
+            return KeyProperties.ENCRYPTION_PADDING_PKCS7;
+        } else if (transformationUpperCase.endsWith("/PKCS1PADDING")) {
+            return KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1;
+        } else if (transformationUpperCase.split("/")[2].startsWith("OAEP")) {
+            return KeyProperties.ENCRYPTION_PADDING_RSA_OAEP;
+        } else {
+            throw new IllegalArgumentException("Unsupported transformation: " + transformation);
+        }
+    }
+
+    static String getCipherBlockMode(String transformation) {
+        return transformation.split("/")[1].toUpperCase(Locale.US);
+    }
+
     static String getSignatureAlgorithmDigest(String algorithm) {
         String algorithmUpperCase = algorithm.toUpperCase(Locale.US);
         int withIndex = algorithmUpperCase.indexOf("WITH");
@@ -698,6 +769,32 @@ abstract class TestUtils extends Assert {
             int minKeySizeBytes = paddingOverheadBytes + (digestOutputSizeBits + 7) / 8 + 1;
             int keySizeBytes = ((RSAKey) key).getModulus().bitLength() / 8;
             return keySizeBytes >= minKeySizeBytes;
+        } else {
+            throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
+        }
+    }
+
+    static int getMaxSupportedPlaintextInputSizeBytes(String transformation, Key key) {
+        String keyAlgorithm = getCipherKeyAlgorithm(transformation);
+        if (KeyProperties.KEY_ALGORITHM_AES.equalsIgnoreCase(keyAlgorithm)) {
+            return Integer.MAX_VALUE;
+        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
+            String encryptionPadding = getCipherEncryptionPadding(transformation);
+            int modulusSizeBytes = (getKeySizeBits(key) + 7) / 8;
+            if (KeyProperties.ENCRYPTION_PADDING_NONE.equalsIgnoreCase(encryptionPadding)) {
+                return modulusSizeBytes - 1;
+            } else if (KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1.equalsIgnoreCase(
+                    encryptionPadding)) {
+                return modulusSizeBytes - 11;
+            } else if (KeyProperties.ENCRYPTION_PADDING_RSA_OAEP.equalsIgnoreCase(
+                    encryptionPadding)) {
+                String digest = getCipherDigest(transformation);
+                int digestOutputSizeBytes = (getDigestOutputSizeBits(digest) + 7) / 8;
+                return modulusSizeBytes - 2 * digestOutputSizeBytes - 2;
+            } else {
+                throw new IllegalArgumentException(
+                        "Unsupported encryption padding scheme: " + encryptionPadding);
+            }
         } else {
             throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
         }
@@ -774,6 +871,41 @@ abstract class TestUtils extends Assert {
         } else {
             throw new IllegalArgumentException(
                     "Unsupported signature algorithm: " + signatureAlgorithm);
+        }
+    }
+
+    static KeyProtection getMinimalWorkingImportParametersForCipheringWith(
+            String transformation, int purposes, boolean ivProvidedWhenEncrypting) {
+        String keyAlgorithm = TestUtils.getCipherKeyAlgorithm(transformation);
+        if (KeyProperties.KEY_ALGORITHM_AES.equalsIgnoreCase(keyAlgorithm)) {
+            String encryptionPadding = TestUtils.getCipherEncryptionPadding(transformation);
+            String blockMode = TestUtils.getCipherBlockMode(transformation);
+            boolean randomizedEncryptionRequired = true;
+            if (KeyProperties.BLOCK_MODE_ECB.equalsIgnoreCase(blockMode)) {
+                randomizedEncryptionRequired = false;
+            } else if ((ivProvidedWhenEncrypting)
+                    && ((purposes & KeyProperties.PURPOSE_ENCRYPT) != 0)) {
+                randomizedEncryptionRequired = false;
+            }
+            return new KeyProtection.Builder(
+                    purposes)
+                    .setBlockModes(blockMode)
+                    .setEncryptionPaddings(encryptionPadding)
+                    .setRandomizedEncryptionRequired(randomizedEncryptionRequired)
+                    .build();
+        } else if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(keyAlgorithm)) {
+            String digest = TestUtils.getCipherDigest(transformation);
+            String encryptionPadding = TestUtils.getCipherEncryptionPadding(transformation);
+            boolean randomizedEncryptionRequired =
+                    !KeyProperties.ENCRYPTION_PADDING_NONE.equalsIgnoreCase(encryptionPadding);
+            return new KeyProtection.Builder(
+                    purposes)
+                    .setDigests((digest != null) ? new String[] {digest} : EmptyArray.STRING)
+                    .setEncryptionPaddings(encryptionPadding)
+                    .setRandomizedEncryptionRequired(randomizedEncryptionRequired)
+                    .build();
+        } else {
+            throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
         }
     }
 }
