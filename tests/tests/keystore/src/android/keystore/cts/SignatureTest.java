@@ -392,6 +392,58 @@ public class SignatureTest extends AndroidTestCase {
         }
     }
 
+    public void testValidSignatureGeneratedForEmptyMessage()
+            throws Exception {
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            for (ImportedKey key : importKatKeyPairsForSigning(getContext(), sigAlgorithm)) {
+                if (!TestUtils.isKeyLongEnoughForSignatureAlgorithm(
+                        sigAlgorithm, key.getOriginalSigningKey())) {
+                    continue;
+                }
+                try {
+                    KeyPair keyPair = key.getKeystoreBackedKeyPair();
+
+                    // Generate a signature
+                    Signature signature = Signature.getInstance(sigAlgorithm, provider);
+                    signature.initSign(keyPair.getPrivate());
+                    byte[] sigBytes = signature.sign();
+
+                    // Assert that it verifies using our own Provider
+                    signature.initVerify(keyPair.getPublic());
+                    assertTrue(signature.verify(sigBytes));
+                } catch (Throwable e) {
+                    throw new RuntimeException(
+                            "Failed for " + sigAlgorithm + " with key " + key.getAlias(), e);
+                }
+            }
+        }
+    }
+
+    public void testEmptySignatureDoesNotVerify()
+            throws Exception {
+        Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
+        assertNotNull(provider);
+        for (String sigAlgorithm : EXPECTED_SIGNATURE_ALGORITHMS) {
+            for (ImportedKey key : importKatKeyPairsForSigning(getContext(), sigAlgorithm)) {
+                if (!TestUtils.isKeyLongEnoughForSignatureAlgorithm(
+                        sigAlgorithm, key.getOriginalSigningKey())) {
+                    continue;
+                }
+                try {
+                    KeyPair keyPair = key.getKeystoreBackedKeyPair();
+                    Signature signature = Signature.getInstance(sigAlgorithm, provider);
+                    signature.initVerify(keyPair.getPublic());
+                    assertFalse(signature.verify(EmptyArray.BYTE));
+                } catch (Throwable e) {
+                    throw new RuntimeException(
+                            "Failed for " + sigAlgorithm + " with key " + key.getAlias(), e);
+                }
+            }
+        }
+    }
+
     public void testSignatureGeneratedByAndroidKeyStoreVerifiesByAndroidKeyStore()
             throws Exception {
         Provider provider = Security.getProvider(EXPECTED_PROVIDER_NAME);
