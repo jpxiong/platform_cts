@@ -47,6 +47,35 @@ public:
           const size_t mSize;
 };
 
+// read/write byte buffer like object
+
+class Blob {
+public:
+    Blob(size_t size) :
+        mData(malloc(size)),
+        mOffset(0),
+        mSize(size),
+        mMem(mData) { }
+
+    // by reference
+    Blob(void *data, size_t size) :
+        mData(data),
+        mOffset(0),
+        mSize(size),
+        mMem(NULL) { }
+
+    ~Blob() {
+        free(mMem);
+    }
+
+    void * const mData;
+          size_t mOffset;
+    const size_t mSize;
+
+private:
+    void * const mMem;
+};
+
 } // namespace android
 
 #endif // ANDROID_BLOB_H

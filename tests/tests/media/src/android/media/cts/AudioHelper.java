@@ -211,13 +211,13 @@ public class AudioHelper {
      * This affects AudioRecord timing.
      */
     public static class AudioRecordAudit extends AudioRecord {
-        AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
+        public AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
                 int format, int bufferSize, boolean isChannelIndex) {
             this(audioSource, sampleRate, channelMask, format, bufferSize, isChannelIndex,
                     AudioManager.STREAM_MUSIC, 500 /*delayMs*/);
         }
 
-        AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
+        public AudioRecordAudit(int audioSource, int sampleRate, int channelMask,
                 int format, int bufferSize,
                 boolean isChannelIndex, int auditStreamType, int delayMs) {
             // without channel index masks, one could call:
@@ -407,5 +407,85 @@ public class AudioHelper {
         private final static String TAG = "AudioRecordAudit";
         private int mPosition;
         private long mFinishAtMs;
+    }
+
+    /* AudioRecordAudit extends AudioRecord to allow concurrent playback
+     * of read content to an AudioTrack.  This is for testing only.
+     * For general applications, it is NOT recommended to extend AudioRecord.
+     * This affects AudioRecord timing.
+     */
+    public static class AudioRecordAuditNative extends AudioRecordNative {
+        public AudioRecordAuditNative() {
+            super();
+            // Caution: delayMs too large results in buffer sizes that cannot be created.
+            mTrack = new AudioTrackNative();
+        }
+
+        @Override
+        public boolean open(int numChannels, int sampleRate, boolean useFloat, int numBuffers) {
+            if (super.open(numChannels, sampleRate, useFloat, numBuffers)) {
+                if (!mTrack.open(numChannels, sampleRate, useFloat, 2 /* numBuffers */)) {
+                    mTrack = null; // remove track
+                }
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void close() {
+            super.close();
+            if (mTrack != null) {
+                mTrack.close();
+            }
+        }
+
+        @Override
+        public boolean start() {
+            if (super.start()) {
+                if (mTrack != null) {
+                    mTrack.start();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public boolean stop() {
+            if (super.stop()) {
+                if (mTrack != null) {
+                    mTrack.stop(); // doesn't allow remaining data to play out
+                }
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public int read(short[] audioData, int offsetInShorts, int sizeInShorts, int readFlags) {
+            int samples = super.read(audioData, offsetInShorts, sizeInShorts, readFlags);
+            if (mTrack != null) {
+                Assert.assertEquals(samples, mTrack.write(audioData, offsetInShorts, samples,
+                        AudioTrackNative.WRITE_FLAG_BLOCKING));
+                mPosition += samples / mTrack.getChannelCount();
+            }
+            return samples;
+        }
+
+        @Override
+        public int read(float[] audioData, int offsetInFloats, int sizeInFloats, int readFlags) {
+            int samples = super.read(audioData, offsetInFloats, sizeInFloats, readFlags);
+            if (mTrack != null) {
+                Assert.assertEquals(samples, mTrack.write(audioData, offsetInFloats, samples,
+                        AudioTrackNative.WRITE_FLAG_BLOCKING));
+                mPosition += samples / mTrack.getChannelCount();
+            }
+            return samples;
+        }
+
+        public AudioTrackNative mTrack;
+        private final static String TAG = "AudioRecordAuditNative";
+        private int mPosition;
     }
 }
