@@ -34,10 +34,25 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
 
     private final List<ApiMethod> mApiMethods = new ArrayList<ApiMethod>();
 
-    ApiClass(String name, boolean deprecated, boolean classAbstract) {
+    private final String mSuperClassName;
+
+    private ApiClass mSuperClass;
+
+    /**
+     * @param name The name of the class
+     * @param deprecated true iff the class is marked as deprecated
+     * @param classAbstract true iff the class is abstract
+     * @param superClassName The fully qualified name of the super class
+     */
+    ApiClass(
+            String name,
+            boolean deprecated,
+            boolean classAbstract,
+            String superClassName) {
         mName = name;
         mDeprecated = deprecated;
         mAbstract = classAbstract;
+        mSuperClassName = superClassName;
     }
 
     @Override
@@ -54,22 +69,20 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
         return mDeprecated;
     }
 
+    public String getSuperClassName() {
+        return mSuperClassName;
+    }
+
     public boolean isAbstract() {
         return mAbstract;
     }
+
+    public void setSuperClass(ApiClass superClass) { mSuperClass = superClass; }
 
     public void addConstructor(ApiConstructor constructor) {
         mApiConstructors.add(constructor);
     }
 
-    public ApiConstructor getConstructor(List<String> parameterTypes) {
-        for (ApiConstructor constructor : mApiConstructors) {
-            if (parameterTypes.equals(constructor.getParameterTypes())) {
-                return constructor;
-            }
-        }
-        return null;
-    }
 
     public Collection<ApiConstructor> getConstructors() {
         return Collections.unmodifiableList(mApiConstructors);
@@ -79,15 +92,29 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
         mApiMethods.add(method);
     }
 
-    public ApiMethod getMethod(String name, List<String> parameterTypes, String returnType) {
-        for (ApiMethod method : mApiMethods) {
-            if (name.equals(method.getName())
-                    && parameterTypes.equals(method.getParameterTypes())
-                    && returnType.equals(method.getReturnType())) {
-                return method;
-            }
+    /** Look for a matching constructor and mark it as covered */
+    public void markConstructorCovered(List<String> parameterTypes) {
+        if (mSuperClass != null) {
+            // Mark matching constructors in the superclass
+            mSuperClass.markConstructorCovered(parameterTypes);
         }
-        return null;
+        ApiConstructor apiConstructor = getConstructor(parameterTypes);
+        if (apiConstructor != null) {
+            apiConstructor.setCovered(true);
+        }
+
+    }
+
+    /** Look for a matching method and if found and mark it as covered */
+    public void markMethodCovered(String name, List<String> parameterTypes, String returnType) {
+        if (mSuperClass != null) {
+            // Mark matching methods in the super class
+            mSuperClass.markMethodCovered(name, parameterTypes, returnType);
+        }
+        ApiMethod apiMethod = getMethod(name, parameterTypes, returnType);
+        if (apiMethod != null) {
+            apiMethod.setCovered(true);
+        }
     }
 
     public Collection<ApiMethod> getMethods() {
@@ -125,5 +152,25 @@ class ApiClass implements Comparable<ApiClass>, HasCoverage {
     @Override
     public int getMemberSize() {
         return getTotalMethods();
+    }
+
+    private ApiMethod getMethod(String name, List<String> parameterTypes, String returnType) {
+        for (ApiMethod method : mApiMethods) {
+            if (name.equals(method.getName())
+                    && parameterTypes.equals(method.getParameterTypes())
+                    && returnType.equals(method.getReturnType())) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    private ApiConstructor getConstructor(List<String> parameterTypes) {
+        for (ApiConstructor constructor : mApiConstructors) {
+            if (parameterTypes.equals(constructor.getParameterTypes())) {
+                return constructor;
+            }
+        }
+        return null;
     }
 }
