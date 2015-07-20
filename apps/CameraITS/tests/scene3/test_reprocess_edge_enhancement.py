@@ -20,6 +20,7 @@ import its.target
 import math
 import matplotlib
 import matplotlib.pyplot
+import numpy
 import os.path
 import pylab
 
@@ -153,28 +154,48 @@ def main():
             print "Sharpness with EE mode [0,1,2,3] for %s reprocess:" % \
                 (reprocess_format) , sharpnesses
 
-        # Verify reported modes for regular results
-        assert(edge_mode_reported_regular == [0,1,2,3])
-        # Verify the images for all modes are not too blurrier than OFF.
-        for edge_mode in [1, 2, 3]:
-            if its.caps.edge_mode(props, edge_mode):
-                assert(sharpness_regular[edge_mode] >
-                    sharpness_regular[0] *
-                    (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
-        # Verify the image for ZSL are not too sharper than OFF
-        assert(sharpness_regular[3] <
-                sharpness_regular[0] * (1.0 + THRESHOLD_RELATIVE_SHARPNESS_DIFF))
 
-        # Verify sharpness of reprocess captures are similar to sharpness of
-        # regular captures.
+        # Verify HQ(2) is sharper than OFF(0)
+        assert(sharpness_regular[2] > sharpness_regular[0])
+
+        # Verify ZSL(3) is similar to OFF(0)
+        assert(numpy.isclose(sharpness_regular[3], sharpness_regular[0],
+                             THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
+        # Verify OFF(0) is not sharper than FAST(1)
+        assert(sharpness_regular[1] >
+               sharpness_regular[0] * (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
+        # Verify FAST(1) is not sharper than HQ(2)
+        assert(sharpness_regular[2] >
+               sharpness_regular[1] * (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
         for reprocess_format in range(len(reprocess_formats)):
-            assert(edge_mode_reported_reprocess[reprocess_format] == [0,1,2,3])
-            for edge_mode in range(4):
-                if its.caps.edge_mode(props, edge_mode):
-                    assert(sharpnesses_reprocess[reprocess_format][edge_mode] >=
-                        (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF) *
-                        sharpnesses_reprocess[reprocess_format][0] *
-                        sharpness_regular[edge_mode] / sharpness_regular[0])
+            # Verify HQ(2) is sharper than OFF(0)
+            assert(sharpnesses_reprocess[reprocess_format][2] >
+                   sharpnesses_reprocess[reprocess_format][0])
+
+            # Verify ZSL(3) is similar to OFF(0)
+            assert(numpy.isclose(sharpnesses_reprocess[reprocess_format][3],
+                                 sharpnesses_reprocess[reprocess_format][0],
+                                 THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
+            # Verify OFF(0) is not sharper than FAST(1)
+            assert(sharpnesses_reprocess[reprocess_format][1] >
+                   sharpnesses_reprocess[reprocess_format][0] *
+                   (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
+            # Verify FAST(1) is not sharper than HQ(2)
+            assert(sharpnesses_reprocess[reprocess_format][2] >
+                   sharpnesses_reprocess[reprocess_format][1] *
+                   (1.0 - THRESHOLD_RELATIVE_SHARPNESS_DIFF))
+
+            # Verify reprocessing HQ(2) is similar to regular HQ(2) relative to
+            # OFF(0)
+            assert(numpy.isclose(sharpness_reprocess[reprocess_format][2] /
+                                    sharpness_reprocess[reprocess_format][0],
+                                 sharpness_regular[2] / sharpness_regular[0],
+                                 THRESHOLD_RELATIVE_SHARPNESS_DIFF))
 
 if __name__ == '__main__':
     main()

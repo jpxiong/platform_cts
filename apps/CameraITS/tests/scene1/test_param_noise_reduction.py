@@ -17,10 +17,11 @@ import its.caps
 import its.device
 import its.objects
 import its.target
-import pylab
-import os.path
 import matplotlib
 import matplotlib.pyplot
+import numpy
+import os.path
+import pylab
 
 def main():
     """Test that the android.noiseReduction.mode param is applied when set.
@@ -33,6 +34,8 @@ def main():
     of this as the baseline.
     """
     NAME = os.path.basename(__file__).split(".")[0]
+
+    RELATIVE_ERROR_TOLERANCE = 0.1
 
     # List of variances for Y,U,V.
     variances = [[],[],[]]
@@ -96,18 +99,27 @@ def main():
 
     assert(nr_modes_reported == [0,1,2,3,4])
 
-    # Check that the variance of the NR=0 image is higher than for the
-    # NR=1 and NR=2 images.
     for j in range(3):
-        for mode in [1,2]:
-            if its.caps.noise_reduction_mode(props, mode):
-                assert(variances[j][mode] < variances[j][0])
-                # Variance of MINIMAL should be higher than for FAST, HQ
-                if its.caps.noise_reduction_mode(props, 3):
-                    assert(variances[j][mode] < variances[j][3])
-                # Variance of ZSL should be higher than for FAST, HQ
-                if its.caps.noise_reduction_mode(props, 4):
-                    assert(variances[j][mode] < variances[j][4])
+        # Smaller variance is better
+        # Verify OFF(0) is not better than FAST(1)
+        assert(variances[j][0] >
+               variances[j][1] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+        # Verify FAST(1) is not better than HQ(2)
+        assert(variances[j][1] >
+               variances[j][2] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+        # Verify HQ(2) is better than OFF(0)
+        assert(variances[j][0] > variances[j][2])
+        if its.caps.noise_reduction_mode(props, 3):
+            # Verify OFF(0) is not better than MINIMAL(3)
+            assert(variances[j][0] >
+                   variances[j][3] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+            # Verify MINIMAL(3) is not better than HQ(2)
+            assert(variances[j][3] >
+                   variances[j][2] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+        if its.caps.noise_reduction_mode(props, 4):
+            # Verify ZSL(4) is close to OFF(0)
+            assert(numpy.isclose(variances[j][4], variances[j][0],
+                                 RELATIVE_ERROR_TOLERANCE))
 
 if __name__ == '__main__':
     main()
