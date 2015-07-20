@@ -41,7 +41,7 @@ LOCAL_MULTILIB := both
 LOCAL_STATIC_JAVA_LIBRARIES := \
     ctsmediautil ctsdeviceutil ctstestserver ctstestrunner
 
-LOCAL_JNI_SHARED_LIBRARIES := libctsmediacodec_jni
+LOCAL_JNI_SHARED_LIBRARIES := libctsmediacodec_jni libaudio_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
