@@ -20,6 +20,7 @@ import its.target
 import math
 import matplotlib
 import matplotlib.pyplot
+import numpy
 import os.path
 import pylab
 
@@ -36,6 +37,8 @@ def main():
     """
 
     NAME = os.path.basename(__file__).split(".")[0]
+
+    RELATIVE_ERROR_TOLERANCE = 0.1
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
@@ -78,7 +81,7 @@ def main():
             print "Ref variances:", ref_variance
 
             for nr_mode in range(5):
-                # Skipp unavailable modes
+                # Skip unavailable modes
                 if not its.caps.noise_reduction_mode(props, nr_mode):
                     nr_modes_reported.append(nr_mode)
                     variances.append(0)
@@ -111,21 +114,28 @@ def main():
             matplotlib.pyplot.savefig("%s_plot_%s_variances.png" %
                                       (NAME, reprocess_format))
 
-            assert(nr_modes_reported == [0,1,2,3,4]
+            assert(nr_modes_reported == [0,1,2,3,4])
 
-            # Check that the variances of the NR=0 and NR=3 and NR=4 images are
-            # higher than for the NR=1 and NR=2 images.
-            for channel in range(3):
-                for nr_mode in [1, 2]:
-                    if its.caps.noise_reduction_mode(props, nr_mode):
-                        assert(variances[nr_mode][channel] <
-                               variances[0][channel])
-                        if its.caps.noise_reduction_mode(props, 3):
-                            assert(variances[nr_mode][channel] <
-                                   variances[3][channel])
-                        if its.caps.noise_reduction_mode(props, 4):
-                            assert(variances[nr_mode][channel] <
-                                   variances[4][channel])
+            for j in range(3):
+                # Smaller variance is better
+                # Verify OFF(0) is not better than FAST(1)
+                assert(variances[0][j] >
+                       variances[1][j] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+                # Verify FAST(1) is not better than HQ(2)
+                assert(variances[1][j] >
+                       variances[2][j] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+                # Verify HQ(2) is better than OFF(0)
+                assert(variances[0][j] > variances[2][j])
+                if its.caps.noise_reduction_mode(props, 3):
+                    # Verify OFF(0) is not better than MINIMAL(3)
+                    assert(variances[0][j] >
+                           variances[3][j] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+                    # Verify MINIMAL(3) is not better than HQ(2)
+                    assert(variances[3][j] >
+                           variances[2][j] * (1.0 - RELATIVE_ERROR_TOLERANCE))
+                # Verify ZSL(4) is close to OFF(0)
+                assert(numpy.isclose(variances[4][j], variances[0][j],
+                                     RELATIVE_ERROR_TOLERANCE))
 
 if __name__ == '__main__':
     main()
