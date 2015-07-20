@@ -64,7 +64,8 @@ public class ResourceManagerTestActivityBase extends Activity {
 
     private MediaCodec.Callback mCallback = new TestCodecCallback();
 
-    private static MediaFormat getTestFormat(VideoCapabilities vcaps, boolean securePlayback) {
+    private MediaFormat getTestFormat(CodecCapabilities caps, boolean securePlayback) {
+        VideoCapabilities vcaps = caps.getVideoCapabilities();
         int maxWidth = vcaps.getSupportedWidths().getUpper();
         int maxHeight = vcaps.getSupportedHeightsFor(maxWidth).getUpper();
         int maxBitrate = vcaps.getBitrateRange().getUpper();
@@ -72,8 +73,7 @@ public class ResourceManagerTestActivityBase extends Activity {
                 .getUpper().intValue();
 
         MediaFormat format = MediaFormat.createVideoFormat(MIME, maxWidth, maxHeight);
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
-                CodecCapabilities.COLOR_FormatYUV420Flexible);
+        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, caps.colorFormats[0]);
         format.setInteger(MediaFormat.KEY_BIT_RATE, maxBitrate);
         format.setInteger(MediaFormat.KEY_FRAME_RATE, maxFramerate);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
@@ -154,8 +154,7 @@ public class ResourceManagerTestActivityBase extends Activity {
     protected void allocateCodecs(int max, MediaCodecInfo info, boolean securePlayback) {
         String name = info.getName();
         CodecCapabilities caps = info.getCapabilitiesForType(MIME);
-        VideoCapabilities vcaps = caps.getVideoCapabilities();
-        MediaFormat format = getTestFormat(vcaps, securePlayback);
+        MediaFormat format = getTestFormat(caps, securePlayback);
         MediaCodec codec = null;
         for (int i = mCodecs.size(); i < max; ++i) {
             try {
@@ -214,6 +213,7 @@ public class ResourceManagerTestActivityBase extends Activity {
         }
     }
 
+    protected boolean mWaitForReclaim = true;
     private Thread mWorkerThread;
     private volatile boolean mUseCodecs = true;
     private volatile boolean mGotReclaimedException = false;
@@ -221,26 +221,27 @@ public class ResourceManagerTestActivityBase extends Activity {
         mWorkerThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (mUseCodecs) {
+                long start = System.currentTimeMillis();
+                long timeSinceStartedMs = 0;
+                while (mUseCodecs && (timeSinceStartedMs < 15000)) {  // timeout in 15s
                     doUseCodecs();
                     try {
                         Thread.sleep(50 /* millis */);
                     } catch (InterruptedException e) {}
+                    timeSinceStartedMs = System.currentTimeMillis() - start;
                 }
                 if (mGotReclaimedException) {
+                    Log.d(TAG, "Got expected reclaim exception.");
                     finishWithResult(RESULT_OK);
+                } else {
+                    Log.d(TAG, "Stopped without getting reclaim exception.");
+                    // if the test is supposed to wait for reclaim event then this is a failure,
+                    // otherwise this is a pass.
+                    finishWithResult(mWaitForReclaim ? RESULT_CANCELED : RESULT_OK);
                 }
             }
         });
         mWorkerThread.start();
-    }
-
-    protected void stopUsingCodecs() {
-        mUseCodecs = false;
-        try {
-            mWorkerThread.join(1000);
-        } catch (InterruptedException e) {
-        }
     }
 
     @Override
