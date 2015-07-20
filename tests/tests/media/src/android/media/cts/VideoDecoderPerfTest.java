@@ -29,7 +29,6 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -231,12 +230,6 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         String message = "average fps for " + testConfig;
         double fps = (double)outputNum / ((finish - start) / 1000.0);
         mReportLog.printValue(message, fps, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-
-        // STOPSHIP(ronghuawu): Remove after 07/26/2015, b/22537593
-        if (Build.TYPE.equals("eng") || Build.TYPE.equals("userdebug")) {
-            message = "frame time diff for " + testConfig + ": " + Arrays.toString(frameTimeDiff);
-            mReportLog.printValue(message, 0, ResultType.NEUTRAL, ResultUnit.NONE);
-        }
     }
 
     public void testH264320x240() throws Exception {
