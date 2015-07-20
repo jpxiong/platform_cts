@@ -31,26 +31,16 @@ public class ResourceManagerTestActivity1 extends ResourceManagerTestActivityBas
         super.onCreate(savedInstanceState);
         moveTaskToBack(true);
 
-        if (allocateCodecs(MAX_INSTANCES) == MAX_INSTANCES) {
-            // haven't reached the limit with MAX_INSTANCES, report RESULT_OK directly and
-            // skip additional test.
-            finishWithResult(RESULT_OK);
-        }
-        useCodecs();
-
-        boolean waitForReclaim = true;
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            waitForReclaim = extras.getBoolean("wait-for-reclaim", waitForReclaim);
+            mWaitForReclaim = extras.getBoolean("wait-for-reclaim", mWaitForReclaim);
         }
 
-        try {
-            Thread.sleep(15000);  // timeout to ensure the activity is finished.
-        } catch (InterruptedException e) {
+        if (allocateCodecs(MAX_INSTANCES) == MAX_INSTANCES) {
+            // haven't reached the limit with MAX_INSTANCES, no need to wait for reclaim exception.
+            mWaitForReclaim = false;
         }
-        stopUsingCodecs();
-        // if the test is supposed to wait for reclaim event then this is a failure, otherwise
-        // this is a pass.
-        finishWithResult(waitForReclaim ? RESULT_CANCELED : RESULT_OK);
+
+        useCodecs();
     }
 }
