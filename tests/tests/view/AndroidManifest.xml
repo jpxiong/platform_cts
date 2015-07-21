@@ -92,7 +92,7 @@
         </activity>
 
         <activity android:name="android.view.animation.cts.GridLayoutAnimCtsActivity"
-            android:label="GridLayoutAnimCtsActivity">
+            android:label="GridLayoutAnimCtsActivity" android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
@@ -100,7 +100,7 @@
         </activity>
 
         <activity android:name="android.view.animation.cts.LayoutAnimCtsActivity"
-            android:label="LayoutAnimCtsActivity">
+            android:label="LayoutAnimCtsActivity" android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.FRAMEWORK_INSTRUMENTATION_TEST" />
