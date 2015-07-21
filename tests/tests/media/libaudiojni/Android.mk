@@ -23,6 +23,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 	appendix-b-1-1-buffer-queue.cpp \
 	appendix-b-1-2-recording.cpp \
+	audio-track-native.cpp \
 	sl-utils.cpp
 
 LOCAL_C_INCLUDES := \
@@ -32,6 +33,6 @@ LOCAL_C_INCLUDES := \
 LOCAL_C_INCLUDES += $(call include-path-for, libaudiojni) \
 	$(call include-path-for, wilhelm)
 
-LOCAL_SHARED_LIBRARIES := libandroid liblog libnativehelper libOpenSLES
+LOCAL_SHARED_LIBRARIES := libandroid liblog libnativehelper libOpenSLES libutils
 
 include $(BUILD_SHARED_LIBRARY)
