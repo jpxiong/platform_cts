@@ -23,6 +23,7 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SRC_FILES := \
 	appendix-b-1-1-buffer-queue.cpp \
 	appendix-b-1-2-recording.cpp \
+	audio-record-native.cpp \
 	audio-track-native.cpp \
 	sl-utils.cpp
 
