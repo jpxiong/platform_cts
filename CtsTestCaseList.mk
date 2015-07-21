@@ -211,6 +211,7 @@ cts_host_libraries := \
     CtsHostUi \
     CtsMonkeyTestCases \
     CtsThemeHostTestCases \
+    CtsUsageHostTestCases \
     CtsSecurityHostTestCases \
     CtsUsbTests
 
