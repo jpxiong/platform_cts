@@ -1,4 +1,4 @@
-# Copyright (C) 2009 The Android Open Source Project
+# Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,22 +16,12 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
-LOCAL_MODULE_TAGS := tests
+LIB_PATH := $(LOCAL_PATH)/../libs/$(TARGET_ARCH_ABI)/
+LOCAL_MODULE := libnativeatrace_jni
+# Don't include this package in any configuration by default.
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := AtraceTestAppJni.c
+LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
+LOCAL_LDLIBS := -L$(LIB_PATH) -landroid -llog
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src)
-
-LOCAL_SDK_VERSION := current
-LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
-
-LOCAL_JNI_SHARED_LIBRARIES := libnativeatrace_jni
-
-LOCAL_PACKAGE_NAME := CtsAtraceTestApp
-
-# sign this app with a different cert than CtsSimpleAppInstallDiffCert
-#LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey1
-
-#LOCAL_DEX_PREOPT := false
-
-include $(BUILD_CTS_SUPPORT_PACKAGE)
-
-include $(call all-makefiles-under,$(LOCAL_PATH))
+include $(BUILD_SHARED_LIBRARY)
