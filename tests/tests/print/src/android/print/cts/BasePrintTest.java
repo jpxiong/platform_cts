@@ -60,13 +60,9 @@ import org.hamcrest.Description;
 import org.mockito.InOrder;
 import org.mockito.stubbing.Answer;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeoutException;
@@ -84,14 +80,6 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
 
     private static final String PM_CLEAR_SUCCESS_OUTPUT = "Success";
 
-    private static final String COMMAND_LIST_ENABLED_IME_COMPONENTS = "ime list -s";
-
-    private static final String COMPONENT_NAME_DUMMY_IME = "com.android.testing.dummyime/.DummyIme";
-
-    private static final String COMMAND_PREFIX_ENABLE_IME = "ime enable ";
-
-    private static final String COMMAND_PREFIX_DISABLE_IME = "ime disable ";
-
     private PrintDocumentActivity mActivity;
 
     private Locale mOldLocale;
@@ -103,53 +91,11 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     private CallCounter mPrintJobQueuedCallCounter;
     private CallCounter mDestroySessionCallCounter;
 
-    private String[] mEnabledImes;
-
-    private String[] getEnabledImes() throws IOException {
-        List<String> imeList = new ArrayList<>();
-
-        ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation()
-                .executeShellCommand(COMMAND_LIST_ENABLED_IME_COMPONENTS);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(pfd.getFileDescriptor())));
-
-        String line;
-        while ((line = reader.readLine()) != null) {
-            imeList.add(line);
-        }
-
-        String[] imeArray = new String[imeList.size()];
-        imeList.toArray(imeArray);
-
-        return imeArray;
-    }
-
-    private void enableDummyIme() throws Exception {
-        mEnabledImes = getEnabledImes();
-        for (String ime : mEnabledImes) {
-            String disableImeCommand = COMMAND_PREFIX_DISABLE_IME + ime;
-            SystemUtil.runShellCommand(getInstrumentation(), disableImeCommand);
-        }
-        String enableDummyCommand = COMMAND_PREFIX_ENABLE_IME + COMPONENT_NAME_DUMMY_IME;
-        SystemUtil.runShellCommand(getInstrumentation(), enableDummyCommand);
-    }
-
-    private void dsableDummyIme() throws Exception {
-        String disableDummyCommand = COMMAND_PREFIX_DISABLE_IME + COMPONENT_NAME_DUMMY_IME;
-        SystemUtil.runShellCommand(getInstrumentation(), disableDummyCommand);
-        for (String ime : mEnabledImes) {
-            String enableImeCommand = COMMAND_PREFIX_ENABLE_IME + ime;
-            SystemUtil.runShellCommand(getInstrumentation(), enableImeCommand);
-        }
-        mEnabledImes = null;
-    }
-
     @Override
     public void setUp() throws Exception {
         // Make sure we start with a clean slate.
         clearPrintSpoolerData();
         enablePrintServices();
-        enableDummyIme();
 
         // Workaround for dexmaker bug: https://code.google.com/p/dexmaker/issues/detail?id=2
         // Dexmaker is used by mockito.
@@ -184,7 +130,6 @@ public abstract class BasePrintTest extends UiAutomatorTestCase {
     public void tearDown() throws Exception {
         // Done with the activity.
         getActivity().finish();
-        dsableDummyIme();
 
         // Restore the locale if needed.
         if (mOldLocale != null) {
