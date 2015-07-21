@@ -27,6 +27,7 @@ import java.util.concurrent.Semaphore;
 
 public class MockInCallService extends InCallService {
     private ArrayList<Call> mCalls = new ArrayList<>();
+    private ArrayList<Call> mConferenceCalls = new ArrayList<>();
     private static InCallServiceCallbacks sCallbacks;
     private Map<Call, MockVideoCallCallback> mVideoCallCallbacks =
             new ArrayMap<Call, MockVideoCallCallback>();
@@ -40,6 +41,9 @@ public class MockInCallService extends InCallService {
         public void onCallAdded(Call call, int numCalls) {};
         public void onCallRemoved(Call call, int numCalls) {};
         public void onCallStateChanged(Call call, int state) {};
+        public void onParentChanged(Call call, Call parent) {};
+        public void onChildrenChanged(Call call, List<Call> children) {};
+        public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {};
 
         final public MockInCallService getService() {
             return mService;
@@ -68,6 +72,30 @@ public class MockInCallService extends InCallService {
             super.onVideoCallChanged(call, videoCall);
             saveVideoCall(call, videoCall);
         }
+
+        @Override
+        public void onParentChanged(Call call, Call parent) {
+            super.onParentChanged(call, parent);
+            if (getCallbacks() != null) {
+                getCallbacks().onParentChanged(call, parent);
+            }
+        }
+
+        @Override
+        public void onChildrenChanged(Call call, List<Call> children) {
+            super.onChildrenChanged(call, children);
+            if (getCallbacks() != null) {
+                getCallbacks().onChildrenChanged(call, children);
+            }
+        }
+
+        @Override
+        public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {
+            super.onConferenceableCallsChanged(call, conferenceableCalls);
+            if (getCallbacks() != null) {
+                getCallbacks().onConferenceableCallsChanged(call, conferenceableCalls);
+            }
+        }
     };
 
     private void saveVideoCall(Call call, VideoCall videoCall) {
@@ -93,13 +121,19 @@ public class MockInCallService extends InCallService {
     @Override
     public void onCallAdded(Call call) {
         super.onCallAdded(call);
-        if (!mCalls.contains(call)) {
-            mCalls.add(call);
-            call.registerCallback(mCallCallback);
-
-            VideoCall videoCall = call.getVideoCall();
-            if (videoCall != null) {
-                saveVideoCall(call, videoCall);
+        if (call.getDetails().hasProperty(Call.Details.PROPERTY_CONFERENCE) == true) {
+            if (!mConferenceCalls.contains(call)) {
+                mConferenceCalls.add(call);
+                call.registerCallback(mCallCallback);
+            }
+        } else {
+            if (!mCalls.contains(call)) {
+                mCalls.add(call);
+                call.registerCallback(mCallCallback);
+                VideoCall videoCall = call.getVideoCall();
+                if (videoCall != null) {
+                    saveVideoCall(call, videoCall);
+                }
             }
         }
         if (getCallbacks() != null) {
@@ -125,17 +159,41 @@ public class MockInCallService extends InCallService {
     }
 
     /**
+     * @return the number of conference calls currently added to the {@code InCallService}.
+     */
+    public int getConferenceCallCount() {
+        return mConferenceCalls.size();
+    }
+
+    /**
      * @return the most recently added call that exists inside the {@code InCallService}
      */
     public Call getLastCall() {
-        if (mCalls.size() >= 1) {
+        if (!mCalls.isEmpty()) {
             return mCalls.get(mCalls.size() - 1);
+        }
+        return null;
+    }
+
+    /**
+     * @return the most recently added conference call that exists inside the {@code InCallService}
+     */
+    public Call getLastConferenceCall() {
+        if (!mConferenceCalls.isEmpty()) {
+            return mConferenceCalls.get(mConferenceCalls.size() - 1);
         }
         return null;
     }
 
     public void disconnectLastCall() {
         final Call call = getLastCall();
+        if (call != null) {
+            call.disconnect();
+        }
+    }
+
+    public void disconnectLastConferenceCall() {
+        final Call call = getLastConferenceCall();
         if (call != null) {
             call.disconnect();
         }
