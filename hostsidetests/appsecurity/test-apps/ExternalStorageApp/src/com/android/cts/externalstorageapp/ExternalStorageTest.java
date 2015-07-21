@@ -16,16 +16,9 @@
 
 package com.android.cts.externalstorageapp;
 
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileNoAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
@@ -75,7 +68,7 @@ public class ExternalStorageTest extends AndroidTestCase {
             }
 
             // Keep walking up until we leave device
-            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 assertDirNoAccess(path);
                 path = path.getParentFile();
             }
@@ -117,21 +110,6 @@ public class ExternalStorageTest extends AndroidTestCase {
         } finally {
             mContext.unregisterReceiver(receiver);
         }
-    }
-
-    /**
-     * Verify we can read only our gifts.
-     */
-    public void doVerifyGifts() throws Exception {
-        final File none = buildGiftForPackage(getContext(), PACKAGE_NONE);
-        assertFileReadWriteAccess(none);
-        assertEquals(100, readInt(none));
-
-        final File read = buildGiftForPackage(getContext(), PACKAGE_READ);
-        assertFileNoAccess(read);
-
-        final File write = buildGiftForPackage(getContext(), PACKAGE_WRITE);
-        assertFileNoAccess(write);
     }
 
     /**

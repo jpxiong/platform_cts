@@ -24,6 +24,10 @@ import com.android.tradefed.testtype.IAbi;
 import com.android.tradefed.testtype.IAbiReceiver;
 import com.android.tradefed.testtype.IBuildReceiver;
 
+/**
+ * Set of tests that verify behavior of runtime permissions, including both
+ * dynamic granting and behavior of legacy apps.
+ */
 public class PermissionsHostTest extends DeviceTestCase implements IAbiReceiver, IBuildReceiver {
     private static final String PKG = "com.android.cts.usepermission";
 
