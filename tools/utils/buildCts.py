@@ -503,6 +503,11 @@ def BuildCtsTemporarilyKnownFailureList():
           'android.content.cts.ContentResolverTest#testUnstableToStableRefs',
           'android.content.cts.ContentResolverTest#testUpdate',
           'android.content.cts.ContentResolverTest#testValidateSyncExtrasBundle',],
+      'android.bluetooth' : [
+          'android.bluetooth.cts.BluetoothLeScanTest#testBasicBleScan',
+          'android.bluetooth.cts.BluetoothLeScanTest#testBatchScan',
+          'android.bluetooth.cts.BluetoothLeScanTest#testOpportunisticScan',
+          'android.bluetooth.cts.BluetoothLeScanTest#testScanFilter',],
       '' : []}
 
 def LogGenerateDescription(name):
