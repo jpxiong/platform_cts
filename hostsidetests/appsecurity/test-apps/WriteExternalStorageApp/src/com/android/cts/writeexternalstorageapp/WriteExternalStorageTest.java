@@ -17,14 +17,10 @@
 package com.android.cts.writeexternalstorageapp;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.TAG;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildProbeFile;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.deleteContents;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
@@ -142,12 +138,12 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         for (File path : paths) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             assertTrue(path.getAbsolutePath().contains(packageName));
 
             // Walk until we leave device, writing the whole way
-            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 assertDirReadWriteAccess(path);
                 path = path.getParentFile();
             }
@@ -179,7 +175,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         int depth = 0;
         while (depth++ < 32) {
             assertDirReadWriteAccess(path);
-            assertEquals(Environment.MEDIA_MOUNTED, Environment.getStorageState(path));
+            assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState(path));
 
             if (path.getAbsolutePath().equals(top.getAbsolutePath())) {
                 break;
@@ -194,7 +190,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         // And going one step further should be outside our reach
         path = path.getParentFile();
         assertDirNoWriteAccess(path);
-        assertEquals(Environment.MEDIA_UNKNOWN, Environment.getStorageState(path));
+        assertEquals(Environment.MEDIA_UNKNOWN, Environment.getExternalStorageState(path));
     }
 
     /**
@@ -202,11 +198,11 @@ public class WriteExternalStorageTest extends AndroidTestCase {
      */
     public void testMountStatus() {
         assertEquals(Environment.MEDIA_UNKNOWN,
-                Environment.getStorageState(new File("/meow-should-never-exist")));
+                Environment.getExternalStorageState(new File("/meow-should-never-exist")));
 
         // Internal data isn't a mount point
         assertEquals(Environment.MEDIA_UNKNOWN,
-                Environment.getStorageState(getContext().getCacheDir()));
+                Environment.getExternalStorageState(getContext().getCacheDir()));
     }
 
     /**
@@ -220,7 +216,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         for (File path : paths) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             assertTrue(path.getAbsolutePath().contains(packageName));
 
@@ -231,7 +227,7 @@ public class WriteExternalStorageTest extends AndroidTestCase {
             }
 
             // Keep walking up until we leave device
-            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 assertDirReadOnlyAccess(path);
                 path = path.getParentFile();
             }
@@ -250,12 +246,12 @@ public class WriteExternalStorageTest extends AndroidTestCase {
         for (File path : paths) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             final File start = path;
 
             boolean found = false;
-            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 final File test = new File(path, ".nomedia");
                 if (test.exists()) {
                     found = true;
@@ -300,34 +296,5 @@ public class WriteExternalStorageTest extends AndroidTestCase {
            br.close();
            probe.delete();
        }
-    }
-
-    /**
-     * Leave gifts for other packages in their primary external cache dirs.
-     */
-    public void doWriteGifts() throws Exception {
-        final File none = buildGiftForPackage(getContext(), PACKAGE_NONE);
-        none.getParentFile().mkdirs();
-        none.createNewFile();
-        assertFileReadWriteAccess(none);
-
-        writeInt(none, 100);
-        assertEquals(100, readInt(none));
-
-        final File read = buildGiftForPackage(getContext(), PACKAGE_READ);
-        read.getParentFile().mkdirs();
-        read.createNewFile();
-        assertFileReadWriteAccess(read);
-
-        writeInt(read, 101);
-        assertEquals(101, readInt(read));
-
-        final File write = buildGiftForPackage(getContext(), PACKAGE_WRITE);
-        write.getParentFile().mkdirs();
-        write.createNewFile();
-        assertFileReadWriteAccess(write);
-
-        writeInt(write, 102);
-        assertEquals(102, readInt(write));
     }
 }

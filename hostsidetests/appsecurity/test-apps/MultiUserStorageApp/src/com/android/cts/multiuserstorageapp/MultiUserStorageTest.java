@@ -45,7 +45,9 @@ public class MultiUserStorageTest extends AndroidTestCase {
 
     private void wipeTestFiles(File dir) {
         dir.mkdirs();
-        for (File file : dir.listFiles()) {
+        final File[] files = dir.listFiles();
+        if (files == null) return;
+        for (File file : files) {
             if (file.getName().startsWith(FILE_PREFIX)) {
                 Log.d(TAG, "Wiping " + file);
                 file.delete();
@@ -53,11 +55,11 @@ public class MultiUserStorageTest extends AndroidTestCase {
         }
     }
 
-    public void cleanIsolatedStorage() throws Exception {
+    public void testCleanIsolatedStorage() throws Exception {
         wipeTestFiles(Environment.getExternalStorageDirectory());
     }
 
-    public void writeIsolatedStorage() throws Exception {
+    public void testWriteIsolatedStorage() throws Exception {
         final int uid = android.os.Process.myUid();
 
         writeInt(buildApiPath(FILE_SINGLETON), uid);
@@ -67,13 +69,13 @@ public class MultiUserStorageTest extends AndroidTestCase {
         for (File path : getAllPackageSpecificPathsExceptObb(getContext())) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             writeInt(new File(path, FILE_SINGLETON), uid);
         }
     }
 
-    public void readIsolatedStorage() throws Exception {
+    public void testReadIsolatedStorage() throws Exception {
         final int uid = android.os.Process.myUid();
 
         // Expect that the value we wrote earlier is still valid and wasn't
@@ -91,23 +93,23 @@ public class MultiUserStorageTest extends AndroidTestCase {
         for (File path : getAllPackageSpecificPathsExceptObb(getContext())) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             assertEquals("Unexpected value in singleton file at " + path, uid,
                     readInt(new File(path, FILE_SINGLETON)));
         }
     }
 
-    public void cleanObbStorage() throws Exception {
+    public void testCleanObbStorage() throws Exception {
         wipeTestFiles(getContext().getObbDir());
     }
 
-    public void writeObbStorage() throws Exception {
+    public void testWriteObbStorage() throws Exception {
         writeInt(buildApiObbPath(FILE_OBB_API_SINGLETON), OBB_API_VALUE);
         writeInt(buildEnvObbPath(FILE_OBB_SINGLETON), OBB_VALUE);
     }
 
-    public void readObbStorage() throws Exception {
+    public void testReadObbStorage() throws Exception {
         assertEquals("Failed to read OBB file from API path", OBB_API_VALUE,
                 readInt(buildApiObbPath(FILE_OBB_API_SINGLETON)));
 

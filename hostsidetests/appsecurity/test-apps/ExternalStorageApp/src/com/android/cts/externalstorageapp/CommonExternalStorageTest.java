@@ -100,7 +100,7 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         for (File path : paths) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             assertDirReadWriteAccess(path);
 

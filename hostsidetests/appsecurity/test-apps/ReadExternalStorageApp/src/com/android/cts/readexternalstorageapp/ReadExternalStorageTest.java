@@ -16,16 +16,9 @@
 
 package com.android.cts.readexternalstorageapp;
 
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_NONE;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_READ;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.PACKAGE_WRITE;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadOnlyAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadOnlyAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertFileReadWriteAccess;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildGiftForPackage;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
-import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
 
 import android.os.Environment;
 import android.test.AndroidTestCase;
@@ -54,7 +47,7 @@ public class ReadExternalStorageTest extends AndroidTestCase {
         for (File path : paths) {
             assertNotNull("Valid media must be inserted during CTS", path);
             assertEquals("Valid media must be inserted during CTS", Environment.MEDIA_MOUNTED,
-                    Environment.getStorageState(path));
+                    Environment.getExternalStorageState(path));
 
             assertTrue(path.getAbsolutePath().contains(packageName));
 
@@ -65,27 +58,10 @@ public class ReadExternalStorageTest extends AndroidTestCase {
             }
 
             // Keep walking up until we leave device
-            while (Environment.MEDIA_MOUNTED.equals(Environment.getStorageState(path))) {
+            while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 assertDirReadOnlyAccess(path);
                 path = path.getParentFile();
             }
         }
-    }
-
-    /**
-     * Verify we can read all gifts.
-     */
-    public void doVerifyGifts() throws Exception {
-        final File none = buildGiftForPackage(getContext(), PACKAGE_NONE);
-        assertFileReadOnlyAccess(none);
-        assertEquals(100, readInt(none));
-
-        final File read = buildGiftForPackage(getContext(), PACKAGE_READ);
-        assertFileReadWriteAccess(read);
-        assertEquals(101, readInt(read));
-
-        final File write = buildGiftForPackage(getContext(), PACKAGE_WRITE);
-        assertFileReadOnlyAccess(write);
-        assertEquals(102, readInt(write));
     }
 }
