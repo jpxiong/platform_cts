@@ -71,8 +71,6 @@
             android:process=":camera2ActivityProcess">
         </activity>
 
-        <activity android:name="android.hardware.input.cts.InputCtsActivity"
-            android:label="InputCtsActivity" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
