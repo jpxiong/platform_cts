@@ -39,6 +39,12 @@ public class AudioNativeTest extends CtsAndroidTestCase {
                 20 /* msecPerBuffer */, 8 /* numBuffers */));
     }
 
+    public void testStereo16Record() {
+        assertTrue(AudioRecordNative.test(
+                2 /* numChannels */, 48000 /* sampleRate */, false /* useFloat */,
+                20 /* msecPerBuffer */, 8 /* numBuffers */));
+    }
+
     public void testPlayStreamData() throws Exception {
         final String TEST_NAME = "testPlayStreamData";
         final boolean TEST_FLOAT_ARRAY[] = {
@@ -127,8 +133,92 @@ public class AudioNativeTest extends CtsAndroidTestCase {
         }
     }
 
+    public void testRecordStreamData() throws Exception {
+        final String TEST_NAME = "testRecordStreamData";
+        final boolean TEST_FLOAT_ARRAY[] = {
+                false,
+                true,
+        };
+        final int TEST_SR_ARRAY[] = {
+                //4000, // below limit of OpenSL ES
+                12345, // irregular sampling rate
+                44100,
+                48000,
+                96000,
+                192000,
+        };
+        final int TEST_CHANNELS_ARRAY[] = {
+                1,
+                2,
+                // 3,
+                4,
+                // 5,
+                6,
+                // 7,
+                8,
+        };
+        final int SEGMENT_DURATION_IN_MSEC = 20;
+        final int NUMBER_SEGMENTS = 10;
+
+        for (boolean TEST_FLOAT : TEST_FLOAT_ARRAY) {
+            for (int TEST_SR : TEST_SR_ARRAY) {
+                for (int TEST_CHANNELS : TEST_CHANNELS_ARRAY) {
+                    // OpenSL ES BUG: we run out of AudioTrack memory for this config on MNC
+                    if (TEST_FLOAT == true && TEST_CHANNELS >= 8 && TEST_SR >= 192000) {
+                        continue;
+                    }
+                    AudioRecordNative record = new AudioRecordNative();
+                    doRecordTest(record, TEST_CHANNELS, TEST_SR, TEST_FLOAT,
+                            SEGMENT_DURATION_IN_MSEC, NUMBER_SEGMENTS);
+                }
+            }
+        }
+    }
+
+    public void testRecordAudit() throws Exception {
+        AudioRecordNative record = new AudioHelper.AudioRecordAuditNative();
+        doRecordTest(record, 4 /* numChannels */, 44100 /* sampleRate */, false /* useFloat */,
+                1000 /* segmentDurationMs */, 10 /* numSegments */);
+    }
+
     static {
         System.loadLibrary("audio_jni");
+    }
+
+    private static final String TAG = "AudioNativeTest";
+
+    private void doRecordTest(AudioRecordNative record,
+            int numChannels, int sampleRate, boolean useFloat,
+            int segmentDurationMs, int numSegments) {
+        final String TEST_NAME = "doRecordTest";
+        try {
+            // Log.d(TEST_NAME, "open numChannels:" + numChannels + " sampleRate:" + sampleRate);
+            assertTrue(TEST_NAME, record.open(numChannels, sampleRate, useFloat,
+                    numSegments /* numBuffers */));
+            assertTrue(TEST_NAME, record.start());
+
+            final int sourceSamples =
+                    (int)((long)sampleRate * segmentDurationMs * numChannels / 1000);
+
+            if (useFloat) {
+                float data[] = new float[sourceSamples];
+                for (int i = 0; i < numSegments; ++i) {
+                    assertEquals(sourceSamples,
+                            record.read(data, 0 /* offset */, sourceSamples,
+                                    AudioRecordNative.READ_FLAG_BLOCKING));
+                }
+            } else {
+                short data[] = new short[sourceSamples];
+                for (int i = 0; i < numSegments; ++i) {
+                    assertEquals(sourceSamples,
+                            record.read(data, 0 /* offset */, sourceSamples,
+                                    AudioRecordNative.READ_FLAG_BLOCKING));
+                }
+            }
+            assertTrue(TEST_NAME, record.stop());
+        } finally {
+            record.close();
+        }
     }
 
     private boolean hasMicrophone() {
