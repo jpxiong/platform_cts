@@ -19,13 +19,22 @@
 
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
+
 #include <jni.h>
+#include <mutex>
 #include <utils/Log.h>
 
 #define CheckErr(res) LOG_ALWAYS_FATAL_IF( \
         (res) != SL_RESULT_SUCCESS, "result error %s", android::getSLErrStr(res));
 
 namespace android {
+
+// FIXME: Move to common file.
+template <typename T>
+static inline
+const T &min(const T &a, const T &b) {
+    return a < b ? a : b;
+}
 
 /* Returns the error string for the OpenSL ES error code
  */
@@ -49,6 +58,37 @@ SLObjectItf OpenSLEngine(bool global = true);
 /* Closes an OpenSL ES Engine object returned by OpenSLEngine().
  */
 void CloseSLEngine(SLObjectItf engine);
+
+// overloaded JNI array helper functions (same as in android_media_AudioRecord)
+inline
+jbyte *envGetArrayElements(JNIEnv *env, jbyteArray array, jboolean *isCopy) {
+    return env->GetByteArrayElements(array, isCopy);
+}
+
+inline
+void envReleaseArrayElements(JNIEnv *env, jbyteArray array, jbyte *elems, jint mode) {
+    env->ReleaseByteArrayElements(array, elems, mode);
+}
+
+inline
+jshort *envGetArrayElements(JNIEnv *env, jshortArray array, jboolean *isCopy) {
+    return env->GetShortArrayElements(array, isCopy);
+}
+
+inline
+void envReleaseArrayElements(JNIEnv *env, jshortArray array, jshort *elems, jint mode) {
+    env->ReleaseShortArrayElements(array, elems, mode);
+}
+
+inline
+jfloat *envGetArrayElements(JNIEnv *env, jfloatArray array, jboolean *isCopy) {
+    return env->GetFloatArrayElements(array, isCopy);
+}
+
+inline
+void envReleaseArrayElements(JNIEnv *env, jfloatArray array, jfloat *elems, jint mode) {
+    env->ReleaseFloatArrayElements(array, elems, mode);
+}
 
 } // namespace android
 
