@@ -64,7 +64,11 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     private String[] mIds;
     private CameraErrorCollector mCollector;
 
+    private static final Size FULLHD = new Size(1920, 1080);
+    private static final Size FULLHD_ALT = new Size(1920, 1088);
+    private static final Size HD = new Size(1280, 720);
     private static final Size VGA = new Size(640, 480);
+    private static final Size QVGA = new Size(320, 240);
 
     /*
      * HW Levels short hand
@@ -149,14 +153,102 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             assertArrayContains(String.format("No JPEG image format for: ID %s",
                     mIds[counter]), outputFormats, ImageFormat.JPEG);
 
-            Size[] sizes = config.getOutputSizes(ImageFormat.YUV_420_888);
-            CameraTestUtils.assertArrayNotEmpty(sizes,
+            Size[] yuvSizes = config.getOutputSizes(ImageFormat.YUV_420_888);
+            Size[] jpegSizes = config.getOutputSizes(ImageFormat.JPEG);
+            Size[] privateSizes = config.getOutputSizes(ImageFormat.PRIVATE);
+
+            CameraTestUtils.assertArrayNotEmpty(yuvSizes,
                     String.format("No sizes for preview format %x for: ID %s",
                             ImageFormat.YUV_420_888, mIds[counter]));
 
-            assertArrayContains(String.format(
-                            "Required VGA size not found for format %x for: ID %s",
-                            ImageFormat.YUV_420_888, mIds[counter]), sizes, VGA);
+            Rect activeRect = CameraTestUtils.getValueNotNull(
+                    c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
+            Size activeArraySize = new Size(activeRect.width(), activeRect.height());
+            Integer hwLevel = c.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
+
+            if (activeArraySize.getWidth() >= FULLHD.getWidth() &&
+                    activeArraySize.getHeight() >= FULLHD.getHeight()) {
+                assertArrayContains(String.format(
+                        "Required FULLHD size not found for format %x for: ID %s",
+                        ImageFormat.JPEG, mIds[counter]), jpegSizes, FULLHD);
+            }
+
+            if (activeArraySize.getWidth() >= HD.getWidth() &&
+                    activeArraySize.getHeight() >= HD.getHeight()) {
+                assertArrayContains(String.format(
+                        "Required HD size not found for format %x for: ID %s",
+                        ImageFormat.JPEG, mIds[counter]), jpegSizes, HD);
+            }
+
+            if (activeArraySize.getWidth() >= VGA.getWidth() &&
+                    activeArraySize.getHeight() >= VGA.getHeight()) {
+                assertArrayContains(String.format(
+                        "Required VGA size not found for format %x for: ID %s",
+                        ImageFormat.JPEG, mIds[counter]), jpegSizes, VGA);
+            }
+
+            if (activeArraySize.getWidth() >= QVGA.getWidth() &&
+                    activeArraySize.getHeight() >= QVGA.getHeight()) {
+                assertArrayContains(String.format(
+                        "Required QVGA size not found for format %x for: ID %s",
+                        ImageFormat.JPEG, mIds[counter]), jpegSizes, QVGA);
+            }
+
+            ArrayList<Size> jpegSizesList = new ArrayList<>(Arrays.asList(jpegSizes));
+            ArrayList<Size> yuvSizesList = new ArrayList<>(Arrays.asList(yuvSizes));
+            ArrayList<Size> privateSizesList = new ArrayList<>(Arrays.asList(privateSizes));
+
+            CamcorderProfile maxVideoProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
+            Size maxVideoSize = new Size(
+                    maxVideoProfile.videoFrameWidth, maxVideoProfile.videoFrameHeight);
+
+            // Handle FullHD special case first
+            if (jpegSizesList.contains(FULLHD)) {
+                if (hwLevel == FULL || (hwLevel == LIMITED &&
+                        maxVideoSize.getWidth() >= FULLHD.getWidth() &&
+                        maxVideoSize.getHeight() >= FULLHD.getHeight())) {
+                    boolean yuvSupportFullHD = yuvSizesList.contains(FULLHD) ||
+                            yuvSizesList.contains(FULLHD_ALT);
+                    boolean privateSupportFullHD = privateSizesList.contains(FULLHD) ||
+                            privateSizesList.contains(FULLHD_ALT);
+                    assertTrue("Full device FullHD YUV size not found", yuvSupportFullHD);
+                    assertTrue("Full device FullHD PRIVATE size not found", privateSupportFullHD);
+                }
+                // remove all FullHD or FullHD_Alt sizes for the remaining of the test
+                jpegSizesList.remove(FULLHD);
+                jpegSizesList.remove(FULLHD_ALT);
+            }
+
+            // Check all sizes other than FullHD
+            if (hwLevel == LIMITED) {
+                // Remove all jpeg sizes larger than max video size
+                ArrayList<Size> toBeRemoved = new ArrayList<>();
+                for (Size size : jpegSizesList) {
+                    if (size.getWidth() >= maxVideoSize.getWidth() &&
+                            size.getHeight() >= maxVideoSize.getHeight()) {
+                        toBeRemoved.add(size);
+                    }
+                }
+                jpegSizesList.removeAll(toBeRemoved);
+            }
+
+            if (hwLevel == FULL || hwLevel == LIMITED) {
+                if (!yuvSizesList.containsAll(jpegSizesList)) {
+                    for (Size s : jpegSizesList) {
+                        if (!yuvSizesList.contains(s)) {
+                            fail("Size " + s + " not found in YUV format");
+                        }
+                    }
+                }
+            }
+
+            if (!privateSizesList.containsAll(yuvSizesList)) {
+                for (Size s : yuvSizesList) {
+                    if (!privateSizesList.contains(s)) {
+                        fail("Size " + s + " not found in PRIVATE format");
+                    }
+                }
+            }
 
             counter++;
         }
