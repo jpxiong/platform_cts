@@ -23,6 +23,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.UserManager;
+import android.support.test.uiautomator.By;
+import android.support.test.uiautomator.BySelector;
+import android.support.test.uiautomator.UiDevice;
+import android.support.test.uiautomator.UiObject2;
+import android.support.test.uiautomator.UiWatcher;
+import android.support.test.uiautomator.Until;
 import android.util.Log;
 
 import java.util.concurrent.ArrayBlockingQueue;
@@ -54,9 +60,18 @@ public class PermissionsTest extends BaseManagedProfileTest {
     private static final String EXTRA_GRANT_STATE
             = "com.android.cts.permission.extra.GRANT_STATE";
     private static final int PERMISSION_ERROR = -2;
+    private static final BySelector CRASH_POPUP_BUTTON_SELECTOR = By
+            .clazz(android.widget.Button.class.getName())
+            .text("OK")
+            .pkg("android");
+    private static final BySelector CRASH_POPUP_TEXT_SELECTOR = By
+            .clazz(android.widget.TextView.class.getName())
+            .pkg("android");
+    private static final String CRASH_WATCHER_ID = "CRASH";
 
     private PermissionBroadcastReceiver mReceiver;
     private PackageManager mPackageManager;
+    private UiDevice mDevice;
 
     @Override
     protected void setUp() throws Exception {
@@ -69,11 +84,13 @@ public class PermissionsTest extends BaseManagedProfileTest {
         mReceiver = new PermissionBroadcastReceiver();
         mContext.registerReceiver(mReceiver, new IntentFilter(ACTION_PERMISSION_RESULT));
         mPackageManager = mContext.getPackageManager();
+        mDevice = UiDevice.getInstance(getInstrumentation());
     }
 
     @Override
     protected void tearDown() throws Exception {
         mContext.unregisterReceiver(mReceiver);
+        mDevice.removeWatcher(CRASH_WATCHER_ID);
         super.tearDown();
     }
 
@@ -144,6 +161,28 @@ public class PermissionsTest extends BaseManagedProfileTest {
         assertPermissionRequest(PackageManager.PERMISSION_GRANTED);
     }
 
+    public void testPermissionPrompts() throws Exception {
+        // register a crash watcher
+        mDevice.registerWatcher(CRASH_WATCHER_ID, new UiWatcher() {
+            @Override
+            public boolean checkForCondition() {
+                UiObject2 button = mDevice.findObject(CRASH_POPUP_BUTTON_SELECTOR);
+                if (button != null) {
+                    UiObject2 text = mDevice.findObject(CRASH_POPUP_TEXT_SELECTOR);
+                    Log.d(TAG, "Removing an error dialog: " + text != null ? text.getText() : null);
+                    button.click();
+                    return true;
+                }
+                return false;
+            }
+        });
+        mDevice.runWatchers();
+
+        assertSetPermissionPolicy(DevicePolicyManager.PERMISSION_POLICY_PROMPT);
+        assertPermissionRequest(PackageManager.PERMISSION_DENIED, "permission_deny_button");
+        assertPermissionRequest(PackageManager.PERMISSION_GRANTED, "permission_allow_button");
+    }
+
     public void testPermissionUpdate_setDeniedState() throws Exception {
         assertEquals(mDevicePolicyManager.getPermissionGrantState(ADMIN_RECEIVER_COMPONENT,
                 PERMISSION_APP_PACKAGE_NAME, PERMISSION_NAME),
@@ -192,6 +231,10 @@ public class PermissionsTest extends BaseManagedProfileTest {
     }
 
     private void assertPermissionRequest(int expected) throws Exception {
+        assertPermissionRequest(expected, null);
+    }
+
+    private void assertPermissionRequest(int expected, String buttonResource) throws Exception {
         Intent launchIntent = new Intent();
         launchIntent.setComponent(new ComponentName(PERMISSION_APP_PACKAGE_NAME,
                 PERMISSIONS_ACTIVITY_NAME));
@@ -199,6 +242,7 @@ public class PermissionsTest extends BaseManagedProfileTest {
         launchIntent.setAction(ACTION_REQUEST_PERMISSION);
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         mContext.startActivity(launchIntent);
+        pressPermissionPromptButton(buttonResource);
         assertEquals(expected, mReceiver.waitForBroadcast());
         assertEquals(expected, mPackageManager.checkPermission(PERMISSION_NAME,
                 PERMISSION_APP_PACKAGE_NAME));
@@ -244,6 +288,20 @@ public class PermissionsTest extends BaseManagedProfileTest {
         assertEquals(mPackageManager.checkPermission(PERMISSION_NAME,
                 SIMPLE_PRE_M_APP_PACKAGE_NAME),
                 PackageManager.PERMISSION_GRANTED);
+    }
+
+    private void pressPermissionPromptButton(String resName) throws Exception {
+        if (resName == null) {
+            return;
+        }
+
+        BySelector selector = By
+                .clazz(android.widget.Button.class.getName())
+                .res("com.android.packageinstaller", resName);
+        mDevice.wait(Until.hasObject(selector), 5000);
+        UiObject2 button = mDevice.findObject(selector);
+        assertNotNull("Couldn't find button with resource id: " + resName, button);
+        button.click();
     }
 
     private class PermissionBroadcastReceiver extends BroadcastReceiver {
