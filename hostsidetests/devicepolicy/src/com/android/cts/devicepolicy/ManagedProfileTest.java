@@ -532,6 +532,22 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "testPermissionMixedPolicies", mUserId));
     }
 
+    public void testPermissionPrompts() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        try {
+            // unlock device and ensure that the screen stays on
+            getDevice().executeShellCommand("input keyevent 82");
+            getDevice().executeShellCommand("settings put global stay_on_while_plugged_in 2");
+            installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+            assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".PermissionsTest",
+                    "testPermissionPrompts", mUserId));
+        } finally {
+            getDevice().executeShellCommand("settings put global stay_on_while_plugged_in 0");
+        }
+    }
+
     public void testPermissionAppUpdate() throws Exception {
         if (!mHasFeature) {
             return;
