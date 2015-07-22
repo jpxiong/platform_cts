@@ -16,8 +16,6 @@
 
 package com.android.cts.monkey;
 
-import com.android.tradefed.log.LogUtil.CLog;
-
 import java.util.Scanner;
 
 public class SeedTest extends AbstractMonkeyTest {
@@ -26,15 +24,11 @@ public class SeedTest extends AbstractMonkeyTest {
         String cmd1 = MONKEY_CMD + " -s 1337 -v -p " + PKGS[0] + " 500";
         String out1 = mDevice.executeShellCommand(cmd1);
         String out2 = mDevice.executeShellCommand(cmd1);
-        CLog.d("monkey output1: %s", out1);
-        CLog.d("monkey output2: %s", out2);
         assertOutputs(out1, out2);
 
         String cmd2 = MONKEY_CMD + " -s 3007 -v -p " + PKGS[0] + " 125";
         String out3 = mDevice.executeShellCommand(cmd2);
         String out4 = mDevice.executeShellCommand(cmd2);
-        CLog.d("monkey output3: %s", out3);
-        CLog.d("monkey output4: %s", out4);
         assertOutputs(out3, out4);
     }
 
