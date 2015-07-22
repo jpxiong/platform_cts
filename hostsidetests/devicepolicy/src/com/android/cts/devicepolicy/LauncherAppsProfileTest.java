@@ -25,6 +25,11 @@ import com.android.tradefed.log.LogUtil.CLog;
  */
 public class LauncherAppsProfileTest extends BaseLauncherAppsTest {
 
+    private static final String MANAGED_PROFILE_PKG = "com.android.cts.managedprofile";
+    private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
+    private static final String ADMIN_RECEIVER_TEST_CLASS =
+            MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
+
     private int mProfileUserId;
     private int mProfileSerialNumber;
     private int mMainUserSerialNumber;

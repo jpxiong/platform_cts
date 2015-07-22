@@ -76,6 +76,7 @@ cts_support_packages := \
     CtsDeviceAdmin \
     CtsDeviceOpenGl \
     CtsWifiConfigCreator \
+    CtsDeviceAndProfileOwnerApp \
     CtsDeviceOwnerApp \
     CtsDeviceTaskswitchingAppA \
     CtsDeviceTaskswitchingAppB \
