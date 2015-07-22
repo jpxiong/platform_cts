@@ -882,14 +882,6 @@ public class SignatureTest extends AndroidTestCase {
                         ? KeyProperties.DIGEST_SHA384 : KeyProperties.DIGEST_SHA256;
                 assertInitSignThrowsInvalidKeyException(algorithm,
                         TestUtils.buildUpon(good).setDigests(badDigest).build());
-
-                // Check that digest NONE is not treated as ANY.
-                if (!KeyProperties.DIGEST_NONE.equalsIgnoreCase(digest)) {
-                    assertInitSignThrowsInvalidKeyException(algorithm,
-                            TestUtils.buildUpon(good)
-                                    .setDigests(KeyProperties.DIGEST_NONE)
-                                    .build());
-                }
             } catch (Throwable e) {
                 throw new RuntimeException("Failed for " + algorithm, e);
             }
