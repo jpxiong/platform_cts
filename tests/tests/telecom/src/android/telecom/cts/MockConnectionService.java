@@ -18,9 +18,12 @@ package android.telecom.cts;
 
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
+import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 /**
@@ -39,14 +42,15 @@ public class MockConnectionService extends CtsConnectionService {
     private boolean mCreateVideoProvider = true;
 
     public Semaphore lock = new Semaphore(0);
-    public MockConnection outgoingConnection;
-    public MockConnection incomingConnection;
+    public List<MockConnection> outgoingConnections = new ArrayList<MockConnection>();
+    public List<MockConnection> incomingConnections = new ArrayList<MockConnection>();
 
     @Override
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
             ConnectionRequest request) {
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), CONNECTION_PRESENTATION);
+        connection.setPhoneAccountHandle(connectionManagerPhoneAccount);
         if (mCreateVideoProvider) {
             connection.createMockVideoProvider();
         } else {
@@ -54,7 +58,7 @@ public class MockConnectionService extends CtsConnectionService {
         }
         connection.setVideoState(request.getVideoState());
 
-        outgoingConnection = connection;
+        outgoingConnections.add(connection);
         lock.release();
         return connection;
     }
@@ -67,9 +71,19 @@ public class MockConnectionService extends CtsConnectionService {
         connection.createMockVideoProvider();
         connection.setVideoState(request.getVideoState());
 
-        incomingConnection = connection;
+        incomingConnections.add(connection);
         lock.release();
         return connection;
+    }
+
+    @Override
+    public void onConference(Connection connection1, Connection connection2) {
+        MockConnection confHost = (MockConnection)connection1;
+        // Create conference and add to telecom
+        MockConference conference = new MockConference(confHost.getPhoneAccountHandle());
+        conference.addConnection(connection1);
+        conference.addConnection(connection2);
+        addConference(conference);
     }
 
     public void setCreateVideoProvider(boolean createVideoProvider) {

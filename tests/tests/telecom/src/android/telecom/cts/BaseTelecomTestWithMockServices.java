@@ -18,6 +18,10 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +41,9 @@ import android.test.InstrumentationTestCase;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -69,7 +76,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     TelecomManager mTelecomManager;
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
-    MockConnectionService connectionService = new MockConnectionService();
+    MockConnectionService connectionService;
 
     @Override
     protected void setUp() throws Exception {
@@ -96,13 +103,16 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         super.tearDown();
     }
 
-    protected PhoneAccount setupConnectionService(CtsConnectionService connectionService,
+    protected PhoneAccount setupConnectionService(MockConnectionService connectionService,
             int flags)
             throws Exception {
-        if (connectionService == null) {
-            connectionService = this.connectionService;
+        if (connectionService != null) {
+            this.connectionService = connectionService;
+        } else {
+            // Generate a vanilla mock connection service, if not provided.
+            this.connectionService = new MockConnectionService();
         }
-        CtsConnectionService.setUp(TEST_PHONE_ACCOUNT, connectionService);
+        CtsConnectionService.setUp(TEST_PHONE_ACCOUNT, this.connectionService);
 
         if ((flags & FLAG_REGISTER) != 0) {
             mTelecomManager.registerPhoneAccount(TEST_PHONE_ACCOUNT);
@@ -141,6 +151,21 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         mInCallCallbacks = new InCallServiceCallbacks() {
             @Override
             public void onCallAdded(Call call, int numCalls) {
+                Log.i(TAG, "onCallAdded, Call: " + call + "Num Calls: " + numCalls);
+                this.lock.release();
+            }
+            @Override
+            public void onParentChanged(Call call, Call parent) {
+                Log.i(TAG, "onParentChanged, Call: " + call + "Parent: " + parent);
+            }
+            @Override
+            public void onChildrenChanged(Call call, List<Call> children) {
+                Log.i(TAG, "onChildrenChanged, Call: " + call + "Childred: " + children);
+            }
+            @Override
+            public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {
+                Log.i(TAG, "onConferenceableCallsChanged, Call: " + call + "Conferenceables: " +
+                        conferenceableCalls);
                 this.lock.release();
             }
         };
@@ -153,6 +178,11 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      * {@link CtsConnectionService} which can be tested.
      */
     void addAndVerifyNewIncomingCall(Uri incomingHandle, Bundle extras) {
+        int currentCallCount = 0;
+        if (mInCallCallbacks.getService() != null) {
+            currentCallCount = mInCallCallbacks.getService().getCallCount();
+        }
+
         if (extras == null) {
             extras = new Bundle();
         }
@@ -167,7 +197,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertEquals("InCallService should contain 1 call after adding a call.", 1,
+        assertEquals("InCallService should contain 1 more call after adding a call.",
+                currentCallCount + 1,
                 mInCallCallbacks.getService().getCallCount());
     }
 
@@ -202,6 +233,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      *  {@link CtsConnectionService} which can be tested.
      */
     void placeAndVerifyCall(Bundle extras, int videoState) {
+        int currentCallCount = 0;
+        if (mInCallCallbacks.getService() != null) {
+            currentCallCount = mInCallCallbacks.getService().getCallCount();
+        }
         placeNewCallWithPhoneAccount(extras, videoState);
 
         try {
@@ -212,11 +247,17 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertEquals("InCallService should contain 1 call after adding a call.", 1,
+        assertEquals("InCallService should contain 1 more call after adding a call.",
+                currentCallCount + 1,
                 mInCallCallbacks.getService().getCallCount());
     }
 
     MockConnection verifyConnectionForOutgoingCall() {
+        // Assuming only 1 connection present
+        return verifyConnectionForOutgoingCall(0);
+    }
+
+    MockConnection verifyConnectionForOutgoingCall(int connectionIndex) {
         try {
             if (!connectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                     TimeUnit.MILLISECONDS)) {
@@ -226,19 +267,27 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertNotNull("Telecom should create outgoing connection for outgoing call",
-                connectionService.outgoingConnection);
-        assertNull("Telecom should not create incoming connection for outgoing call",
-                connectionService.incomingConnection);
+        assertThat("Telecom should create outgoing connection for outgoing call",
+                connectionService.outgoingConnections.size(), not(equalTo(0)));
+        assertEquals("Telecom should not create incoming connections for outgoing calls",
+                0, connectionService.incomingConnections.size());
+        MockConnection connection = connectionService.outgoingConnections.get(connectionIndex);
+        setAndverifyConnectionForOutgoingCall(connection);
+        return connection;
+    }
 
-        connectionService.outgoingConnection.setDialing();
-        connectionService.outgoingConnection.setActive();
-        assertEquals(Connection.STATE_ACTIVE,
-                connectionService.outgoingConnection.getState());
-        return connectionService.outgoingConnection;
+    void setAndverifyConnectionForOutgoingCall(MockConnection connection) {
+        connection.setDialing();
+        connection.setActive();
+        assertEquals(Connection.STATE_ACTIVE, connection.getState());
     }
 
     MockConnection verifyConnectionForIncomingCall() {
+        // Assuming only 1 connection present
+        return verifyConnectionForIncomingCall(0);
+    }
+
+    MockConnection verifyConnectionForIncomingCall(int connectionIndex) {
         try {
             if (!connectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                     TimeUnit.MILLISECONDS)) {
@@ -248,15 +297,42 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             Log.i(TAG, "Test interrupted!");
         }
 
-        assertNull("Telecom should not create outgoing connection for outgoing call",
-                connectionService.outgoingConnection);
-        assertNotNull("Telecom should create incoming connection for outgoing call",
-                connectionService.incomingConnection);
+        assertThat("Telecom should create incoming connections for incoming calls",
+                connectionService.incomingConnections.size(), not(equalTo(0)));
+        assertEquals("Telecom should not create outgoing connections for incoming calls",
+                0, connectionService.outgoingConnections.size());
+        MockConnection connection = connectionService.incomingConnections.get(connectionIndex);
+        setAndverifyConnectionForIncomingCall(connection);
+        return connection;
+    }
 
-        connectionService.incomingConnection.setRinging();
-        assertEquals(Connection.STATE_RINGING,
-                connectionService.incomingConnection.getState());
-        return connectionService.incomingConnection;
+    void setAndverifyConnectionForIncomingCall(MockConnection connection) {
+        connection.setRinging();
+        assertEquals(Connection.STATE_RINGING, connection.getState());
+    }
+
+    void setAndVerifyConferenceablesForOutgoingConnection(int connectionIndex) {
+        /**
+         * Make all other outgoing connections as conferenceable with this
+         * new connection.
+         */
+        MockConnection connection = connectionService.outgoingConnections.get(connectionIndex);
+        List<Connection> confConnections = new ArrayList<>(connectionService.outgoingConnections.size());
+        for (Connection c : connectionService.outgoingConnections) {
+            if (c != connection) {
+                confConnections.add(c);
+            }
+        }
+        connection.setConferenceableConnections(confConnections);
+
+        try {
+            if (!mInCallCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
+                fail("No call added to the conferenceables list.");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+        assertEquals(connection.getConferenceables(), confConnections);
     }
 
     /**
@@ -313,6 +389,23 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         "InCallService should contain " + numCalls + " calls."
     );
     }
+
+    void assertNumConferenceCalls(final MockInCallService inCallService, final int numCalls) {
+        waitUntilConditionIsTrueOrTimeout(new Condition() {
+            @Override
+            public Object expected() {
+                return numCalls;
+            }
+            @Override
+            public Object actual() {
+                return inCallService.getConferenceCallCount();
+            }
+        },
+        WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+        "InCallService should contain " + numCalls + " conference calls."
+    );
+    }
+
 
     void assertMuteState(final InCallService incallService, final boolean isMuted) {
         waitUntilConditionIsTrueOrTimeout(

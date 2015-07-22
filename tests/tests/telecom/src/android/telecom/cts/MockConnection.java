@@ -20,6 +20,7 @@ import static android.telecom.CallAudioState.*;
 import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
+import android.telecom.PhoneAccountHandle;
 import android.telecom.VideoProfile;
 import android.util.Log;
 
@@ -35,6 +36,7 @@ public class MockConnection extends Connection {
     public int videoState = VideoProfile.STATE_AUDIO_ONLY;
     private String mDtmfString = "";
     private MockVideoProvider mMockVideoProvider;
+    private PhoneAccountHandle mPhoneAccountHandle;
 
     @Override
     public void onAnswer() {
@@ -154,4 +156,13 @@ public class MockConnection extends Connection {
     public MockVideoProvider getMockVideoProvider() {
         return mMockVideoProvider;
     }
+
+    public void setPhoneAccountHandle(PhoneAccountHandle handle)  {
+        mPhoneAccountHandle = handle;
+    }
+
+    public PhoneAccountHandle getPhoneAccountHandle()  {
+        return mPhoneAccountHandle;
+    }
+
 }
