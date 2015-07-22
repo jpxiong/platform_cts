@@ -103,8 +103,6 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
         assertTrue(commandOutput + " expected to start with \"Success:\"",
                 commandOutput.startsWith("Success:"));
-        // Wait 60 seconds for intents generated to be handled.
-        Thread.sleep(60 * 1000);
     }
 
     protected int getMaxNumberOfUsersSupported() throws DeviceNotAvailableException {
@@ -144,12 +142,14 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     }
 
     protected void removeUser(int userId) throws Exception  {
+        String stopUserCommand = "am stop-user -w " + userId;
+        CLog.logAndDisplay(LogLevel.INFO, "starting command \"" + stopUserCommand + "\" and waiting.");
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + stopUserCommand + ": "
+                + getDevice().executeShellCommand(stopUserCommand));
         String removeUserCommand = "pm remove-user " + userId;
         CLog.logAndDisplay(LogLevel.INFO, "starting command " + removeUserCommand);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + removeUserCommand + ": "
                 + getDevice().executeShellCommand(removeUserCommand));
-        // Wait 60 seconds for user to finish being removed.
-        Thread.sleep(60 * 1000);
     }
 
     protected void removeTestUsers() throws Exception {
@@ -288,8 +288,6 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         String[] tokens = commandOutput.split("\\s+");
         assertTrue(tokens.length > 0);
         assertEquals("Success:", tokens[0]);
-        // Wait 60 seconds for intents generated to be handled.
-        Thread.sleep(60 * 1000);
         return Integer.parseInt(tokens[tokens.length-1]);
     }
 
