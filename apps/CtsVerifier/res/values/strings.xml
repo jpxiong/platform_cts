@@ -124,6 +124,16 @@
     <string name="da_lock_success">It appears the screen was locked successfully!</string>
     <string name="da_lock_error">It does not look like the screen was locked...</string>
 
+    <!-- Strings for lock bound keys test -->
+    <string name="sec_lock_bound_key_test">Lock Bound Keys Test</string>
+    <string name="sec_lock_bound_key_test_info">
+        This test ensures that Keystore cryptographic keys that are bound to lock screen authentication
+        are unusable without a recent enough authentication. You need to set up a screen lock in order to
+        complete this test. If available, this test should be run by using fingerprint authentication
+        as well as PIN/pattern/password authentication.
+    </string>
+    <string name="sec_start_test">Start Test</string>
+
     <!-- Strings for BluetoothActivity -->
     <string name="bluetooth_test">Bluetooth Test</string>
     <string name="bluetooth_test_info">The Bluetooth Control tests check whether or not the device
