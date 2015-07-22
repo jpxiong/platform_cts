@@ -18,7 +18,7 @@ package android.telecom.cts;
 
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
-import android.telecom.DisconnectCause;
+import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.TelecomManager;
 
@@ -31,7 +31,7 @@ import java.util.concurrent.Semaphore;
  * of Telecom CTS tests that simply require that a outgoing call is placed, or incoming call is
  * received.
  */
-public class MockConnectionService extends CtsConnectionService {
+public class MockConnectionService extends ConnectionService {
     public static final int CONNECTION_PRESENTATION =  TelecomManager.PRESENTATION_ALLOWED;
 
     /**
@@ -78,12 +78,11 @@ public class MockConnectionService extends CtsConnectionService {
 
     @Override
     public void onConference(Connection connection1, Connection connection2) {
-        MockConnection confHost = (MockConnection)connection1;
-        // Create conference and add to telecom
-        MockConference conference = new MockConference(confHost.getPhoneAccountHandle());
-        conference.addConnection(connection1);
-        conference.addConnection(connection2);
-        addConference(conference);
+        // Make sure that these connections are already not conferenced.
+        if (connection1.getConference() == null && connection2.getConference() == null) {
+            MockConference conference = new MockConference(connection1, connection2);
+            CtsConnectionService.addConferenceToTelecom(conference);
+        }
     }
 
     public void setCreateVideoProvider(boolean createVideoProvider) {

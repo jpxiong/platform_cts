@@ -16,6 +16,7 @@
 
 package android.telecom.cts;
 
+import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
@@ -32,9 +33,28 @@ import java.util.concurrent.Semaphore;
  * tell CtsConnectionService to forward any method invocations to that test's implementation.
  * This is set up using {@link #setUp} and should be cleaned up before the end of the test using
  * {@link #tearDown}.
+ *
+ * sConnectionService: Contains the connection service object provided by the current test in
+ *                     progress. We use this object to forward any communication received from the
+ *                     Telecom framework to the test connection service.
+ * sTelecomConnectionService: Contains the connection service object registered to the Telecom
+ *                            framework. We use this object to forward any communication from the
+ *                            test connection service to the Telecom framework.
+ *
  */
 public class CtsConnectionService extends ConnectionService {
+    // This is the connection service implemented by the test
     private static ConnectionService sConnectionService;
+    // This is the connection service registered with Telecom
+    private static ConnectionService sTelecomConnectionService;
+
+    public CtsConnectionService() throws Exception {
+        super();
+        if (sTelecomConnectionService != null) {
+            throw new Exception("Telecom ConnectionService exists");
+        }
+        sTelecomConnectionService = this;
+    }
 
     // ConnectionService used by default as a fallback if no connection service is specified
     // during test setup.
@@ -85,9 +105,27 @@ public class CtsConnectionService extends ConnectionService {
             if (sConnectionService != null) {
                 return sConnectionService.onCreateIncomingConnection(
                         connectionManagerPhoneAccount, request);
+            } else {
+                return mMockConnectionService.onCreateIncomingConnection(
+                        connectionManagerPhoneAccount, request);
             }
-            return mMockConnectionService.onCreateIncomingConnection(
-                    connectionManagerPhoneAccount, request);
+        }
+    }
+
+    @Override
+    public void onConference(Connection connection1, Connection connection2) {
+        synchronized(sLock) {
+            if (sConnectionService != null) {
+                sConnectionService.onConference(connection1, connection2);
+            } else {
+                mMockConnectionService.onConference(connection1, connection2);
+            }
+        }
+    }
+
+    public static void addConferenceToTelecom(Conference conference) {
+        synchronized(sLock) {
+            sTelecomConnectionService.addConference(conference);
         }
     }
 }
