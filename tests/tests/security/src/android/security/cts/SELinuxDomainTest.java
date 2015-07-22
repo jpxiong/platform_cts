@@ -265,15 +265,15 @@ public class SELinuxDomainTest extends TestCase {
     }
 
     /*
-     * Their will at least be some kernel thread running and all kthreads should
-     * be in kernel context.
+     * All kthreads should be in kernel context.
      */
     public void testKernelDomain() throws FileNotFoundException {
         String domain = "u:r:kernel:s0";
         List<ProcessDetails> procs = ProcessDetails.getProcessMap().get(domain);
-        assertNotNull(procs);
-        for (ProcessDetails p : procs) {
-            assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
+        if (procs != null) {
+            for (ProcessDetails p : procs) {
+                assertTrue("Non Kernel thread \"" + p + "\" found!", p.isKernel());
+            }
         }
     }
 
