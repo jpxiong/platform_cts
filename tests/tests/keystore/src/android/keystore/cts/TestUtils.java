@@ -858,6 +858,11 @@ abstract class TestUtils extends Assert {
     }
 
     static KeyProtection getMinimalWorkingImportParametersForCipheringWith(
+            String transformation, int purposes) {
+        return getMinimalWorkingImportParametersForCipheringWith(transformation, purposes, false);
+    }
+
+    static KeyProtection getMinimalWorkingImportParametersForCipheringWith(
             String transformation, int purposes, boolean ivProvidedWhenEncrypting) {
         String keyAlgorithm = TestUtils.getCipherKeyAlgorithm(transformation);
         if (KeyProperties.KEY_ALGORITHM_AES.equalsIgnoreCase(keyAlgorithm)) {
