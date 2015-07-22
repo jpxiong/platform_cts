@@ -20,17 +20,10 @@ import android.os.Bundle;
 import android.os.Trace;
 
 public class AtraceTestAppActivity extends Activity {
-    static {
-        System.loadLibrary("nativeatrace_jni");
-    }
-
-    private static native void nativeTraceSection();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Trace.beginSection("traceable-app-test-section");
         super.onCreate(savedInstanceState);
         Trace.endSection();
-        nativeTraceSection();
     }
 }
