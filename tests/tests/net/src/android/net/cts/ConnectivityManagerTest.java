@@ -16,6 +16,7 @@
 
 package android.net.cts;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -52,6 +53,10 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public static final int TYPE_MOBILE = ConnectivityManager.TYPE_MOBILE;
     public static final int TYPE_WIFI = ConnectivityManager.TYPE_WIFI;
     private static final int HOST_ADDRESS = 0x7f000001;// represent ip 127.0.0.1
+
+    // Action sent to ConnectivityActionReceiver when a network callback is sent via PendingIntent.
+    private static final String NETWORK_CALLBACK_ACTION =
+            "ConnectivityManagerTest.NetworkCallbackAction";
 
     // device could have only one interface: data, wifi.
     private static final int MIN_NUM_NETWORK_TYPES = 1;
@@ -127,17 +132,18 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     public void testGetActiveNetworkInfo() {
         NetworkInfo ni = mCm.getActiveNetworkInfo();
 
-        assertTrue("You must have an active network connection to complete CTS", ni != null);
+        assertNotNull("You must have an active network connection to complete CTS", ni);
         assertTrue(ConnectivityManager.isNetworkTypeValid(ni.getType()));
         assertTrue(ni.getState() == State.CONNECTED);
     }
 
     public void testGetActiveNetwork() {
         Network network = mCm.getActiveNetwork();
-        assertTrue("You must have an active network connection to complete CTS", network != null);
+        assertNotNull("You must have an active network connection to complete CTS", network);
 
         NetworkInfo ni = mCm.getNetworkInfo(network);
-        assertTrue("Network returned from getActiveNetwork was invalid", ni != null);
+        assertNotNull("Network returned from getActiveNetwork was invalid", ni);
+
         // Similar to testGetActiveNetworkInfo above.
         assertTrue(ConnectivityManager.isNetworkTypeValid(ni.getType()));
         assertTrue(ni.getState() == State.CONNECTED);
@@ -280,8 +286,8 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             }
 
             // Register a receiver that will capture the connectivity change for hipri.
-            ConnectivityActionReceiver receiver =
-                    new ConnectivityActionReceiver(ConnectivityManager.TYPE_MOBILE_HIPRI);
+            ConnectivityActionReceiver receiver = new ConnectivityActionReceiver(
+                    ConnectivityManager.TYPE_MOBILE_HIPRI, NetworkInfo.State.CONNECTED);
             IntentFilter filter = new IntentFilter();
             filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
             mContext.registerReceiver(receiver, filter);
@@ -292,7 +298,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             assertTrue("Couldn't start using the HIPRI feature.", result != -1);
 
             // Check that the ConnectivityManager reported that it connected using hipri...
-            assertTrue("Couldn't connect using hipri...", receiver.waitForConnection());
+            assertTrue("Couldn't connect using hipri...", receiver.waitForState());
 
             assertTrue("Couldn't requestRouteToHost using HIPRI.",
                     mCm.requestRouteToHost(ConnectivityManager.TYPE_MOBILE_HIPRI, HOST_ADDRESS));
@@ -307,7 +313,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             // TODO check dns selection
             // TODO check routes
             if (!isWifiEnabled) {
-                mWifiManager.setWifiEnabled(false);
+                disconnectFromWifi();
             }
         }
     }
@@ -323,7 +329,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
      */
     public void testRegisterNetworkCallback() {
         if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
-            Log.i(TAG, "testRegisterNetworkCallback cannot execute unless devices supports WiFi");
+            Log.i(TAG, "testRegisterNetworkCallback cannot execute unless device supports WiFi");
             return;
         }
 
@@ -353,47 +359,167 @@ public class ConnectivityManagerTest extends AndroidTestCase {
             mCm.unregisterNetworkCallback(callback);
 
             // Return WiFI to its original enabled/disabled state.
-            mWifiManager.setWifiEnabled(previousWifiEnabledState);
+            if (!previousWifiEnabledState) {
+                disconnectFromWifi();
+            }
         }
     }
 
-    private void connectToWifi() throws InterruptedException {
-        ConnectivityActionReceiver receiver =
-                new ConnectivityActionReceiver(ConnectivityManager.TYPE_WIFI);
+    /**
+     * Tests both registerNetworkCallback and unregisterNetworkCallback similarly to
+     * {@link #testRegisterNetworkCallback} except that a {@code PendingIntent} is used instead
+     * of a {@code NetworkCallback}.
+     */
+    public void testRegisterNetworkCallback_withPendingIntent() {
+        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+            Log.i(TAG, "testRegisterNetworkCallback cannot execute unless device supports WiFi");
+            return;
+        }
+
+        // Create a ConnectivityActionReceiver that has an IntentFilter for our locally defined
+        // action, NETWORK_CALLBACK_ACTION.
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NETWORK_CALLBACK_ACTION);
+
+        ConnectivityActionReceiver receiver = new ConnectivityActionReceiver(
+                ConnectivityManager.TYPE_WIFI, NetworkInfo.State.CONNECTED);
+        mContext.registerReceiver(receiver, filter);
+
+        // Create a broadcast PendingIntent for NETWORK_CALLBACK_ACTION.
+        Intent intent = new Intent(NETWORK_CALLBACK_ACTION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                mContext, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        // We will register for a WIFI network being available or lost.
+        NetworkRequest request = new NetworkRequest.Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                .build();
+        mCm.registerNetworkCallback(request, pendingIntent);
+
+        boolean previousWifiEnabledState = mWifiManager.isWifiEnabled();
+
+        try {
+            // Make sure WiFi is connected to an access point to start with.
+            if (!previousWifiEnabledState) {
+                connectToWifi();
+            }
+
+            // Now we expect to get the Intent delivered notifying of the availability of the wifi
+            // network even if it was already connected as a state-based action when the callback
+            // is registered.
+            assertTrue("Did not receive expected Intent " + intent + " for TRANSPORT_WIFI",
+                    receiver.waitForState());
+        } catch (InterruptedException e) {
+            fail("Broadcast receiver or NetworkCallback wait was interrupted.");
+        } finally {
+            mCm.unregisterNetworkCallback(pendingIntent);
+            pendingIntent.cancel();
+            mContext.unregisterReceiver(receiver);
+
+            // Return WiFI to its original enabled/disabled state.
+            if (!previousWifiEnabledState) {
+                disconnectFromWifi();
+            }
+        }
+    }
+
+    /** Enable WiFi and wait for it to become connected to a network. */
+    private void connectToWifi() {
+        ConnectivityActionReceiver receiver = new ConnectivityActionReceiver(
+                ConnectivityManager.TYPE_WIFI, NetworkInfo.State.CONNECTED);
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         mContext.registerReceiver(receiver, filter);
 
-        assertTrue(mWifiManager.setWifiEnabled(true));
-        assertTrue("Wifi must be configured to connect to an access point for this test.",
-                receiver.waitForConnection());
+        boolean connected = false;
+        try {
+            assertTrue(mWifiManager.setWifiEnabled(true));
+            connected = receiver.waitForState();
+        } catch (InterruptedException ex) {
+            fail("connectToWifi was interrupted");
+        } finally {
+            mContext.unregisterReceiver(receiver);
+        }
 
-        mContext.unregisterReceiver(receiver);
+        assertTrue("Wifi must be configured to connect to an access point for this test.",
+                connected);
     }
 
-    /** Receiver that captures the last connectivity change's network type and state. */
+    /** Disable WiFi and wait for it to become disconnected from the network. */
+    private void disconnectFromWifi() {
+        ConnectivityActionReceiver receiver = new ConnectivityActionReceiver(
+                ConnectivityManager.TYPE_WIFI, NetworkInfo.State.DISCONNECTED);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        mContext.registerReceiver(receiver, filter);
+
+        boolean disconnected = false;
+        try {
+            assertTrue(mWifiManager.setWifiEnabled(false));
+            disconnected = receiver.waitForState();
+        } catch (InterruptedException ex) {
+            fail("disconnectFromWifi was interrupted");
+        } finally {
+            mContext.unregisterReceiver(receiver);
+        }
+
+        assertTrue("Wifi failed to reach DISCONNECTED state.", disconnected);
+    }
+
+    /**
+     * Receiver that captures the last connectivity change's network type and state. Recognizes
+     * both {@code CONNECTIVITY_ACTION} and {@code NETWORK_CALLBACK_ACTION} intents.
+     */
     private class ConnectivityActionReceiver extends BroadcastReceiver {
 
         private final CountDownLatch mReceiveLatch = new CountDownLatch(1);
 
         private final int mNetworkType;
+        private final NetworkInfo.State mNetState;
 
-        ConnectivityActionReceiver(int networkType) {
+        ConnectivityActionReceiver(int networkType, NetworkInfo.State netState) {
             mNetworkType = networkType;
+            mNetState = netState;
         }
 
         public void onReceive(Context context, Intent intent) {
-            NetworkInfo networkInfo = intent.getExtras()
-                    .getParcelable(ConnectivityManager.EXTRA_NETWORK_INFO);
+            String action = intent.getAction();
+            NetworkInfo networkInfo = null;
+
+            // When receiving ConnectivityManager.CONNECTIVITY_ACTION, the NetworkInfo parcelable
+            // is stored in EXTRA_NETWORK_INFO. With a NETWORK_CALLBACK_ACTION, the Network is
+            // sent in EXTRA_NETWORK and we need to ask the ConnectivityManager for the NetworkInfo.
+            if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
+                networkInfo = intent.getExtras()
+                        .getParcelable(ConnectivityManager.EXTRA_NETWORK_INFO);
+                assertNotNull("ConnectivityActionReceiver expected EXTRA_NETWORK_INFO", networkInfo);
+            } else if (NETWORK_CALLBACK_ACTION.equals(action)) {
+                Network network = intent.getExtras()
+                        .getParcelable(ConnectivityManager.EXTRA_NETWORK);
+                assertNotNull("ConnectivityActionReceiver expected EXTRA_NETWORK", network);
+                networkInfo = mCm.getNetworkInfo(network);
+                if (networkInfo == null) {
+                    // When disconnecting, it seems like we get an intent sent with an invalid
+                    // Network; that is, by the time we call ConnectivityManager.getNetworkInfo(),
+                    // it is invalid. Ignore these.
+                    Log.i(TAG, "ConnectivityActionReceiver NETWORK_CALLBACK_ACTION ignoring "
+                            + "invalid network");
+                    return;
+                }
+            } else {
+                fail("ConnectivityActionReceiver received unxpected intent action: " + action);
+            }
+
+            assertNotNull("ConnectivityActionReceiver didn't find NetworkInfo", networkInfo);
             int networkType = networkInfo.getType();
             State networkState = networkInfo.getState();
             Log.i(TAG, "Network type: " + networkType + " state: " + networkState);
-            if (networkType == mNetworkType && networkInfo.getState() == State.CONNECTED) {
+            if (networkType == mNetworkType && networkInfo.getState() == mNetState) {
                 mReceiveLatch.countDown();
             }
         }
 
-        public boolean waitForConnection() throws InterruptedException {
+        public boolean waitForState() throws InterruptedException {
             return mReceiveLatch.await(30, TimeUnit.SECONDS);
         }
     }
@@ -402,7 +528,7 @@ public class ConnectivityManagerTest extends AndroidTestCase {
      * Callback used in testRegisterNetworkCallback that allows caller to block on
      * {@code onAvailable}.
      */
-    private class TestNetworkCallback extends ConnectivityManager.NetworkCallback {
+    private static class TestNetworkCallback extends ConnectivityManager.NetworkCallback {
         private final CountDownLatch mAvailableLatch = new CountDownLatch(1);
 
         public boolean waitForAvailable() throws InterruptedException {
