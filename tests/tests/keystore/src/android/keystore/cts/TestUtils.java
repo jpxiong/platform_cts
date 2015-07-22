@@ -27,6 +27,7 @@ import junit.framework.Assert;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -889,5 +890,16 @@ abstract class TestUtils extends Assert {
         } else {
             throw new IllegalArgumentException("Unsupported key algorithm: " + keyAlgorithm);
         }
+    }
+
+    static byte[] getBigIntegerMagnitudeBytes(BigInteger value) {
+        return removeLeadingZeroByteIfPresent(value.toByteArray());
+    }
+
+    private static byte[] removeLeadingZeroByteIfPresent(byte[] value) {
+        if ((value.length < 1) || (value[0] != 0)) {
+            return value;
+        }
+        return TestUtils.subarray(value, 1, value.length - 1);
     }
 }
