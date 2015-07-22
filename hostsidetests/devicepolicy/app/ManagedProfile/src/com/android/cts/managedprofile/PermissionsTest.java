@@ -197,7 +197,7 @@ public class PermissionsTest extends BaseManagedProfileTest {
                 PERMISSIONS_ACTIVITY_NAME));
         launchIntent.putExtra(EXTRA_PERMISSION, PERMISSION_NAME);
         launchIntent.setAction(ACTION_REQUEST_PERMISSION);
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         mContext.startActivity(launchIntent);
         assertEquals(expected, mReceiver.waitForBroadcast());
         assertEquals(expected, mPackageManager.checkPermission(PERMISSION_NAME,
@@ -212,7 +212,7 @@ public class PermissionsTest extends BaseManagedProfileTest {
                 PERMISSIONS_ACTIVITY_NAME));
         launchIntent.putExtra(EXTRA_PERMISSION, PERMISSION_NAME);
         launchIntent.setAction(ACTION_CHECK_HAS_PERMISSION);
-        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         mContext.startActivity(launchIntent);
         assertEquals(expected, mReceiver.waitForBroadcast());
     }
