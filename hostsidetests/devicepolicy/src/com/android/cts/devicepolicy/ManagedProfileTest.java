@@ -55,6 +55,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String FEATURE_CAMERA = "android.hardware.camera";
     private static final String FEATURE_WIFI = "android.hardware.wifi";
 
+    private static final String ADD_RESTRICTION_COMMAND = "add-restriction";
+
     private static final int USER_OWNER = 0;
 
     // ID of the profile we'll create. This will always be a profile of USER_OWNER.
@@ -179,6 +181,49 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         // TODO: Test with startActivity
     }
 
+    public void testAppLinks() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        // Disable all pre-existing browsers in the managed profile so they don't interfere with
+        // intents resolution.
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".CrossProfileUtils",
+                "testDisableAllBrowsers", mUserId));
+        installApp(INTENT_RECEIVER_APK);
+        installApp(INTENT_SENDER_APK);
+
+        changeVerificationStatus(USER_OWNER, INTENT_RECEIVER_PKG, "ask");
+        changeVerificationStatus(mUserId, INTENT_RECEIVER_PKG, "ask");
+        // We should have two receivers: IntentReceiverActivity and BrowserActivity in the
+        // managed profile
+        assertAppLinkResult("testTwoReceivers");
+
+        changeUserRestrictionForUser("allow_parent_profile_app_linking", ADD_RESTRICTION_COMMAND,
+                mUserId);
+        // Now we should also have one receiver in the primary user, so three receivers in total.
+        assertAppLinkResult("testThreeReceivers");
+
+        changeVerificationStatus(USER_OWNER, INTENT_RECEIVER_PKG, "never");
+        // The primary user one has been set to never: we should only have the managed profile ones.
+        assertAppLinkResult("testTwoReceivers");
+
+        changeVerificationStatus(mUserId, INTENT_RECEIVER_PKG, "never");
+        // Now there's only the browser in the managed profile left
+        assertAppLinkResult("testReceivedByBrowserActivityInManaged");
+
+        changeVerificationStatus(USER_OWNER, INTENT_RECEIVER_PKG, "always");
+        changeVerificationStatus(mUserId, INTENT_RECEIVER_PKG, "ask");
+        // We've set the receiver in the primary user to always: only this one should receive the
+        // intent.
+        assertAppLinkResult("testReceivedByAppLinkActivityInPrimary");
+
+        changeVerificationStatus(mUserId, INTENT_RECEIVER_PKG, "always");
+        // We have one always in the primary user and one always in the managed profile: the managed
+        // profile one should have precedence.
+        assertAppLinkResult("testReceivedByAppLinkActivityInManaged");
+    }
+
+
     public void testSettingsIntents() throws Exception {
         if (!mHasFeature) {
             return;
@@ -269,17 +314,16 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             return;
         }
         String restriction = "no_debugging_features";  // UserManager.DISALLOW_DEBUGGING_FEATURES
-        String command = "add-restriction";
 
         String addRestrictionCommandOutput =
-                changeUserRestrictionForUser(restriction, command, mUserId);
+                changeUserRestrictionForUser(restriction, ADD_RESTRICTION_COMMAND, mUserId);
         assertTrue("Command was expected to succeed " + addRestrictionCommandOutput,
                 addRestrictionCommandOutput.contains("Status: ok"));
 
         // This should now fail, as the shell is not available to start activities under a different
         // user once the restriction is in place.
         addRestrictionCommandOutput =
-                changeUserRestrictionForUser(restriction, command, mUserId);
+                changeUserRestrictionForUser(restriction, ADD_RESTRICTION_COMMAND, mUserId);
         assertTrue(
                 "Expected SecurityException when starting the activity "
                         + addRestrictionCommandOutput,
@@ -622,5 +666,17 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         CLog.logAndDisplay(LogLevel.INFO,
                 "Output for command " + adbCommand + ": " + commandOutput);
         return commandOutput;
+    }
+
+    // status should be one of never, undefined, ask, always
+    private void changeVerificationStatus(int userId, String packageName, String status)
+            throws DeviceNotAvailableException {
+        String command = "pm set-app-link --user " + userId + " " + packageName + " " + status;
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+                + getDevice().executeShellCommand(command));
+    }
+
+    private void assertAppLinkResult(String methodName) throws DeviceNotAvailableException {
+        assertTrue(runDeviceTestsAsUser(INTENT_SENDER_PKG, ".AppLinkTest", methodName, mUserId));
     }
 }
