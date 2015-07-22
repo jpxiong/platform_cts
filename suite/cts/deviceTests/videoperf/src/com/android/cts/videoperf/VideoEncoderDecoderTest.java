@@ -362,7 +362,6 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
     private void doTestGoog(String mimeType, int w, int h) throws Exception {
         mTestConfig.mTestPixels = false;
-        mTestConfig.mReportFrameTime = true;
         mTestConfig.mTotalFrames = 3000;
         mTestConfig.mNumberOfRepeat = 2;
         doTest(true /* isGoog */, mimeType, w, h);
@@ -371,7 +370,6 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
     private void doTestOther(String mimeType, int w, int h) throws Exception {
         mTestConfig.mTestPixels = false;
         mTestConfig.mTestResult = true;
-        mTestConfig.mReportFrameTime = true;
         mTestConfig.mTotalFrames = 3000;
         mTestConfig.mNumberOfRepeat = 2;
         doTest(false /* isGoog */, mimeType, w, h);
