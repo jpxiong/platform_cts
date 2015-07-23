@@ -698,6 +698,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         // blank final variables: all successful paths will initialize the times.
         final long endTime;
         final long startTime;
+        final long stopRequestTime;
         final long stopTime;
 
         try {
@@ -850,6 +851,7 @@ public class AudioRecordTest extends CtsAndroidTestCase {
             // One must sleep to make sure the last event(s) come in.
             Thread.sleep(30);
 
+            stopRequestTime = System.currentTimeMillis();
             record.stop();
             assertEquals(AudioRecord.RECORDSTATE_STOPPED, record.getRecordingState());
 
@@ -911,10 +913,14 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         // and there is no record.getPosition(), we consider only differential timing
         // from the first marker or periodic event.
         final int toleranceInFrames = TEST_SR * 80 / 1000; // 80 ms
+        final int testTimeInFrames = (int)((long)TEST_TIME_MS * TEST_SR / 1000);
 
         AudioHelper.Statistics markerStat = new AudioHelper.Statistics();
         for (int i = 1; i < markerList.size(); ++i) {
             final int expected = mMarkerPeriodInFrames * i;
+            if (markerList.get(i) > testTimeInFrames) {
+                break; // don't consider any notifications when we might be stopping.
+            }
             final int actual = markerList.get(i) - markerList.get(0);
             //Log.d(TAG, "Marker: " + i + " expected(" + expected + ")  actual(" + actual
             //        + ")  diff(" + (actual - expected) + ")"
@@ -926,6 +932,9 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         AudioHelper.Statistics periodicStat = new AudioHelper.Statistics();
         for (int i = 1; i < periodicList.size(); ++i) {
             final int expected = updatePeriodInFrames * i;
+            if (periodicList.get(i) > testTimeInFrames) {
+                break; // don't consider any notifications when we might be stopping.
+            }
             final int actual = periodicList.get(i) - periodicList.get(0);
             //Log.d(TAG, "Update: " + i + " expected(" + expected + ")  actual(" + actual
             //        + ")  diff(" + (actual - expected) + ")"
@@ -938,9 +947,11 @@ public class AudioRecordTest extends CtsAndroidTestCase {
         ReportLog log = getReportLog();
         log.printValue(reportName + ": startRecording lag", firstSampleTime - startTime,
                 ResultType.LOWER_BETTER, ResultUnit.MS);
+        log.printValue(reportName + ": stop execution time", stopTime - stopRequestTime,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
         log.printValue(reportName + ": Total record time expected", TEST_TIME_MS,
                 ResultType.NEUTRAL, ResultUnit.MS);
-        log.printValue(reportName + ": Total record time actual", (endTime - firstSampleTime),
+        log.printValue(reportName + ": Total record time actual", endTime - firstSampleTime,
                 ResultType.NEUTRAL, ResultUnit.MS);
         log.printValue(reportName + ": Total markers expected", markerPeriods,
                 ResultType.NEUTRAL, ResultUnit.COUNT);
