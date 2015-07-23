@@ -132,6 +132,14 @@
         complete this test. If available, this test should be run by using fingerprint authentication
         as well as PIN/pattern/password authentication.
     </string>
+    <string name="sec_fingerprint_bound_key_test">Fingerprint Bound Keys Test</string>
+    <string name="sec_fingerprint_bound_key_test_info">
+        This test ensures that Keystore cryptographic keys that are bound to fingerprint authentication
+        are unusable without an authentication. You need to set up a fingerprint order to
+        complete this test.
+    </string>
+    <string name="sec_fp_dialog_message">Authenticate now with fingerprint</string>
+    <string name="sec_fp_auth_failed">Authentication failed</string>
     <string name="sec_start_test">Start Test</string>
 
     <!-- Strings for BluetoothActivity -->
