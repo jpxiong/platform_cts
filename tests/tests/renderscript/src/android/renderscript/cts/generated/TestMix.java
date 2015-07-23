@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestMix extends RSBaseCompute {
 
     private ScriptC_TestMix script;
@@ -42,9 +44,9 @@ public class TestMix extends RSBaseCompute {
     }
 
     private void checkMixFloatFloatFloatFloat() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9f4beff6471d6db1l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6ede0b88b4422e8fl, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6d2f014ec6a51d9fl, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x471d6db1l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb4422e8fl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc6a51d9fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -67,13 +69,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloatFloatFloatFloat(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -90,36 +98,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloatFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloatFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat2Float2Float2Float2() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x45502e8f0a2d9ce9l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xba2b8a035395e837l, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe56bef3c621e0ac7l, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xa2d9ce9l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5395e837l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x621e0ac7l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -142,13 +158,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat2Float2Float2Float2(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -165,36 +187,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat2Float2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat2Float2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat3Float3Float3Float3() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xeb4701726b009c5l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9b21f6b3249ee4cbl, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf15862eab0d4f51bl, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x26b009c5l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x249ee4cbl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb0d4f51bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -217,13 +247,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat3Float3Float3Float3(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -240,36 +276,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat3Float3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat3Float3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat4Float4Float4Float4() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd818b19f433276a1l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7c186362f5a7e15fl, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfd44d698ff8bdf6fl, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x433276a1l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf5a7e15fl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xff8bdf6fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -292,13 +336,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat4Float4Float4Float4(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -315,36 +365,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat4Float4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat4Float4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat2Float2FloatFloat2() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf811b2d52bd1d7c3l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x17a127e13c8dd1c5l, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe0b7d03e92afd1f5l, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2bd1d7c3l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3c8dd1c5l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x92afd1f5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -367,13 +425,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat2Float2FloatFloat2(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -390,36 +454,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat2Float2FloatFloat2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat2Float2FloatFloat2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat3Float3FloatFloat3() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xae7aff441b20fa80l, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe64a4d60d6f4de7cl, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x21bd09bbd131a27cl, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1b20fa80l, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd6f4de7cl, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd131a27cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -442,13 +514,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat3Float3FloatFloat3(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -465,36 +543,44 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat3Float3FloatFloat3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat3Float3FloatFloat3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMixFloat4Float4FloatFloat4() {
-        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x64e44bb30a701d3dl, false);
-        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb4f372e0715beb33l, false);
-        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x62c243390fb37303l, false);
+        Allocation inStart = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa701d3dl, false);
+        Allocation inStop = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x715beb33l, false);
+        Allocation inFraction = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfb37303l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInStop(inStop);
@@ -517,13 +603,19 @@ public class TestMix extends RSBaseCompute {
 
     private void verifyResultsMixFloat4Float4FloatFloat4(Allocation inStart, Allocation inStop, Allocation inFraction, Allocation out, boolean relaxed) {
         float[] arrayInStart = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStart, (float) 42);
         inStart.copyTo(arrayInStart);
         float[] arrayInStop = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInStop, (float) 42);
         inStop.copyTo(arrayInStop);
         float[] arrayInFraction = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInFraction, (float) 42);
         inFraction.copyTo(arrayInFraction);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -540,30 +632,38 @@ public class TestMix extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inStart: ");
-                    appendVariableToMessage(message, args.inStart);
-                    message.append("\n");
-                    message.append("Input inStop: ");
-                    appendVariableToMessage(message, args.inStop);
-                    message.append("\n");
-                    message.append("Input inFraction: ");
-                    appendVariableToMessage(message, args.inFraction);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inStart: ");
+                        appendVariableToMessage(message, args.inStart);
+                        message.append("\n");
+                        message.append("Input inStop: ");
+                        appendVariableToMessage(message, args.inStop);
+                        message.append("\n");
+                        message.append("Input inFraction: ");
+                        appendVariableToMessage(message, args.inFraction);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMixFloat4Float4FloatFloat4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMixFloat4Float4FloatFloat4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testMix() {

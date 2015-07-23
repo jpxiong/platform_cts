@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestAbs extends RSBaseCompute {
 
     private ScriptC_TestAbs script;
@@ -40,7 +42,7 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsCharUchar() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x79257810f7393ea6l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xf7393ea6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             script.forEach_testAbsCharUchar(inV, out);
@@ -59,9 +61,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsCharUchar(Allocation inV, Allocation out, boolean relaxed) {
         byte[] arrayInV = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (byte) 42);
         inV.copyTo(arrayInV);
         byte[] arrayOut = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -75,28 +81,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsCharUchar" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsCharUchar" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsChar2Uchar2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xff611dd40e5e407cl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xe5e407cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testAbsChar2Uchar2(inV, out);
@@ -115,9 +129,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsChar2Uchar2(Allocation inV, Allocation out, boolean relaxed) {
         byte[] arrayInV = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (byte) 42);
         inV.copyTo(arrayInV);
         byte[] arrayOut = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -131,28 +149,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar2Uchar2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsChar2Uchar2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsChar3Uchar3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xff62e6ef0479615al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x479615al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testAbsChar3Uchar3(inV, out);
@@ -171,9 +197,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsChar3Uchar3(Allocation inV, Allocation out, boolean relaxed) {
         byte[] arrayInV = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (byte) 42);
         inV.copyTo(arrayInV);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -187,28 +217,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar3Uchar3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsChar3Uchar3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsChar4Uchar4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xff64b009fa948238l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xfa948238l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testAbsChar4Uchar4(inV, out);
@@ -227,9 +265,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsChar4Uchar4(Allocation inV, Allocation out, boolean relaxed) {
         byte[] arrayInV = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (byte) 42);
         inV.copyTo(arrayInV);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -243,24 +285,32 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsChar4Uchar4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsChar4Uchar4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsShortUshort {
@@ -269,7 +319,7 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsShortUshort() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xfab837da064819cl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xa064819cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             script.forEach_testAbsShortUshort(inV, out);
@@ -288,9 +338,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsShortUshort(Allocation inV, Allocation out, boolean relaxed) {
         short[] arrayInV = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (short) 42);
         inV.copyTo(arrayInV);
         short[] arrayOut = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -304,28 +358,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShortUshort" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsShortUshort" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsShort2Ushort2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x231450e16856b93el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x6856b93el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testAbsShort2Ushort2(inV, out);
@@ -344,9 +406,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsShort2Ushort2(Allocation inV, Allocation out, boolean relaxed) {
         short[] arrayInV = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (short) 42);
         inV.copyTo(arrayInV);
         short[] arrayOut = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -360,28 +426,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort2Ushort2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsShort2Ushort2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsShort3Ushort3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x23611868beb24a6al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xbeb24a6al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testAbsShort3Ushort3(inV, out);
@@ -400,9 +474,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsShort3Ushort3(Allocation inV, Allocation out, boolean relaxed) {
         short[] arrayInV = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (short) 42);
         inV.copyTo(arrayInV);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -416,28 +494,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort3Ushort3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsShort3Ushort3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsShort4Ushort4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x23addff0150ddb96l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x150ddb96l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testAbsShort4Ushort4(inV, out);
@@ -456,9 +542,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsShort4Ushort4(Allocation inV, Allocation out, boolean relaxed) {
         short[] arrayInV = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (short) 42);
         inV.copyTo(arrayInV);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -472,24 +562,32 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsShort4Ushort4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsShort4Ushort4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsIntUint {
@@ -498,7 +596,7 @@ public class TestAbs extends RSBaseCompute {
     }
 
     private void checkAbsIntUint() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6adb1880ac5b83e6l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xac5b83e6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             script.forEach_testAbsIntUint(inV, out);
@@ -517,9 +615,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsIntUint(Allocation inV, Allocation out, boolean relaxed) {
         int[] arrayInV = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (int) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -533,28 +635,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsIntUint" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsIntUint" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsInt2Uint2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xc8728053938616fal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x938616fal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testAbsInt2Uint2(inV, out);
@@ -573,9 +683,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsInt2Uint2(Allocation inV, Allocation out, boolean relaxed) {
         int[] arrayInV = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (int) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -589,28 +703,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt2Uint2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsInt2Uint2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsInt3Uint3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xc8728af4f28ddbeel, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xf28ddbeel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testAbsInt3Uint3(inV, out);
@@ -629,9 +751,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsInt3Uint3(Allocation inV, Allocation out, boolean relaxed) {
         int[] arrayInV = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (int) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -645,28 +771,36 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt3Uint3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsInt3Uint3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkAbsInt4Uint4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xc87295965195a0e2l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x5195a0e2l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testAbsInt4Uint4(inV, out);
@@ -685,9 +819,13 @@ public class TestAbs extends RSBaseCompute {
 
     private void verifyResultsAbsInt4Uint4(Allocation inV, Allocation out, boolean relaxed) {
         int[] arrayInV = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (int) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -701,24 +839,32 @@ public class TestAbs extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkAbsInt4Uint4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkAbsInt4Uint4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testAbs() {

@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestMad extends RSBaseCompute {
 
     private ScriptC_TestMad script;
@@ -42,9 +44,9 @@ public class TestMad extends RSBaseCompute {
     }
 
     private void checkMadFloatFloatFloatFloat() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a4461e340b4de48l, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a4461e340b4de49l, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xcea3b86dc50ce0fcl, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x40b4de48l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x40b4de49l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc50ce0fcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -67,13 +69,19 @@ public class TestMad extends RSBaseCompute {
 
     private void verifyResultsMadFloatFloatFloatFloat(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
         float[] arrayInMultiplicand1 = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInMultiplicand1, (float) 42);
         inMultiplicand1.copyTo(arrayInMultiplicand1);
         float[] arrayInMultiplicand2 = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInMultiplicand2, (float) 42);
         inMultiplicand2.copyTo(arrayInMultiplicand2);
         float[] arrayInOffset = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInOffset, (float) 42);
         inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -90,36 +98,44 @@ public class TestMad extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMultiplicand1: ");
-                    appendVariableToMessage(message, args.inMultiplicand1);
-                    message.append("\n");
-                    message.append("Input inMultiplicand2: ");
-                    appendVariableToMessage(message, args.inMultiplicand2);
-                    message.append("\n");
-                    message.append("Input inOffset: ");
-                    appendVariableToMessage(message, args.inOffset);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMultiplicand1: ");
+                        appendVariableToMessage(message, args.inMultiplicand1);
+                        message.append("\n");
+                        message.append("Input inMultiplicand2: ");
+                        appendVariableToMessage(message, args.inMultiplicand2);
+                        message.append("\n");
+                        message.append("Input inOffset: ");
+                        appendVariableToMessage(message, args.inOffset);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMadFloatFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMadFloatFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMadFloat2Float2Float2Float2() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdfffb28a8a5fd7c0l, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdfffb28a8a5fd7c1l, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3da8592f318f8924l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8a5fd7c0l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8a5fd7c1l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x318f8924l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -142,13 +158,19 @@ public class TestMad extends RSBaseCompute {
 
     private void verifyResultsMadFloat2Float2Float2Float2(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
         float[] arrayInMultiplicand1 = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInMultiplicand1, (float) 42);
         inMultiplicand1.copyTo(arrayInMultiplicand1);
         float[] arrayInMultiplicand2 = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInMultiplicand2, (float) 42);
         inMultiplicand2.copyTo(arrayInMultiplicand2);
         float[] arrayInOffset = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInOffset, (float) 42);
         inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -165,36 +187,44 @@ public class TestMad extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMultiplicand1: ");
-                    appendVariableToMessage(message, args.inMultiplicand1);
-                    message.append("\n");
-                    message.append("Input inMultiplicand2: ");
-                    appendVariableToMessage(message, args.inMultiplicand2);
-                    message.append("\n");
-                    message.append("Input inOffset: ");
-                    appendVariableToMessage(message, args.inOffset);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMultiplicand1: ");
+                        appendVariableToMessage(message, args.inMultiplicand1);
+                        message.append("\n");
+                        message.append("Input inMultiplicand2: ");
+                        appendVariableToMessage(message, args.inMultiplicand2);
+                        message.append("\n");
+                        message.append("Input inOffset: ");
+                        appendVariableToMessage(message, args.inOffset);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMadFloat2Float2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMadFloat2Float2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMadFloat3Float3Float3Float3() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdd6226bde1551f1cl, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdd6226bde1551f1dl, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x117f5b0bfb77d218l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe1551f1cl, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe1551f1dl, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfb77d218l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -217,13 +247,19 @@ public class TestMad extends RSBaseCompute {
 
     private void verifyResultsMadFloat3Float3Float3Float3(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
         float[] arrayInMultiplicand1 = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMultiplicand1, (float) 42);
         inMultiplicand1.copyTo(arrayInMultiplicand1);
         float[] arrayInMultiplicand2 = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMultiplicand2, (float) 42);
         inMultiplicand2.copyTo(arrayInMultiplicand2);
         float[] arrayInOffset = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInOffset, (float) 42);
         inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -240,36 +276,44 @@ public class TestMad extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMultiplicand1: ");
-                    appendVariableToMessage(message, args.inMultiplicand1);
-                    message.append("\n");
-                    message.append("Input inMultiplicand2: ");
-                    appendVariableToMessage(message, args.inMultiplicand2);
-                    message.append("\n");
-                    message.append("Input inOffset: ");
-                    appendVariableToMessage(message, args.inOffset);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMultiplicand1: ");
+                        appendVariableToMessage(message, args.inMultiplicand1);
+                        message.append("\n");
+                        message.append("Input inMultiplicand2: ");
+                        appendVariableToMessage(message, args.inMultiplicand2);
+                        message.append("\n");
+                        message.append("Input inOffset: ");
+                        appendVariableToMessage(message, args.inOffset);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMadFloat3Float3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMadFloat3Float3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMadFloat4Float4Float4Float4() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdac49af1384a6678l, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdac49af1384a6679l, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe5565ce8c5601b0cl, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x384a6678l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x384a6679l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc5601b0cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -292,13 +336,19 @@ public class TestMad extends RSBaseCompute {
 
     private void verifyResultsMadFloat4Float4Float4Float4(Allocation inMultiplicand1, Allocation inMultiplicand2, Allocation inOffset, Allocation out, boolean relaxed) {
         float[] arrayInMultiplicand1 = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMultiplicand1, (float) 42);
         inMultiplicand1.copyTo(arrayInMultiplicand1);
         float[] arrayInMultiplicand2 = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMultiplicand2, (float) 42);
         inMultiplicand2.copyTo(arrayInMultiplicand2);
         float[] arrayInOffset = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInOffset, (float) 42);
         inOffset.copyTo(arrayInOffset);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -315,30 +365,38 @@ public class TestMad extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMultiplicand1: ");
-                    appendVariableToMessage(message, args.inMultiplicand1);
-                    message.append("\n");
-                    message.append("Input inMultiplicand2: ");
-                    appendVariableToMessage(message, args.inMultiplicand2);
-                    message.append("\n");
-                    message.append("Input inOffset: ");
-                    appendVariableToMessage(message, args.inOffset);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMultiplicand1: ");
+                        appendVariableToMessage(message, args.inMultiplicand1);
+                        message.append("\n");
+                        message.append("Input inMultiplicand2: ");
+                        appendVariableToMessage(message, args.inMultiplicand2);
+                        message.append("\n");
+                        message.append("Input inOffset: ");
+                        appendVariableToMessage(message, args.inOffset);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMadFloat4Float4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMadFloat4Float4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testMad() {

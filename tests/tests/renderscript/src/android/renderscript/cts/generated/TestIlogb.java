@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestIlogb extends RSBaseCompute {
 
     private ScriptC_TestIlogb script;
@@ -40,7 +42,7 @@ public class TestIlogb extends RSBaseCompute {
     }
 
     private void checkIlogbFloatInt() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6103ca4b5664967bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5664967bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.forEach_testIlogbFloatInt(inV, out);
@@ -59,9 +61,13 @@ public class TestIlogb extends RSBaseCompute {
 
     private void verifyResultsIlogbFloatInt(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -73,23 +79,31 @@ public class TestIlogb extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkIlogbFloatInt" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkIlogbFloatInt" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkIlogbFloat2Int2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb460143cb6f32a61l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb6f32a61l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testIlogbFloat2Int2(inV, out);
@@ -108,9 +122,13 @@ public class TestIlogb extends RSBaseCompute {
 
     private void verifyResultsIlogbFloat2Int2(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -122,23 +140,31 @@ public class TestIlogb extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkIlogbFloat2Int2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkIlogbFloat2Int2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkIlogbFloat3Int3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb460147c009b3a97l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9b3a97l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testIlogbFloat3Int3(inV, out);
@@ -157,9 +183,13 @@ public class TestIlogb extends RSBaseCompute {
 
     private void verifyResultsIlogbFloat3Int3(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -171,23 +201,31 @@ public class TestIlogb extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkIlogbFloat3Int3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkIlogbFloat3Int3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkIlogbFloat4Int4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb46014bb4a434acdl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4a434acdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testIlogbFloat4Int4(inV, out);
@@ -206,9 +244,13 @@ public class TestIlogb extends RSBaseCompute {
 
     private void verifyResultsIlogbFloat4Int4(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -220,19 +262,27 @@ public class TestIlogb extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyIlogb(args);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkIlogbFloat4Int4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkIlogbFloat4Int4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testIlogb() {

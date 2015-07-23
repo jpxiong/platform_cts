@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestRemquo extends RSBaseCompute {
 
     private ScriptC_TestRemquo script;
@@ -42,8 +44,8 @@ public class TestRemquo extends RSBaseCompute {
     }
 
     private void checkRemquoFloatFloatIntFloat() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xcd5efc69edd4ff2al, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4ff0c9312eb19f93l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xedd4ff2al, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2eb19f93l, false);
         try {
             Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -68,13 +70,19 @@ public class TestRemquo extends RSBaseCompute {
 
     private void verifyResultsRemquoFloatFloatIntFloat(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         int[] arrayOutQuotient = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOutQuotient, (int) 42);
         outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -89,30 +97,38 @@ public class TestRemquo extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Output outQuotient: ");
-                    appendVariableToMessage(message, args.outQuotient);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkRemquoFloatFloatIntFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Output outQuotient: ");
+                        appendVariableToMessage(message, args.outQuotient);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemquoFloatFloatIntFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemquoFloat2Float2Int2Float2() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x28c14abc3a27171al, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x58f8799a6ba08403l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3a27171al, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6ba08403l, false);
         try {
             Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -137,13 +153,19 @@ public class TestRemquo extends RSBaseCompute {
 
     private void verifyResultsRemquoFloat2Float2Int2Float2(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         int[] arrayOutQuotient = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOutQuotient, (int) 42);
         outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -158,30 +180,38 @@ public class TestRemquo extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Output outQuotient: ");
-                    appendVariableToMessage(message, args.outQuotient);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkRemquoFloat2Float2Int2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Output outQuotient: ");
+                        appendVariableToMessage(message, args.outQuotient);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemquoFloat2Float2Int2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemquoFloat3Float3Int3Float3() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf60211df96052526l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd1d6c7fcf273f8afl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x96052526l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf273f8afl, false);
         try {
             Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -206,13 +236,19 @@ public class TestRemquo extends RSBaseCompute {
 
     private void verifyResultsRemquoFloat3Float3Int3Float3(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         int[] arrayOutQuotient = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOutQuotient, (int) 42);
         outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -227,30 +263,38 @@ public class TestRemquo extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Output outQuotient: ");
-                    appendVariableToMessage(message, args.outQuotient);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkRemquoFloat3Float3Int3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Output outQuotient: ");
+                        appendVariableToMessage(message, args.outQuotient);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemquoFloat3Float3Int3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemquoFloat4Float4Int4Float4() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc342d902f1e33332l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4ab5165f79476d5bl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf1e33332l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x79476d5bl, false);
         try {
             Allocation outQuotient = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -275,13 +319,19 @@ public class TestRemquo extends RSBaseCompute {
 
     private void verifyResultsRemquoFloat4Float4Int4Float4(Allocation inNumerator, Allocation inDenominator, Allocation outQuotient, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         int[] arrayOutQuotient = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOutQuotient, (int) 42);
         outQuotient.copyTo(arrayOutQuotient);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -296,25 +346,33 @@ public class TestRemquo extends RSBaseCompute {
                 String errorMessage = CoreMathVerifier.verifyRemquo(args, target);
                 boolean valid = errorMessage == null;
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Output outQuotient: ");
-                    appendVariableToMessage(message, args.outQuotient);
-                    message.append("\n");
-                    message.append("Output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append(errorMessage);
-                    assertTrue("Incorrect output for checkRemquoFloat4Float4Int4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Output outQuotient: ");
+                        appendVariableToMessage(message, args.outQuotient);
+                        message.append("\n");
+                        message.append("Output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append(errorMessage);
+                        message.append("Errors at");
+                    }
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemquoFloat4Float4Int4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testRemquo() {
