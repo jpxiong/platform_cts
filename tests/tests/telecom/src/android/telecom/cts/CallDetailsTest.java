@@ -165,7 +165,9 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getExtras() getter returns the correct object.
      */
     public void testExtras() {
-        assertThat(mCall.getDetails().getExtras(), is(Bundle.class));
+        if (mCall.getDetails().getExtras() != null) {
+            assertThat(mCall.getDetails().getExtras(), is(Bundle.class));
+        }
     }
 
     /**
@@ -179,7 +181,9 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getGatewayInfo() getter returns the correct object.
      */
     public void testGatewayInfo() {
-        assertThat(mCall.getDetails().getGatewayInfo(), is(GatewayInfo.class));
+        if (mCall.getDetails().getGatewayInfo() != null) {
+            assertThat(mCall.getDetails().getGatewayInfo(), is(GatewayInfo.class));
+        }
     }
 
     /**
