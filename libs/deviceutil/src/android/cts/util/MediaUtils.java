@@ -26,9 +26,15 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.util.Range;
+
+import com.android.cts.util.ReportLog;
+import com.android.cts.util.ResultType;
+import com.android.cts.util.ResultUnit;
+
 import java.lang.reflect.Method;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.lang.reflect.Modifier.isStatic;
+import java.util.Arrays;
 import java.util.Map;
 import android.util.Log;
 
@@ -398,5 +404,115 @@ public class MediaUtils {
         }
 
         return extractor;
+    }
+
+    /**
+     * return the average value of the passed array.
+     */
+    public static double getAverage(double[] data) {
+        int num = data.length;
+        if (num == 0) {
+            return 0;
+        }
+
+        double sum = data[0];
+        for (int i = 1; i < num; i++) {
+            sum += data[i];
+        }
+        return sum / num;
+    }
+
+    /**
+     * return the standard deviation value of the passed array
+     */
+    public static double getStdev(double[] data) {
+        double average = getAverage(data);
+        int num = data.length;
+        if (num == 0) {
+            return 0;
+        }
+        double variance = 0;
+        for (int i = 0; i < num; ++i) {
+            variance += (data[i] - average) * (data[i] - average);
+        }
+        variance /= num;
+        return Math.sqrt(variance);
+    }
+
+    public static double[] calculateMovingAverage(double[] array, int n) {
+        int num = array.length;
+        if (num < n) {
+            return null;
+        }
+        int avgsNum = num - n + 1;
+        double[] avgs = new double[avgsNum];
+        double sum = array[0];
+        for (int i = 1; i < n; ++i) {
+            sum += array[i];
+        }
+        avgs[0] = sum / n;
+
+        for (int i = n; i < num; ++i) {
+            sum = sum - array[i - n] + array[i];
+            avgs[i - n + 1] = sum / n;
+        }
+        return avgs;
+    }
+
+    public static void logResults(ReportLog log, String prefix,
+            double min, double max, double avg, double stdev) {
+        log.printValue(prefix + " fps", 1000000000 / min, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        log.printValue(prefix + " TimeDiffNsMin", min, ResultType.LOWER_BETTER, ResultUnit.NONE);
+        log.printValue(prefix + " TimeDiffNsMax", max, ResultType.LOWER_BETTER, ResultUnit.NONE);
+        log.printValue(prefix + " TimeDiffNsAverage",
+                avg, ResultType.LOWER_BETTER, ResultUnit.NONE);
+        log.printValue(prefix + " TimeDiffNsStdev",
+                stdev, ResultType.LOWER_BETTER, ResultUnit.NONE);
+    }
+
+    public static VideoCapabilities getVideoCapabilities(String codecName, String mime) {
+        for (MediaCodecInfo info : sMCL.getCodecInfos()) {
+            if (!info.getName().equalsIgnoreCase(codecName)) {
+                continue;
+            }
+            CodecCapabilities caps;
+            try {
+                caps = info.getCapabilitiesForType(mime);
+            } catch (IllegalArgumentException e) {
+                // mime is not supported
+                continue;
+            }
+            return caps.getVideoCapabilities();
+        }
+        return null;
+    }
+
+    public static Range<Double> getAchievableFrameRatesFor(
+            String codecName, String mimeType, int width, int height) {
+        VideoCapabilities cap = getVideoCapabilities(codecName, mimeType);
+        if (cap == null) {
+            return null;
+        }
+        return cap.getAchievableFrameRatesFor(width, height);
+    }
+
+    private static final double FRAMERATE_TOLERANCE = Math.sqrt(12.1);
+    public static boolean verifyResults(String name, String mime, int w, int h, double measured) {
+        Range<Double> reported = getAchievableFrameRatesFor(name, mime, w, h);
+        if (reported == null) {
+            Log.d(TAG, "Failed to getAchievableFrameRatesFor " +
+                    name + " " + mime + " " + w + "x" + h);
+            return false;
+        }
+        double lowerBoundary1 = reported.getLower() / FRAMERATE_TOLERANCE;
+        double upperBoundary1 = reported.getUpper() * FRAMERATE_TOLERANCE;
+        double lowerBoundary2 = reported.getUpper() / Math.pow(FRAMERATE_TOLERANCE, 2);
+        double upperBoundary2 = reported.getLower() * Math.pow(FRAMERATE_TOLERANCE, 2);
+        Log.d(TAG, name + " " + mime + " " + w + "x" + h + " " +
+                "lowerBoundary1 " + lowerBoundary1 + " upperBoundary1 " + upperBoundary1 +
+                " lowerBoundary2 " + lowerBoundary2 + " upperBoundary2 " + upperBoundary2 +
+                " measured " + measured);
+        return (measured >= lowerBoundary1 && measured <= upperBoundary1 &&
+                measured >= lowerBoundary2 && measured <= upperBoundary2);
     }
 }
