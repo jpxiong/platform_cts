@@ -179,12 +179,13 @@ public class ResourceManagerTestActivityBase extends Activity {
             } catch (MediaCodec.CodecException e) {
                 Log.d(TAG, "CodecException 0x" + Integer.toHexString(e.getErrorCode()));
                 break;
+            } finally {
+                if (codec != null) {
+                    Log.d(TAG, "release codec");
+                    codec.release();
+                    codec = null;
+                }
             }
-        }
-        if (codec != null) {
-            Log.d(TAG, "release codec");
-            codec.release();
-            codec = null;
         }
     }
 
