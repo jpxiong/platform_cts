@@ -34,6 +34,7 @@ public class ResourceManagerTestActivityBase extends Activity {
     public static final int TYPE_MIX = 2;
 
     protected String TAG;
+    private static final int FRAME_RATE = 10;
     private static final int IFRAME_INTERVAL = 10;  // 10 seconds between I-frames
     private static final String MIME = MediaFormat.MIMETYPE_VIDEO_AVC;
 
@@ -66,16 +67,14 @@ public class ResourceManagerTestActivityBase extends Activity {
 
     private MediaFormat getTestFormat(CodecCapabilities caps, boolean securePlayback) {
         VideoCapabilities vcaps = caps.getVideoCapabilities();
-        int maxWidth = vcaps.getSupportedWidths().getUpper();
-        int maxHeight = vcaps.getSupportedHeightsFor(maxWidth).getUpper();
-        int maxBitrate = vcaps.getBitrateRange().getUpper();
-        int maxFramerate = vcaps.getSupportedFrameRatesFor(maxWidth, maxHeight)
-                .getUpper().intValue();
+        int width = vcaps.getSupportedWidths().getLower();
+        int height = vcaps.getSupportedHeightsFor(width).getLower();
+        int bitrate = vcaps.getBitrateRange().getLower();
 
-        MediaFormat format = MediaFormat.createVideoFormat(MIME, maxWidth, maxHeight);
+        MediaFormat format = MediaFormat.createVideoFormat(MIME, width, height);
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, caps.colorFormats[0]);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, maxBitrate);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, maxFramerate);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
         format.setFeatureEnabled(CodecCapabilities.FEATURE_SecurePlayback, securePlayback);
         return format;
@@ -122,23 +121,27 @@ public class ResourceManagerTestActivityBase extends Activity {
             Log.d(TAG, "type is: " + type);
         }
 
-        boolean shouldSkip = true;
+        boolean shouldSkip = false;
         boolean securePlayback;
         if (type == TYPE_NONSECURE || type == TYPE_MIX) {
             securePlayback = false;
             MediaCodecInfo info = getTestCodecInfo(securePlayback);
             if (info != null) {
-                shouldSkip = false;
                 allocateCodecs(max, info, securePlayback);
+            } else {
+                shouldSkip = true;
             }
         }
 
-        if (type == TYPE_SECURE || type == TYPE_MIX) {
-            securePlayback = true;
-            MediaCodecInfo info = getTestCodecInfo(securePlayback);
-            if (info != null) {
-                shouldSkip = false;
-                allocateCodecs(max, info, securePlayback);
+        if (!shouldSkip) {
+            if (type == TYPE_SECURE || type == TYPE_MIX) {
+                securePlayback = true;
+                MediaCodecInfo info = getTestCodecInfo(securePlayback);
+                if (info != null) {
+                    allocateCodecs(max, info, securePlayback);
+                } else {
+                    shouldSkip = true;
+                }
             }
         }
 
@@ -190,6 +193,7 @@ public class ResourceManagerTestActivityBase extends Activity {
             Log.d(TAG, "release codec #" + i);
             mCodecs.get(i).release();
         }
+        mCodecs.clear();
         setResult(result);
         finish();
         Log.d(TAG, "activity finished");
