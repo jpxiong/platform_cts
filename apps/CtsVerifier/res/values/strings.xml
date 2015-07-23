@@ -22,6 +22,7 @@
     <string name="info_button_text">Info</string>
     <string name="fail_button_text">Fail</string>
     <string name="next_button_text">Next</string>
+    <string name="go_button_text">Go</string>
 
     <!-- Strings for TestListActivity -->
     <string name="test_category_audio">Audio</string>
@@ -1552,7 +1553,6 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="provisioning_byod_delete_profile">Initiate deletion of work profile.</string>
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
     <string name="provisioning_byod_disabled">Device provisioning is not enabled.</string>
-    <string name="provisioning_byod_go">Go</string>
     <string name="provisioning_button_finish">Finish</string>
     <string name="provisioning_cross_profile_chooser">Choose an app to complete action</string>
 

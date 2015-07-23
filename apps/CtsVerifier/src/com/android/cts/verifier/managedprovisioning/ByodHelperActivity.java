@@ -39,7 +39,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import com.android.cts.verifier.R;
-import com.android.cts.verifier.managedprovisioning.ByodFlowTestActivity.TestResult;
 import com.android.cts.verifier.managedprovisioning.ByodPresentMediaDialog.DialogCallback;
 
 /**
