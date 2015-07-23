@@ -47,7 +47,7 @@ public class DrawActivity extends Activity {
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
         mHandler = new RenderSpecHandler();
         int uiMode = getResources().getConfiguration().uiMode;
-        mOnTv = (uiMode & Configuration.UI_MODE_TYPE_TELEVISION) == Configuration.UI_MODE_TYPE_TELEVISION;
+        mOnTv = (uiMode & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION;
     }
 
     public boolean getOnTv() {
