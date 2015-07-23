@@ -37,6 +37,7 @@ public class BatchArrivalVerification extends AbstractSensorVerification {
     private final List<IndexedEventPair> mFailures = new LinkedList<IndexedEventPair>();
     private TestSensorEvent mFirstEvent = null;
     private int mIndex = 0;
+    private final long mEstimatedTestStartTimeMs;
 
     /**
      * Construct a {@link EventGapVerification}
@@ -45,6 +46,7 @@ public class BatchArrivalVerification extends AbstractSensorVerification {
      */
     public BatchArrivalVerification(long expectedBatchArrivalTimeUs) {
          mExpectedBatchArrivalTimeUs = expectedBatchArrivalTimeUs;
+         mEstimatedTestStartTimeMs = SystemClock.elapsedRealtime();
     }
 
     /**
@@ -91,13 +93,14 @@ public class BatchArrivalVerification extends AbstractSensorVerification {
 
         if (count > 0) {
             StringBuilder sb = new StringBuilder();
-            sb.append(count).append(" batch delayed: ");
+            sb.append(count).append(" BatchArrivalDelayed: ");
             for (int i = 0; i < Math.min(count, TRUNCATE_MESSAGE_LENGTH); i++) {
                 IndexedEventPair info = mFailures.get(i);
                 sb.append(String.format("expectedBatchArrival=%dms actualBatchArrivalTime=%dms "+
-                                        "diff=%dms tolerance=%dms",
+                                        "estimedTestStartTime=%dms diff=%dms tolerance=%dms",
                                          (mExpectedBatchArrivalTimeUs)/1000,
                                          info.event.receivedTimestamp/(1000 * 1000),
+                                         mEstimatedTestStartTimeMs,
                                          (mExpectedBatchArrivalTimeUs -
                                           info.event.receivedTimestamp/1000)/1000,
                                          BATCH_ARRIVAL_TOLERANCE_US/1000)

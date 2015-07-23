@@ -225,7 +225,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
                     builder.append("\n");
                     builder.append("ReceivedTimestamp=")
                     .append(mTimeStampFlushCompleteEvents.get(j)/1000000)
-                    .append(" Flush complete Event");
+                    .append("ms Flush complete Event");
                     ++j;
                 }
             }
