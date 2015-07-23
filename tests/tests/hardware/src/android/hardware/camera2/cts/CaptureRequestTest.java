@@ -147,7 +147,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 changeExposure(requestBuilder, DEFAULT_EXP_TIME_NS, DEFAULT_SENSITIVITY);
 
                 Size previewSz =
-                        getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
+                        getMaxPreviewSize(mCamera.getId(), mCameraManager,
+                        getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
 
                 startPreview(requestBuilder, previewSz, listener);
                 waitForSettingsApplied(listener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
@@ -202,7 +203,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                         STATISTICS_LENS_SHADING_MAP_MODE_ON);
 
                 Size previewSz =
-                        getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
+                        getMaxPreviewSize(mCamera.getId(), mCameraManager,
+                        getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
 
                 listener = new SimpleCaptureCallback();
                 startPreview(requestBuilder, previewSz, listener);
@@ -256,7 +258,8 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 int[] modes = mStaticInfo.getAeAvailableAntiBandingModesChecked();
 
                 Size previewSz =
-                        getMaxPreviewSize(mCamera.getId(), mCameraManager, PREVIEW_SIZE_BOUND);
+                        getMaxPreviewSize(mCamera.getId(), mCameraManager,
+                        getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
 
                 for (int mode : modes) {
                     antiBandingTestByMode(previewSz, mode);
