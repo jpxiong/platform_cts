@@ -32,6 +32,7 @@ import com.android.cts.verifier.ArrayTestListAdapter;
 import com.android.cts.verifier.DialogTestListActivity;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListActivity;
+import com.android.cts.verifier.TestListAdapter.TestListItem;
 import com.android.cts.verifier.TestResult;
 
 /**
@@ -73,6 +74,7 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
     private DialogTestListItem mCrossProfileImageCaptureSupportTest;
     private DialogTestListItem mCrossProfileVideoCaptureSupportTest;
     private DialogTestListItem mCrossProfileAudioCaptureSupportTest;
+    private TestListItem mKeyguardDisabledFeaturesTest;
 
     public ByodFlowTestActivity() {
         super(R.layout.provisioning_byod,
@@ -256,6 +258,11 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
                 R.string.provisioning_byod_cross_profile_instruction,
                 chooser);
 
+        mKeyguardDisabledFeaturesTest = TestListItem.newTest(this,
+                R.string.provisioning_byod_keyguard_disabled_features,
+                KeyguardDisabledFeaturesActivity.class.getName(),
+                new Intent(this, KeyguardDisabledFeaturesActivity.class), null);
+
         // Test for checking if the required intent filters are set during managed provisioning.
         mIntentFiltersTest = new DialogTestListItem(this,
                 R.string.provisioning_byod_cross_profile_intent_filters,
@@ -295,6 +302,7 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
         adapter.add(mEnableNonMarketTest);
         adapter.add(mIntentFiltersTest);
         adapter.add(mPermissionLockdownTest);
+        adapter.add(mKeyguardDisabledFeaturesTest);
 
         if (canResolveIntent(ByodHelperActivity.getCaptureImageIntent())) {
             // Capture image intent can be resolved in primary profile, so test.

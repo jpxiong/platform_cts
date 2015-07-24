@@ -67,8 +67,13 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
     public static final String ACTION_CAPTURE_AND_CHECK_VIDEO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO";
     // Primage -> managed intent: request to capture and check an audio recording
     public static final String ACTION_CAPTURE_AND_CHECK_AUDIO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO";
+    public static final String ACTION_KEYGUARD_DISABLED_FEATURES =
+            "com.android.cts.verifier.managedprovisioning.BYOD_KEYGUARD_DISABLED_FEATURES";
+    public static final String ACTION_LOCKNOW =
+            "com.android.cts.verifier.managedprovisioning.BYOD_LOCKNOW";
 
     public static final String EXTRA_PROVISIONED = "extra_provisioned";
+    public static final String EXTRA_PARAMETER_1 = "extra_parameter_1";
 
     // Primary -> managed intent: set unknown sources restriction and install package
     public static final String ACTION_INSTALL_APK = "com.android.cts.verifier.managedprovisioning.BYOD_INSTALL_APK";
@@ -187,6 +192,14 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
                 finish();
             }
             return;
+        } else if (ACTION_KEYGUARD_DISABLED_FEATURES.equals(action)) {
+            final int value = intent.getIntExtra(EXTRA_PARAMETER_1,
+                    DevicePolicyManager.KEYGUARD_DISABLE_FEATURES_NONE);
+            ComponentName admin = DeviceAdminTestReceiver.getReceiverComponentName();
+            mDevicePolicyManager.setKeyguardDisabledFeatures(admin, value);
+        } else if (ACTION_LOCKNOW.equals(action)) {
+            mDevicePolicyManager.lockNow();
+            setResult(RESULT_OK);
         }
         // This activity has no UI and is only used to respond to CtsVerifier in the primary side.
         finish();
@@ -265,6 +278,10 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
 
     public static Intent getCaptureAudioIntent() {
         return new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+    }
+
+    public static Intent createLockIntent() {
+        return new Intent(ACTION_LOCKNOW);
     }
 
     private Uri getTempUri(String fileName) {

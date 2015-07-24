@@ -1369,7 +1369,12 @@
                 android:theme="@android:style/Theme.NoDisplay"
                 android:noHistory="true"
                 android:autoRemoveFromRecents="true"
-                android:stateNotNeeded="true"/>
+                android:stateNotNeeded="true">
+        </activity>
+
+        <activity android:name=".managedprovisioning.KeyguardDisabledFeaturesActivity"
+                android:label="@string/provisioning_byod_keyguard_disabled_features">
+        </activity>
 
         <activity android:name=".managedprovisioning.WifiLockdownTestActivity"
                 android:label="@string/device_owner_wifi_lockdown_test">
@@ -1416,6 +1421,8 @@
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_IMAGE" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_KEYGUARD_DISABLED_FEATURES" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_LOCKNOW" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
@@ -1455,6 +1462,7 @@
         <activity android:name=".managedprovisioning.WorkNotificationTestActivity">
             <intent-filter>
                 <action android:name="com.android.cts.verifier.managedprovisioning.WORK_NOTIFICATION" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.LOCKSCREEN_NOTIFICATION" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.CLEAR_WORK_NOTIFICATION" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
