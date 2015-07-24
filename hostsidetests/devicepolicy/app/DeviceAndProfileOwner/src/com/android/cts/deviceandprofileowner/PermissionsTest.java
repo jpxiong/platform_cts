@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.managedprofile;
+package com.android.cts.deviceandprofileowner;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Test Runtime Permissions APIs in DevicePolicyManager.
  */
-public class PermissionsTest extends BaseManagedProfileTest {
+public class PermissionsTest extends BaseDeviceAdminTest {
     private static final String TAG = "PermissionsTest";
 
     private static final String PERMISSION_APP_PACKAGE_NAME
@@ -76,11 +76,6 @@ public class PermissionsTest extends BaseManagedProfileTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        // Make sure we are running in a managed profile, otherwise risk wiping the primary user's
-        // data.
-        assertTrue(mDevicePolicyManager.isAdminActive(ADMIN_RECEIVER_COMPONENT));
-        assertTrue(mDevicePolicyManager.isProfileOwnerApp(
-                ADMIN_RECEIVER_COMPONENT.getPackageName()));
         mReceiver = new PermissionBroadcastReceiver();
         mContext.registerReceiver(mReceiver, new IntentFilter(ACTION_PERMISSION_RESULT));
         mPackageManager = mContext.getPackageManager();
