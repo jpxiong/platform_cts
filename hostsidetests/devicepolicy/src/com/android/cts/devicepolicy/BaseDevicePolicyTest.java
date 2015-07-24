@@ -49,13 +49,9 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
 
     private static final String RUNNER = "android.support.test.runner.AndroidJUnitRunner";
 
-    protected static final String MANAGED_PROFILE_PKG = "com.android.cts.managedprofile";
-    protected static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
-    protected static final String ADMIN_RECEIVER_TEST_CLASS =
-            MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
-
     protected CtsBuildHelper mCtsBuild;
 
+    private String mPackageVerifier;
     private HashSet<String> mAvailableFeatures;
     protected boolean mHasFeature;
 
@@ -70,6 +66,18 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         assertNotNull(mCtsBuild);  // ensure build has been set before test is run.
         mHasFeature = getDevice().getApiLevel() >= 21 /* Build.VERSION_CODES.L */
                 && hasDeviceFeature("android.software.device_admin");
+        // disable the package verifier to avoid the dialog when installing an app
+        mPackageVerifier = getDevice().executeShellCommand(
+                "settings get global package_verifier_enable");
+        getDevice().executeShellCommand("settings put global package_verifier_enable 0");
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        // reset the package verifier setting to its original value
+        getDevice().executeShellCommand("settings put global package_verifier_enable "
+                + mPackageVerifier);
+        super.tearDown();
     }
 
     protected void installApp(String fileName)
@@ -336,6 +344,14 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
 
     protected void setDeviceAdmin(String componentName) throws DeviceNotAvailableException {
         String command = "dpm set-active-admin '" + componentName + "'";
+        String commandOutput = getDevice().executeShellCommand(command);
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
+        assertTrue(commandOutput + " expected to start with \"Success:\"",
+                commandOutput.startsWith("Success:"));
+    }
+
+    protected void setDeviceOwner(String componentName) throws DeviceNotAvailableException {
+        String command = "dpm set-device-owner '" + componentName + "'";
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
         assertTrue(commandOutput + " expected to start with \"Success:\"",
