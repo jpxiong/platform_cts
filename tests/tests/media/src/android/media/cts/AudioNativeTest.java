@@ -40,6 +40,9 @@ public class AudioNativeTest extends CtsAndroidTestCase {
     }
 
     public void testStereo16Record() {
+        if (!hasMicrophone()) {
+            return;
+        }
         assertTrue(AudioRecordNative.test(
                 2 /* numChannels */, 48000 /* sampleRate */, false /* useFloat */,
                 20 /* msecPerBuffer */, 8 /* numBuffers */));
@@ -134,6 +137,9 @@ public class AudioNativeTest extends CtsAndroidTestCase {
     }
 
     public void testRecordStreamData() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         final String TEST_NAME = "testRecordStreamData";
         final boolean TEST_FLOAT_ARRAY[] = {
                 false,
@@ -176,6 +182,9 @@ public class AudioNativeTest extends CtsAndroidTestCase {
     }
 
     public void testRecordAudit() throws Exception {
+        if (!hasMicrophone()) {
+            return;
+        }
         AudioRecordNative record = new AudioHelper.AudioRecordAuditNative();
         doRecordTest(record, 4 /* numChannels */, 44100 /* sampleRate */, false /* useFloat */,
                 1000 /* segmentDurationMs */, 10 /* numSegments */);
