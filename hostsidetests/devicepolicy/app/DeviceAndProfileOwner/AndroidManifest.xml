@@ -32,6 +32,8 @@
         </receiver>
         <activity
             android:name="com.android.cts.deviceandprofileowner.ApplicationRestrictionsActivity" />
+        <activity
+            android:name="com.android.cts.deviceandprofileowner.ScreenCaptureDisabledActivity" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
