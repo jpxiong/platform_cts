@@ -22,9 +22,15 @@
 
     <application>
         <uses-library android:name="android.test.runner" />
-        <activity android:name="TestActivity"
-            android:label="The Target Activity for alarmClock Intents Test">
+
+        <activity android:name="TestStartActivity"
+                  android:label="The Target Activity for AlarmClock CTS Test">
             <intent-filter>
+                <action android:name="android.intent.action.TEST_START_ACTIVITY_DISMISS_ALARM" />
+                <action android:name="android.intent.action.TEST_START_ACTIVITY_SET_ALARM" />
+                <action android:name=
+                        "android.intent.action.TEST_START_ACTIVITY_SET_ALARM_FOR_DISMISSAL" />
+                <action android:name="android.intent.action.TEST_START_ACTIVITY_SNOOZE_ALARM" />
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
