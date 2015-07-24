@@ -549,13 +549,15 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         MediaFormat format =
                 createMinFormat(mime, caps.getVideoCapabilities(), caps.colorFormats[0]);
         Vector<MediaCodec> codecs = new Vector<MediaCodec>();
+        MediaCodec codec = null;
         for (int i = 0; i < max; ++i) {
             try {
                 Log.d(TAG, "Create codec " + name + " #" + i);
-                MediaCodec codec = MediaCodec.createByCodecName(name);
+                codec = MediaCodec.createByCodecName(name);
                 codec.configure(format, null, null, flag);
                 codec.start();
                 codecs.add(codec);
+                codec = null;
             } catch (IllegalArgumentException e) {
                 fail("Got unexpected IllegalArgumentException " + e.getMessage());
             } catch (IOException e) {
@@ -569,12 +571,20 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                 } else {
                     fail("Unexpected CodecException " + e.getDiagnosticInfo());
                 }
+            } finally {
+                if (codec != null) {
+                    Log.d(TAG, "release codec");
+                    codec.release();
+                    codec = null;
+                }
             }
         }
         int actualMax = codecs.size();
         for (int i = 0; i < codecs.size(); ++i) {
+            Log.d(TAG, "release codec #" + i);
             codecs.get(i).release();
         }
+        codecs.clear();
         return actualMax;
     }
 
