@@ -18,6 +18,8 @@ package com.android.cts.usepermission;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertMediaNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertMediaReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.logCommand;
 
@@ -50,6 +52,7 @@ public class UsePermissionCompatTest extends InstrumentationTestCase {
                 assertDirReadWriteAccess(path);
             }
         }
+        assertMediaReadWriteAccess(getInstrumentation().getContext().getContentResolver());
     }
 
     public void testCompatRevoked() throws Exception {
@@ -71,6 +74,7 @@ public class UsePermissionCompatTest extends InstrumentationTestCase {
                 assertDirNoAccess(dir);
             }
         }
+        assertMediaNoAccess(getInstrumentation().getContext().getContentResolver());
 
         // Just to be sure, poke explicit path
         assertDirNoAccess(new File(Environment.getExternalStorageDirectory(),
