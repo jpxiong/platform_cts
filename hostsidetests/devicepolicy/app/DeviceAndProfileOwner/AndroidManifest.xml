@@ -30,6 +30,8 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
+        <activity
+            android:name="com.android.cts.deviceandprofileowner.ApplicationRestrictionsActivity" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
