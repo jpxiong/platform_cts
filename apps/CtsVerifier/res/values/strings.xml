@@ -89,11 +89,13 @@
     </string>
     <string name="car_dock_test">Car Dock Test</string>
     <string name="car_dock_test_desc">This test ensures that car mode opens the app associated with
-        car dock when going into car mode. Click on "Enable Car Mode" to start the test. Clicking on
-        the button will either bring up a disambiguation dialog asking which app to open or
-        immediately open the CAR_DOCK application. Select the "CTS Verifier" app if the dialog pops up,
-        which open the CAR_DOCK application. In the CAR_DOCK application, press the home button, which
-        will enable the pass button if the framework correctly tries to open the CAR_DOCk app again.</string>
+        car dock when going into car mode.\n\n
+        Click on "Enable Car Mode" to start the test. Clicking on the button will either bring up a
+        disambiguation dialog asking which app to open or immediately open the CAR_DOCK application.
+        Select the "CTS Verifier" app and then "Always" if the dialog pops up.
+        This will open the CAR_DOCK application.\n\n
+        In the CAR_DOCK application, press the home button, which will enable the pass button if the
+        framework correctly tries to open the CAR_DOCK app again.</string>
     <string name="car_mode_enable">Enable Car Mode</string>
     <string name="car_dock_activity_text">Press the Home button</string>
     <string name="da_no_policy">1. Press the \"Generate Policy\" to create a random device
