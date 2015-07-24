@@ -16,6 +16,7 @@
 
 package com.android.cts.videoperf;
 
+import android.cts.util.DeviceReportLog;
 import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.media.cts.CodecImage;
@@ -107,6 +108,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
     private TestConfig mTestConfig;
 
+    private DeviceReportLog mReportLog;
+
     @Override
     protected void setUp() throws Exception {
         mEncodedOutputBuffer = new LinkedList<Pair<ByteBuffer, BufferInfo>>();
@@ -114,6 +117,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         long now = System.currentTimeMillis();
         mRandom = new Random(now);
         mTestConfig = new TestConfig();
+        mReportLog = new DeviceReportLog();
         super.setUp();
     }
 
@@ -127,6 +131,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
         mUVDirectBuffer = null;
         mRandom = null;
         mTestConfig = null;
+        mReportLog.deliverReportToHost(getInstrumentation());
         super.tearDown();
     }
 
@@ -484,19 +489,19 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             // it will be good to clean everything to make every run the same.
             System.gc();
         }
-        getReportLog().printArray("encoder", encoderFpsResults, ResultType.HIGHER_BETTER,
+        mReportLog.printArray("encoder", encoderFpsResults, ResultType.HIGHER_BETTER,
                 ResultUnit.FPS);
-        getReportLog().printArray("rms error", decoderRmsErrorResults, ResultType.LOWER_BETTER,
+        mReportLog.printArray("rms error", decoderRmsErrorResults, ResultType.LOWER_BETTER,
                 ResultUnit.NONE);
-        getReportLog().printArray("decoder", decoderFpsResults, ResultType.HIGHER_BETTER,
+        mReportLog.printArray("decoder", decoderFpsResults, ResultType.HIGHER_BETTER,
                 ResultUnit.FPS);
-        getReportLog().printArray("encoder decoder", totalFpsResults, ResultType.HIGHER_BETTER,
+        mReportLog.printArray("encoder decoder", totalFpsResults, ResultType.HIGHER_BETTER,
                 ResultUnit.FPS);
-        getReportLog().printValue(mimeType + " encoder average fps for " + w + "x" + h,
+        mReportLog.printValue(mimeType + " encoder average fps for " + w + "x" + h,
                 Stat.getAverage(encoderFpsResults), ResultType.HIGHER_BETTER, ResultUnit.FPS);
-        getReportLog().printValue(mimeType + " decoder average fps for " + w + "x" + h,
+        mReportLog.printValue(mimeType + " decoder average fps for " + w + "x" + h,
                 Stat.getAverage(decoderFpsResults), ResultType.HIGHER_BETTER, ResultUnit.FPS);
-        getReportLog().printSummary("encoder decoder", Stat.getAverage(totalFpsResults),
+        mReportLog.printSummary("encoder decoder", Stat.getAverage(totalFpsResults),
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
         for (int i = 0; i < mTestConfig.mNumberOfRepeat; i++) {
             // make sure that rms error is not too big.
@@ -506,10 +511,10 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             }
 
             if (mTestConfig.mReportFrameTime) {
-                getReportLog().printValue(
+                mReportLog.printValue(
                         "encodertest#" + i + ": " + Arrays.toString(mEncoderFrameTimeDiff[i]),
                         0, ResultType.NEUTRAL, ResultUnit.NONE);
-                getReportLog().printValue(
+                mReportLog.printValue(
                         "decodertest#" + i + ": " + Arrays.toString(mDecoderFrameTimeDiff[i]),
                         0, ResultType.NEUTRAL, ResultUnit.NONE);
             }
