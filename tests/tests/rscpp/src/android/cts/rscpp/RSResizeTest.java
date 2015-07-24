@@ -86,6 +86,7 @@ public class RSResizeTest extends RSCppTest {
         } else {
             rsCppOutput.copyFromUnchecked(nativeFloatAlloc);
         }
+        mVerify.set_image_tolerance(0.04f); // Kept loose till a better test designed
         mVerify.invoke_verify(rsOutput, rsCppOutput, rsInput);
         checkForErrors();
     }
