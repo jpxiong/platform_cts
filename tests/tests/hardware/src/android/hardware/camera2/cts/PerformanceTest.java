@@ -684,7 +684,9 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
      */
     private void initializeImageReader(String cameraId, int format) throws Exception {
         mOrderedPreviewSizes = CameraTestUtils.getSupportedPreviewSizes(
-                cameraId, mCameraManager, CameraTestUtils.PREVIEW_SIZE_BOUND);
+                cameraId, mCameraManager,
+                CameraTestUtils.getPreviewSizeBound(mWindowManager,
+                    CameraTestUtils.PREVIEW_SIZE_BOUND));
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         createImageReader(maxPreviewSize, format, NUM_MAX_IMAGES, /*listener*/null);
         updatePreviewSurface(maxPreviewSize);

@@ -50,7 +50,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.Pair;
 import android.util.Size;
+import android.view.Display;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import com.android.ex.camera2.blocking.BlockingCameraManager;
 import com.android.ex.camera2.blocking.BlockingCameraManager.BlockingOpenException;
@@ -2057,5 +2059,23 @@ public class CameraTestUtils extends Assert {
             jpegQuality = jpgQuality;
             thumbnailQuality = thumbQuality;
         }
+    }
+
+    public static Size getPreviewSizeBound(WindowManager windowManager, Size bound) {
+        Display display = windowManager.getDefaultDisplay();
+
+        int width = display.getWidth();
+        int height = display.getHeight();
+
+        if (height > width) {
+            height = width;
+            width = display.getHeight();
+        }
+
+        if (bound.getWidth() <= width &&
+            bound.getHeight() <= height)
+            return bound;
+        else
+            return new Size(width, height);
     }
 }

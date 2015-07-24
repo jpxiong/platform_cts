@@ -41,6 +41,7 @@ import android.os.HandlerThread;
 import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
+import android.view.WindowManager;
 
 import com.android.ex.camera2.blocking.BlockingSessionCallback;
 import com.android.ex.camera2.blocking.BlockingStateCallback;
@@ -75,11 +76,14 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
     protected List<Size> mOrderedVideoSizes; // In descending order.
     protected List<Size> mOrderedStillSizes; // In descending order.
 
+    protected WindowManager mWindowManager;
+
     @Override
     public void setContext(Context context) {
         super.setContext(context);
         mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         assertNotNull("Can't connect to camera manager!", mCameraManager);
+        mWindowManager = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
     }
 
     /**
@@ -189,7 +193,8 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.ASSERT, /*collector*/null);
         mOrderedPreviewSizes = getSupportedPreviewSizes(
-                cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+                cameraId, mCameraManager,
+                getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
         mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
         mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
 
