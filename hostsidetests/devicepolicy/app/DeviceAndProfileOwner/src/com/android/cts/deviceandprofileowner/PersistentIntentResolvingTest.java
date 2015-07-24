@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.deviceowner;
+package com.android.cts.deviceandprofileowner;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -22,8 +22,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.SystemClock;
 
-public class PersistentIntentResolvingTest extends BaseDeviceOwnerTest {
-    public static final String EXAMPLE_ACTION = "com.android.cts.deviceowner.EXAMPLE_ACTION";
+public class PersistentIntentResolvingTest extends BaseDeviceAdminTest {
+    static final String EXAMPLE_ACTION = "com.android.cts.deviceandprofileowner.EXAMPLE_ACTION";
 
     private boolean mReceivedConfirmationFrom1;
     private boolean mReceivedConfirmationFrom2;
@@ -48,7 +48,8 @@ public class PersistentIntentResolvingTest extends BaseDeviceOwnerTest {
 
     @Override
     protected void tearDown() throws Exception {
-        mDevicePolicyManager.clearPackagePersistentPreferredActivities(getWho(), PACKAGE_NAME);
+        mDevicePolicyManager.clearPackagePersistentPreferredActivities(ADMIN_RECEIVER_COMPONENT,
+                PACKAGE_NAME);
         mContext.unregisterReceiver(mReceiver);
 
         super.tearDown();
@@ -80,7 +81,8 @@ public class PersistentIntentResolvingTest extends BaseDeviceOwnerTest {
 
     public void testAddAndClearPersistentPreferredActivitiesYieldsResolverActivity() {
         addPersistentPreferredActivity();
-        mDevicePolicyManager.clearPackagePersistentPreferredActivities(getWho(), PACKAGE_NAME);
+        mDevicePolicyManager.clearPackagePersistentPreferredActivities(ADMIN_RECEIVER_COMPONENT,
+                PACKAGE_NAME);
 
         sendExampleIntent();
         SystemClock.sleep(5000);
@@ -121,6 +123,7 @@ public class PersistentIntentResolvingTest extends BaseDeviceOwnerTest {
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         ComponentName targetComponent = new ComponentName(PACKAGE_NAME,
                 ExampleIntentReceivingActivity2.class.getName());
-        mDevicePolicyManager.addPersistentPreferredActivity(getWho(), filter, targetComponent);
+        mDevicePolicyManager.addPersistentPreferredActivity(ADMIN_RECEIVER_COMPONENT, filter,
+                targetComponent);
     }
 }

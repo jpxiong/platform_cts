@@ -35,19 +35,9 @@
                 <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
-        <activity android:name="com.android.cts.deviceowner.ExampleIntentReceivingActivity1">
-            <intent-filter>
-                <action android:name="com.android.cts.deviceowner.EXAMPLE_ACTION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
 
-        <activity android:name="com.android.cts.deviceowner.ExampleIntentReceivingActivity2">
-            <intent-filter>
-                <action android:name="com.android.cts.deviceowner.EXAMPLE_ACTION" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name="com.android.cts.deviceowner.KeyManagementActivity" />
 
         <activity
             android:name="com.android.cts.deviceowner.LockTaskUtilityActivity" />

@@ -45,13 +45,13 @@ import android.content.ComponentName;
 import android.content.Context;
 
 public class KeyManagementTest extends
-        ActivityInstrumentationTestCase2<ExampleIntentReceivingActivity1> {
+        ActivityInstrumentationTestCase2<KeyManagementActivity> {
 
     private static final int KEYCHAIN_TIMEOUT_MS = 8000;
     private DevicePolicyManager mDevicePolicyManager;
 
     public KeyManagementTest() {
-        super(ExampleIntentReceivingActivity1.class);
+        super(KeyManagementActivity.class);
     }
 
     @Override

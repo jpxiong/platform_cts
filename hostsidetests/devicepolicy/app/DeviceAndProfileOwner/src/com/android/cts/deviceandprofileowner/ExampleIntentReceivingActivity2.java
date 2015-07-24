@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.cts.deviceowner;
+package com.android.cts.deviceandprofileowner;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class ExampleIntentReceivingActivity1 extends Activity {
-    public static final String CONFIRM_ACTION = "com.android.cts.deviceowner.CONFIRM_1";
+public class ExampleIntentReceivingActivity2 extends Activity {
+    static final String CONFIRM_ACTION = "com.android.cts.deviceandprofileowner.CONFIRM_2";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
