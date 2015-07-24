@@ -313,13 +313,6 @@
   bug: 17675466
 },
 {
-  description: "tests will soon become mandatory",
-  names: [
-    "android.hardware.cts.SensorTest#testBatchAndFlush"
-  ],
-  bug: 18958411
-},
-{
   description: "This test failed on hw decoder that doesn't output frame with the configured format.",
   names: [
     "android.media.cts.ImageReaderDecoderTest#testHwAVCDecode360pForFlexibleYuv"
