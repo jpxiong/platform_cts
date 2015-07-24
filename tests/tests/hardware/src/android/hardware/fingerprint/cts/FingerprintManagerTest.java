@@ -55,12 +55,11 @@ public class FingerprintManagerTest extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        // TODO: pm.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT);
-        // PackageManager pm = getContext().getPackageManager();
-        mHasFingerprintManager = true;
         mAuthState = AuthState.AUTH_UNKNOWN;
 
-        if (mHasFingerprintManager) {
+        PackageManager pm = getContext().getPackageManager();
+        if (pm.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
+            mHasFingerprintManager = true;
             mFingerprintManager = (FingerprintManager)
                     getContext().getSystemService(Context.FINGERPRINT_SERVICE);
         }
