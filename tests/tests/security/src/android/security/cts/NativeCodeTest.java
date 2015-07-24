@@ -62,6 +62,12 @@ public class NativeCodeTest extends TestCase {
                    + "For more information, see "
                    + "https://nvidia.custhelp.com/app/answers/detail/a_id/3618",
                    doNvmapIocFromIdTest());
+
+    public void testPingPongRoot() throws Exception {
+        assertTrue("Device is vulnerable to CVE-2015-3636, a vulnerability in the ping "
+                   + "socket implementation. Please apply the security patch at "
+                   + "https://github.com/torvalds/linux/commit/a134f083e79f",
+                   doPingPongRootTest());
     }
 
     /**
@@ -132,4 +138,17 @@ public class NativeCodeTest extends TestCase {
      * false if the device is vulnerable.
      */
     private static native boolean doCVE20141710Test();
+
+    /**
+     * CVE-2015-3636
+     *
+     * Returns true if the patch is applied, crashes the system otherwise.
+     *
+     * Detects if the following patch is present.
+     * https://github.com/torvalds/linux/commit/a134f083e79f
+     *
+     * Credit: Wen Xu and wushi of KeenTeam.
+     * http://seclists.org/oss-sec/2015/q2/333
+     */
+    private static native boolean doPingPongRootTest();
 }
