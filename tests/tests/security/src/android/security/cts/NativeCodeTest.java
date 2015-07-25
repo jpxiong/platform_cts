@@ -62,6 +62,7 @@ public class NativeCodeTest extends TestCase {
                    + "For more information, see "
                    + "https://nvidia.custhelp.com/app/answers/detail/a_id/3618",
                    doNvmapIocFromIdTest());
+    }
 
     public void testPingPongRoot() throws Exception {
         assertTrue("Device is vulnerable to CVE-2015-3636, a vulnerability in the ping "
