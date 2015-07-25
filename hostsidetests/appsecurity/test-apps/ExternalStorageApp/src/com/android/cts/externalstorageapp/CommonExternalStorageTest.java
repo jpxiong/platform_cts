@@ -16,8 +16,13 @@
 
 package com.android.cts.externalstorageapp;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -283,6 +288,35 @@ public class CommonExternalStorageTest extends AndroidTestCase {
             fail("able to write!");
         } catch (IOException e) {
             // expected
+        }
+    }
+
+    public static void assertMediaNoAccess(ContentResolver resolver) throws Exception {
+        final ContentValues values = new ContentValues();
+        values.put(Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(Images.Media.DATA,
+                buildProbeFile(Environment.getExternalStorageDirectory()).getAbsolutePath());
+
+        try {
+            resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            fail("Expected access to be blocked");
+        } catch (Exception expected) {
+        }
+    }
+
+    public static void assertMediaReadWriteAccess(ContentResolver resolver) throws Exception {
+        final ContentValues values = new ContentValues();
+        values.put(Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(Images.Media.DATA,
+                buildProbeFile(Environment.getExternalStorageDirectory()).getAbsolutePath());
+
+        final Uri uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+        try {
+            resolver.openFileDescriptor(uri, "rw").close();
+            resolver.openFileDescriptor(uri, "w").close();
+            resolver.openFileDescriptor(uri, "r").close();
+        } finally {
+            resolver.delete(uri, null, null);
         }
     }
 
