@@ -18,6 +18,8 @@ package com.android.cts.usepermission;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertMediaNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertMediaReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.logCommand;
 
 import android.content.pm.PackageManager;
@@ -52,6 +54,7 @@ public class UsePermissionTest extends InstrumentationTestCase {
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirNoAccess(Environment.getExternalStorageDirectory());
         assertDirReadWriteAccess(getInstrumentation().getContext().getExternalCacheDir());
+        assertMediaNoAccess(getInstrumentation().getContext().getContentResolver());
     }
 
     public void testGranted() throws Exception {
@@ -64,6 +67,7 @@ public class UsePermissionTest extends InstrumentationTestCase {
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirReadWriteAccess(Environment.getExternalStorageDirectory());
         assertDirReadWriteAccess(getInstrumentation().getContext().getExternalCacheDir());
+        assertMediaReadWriteAccess(getInstrumentation().getContext().getContentResolver());
     }
 
     public void testInteractiveGrant() throws Exception {
@@ -77,6 +81,7 @@ public class UsePermissionTest extends InstrumentationTestCase {
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirNoAccess(Environment.getExternalStorageDirectory());
         assertDirReadWriteAccess(getInstrumentation().getContext().getExternalCacheDir());
+        assertMediaNoAccess(getInstrumentation().getContext().getContentResolver());
 
         // Go through normal grant flow
         mDevice = UiDevice.getInstance(getInstrumentation());
@@ -110,6 +115,7 @@ public class UsePermissionTest extends InstrumentationTestCase {
         assertEquals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
         assertDirReadWriteAccess(Environment.getExternalStorageDirectory());
         assertDirReadWriteAccess(getInstrumentation().getContext().getExternalCacheDir());
+        assertMediaReadWriteAccess(getInstrumentation().getContext().getContentResolver());
 
         mActivity.finish();
     }
