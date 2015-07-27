@@ -260,23 +260,10 @@ class CtsBuilder(object):
     self.__WritePlan(plan, 'CTS-l-tests')
 
     # CTS - sub plan for tests in drawelement packages
-    # STOPSHIP(jpoyry): Do not ship with reduced test plan to avoid confusion of having multiple
-    #                   different deqp sets in different plans.
-
-    plan = tools.TestPlan(packages)
-    plan.Exclude('.*')
-    plan.Include(r'com\.drawelements\.deqp\.gles3')
-    plan.Include(r'com\.drawelements\.deqp\.gles31')
-    plan.IncludeTests('com.drawelements.deqp.gles3', ReadFileLines(os.path.join(self.test_root, 'deqp/gles3-golden-tests.txt')))
-    plan.IncludeTests('com.drawelements.deqp.gles31', ReadFileLines(os.path.join(self.test_root, 'deqp/gles31-golden-tests.txt')))
-    self.__WritePlan(plan, 'CTS-DEQP')
-
     plan = tools.TestPlan(packages)
     plan.Exclude('.*')
     plan.Include(r'com\.drawelements\.')
-    plan.ExcludeTests('com.drawelements.deqp.gles3', ReadFileLines(os.path.join(self.test_root, 'deqp/gles3-golden-tests.txt')))
-    plan.ExcludeTests('com.drawelements.deqp.gles31', ReadFileLines(os.path.join(self.test_root, 'deqp/gles31-golden-tests.txt')))
-    self.__WritePlan(plan, 'CTS-DEQP-staging')
+    self.__WritePlan(plan, 'CTS-DEQP')
 
     # CTS - sub plan for new test packages added for staging
     plan = tools.TestPlan(packages)
