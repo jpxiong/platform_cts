@@ -26,6 +26,7 @@ import android.media.Rating;
 import android.media.VolumeProvider;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
+import android.media.session.MediaSession.QueueItem;
 import android.media.session.PlaybackState;
 import android.os.Bundle;
 import android.os.Handler;
@@ -165,8 +166,8 @@ public class MediaSessionTest extends AndroidTestCase {
 
             // test setQueue and setQueueTitle
             mCallback.resetLocked();
-            List<MediaSession.QueueItem> queue = new ArrayList<MediaSession.QueueItem>();
-            MediaSession.QueueItem item = new MediaSession.QueueItem(new MediaDescription.Builder()
+            List<QueueItem> queue = new ArrayList<>();
+            QueueItem item = new QueueItem(new MediaDescription.Builder()
                     .setMediaId(TEST_VALUE).setTitle("title").build(), TEST_QUEUE_ID);
             queue.add(item);
             mSession.setQueue(queue);
@@ -289,6 +290,23 @@ public class MediaSessionTest extends AndroidTestCase {
         }
     }
 
+    /**
+     * Tests MediaSession.QueueItem.
+     */
+    public void testQueueItem() {
+        QueueItem item = new QueueItem(new MediaDescription.Builder()
+                .setMediaId("media-id").setTitle("title").build(), TEST_QUEUE_ID);
+        assertEquals(TEST_QUEUE_ID, item.getQueueId());
+        assertEquals("media-id", item.getDescription().getMediaId());
+        assertEquals("title", item.getDescription().getTitle());
+
+        Parcel p = Parcel.obtain();
+        item.writeToParcel(p, 0);
+        p.setDataPosition(0);
+        QueueItem other = QueueItem.CREATOR.createFromParcel(p);
+        assertEquals(item.toString(), other.toString());
+        p.recycle();
+    }
 
     /**
      * Verifies that a new session hasn't had any configuration bits set yet.
@@ -334,7 +352,7 @@ public class MediaSessionTest extends AndroidTestCase {
 
         private volatile PlaybackState mPlaybackState;
         private volatile MediaMetadata mMediaMetadata;
-        private volatile List<MediaSession.QueueItem> mQueue;
+        private volatile List<QueueItem> mQueue;
         private volatile CharSequence mTitle;
         private volatile String mEvent;
         private volatile Bundle mExtras;
@@ -377,7 +395,7 @@ public class MediaSessionTest extends AndroidTestCase {
         }
 
         @Override
-        public void onQueueChanged(List<MediaSession.QueueItem> queue) {
+        public void onQueueChanged(List<QueueItem> queue) {
             synchronized (mWaitLock) {
                 mOnQueueChangedCalled = true;
                 mQueue = queue;
