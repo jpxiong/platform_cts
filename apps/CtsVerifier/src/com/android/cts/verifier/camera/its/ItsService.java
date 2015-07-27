@@ -497,6 +497,7 @@ public class ItsService extends Service implements SensorEventListener {
                         mSocketWriteQueue.clear();
                         mOpenSocket.close();
                         mOpenSocket = null;
+                        mSocketWriteRunnable.setOpenSocket(null);
                         Logt.i(TAG, "Socket disconnected");
                     }
                 } catch (java.io.IOException e) {
@@ -509,9 +510,12 @@ public class ItsService extends Service implements SensorEventListener {
             Logt.i(TAG, "Socket server loop exited");
             mThreadExitFlag = true;
             try {
-                if (mOpenSocket != null) {
-                    mOpenSocket.close();
-                    mOpenSocket = null;
+                synchronized(mSocketWriteDrainLock) {
+                    if (mOpenSocket != null) {
+                        mOpenSocket.close();
+                        mOpenSocket = null;
+                        mSocketWriteRunnable.setOpenSocket(null);
+                    }
                 }
             } catch (java.io.IOException e) {
                 Logt.w(TAG, "Exception closing socket");
