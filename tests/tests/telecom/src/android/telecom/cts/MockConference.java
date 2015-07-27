@@ -16,14 +16,10 @@
 
 package android.telecom.cts;
 
-import static android.telecom.CallAudioState.*;
-import android.telecom.CallAudioState;
-import android.telecom.Connection;
 import android.telecom.Conference;
+import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
-import android.telecom.VideoProfile;
-import android.util.Log;
 
 /**
  * {@link Conference} subclass that immediately performs any state changes that are a result of
@@ -31,8 +27,46 @@ import android.util.Log;
  */
 public class MockConference extends Conference {
 
-    // todo: Dummy implementation for now.
     public MockConference(PhoneAccountHandle phoneAccount) {
         super(phoneAccount);
+    }
+
+    public MockConference(Connection a, Connection b) {
+        super(null);
+        setConnectionCapabilities(a.getConnectionCapabilities());
+        addConnection(a);
+        addConnection(b);
+        setActive();
+    }
+
+    @Override
+    public void onDisconnect() {
+        for (Connection c : getConnections()) {
+            c.setDisconnected(new DisconnectCause(DisconnectCause.REMOTE));
+            c.destroy();
+        }
+    }
+
+    @Override
+    public void onSeparate(Connection connection) {
+        if (getConnections().contains(connection)) {
+            removeConnection(connection);
+        }
+    }
+
+    @Override
+    public void onHold() {
+        for (Connection c : getConnections()) {
+            c.setOnHold();
+        }
+        setOnHold();
+    }
+
+    @Override
+    public void onUnhold() {
+        for (Connection c : getConnections()) {
+            c.setActive();
+        }
+        setActive();
     }
 }
