@@ -16,8 +16,10 @@
 
 package android.permission.cts;
 
+import android.content.ContentValues;
 import android.provider.CallLog;
 import android.provider.Contacts;
+import android.provider.Settings;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 
@@ -73,7 +75,19 @@ public class ProviderPermissionTest extends AndroidTestCase {
      *   {@link android.Manifest.permission#WRITE_SETTINGS}
      */
     public void testWriteSettings() {
-        assertWritingContentUriRequiresPermission(android.provider.Settings.System.CONTENT_URI,
-                android.Manifest.permission.WRITE_SETTINGS);
+        final String permission = android.Manifest.permission.WRITE_SETTINGS;
+        ContentValues value = new ContentValues();
+        value.put(Settings.System.NAME, "name");
+        value.put(Settings.System.VALUE, "value_insert");
+
+        try {
+            getContext().getContentResolver().insert(Settings.System.CONTENT_URI, value);
+            fail("expected SecurityException requiring " + permission);
+        } catch (SecurityException expected) {
+            assertNotNull("security exception's error message.", expected.getMessage());
+            assertTrue("error message should contain \"" + permission + "\". Got: \""
+                    + expected.getMessage() + "\".",
+                    expected.getMessage().contains(permission));
+        }
     }
 }
