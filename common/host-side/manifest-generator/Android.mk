@@ -18,8 +18,6 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_JAVA_LIBRARIES := compatibility-common-util-hostsidelib
-
 LOCAL_STATIC_JAVA_LIBRARIES := kxml2-2.3.0
 
 LOCAL_JAR_MANIFEST := MANIFEST.mf
