@@ -17,10 +17,10 @@ package com.android.cts.tradefed.result;
 
 import static com.android.cts.tradefed.result.CtsXmlResultReporter.CTS_RESULT_FILE_VERSION;
 
+import com.android.cts.tradefed.build.ICtsBuildInfo;
 import com.android.cts.tradefed.UnitTests;
 import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.testrunner.TestIdentifier;
-import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.LogDataType;
 import com.android.tradefed.result.LogFile;
@@ -53,7 +53,7 @@ public class CtsXmlResultReporterTest extends TestCase {
     private ByteArrayOutputStream mOutputStream;
     private File mBuildDir;
     private File mReportDir;
-    private IFolderBuildInfo mMockBuild;
+    private ICtsBuildInfo mMockBuild;
 
     /**
      * {@inheritDoc}
@@ -84,9 +84,11 @@ public class CtsXmlResultReporterTest extends TestCase {
         File plansDir = new File(repoDir, "plans");
         assertTrue(casesDir.mkdirs());
         assertTrue(plansDir.mkdirs());
-        mMockBuild = EasyMock.createNiceMock(IFolderBuildInfo.class);
+        mMockBuild = EasyMock.createMock(ICtsBuildInfo.class);
         EasyMock.expect(mMockBuild.getDeviceSerial()).andStubReturn(null);
         EasyMock.expect(mMockBuild.getRootDir()).andStubReturn(mBuildDir);
+        mMockBuild.setResultDir((File) EasyMock.anyObject());
+        EasyMock.expectLastCall();
         EasyMock.replay(mMockBuild);
     }
 

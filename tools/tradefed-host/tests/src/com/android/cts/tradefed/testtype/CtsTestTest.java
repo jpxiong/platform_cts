@@ -23,6 +23,7 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
+import com.android.tradefed.targetprep.ITargetPreparer;
 import com.android.tradefed.testtype.IRemoteTest;
 import com.android.tradefed.util.xml.AbstractXmlParser.ParseException;
 
@@ -286,6 +287,8 @@ public class CtsTestTest extends TestCase {
         EasyMock.expect(mMockPackageDef.getAbi()).andReturn(UnitTests.ABI).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getId()).andReturn(ID).atLeastOnce();
         EasyMock.expect(mMockPackageDef.getDigest()).andReturn("digest").atLeastOnce();
+        EasyMock.expect(mMockPackageDef.getPackagePreparers()).andReturn(
+                    new ArrayList<ITargetPreparer>()).atLeastOnce();
         mMockTest.run((ITestInvocationListener) EasyMock.anyObject());
     }
 
