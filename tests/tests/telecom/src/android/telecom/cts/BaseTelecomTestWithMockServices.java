@@ -42,7 +42,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -154,13 +153,18 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 Log.i(TAG, "onCallAdded, Call: " + call + "Num Calls: " + numCalls);
                 this.lock.release();
             }
+            public void onCallRemoved(Call call, int numCalls) {
+                Log.i(TAG, "onCallRemoved, Call: " + call + "Num Calls: " + numCalls);
+            }
             @Override
             public void onParentChanged(Call call, Call parent) {
                 Log.i(TAG, "onParentChanged, Call: " + call + "Parent: " + parent);
+                this.lock.release();
             }
             @Override
             public void onChildrenChanged(Call call, List<Call> children) {
-                Log.i(TAG, "onChildrenChanged, Call: " + call + "Childred: " + children);
+                Log.i(TAG, "onChildrenChanged, Call: " + call + "Children: " + children);
+                this.lock.release();
             }
             @Override
             public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {
@@ -178,6 +182,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      * {@link CtsConnectionService} which can be tested.
      */
     void addAndVerifyNewIncomingCall(Uri incomingHandle, Bundle extras) {
+        assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
         int currentCallCount = 0;
         if (mInCallCallbacks.getService() != null) {
             currentCallCount = mInCallCallbacks.getService().getCallCount();
@@ -233,6 +238,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      *  {@link CtsConnectionService} which can be tested.
      */
     void placeAndVerifyCall(Bundle extras, int videoState) {
+        assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
         int currentCallCount = 0;
         if (mInCallCallbacks.getService() != null) {
             currentCallCount = mInCallCallbacks.getService().getCallCount();
@@ -335,12 +341,59 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals(connection.getConferenceables(), confConnections);
     }
 
+    void addAndVerifyConferenceCall(Call call1, Call call2) {
+        assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
+        int currentConfCallCount = 0;
+        if (mInCallCallbacks.getService() != null) {
+            currentConfCallCount = mInCallCallbacks.getService().getConferenceCallCount();
+        }
+        List<Call> call1ConfList = call1.getConferenceableCalls();
+        List<Call> call2ConfList = call2.getConferenceableCalls();
+        if (call1ConfList.contains(call2) && call2ConfList.contains(call1)) {
+            call1.conference(call2);
+        } else {
+            fail("Calls cannot be conferenced!");
+        }
+
+        /**
+         * We should have 1 onCallAdded, 2 onChildrenChanged and 2 onParentChanged invoked, so
+         * we should have 5 available permits on the incallService lock.
+         */
+        try {
+            if (!mInCallCallbacks.lock.tryAcquire(5, 3, TimeUnit.SECONDS)) {
+                fail("Conference addition failed.");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+
+        assertEquals("InCallService should contain 1 more call after adding a conf call.",
+                currentConfCallCount + 1,
+                mInCallCallbacks.getService().getConferenceCallCount());
+    }
+
+    void splitFromConferenceCall(Call call1) {
+        assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
+
+        call1.splitFromConference();
+        /**
+         * We should have 1 onChildrenChanged and 1 onParentChanged invoked, so
+         * we should have 2 available permits on the incallService lock.
+         */
+        try {
+            if (!mInCallCallbacks.lock.tryAcquire(2, 3, TimeUnit.SECONDS)) {
+                fail("Conference split failed");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+    }
     /**
      * Disconnect the created test call and verify that Telecom has cleared all calls.
      */
     void cleanupCalls() {
         if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
-            mInCallCallbacks.getService().disconnectLastCall();
+            mInCallCallbacks.getService().disconnectAllCalls();
             assertNumCalls(mInCallCallbacks.getService(), 0);
         }
     }

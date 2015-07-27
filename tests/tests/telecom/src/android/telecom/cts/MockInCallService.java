@@ -137,16 +137,20 @@ public class MockInCallService extends InCallService {
             }
         }
         if (getCallbacks() != null) {
-            getCallbacks().onCallAdded(call, mCalls.size());
+            getCallbacks().onCallAdded(call, mCalls.size() + mConferenceCalls.size());
         }
     }
 
     @Override
     public void onCallRemoved(Call call) {
         super.onCallRemoved(call);
-        mCalls.remove(call);
+        if (call.getDetails().hasProperty(Call.Details.PROPERTY_CONFERENCE) == true) {
+            mConferenceCalls.remove(call);
+        } else {
+            mCalls.remove(call);
+        }
         if (getCallbacks() != null) {
-            getCallbacks().onCallRemoved(call, mCalls.size());
+            getCallbacks().onCallRemoved(call, mCalls.size() + mConferenceCalls.size());
             saveVideoCall(call, null /* remove videoCall */);
         }
     }
@@ -195,6 +199,18 @@ public class MockInCallService extends InCallService {
     public void disconnectLastConferenceCall() {
         final Call call = getLastConferenceCall();
         if (call != null) {
+            call.disconnect();
+        }
+    }
+
+    public void disconnectAllCalls() {
+        for (final Call call: mCalls) {
+            call.disconnect();
+        }
+    }
+
+    public void disconnectAllConferenceCalls() {
+        for (final Call call: mConferenceCalls) {
             call.disconnect();
         }
     }
