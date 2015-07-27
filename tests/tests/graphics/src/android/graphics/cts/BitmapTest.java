@@ -446,9 +446,22 @@ public class BitmapTest extends AndroidTestCase {
         }catch(IllegalArgumentException e){
         }
 
-        // normal case
+        // normal case 565
         mBitmap.setPixel(10, 16, 0xFF << 24);
         assertEquals(0xFF << 24, mBitmap.getPixel(10, 16));
+
+        // normal case A_8
+        mBitmap = Bitmap.createBitmap(10, 10, Config.ALPHA_8);
+        mBitmap.setPixel(5, 5, 0xFFFFFFFF);
+        assertEquals(0xFFFFFFFF, mBitmap.getPixel(5, 5));
+        mBitmap.setPixel(5, 5, 0xA8A8A8A8);
+        assertEquals(0xA8A8A8A8, mBitmap.getPixel(5, 5));
+        mBitmap.setPixel(5, 5, 0x00000000);
+        assertEquals(0x00000000, mBitmap.getPixel(5, 5));
+
+        // test reconstructing color channels
+        mBitmap.setPixel(5, 5, 0x1F000000);
+        assertEquals(0x1F1F1F1F, mBitmap.getPixel(5, 5));
     }
 
     public void testGetRowBytes(){
