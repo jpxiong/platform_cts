@@ -122,9 +122,7 @@ JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
     struct addrinfo *res = NULL;
     net_handle_t handle = (net_handle_t) nethandle;
 
-    // Quoth Ian Swett:
-    //     "QUIC always uses 80 and 443, but only 443 is used for secure(HTTPS) traffic."
-    int rval = android_getaddrinfofornetwork(handle, kHostname, "80", &kHints, &res);
+    int rval = android_getaddrinfofornetwork(handle, kHostname, "443", &kHints, &res);
     if (rval != 0) {
         ALOGD("android_getaddrinfofornetwork(%llu, %s) returned rval=%d errno=%d",
               handle, kHostname, rval, errno);
