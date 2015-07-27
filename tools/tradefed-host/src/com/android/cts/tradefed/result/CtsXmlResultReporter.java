@@ -17,13 +17,13 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.cts.tradefed.build.ICtsBuildInfo;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
-import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
@@ -104,6 +104,7 @@ public class CtsXmlResultReporter
     private TestPackageResult mCurrentPkgResult = null;
     private Test mCurrentTest = null;
     private boolean mIsDeviceInfoRun = false;
+    private boolean mIsExtendedDeviceInfoRun = false;
     private ResultReporter mReporter;
     private File mLogDir;
     private String mSuiteName;
@@ -124,10 +125,10 @@ public class CtsXmlResultReporter
     @Override
     public void invocationStarted(IBuildInfo buildInfo) {
         mBuildInfo = buildInfo;
-        if (!(buildInfo instanceof IFolderBuildInfo)) {
-            throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
+        if (!(buildInfo instanceof ICtsBuildInfo)) {
+            throw new IllegalArgumentException("build info is not a ICtsBuildInfo");
         }
-        IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
+        ICtsBuildInfo ctsBuild = (ICtsBuildInfo)buildInfo;
         CtsBuildHelper ctsBuildHelper = getBuildHelper(ctsBuild);
         mDeviceSerial = buildInfo.getDeviceSerial() == null ? "unknown_device" :
             buildInfo.getDeviceSerial();
@@ -154,6 +155,8 @@ public class CtsXmlResultReporter
         }
         mSuiteName = ctsBuildHelper.getSuiteName();
         mReporter = new ResultReporter(mResultServer, mSuiteName);
+
+        ctsBuild.setResultDir(mReportDir);
 
         // TODO: allow customization of log dir
         // create a unique directory for saving logs, with same name as result dir
@@ -199,7 +202,7 @@ public class CtsXmlResultReporter
      * Helper method to retrieve the {@link CtsBuildHelper}.
      * @param ctsBuild
      */
-    CtsBuildHelper getBuildHelper(IFolderBuildInfo ctsBuild) {
+    CtsBuildHelper getBuildHelper(ICtsBuildInfo ctsBuild) {
         CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
         try {
             buildHelper.validateStructure();
@@ -255,7 +258,8 @@ public class CtsXmlResultReporter
     @Override
     public void testRunStarted(String id, int numTests) {
         mIsDeviceInfoRun = DeviceInfoCollector.IDS.contains(id);
-        if (!mIsDeviceInfoRun) {
+        mIsExtendedDeviceInfoRun = DeviceInfoCollector.EXTENDED_IDS.contains(id);
+        if (!mIsDeviceInfoRun && !mIsExtendedDeviceInfoRun) {
             mCurrentPkgResult = mResults.getOrCreatePackage(id);
             mCurrentPkgResult.setDeviceSerial(mDeviceSerial);
         }
@@ -266,7 +270,7 @@ public class CtsXmlResultReporter
      */
     @Override
     public void testStarted(TestIdentifier test) {
-        if (!mIsDeviceInfoRun) {
+        if (!mIsDeviceInfoRun && !mIsExtendedDeviceInfoRun) {
             mCurrentTest = mCurrentPkgResult.insertTest(test);
         }
     }
@@ -276,7 +280,7 @@ public class CtsXmlResultReporter
      */
     @Override
     public void testFailed(TestIdentifier test, String trace) {
-        if (!mIsDeviceInfoRun) {
+        if (!mIsDeviceInfoRun && !mIsExtendedDeviceInfoRun) {
             mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
         }
     }
@@ -287,7 +291,7 @@ public class CtsXmlResultReporter
     @Override
     public void testAssumptionFailure(TestIdentifier test, String trace) {
         // TODO: do something different here?
-        if (!mIsDeviceInfoRun) {
+        if (!mIsDeviceInfoRun && !mIsExtendedDeviceInfoRun) {
             mCurrentPkgResult.reportTestFailure(test, CtsTestStatus.FAIL, trace);
         }
     }
@@ -305,7 +309,7 @@ public class CtsXmlResultReporter
      */
     @Override
     public void testEnded(TestIdentifier test, Map<String, String> testMetrics) {
-        if (!mIsDeviceInfoRun) {
+        if (!mIsDeviceInfoRun && !mIsExtendedDeviceInfoRun) {
             mCurrentPkgResult.reportTestEnded(test, testMetrics);
         }
     }
@@ -317,8 +321,19 @@ public class CtsXmlResultReporter
     public void testRunEnded(long elapsedTime, Map<String, String> runMetrics) {
         if (mIsDeviceInfoRun) {
             mResults.populateDeviceInfoMetrics(runMetrics);
+        } else if (mIsExtendedDeviceInfoRun) {
+            checkExtendedDeviceInfoMetrics(runMetrics);
         } else {
             mCurrentPkgResult.populateMetrics(runMetrics);
+        }
+    }
+
+    private void checkExtendedDeviceInfoMetrics(Map<String, String> runMetrics) {
+        for (Map.Entry<String, String> metricEntry : runMetrics.entrySet()) {
+            String value = metricEntry.getValue();
+            if (!value.endsWith(".deviceinfo.json")) {
+                CLog.e(String.format("%s failed: %s", metricEntry.getKey(), value));
+            }
         }
     }
 
