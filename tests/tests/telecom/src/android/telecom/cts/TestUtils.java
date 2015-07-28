@@ -38,9 +38,12 @@ public class TestUtils {
     // tests in the Telecom2 test package.
     public static String PACKAGE = "com.android.cts.telecom";
     public static final String COMPONENT = "android.telecom.cts.CtsConnectionService";
+    public static final String REMOTE_COMPONENT = "android.telecom.cts.CtsRemoteConnectionService";
     public static final String ACCOUNT_ID = "xtstest_CALL_PROVIDER_ID";
+    public static final String REMOTE_ACCOUNT_ID = "xtstest_REMOTE_CALL_PROVIDER_ID";
 
-    public static final String LABEL = "CTSConnectionService";
+    public static final String ACCOUNT_LABEL = "CTSConnectionService";
+    public static final String REMOTE_ACCOUNT_LABEL = "CTSRemoteConnectionService";
 
     private static final String COMMAND_SET_DEFAULT_DIALER = "telecom set-default-dialer ";
 
@@ -49,6 +52,8 @@ public class TestUtils {
     private static final String COMMAND_GET_SYSTEM_DIALER = "telecom get-system-dialer";
 
     private static final String COMMAND_ENABLE = "telecom set-phone-account-enabled ";
+
+    private static final String COMMAND_REGISTER_SIM = "telecom register-sim-phone-account ";
 
     public static final String MERGE_CALLER_NAME = "calls-merged";
     public static final String SWAP_CALLER_NAME = "calls-swapped";
@@ -80,6 +85,14 @@ public class TestUtils {
         executeShellCommand(instrumentation, COMMAND_ENABLE
                 + component.getPackageName() + "/" + component.getClassName() + " "
                 + handle.getId());
+    }
+
+    public static void registerSimPhoneAccount(Instrumentation instrumentation,
+            PhoneAccountHandle handle, String label, String address) throws Exception {
+        final ComponentName component = handle.getComponentName();
+        executeShellCommand(instrumentation, COMMAND_REGISTER_SIM
+                + component.getPackageName() + "/" + component.getClassName() + " "
+                + handle.getId() + " " + label + " " + address);
     }
 
     /**

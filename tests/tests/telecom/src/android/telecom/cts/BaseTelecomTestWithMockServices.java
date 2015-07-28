@@ -34,6 +34,7 @@ import android.telecom.Connection;
 import android.telecom.InCallService;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.RemoteConnection;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 import android.telecom.cts.MockInCallService.InCallServiceCallbacks;
@@ -58,16 +59,21 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             new PhoneAccountHandle(new ComponentName(PACKAGE, COMPONENT), ACCOUNT_ID);
 
     public static final PhoneAccount TEST_PHONE_ACCOUNT = PhoneAccount.builder(
-            TEST_PHONE_ACCOUNT_HANDLE, LABEL)
+            TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
             .setAddress(Uri.parse("tel:555-TEST"))
             .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
             .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
-                    PhoneAccount.CAPABILITY_VIDEO_CALLING)
+                    PhoneAccount.CAPABILITY_VIDEO_CALLING |
+                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER)
             .setHighlightColor(Color.RED)
-            .setShortDescription(LABEL)
+            .setShortDescription(ACCOUNT_LABEL)
             .addSupportedUriScheme(PhoneAccount.SCHEME_TEL)
             .addSupportedUriScheme(PhoneAccount.SCHEME_VOICEMAIL)
             .build();
+
+    public static final PhoneAccountHandle TEST_REMOTE_PHONE_ACCOUNT_HANDLE =
+            new PhoneAccountHandle(new ComponentName(PACKAGE, REMOTE_COMPONENT), REMOTE_ACCOUNT_ID);
+    public static final String TEST_REMOTE_PHONE_ACCOUNT_ADDRESS = "tel:666-TEST";
 
     private static int sCounter = 0;
 
@@ -75,7 +81,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     TelecomManager mTelecomManager;
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
-    MockConnectionService connectionService;
+    MockConnectionService connectionService = null;
+    MockConnectionService remoteConnectionService = null;
 
     @Override
     protected void setUp() throws Exception {
@@ -97,7 +104,13 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
             }
-            tearDownConnectionService(TEST_PHONE_ACCOUNT);
+            // Disconnect the remote phone account if the test had set it up.
+            if (remoteConnectionService != null) {
+                tearDownConnectionServices(TEST_PHONE_ACCOUNT_HANDLE,
+                        TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+            } else {
+                tearDownConnectionService(TEST_PHONE_ACCOUNT_HANDLE);
+            }
         }
         super.tearDown();
     }
@@ -111,23 +124,59 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             // Generate a vanilla mock connection service, if not provided.
             this.connectionService = new MockConnectionService();
         }
-        CtsConnectionService.setUp(TEST_PHONE_ACCOUNT, this.connectionService);
+        CtsConnectionService.setUp(TEST_PHONE_ACCOUNT_HANDLE, this.connectionService);
 
         if ((flags & FLAG_REGISTER) != 0) {
             mTelecomManager.registerPhoneAccount(TEST_PHONE_ACCOUNT);
         }
         if ((flags & FLAG_ENABLE) != 0) {
-            TestUtils.enablePhoneAccount(getInstrumentation(),
-                    TEST_PHONE_ACCOUNT_HANDLE);
+            TestUtils.enablePhoneAccount(getInstrumentation(), TEST_PHONE_ACCOUNT_HANDLE);
         }
 
         return TEST_PHONE_ACCOUNT;
     }
 
-    protected void tearDownConnectionService(PhoneAccount account) throws Exception {
-        mTelecomManager.unregisterPhoneAccount(account.getAccountHandle());
+    protected void setupConnectionServices(MockConnectionService connectionService,
+            MockConnectionService remoteConnectionService, int flags)
+            throws Exception {
+        // Setup the primary connection service first
+        setupConnectionService(connectionService, flags);
+
+        if (remoteConnectionService != null) {
+            this.remoteConnectionService = remoteConnectionService;
+        } else {
+            // Generate a vanilla mock connection service, if not provided.
+            this.remoteConnectionService = new MockConnectionService();
+        }
+        CtsRemoteConnectionService.setUp(TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
+                this.remoteConnectionService);
+
+        if ((flags & FLAG_REGISTER) != 0) {
+            // This needs SIM subscription, so register via adb commands to get system permission.
+            TestUtils.registerSimPhoneAccount(getInstrumentation(),
+                    TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
+                    REMOTE_ACCOUNT_LABEL,
+                    TEST_REMOTE_PHONE_ACCOUNT_ADDRESS);
+        }
+        if ((flags & FLAG_ENABLE) != 0) {
+            TestUtils.enablePhoneAccount(getInstrumentation(), TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+        }
+    }
+
+    protected void tearDownConnectionService(PhoneAccountHandle accountHandle) throws Exception {
+        mTelecomManager.unregisterPhoneAccount(accountHandle);
         CtsConnectionService.tearDown();
         this.connectionService = null;
+    }
+
+    protected void tearDownConnectionServices(PhoneAccountHandle accountHandle,
+            PhoneAccountHandle remoteAccountHandle) throws Exception {
+        // Teardown the primary connection service first
+        tearDownConnectionService(accountHandle);
+
+        mTelecomManager.unregisterPhoneAccount(remoteAccountHandle);
+        CtsRemoteConnectionService.tearDown();
+        this.remoteConnectionService = null;
     }
 
     protected void startCallTo(Uri address, PhoneAccountHandle accountHandle) {
@@ -295,6 +344,30 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         return connection;
     }
 
+    MockConnection verifyRemoteConnectionForOutgoingCall() {
+        // Assuming only 1 connection present
+        return verifyRemoteConnectionForOutgoingCall(0);
+    }
+
+    MockConnection verifyRemoteConnectionForOutgoingCall(int connectionIndex) {
+        try {
+            if (!remoteConnectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("No outgoing call connection requested by Telecom");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+
+        assertThat("Telecom should create outgoing connection for remote outgoing call",
+                remoteConnectionService.outgoingConnections.size(), not(equalTo(0)));
+        assertEquals("Telecom should not create incoming connections for remote outgoing calls",
+                0, remoteConnectionService.incomingConnections.size());
+        MockConnection connection = remoteConnectionService.outgoingConnections.get(connectionIndex);
+        setAndverifyConnectionForOutgoingCall(connection);
+        return connection;
+    }
+
     void setAndverifyConnectionForOutgoingCall(MockConnection connection) {
         connection.setDialing();
         connection.setActive();
@@ -321,6 +394,30 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("Telecom should not create outgoing connections for incoming calls",
                 0, connectionService.outgoingConnections.size());
         MockConnection connection = connectionService.incomingConnections.get(connectionIndex);
+        setAndverifyConnectionForIncomingCall(connection);
+        return connection;
+    }
+
+    MockConnection verifyRemoteConnectionForIncomingCall() {
+        // Assuming only 1 connection present
+        return verifyRemoteConnectionForIncomingCall(0);
+    }
+
+    MockConnection verifyRemoteConnectionForIncomingCall(int connectionIndex) {
+        try {
+            if (!remoteConnectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("No outgoing call connection requested by Telecom");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+
+        assertThat("Telecom should create incoming connections for remote incoming calls",
+                remoteConnectionService.incomingConnections.size(), not(equalTo(0)));
+        assertEquals("Telecom should not create outgoing connections for remote incoming calls",
+                0, remoteConnectionService.outgoingConnections.size());
+        MockConnection connection = remoteConnectionService.incomingConnections.get(connectionIndex);
         setAndverifyConnectionForIncomingCall(connection);
         return connection;
     }
@@ -620,6 +717,24 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                 "Call should have display name: " + name
+        );
+    }
+
+    void assertRemoteConnectionState(final RemoteConnection connection, final int state) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return state;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return connection.getState();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Remote Connection should be in state " + state
         );
     }
 
