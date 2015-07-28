@@ -91,10 +91,6 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         executeDeviceOwnerTest("PersistentIntentResolvingTest");
     }
 
-    public void testScreenCaptureDisabled() throws Exception {
-        executeDeviceOwnerTest("ScreenCaptureDisabledTest");
-    }
-
     public void testPackageInstall() throws Exception {
         final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
         try {
