@@ -121,7 +121,6 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
 
     @Override
     protected void tearDown() throws Exception {
-        super.tearDown();
         if (mProcessPid != -1) {
             android.os.Process.killProcess(mProcessPid);
             mProcessPid = -1;
@@ -140,6 +139,7 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
         }
         mContext = null;
         mActivityManager = null;
+        super.tearDown();
     }
 
     /**
