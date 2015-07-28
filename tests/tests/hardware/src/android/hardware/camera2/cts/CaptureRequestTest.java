@@ -1168,7 +1168,9 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
                 changeExposure(requestBuilder, expTimes[i], sensitivities[j]);
                 mSession.capture(requestBuilder.build(), listener, mHandler);
 
-                CaptureResult result = listener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
+                // make sure timeout is long enough for long exposure time
+                long timeout = WAIT_FOR_RESULT_TIMEOUT_MS + expTimes[i];
+                CaptureResult result = listener.getCaptureResult(timeout);
                 long resultExpTime = getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
                 int resultSensitivity = getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
                 validateExposureTime(expTimes[i], resultExpTime);
