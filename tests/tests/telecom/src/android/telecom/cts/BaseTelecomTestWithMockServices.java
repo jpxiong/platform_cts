@@ -153,6 +153,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 Log.i(TAG, "onCallAdded, Call: " + call + "Num Calls: " + numCalls);
                 this.lock.release();
             }
+            @Override
             public void onCallRemoved(Call call, int numCalls) {
                 Log.i(TAG, "onCallRemoved, Call: " + call + "Num Calls: " + numCalls);
             }
@@ -171,6 +172,18 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 Log.i(TAG, "onConferenceableCallsChanged, Call: " + call + "Conferenceables: " +
                         conferenceableCalls);
                 this.lock.release();
+            }
+            @Override
+            public void onDetailsChanged(Call call, Call.Details details) {
+                Log.i(TAG, "onDetailsChanged, Call: " + call + "Details: " + details);
+            }
+            @Override
+            public void onCallDestroyed(Call call) {
+                Log.i(TAG, "onCallDestroyed, Call: " + call);
+            }
+            @Override
+            public void onCallStateChanged(Call call, int newState) {
+                Log.i(TAG, "onCallStateChanged, Call: " + call + "New State: " + newState);
             }
         };
 
@@ -388,12 +401,15 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             Log.i(TAG, "Test interrupted!");
         }
     }
+
     /**
      * Disconnect the created test call and verify that Telecom has cleared all calls.
      */
     void cleanupCalls() {
         if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
+            mInCallCallbacks.getService().disconnectAllConferenceCalls();
             mInCallCallbacks.getService().disconnectAllCalls();
+            assertNumConferenceCalls(mInCallCallbacks.getService(), 0);
             assertNumCalls(mInCallCallbacks.getService(), 0);
         }
     }
@@ -586,6 +602,24 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             },
             WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
             "DTMF string should be equivalent to entered DTMF characters: " + dtmfString
+        );
+    }
+
+    void assertCallDisplayName(final Call call, final String name) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return name;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().getCallerDisplayName();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should have display name: " + name
         );
     }
 

@@ -20,6 +20,7 @@ import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
 
 /**
  * {@link Conference} subclass that immediately performs any state changes that are a result of
@@ -41,10 +42,12 @@ public class MockConference extends Conference {
 
     @Override
     public void onDisconnect() {
+        super.onDisconnect();
         for (Connection c : getConnections()) {
             c.setDisconnected(new DisconnectCause(DisconnectCause.REMOTE));
             c.destroy();
         }
+        destroy();
     }
 
     @Override
@@ -55,7 +58,28 @@ public class MockConference extends Conference {
     }
 
     @Override
+    public void onMerge() {
+        super.onMerge();
+        // Let's just change the connection display name for testing that onMerge was invoked.
+        for (Connection c : getConnections()) {
+            c.setCallerDisplayName(
+                    TestUtils.MERGE_CALLER_NAME, TelecomManager.PRESENTATION_ALLOWED);
+        }
+    }
+
+    @Override
+    public void onSwap() {
+        super.onSwap();
+        // Let's just change the connection display name for testing that onSwap was invoked.
+        for (Connection c : getConnections()) {
+            c.setCallerDisplayName(
+                    TestUtils.SWAP_CALLER_NAME, TelecomManager.PRESENTATION_ALLOWED);
+        }
+    }
+
+    @Override
     public void onHold() {
+        super.onHold();
         for (Connection c : getConnections()) {
             c.setOnHold();
         }
@@ -64,6 +88,7 @@ public class MockConference extends Conference {
 
     @Override
     public void onUnhold() {
+        super.onUnhold();
         for (Connection c : getConnections()) {
             c.setActive();
         }

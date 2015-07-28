@@ -50,9 +50,6 @@ public class CtsConnectionService extends ConnectionService {
 
     public CtsConnectionService() throws Exception {
         super();
-        if (sTelecomConnectionService != null) {
-            throw new Exception("Telecom ConnectionService exists");
-        }
         sTelecomConnectionService = this;
     }
 
