@@ -23,9 +23,6 @@ import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
-import android.util.Log;
-
-import java.util.List;
 
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
@@ -33,9 +30,8 @@ import java.util.List;
  */
 public class ConferenceTest extends BaseTelecomTestWithMockServices {
     public static final int CONF_CAPABILITIES = Connection.CAPABILITY_SEPARATE_FROM_CONFERENCE |
-            Connection.CAPABILITY_DISCONNECT_FROM_CONFERENCE | Connection.CAPABILITY_HOLD;
-    public static final int MERGE_CONF_CAPABILITIES = Connection.CAPABILITY_MERGE_CONFERENCE |
-            Connection.CAPABILITY_SWAP_CONFERENCE;
+            Connection.CAPABILITY_DISCONNECT_FROM_CONFERENCE | Connection.CAPABILITY_HOLD |
+            Connection.CAPABILITY_MERGE_CONFERENCE | Connection.CAPABILITY_SWAP_CONFERENCE;
 
     private Call mCall1;
     private Call mCall2;
@@ -104,5 +100,42 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if ((mCall1.getParent() == conf) || (conf.getChildren().contains(mCall1))) {
             fail("Call 1 should not be still conferenced");
         }
+    }
+
+    public void testConferenceHoldAndUnhold() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        addAndVerifyConferenceCall(mCall1, mCall2);
+        final Call conf = mInCallService.getLastConferenceCall();
+
+        conf.hold();
+        assertCallState(conf, Call.STATE_HOLDING);
+        assertCallState(mCall1, Call.STATE_HOLDING);
+        assertCallState(mCall2, Call.STATE_HOLDING);
+
+        conf.unhold();
+        assertCallState(conf, Call.STATE_ACTIVE);
+        assertCallState(mCall1, Call.STATE_ACTIVE);
+        assertCallState(mCall2, Call.STATE_ACTIVE);
+    }
+
+    public void testConferenceMergeAndSwap() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        addAndVerifyConferenceCall(mCall1, mCall2);
+        final Call conf = mInCallService.getLastConferenceCall();
+
+        conf.mergeConference();
+        assertCallDisplayName(mCall1, TestUtils.MERGE_CALLER_NAME);
+        assertCallDisplayName(mCall2, TestUtils.MERGE_CALLER_NAME);
+
+        conf.swapConference();
+        assertCallDisplayName(mCall1, TestUtils.SWAP_CALLER_NAME);
+        assertCallDisplayName(mCall2, TestUtils.SWAP_CALLER_NAME);
+
     }
 }
