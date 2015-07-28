@@ -34,6 +34,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <linux/sysctl.h>
+#include <arpa/inet.h>
 
 /*
  * Returns true iff this device is vulnerable to CVE-2013-2094.
@@ -227,6 +228,28 @@ static jboolean android_security_cts_NativeCodeTest_doNvmapIocFromIdTest(JNIEnv*
     return !vulnerable;
 }
 
+static jboolean android_security_cts_NativeCodeTest_doPingPongRootTest(JNIEnv*, jobject)
+{
+    int icmp_sock;
+    struct sockaddr sock_addr;
+
+    memset(&sock_addr, 0, sizeof(sock_addr));
+    icmp_sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+    sock_addr.sa_family = AF_INET;
+
+    /* first connect */
+    connect(icmp_sock, &sock_addr, sizeof(sock_addr));
+
+    /* disconnect */
+    sock_addr.sa_family = AF_UNSPEC;
+    connect(icmp_sock, &sock_addr, sizeof(sock_addr));
+
+    /* second disconnect -> crash */
+    sock_addr.sa_family = AF_UNSPEC;
+    connect(icmp_sock, &sock_addr, sizeof(sock_addr));
+
+    return true;
+}
 
 static JNINativeMethod gMethods[] = {
     {  "doPerfEventTest", "()Z",
@@ -241,6 +264,8 @@ static JNINativeMethod gMethods[] = {
             (void *) android_security_cts_NativeCodeTest_doFutexTest },
     {  "doNvmapIocFromIdTest", "()Z",
             (void *) android_security_cts_NativeCodeTest_doNvmapIocFromIdTest },
+    {  "doPingPongRootTest", "()Z",
+            (void *) android_security_cts_NativeCodeTest_doPingPongRootTest },
 };
 
 int register_android_security_cts_NativeCodeTest(JNIEnv* env)
