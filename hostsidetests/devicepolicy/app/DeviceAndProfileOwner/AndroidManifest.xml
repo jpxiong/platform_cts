@@ -34,6 +34,22 @@
             android:name="com.android.cts.deviceandprofileowner.ApplicationRestrictionsActivity" />
         <activity
             android:name="com.android.cts.deviceandprofileowner.ScreenCaptureDisabledActivity" />
+        <activity
+            android:name="com.android.cts.deviceandprofileowner.ExampleIntentReceivingActivity1">
+            <intent-filter>
+                <action android:name="com.android.cts.deviceandprofileowner.EXAMPLE_ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.android.cts.deviceandprofileowner.ExampleIntentReceivingActivity2">
+            <intent-filter>
+                <action android:name="com.android.cts.deviceandprofileowner.EXAMPLE_ACTION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"

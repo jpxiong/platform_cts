@@ -131,6 +131,13 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         executeDeviceTestMethod(".PermissionsTest", "testPermissionGrantStatePreMApp");
     }
 
+    public void testPersistentIntentResolving() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        executeDeviceTestClass(".PersistentIntentResolvingTest");
+    }
+
     public void testScreenCaptureDisabled() throws Exception {
         if (!mHasFeature) {
             return;

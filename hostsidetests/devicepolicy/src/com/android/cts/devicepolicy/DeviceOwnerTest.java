@@ -87,10 +87,6 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         }
     }
 
-    public void testPersistentIntentResolving() throws Exception {
-        executeDeviceOwnerTest("PersistentIntentResolvingTest");
-    }
-
     public void testPackageInstall() throws Exception {
         final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
         try {
