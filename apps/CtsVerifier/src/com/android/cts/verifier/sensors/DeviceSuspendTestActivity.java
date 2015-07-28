@@ -55,7 +55,7 @@ public class DeviceSuspendTestActivity
         private PendingIntent mPendingIntent;
         private AlarmManager mAlarmManager;
         private static String ACTION_ALARM = "DeviceSuspendTestActivity.ACTION_ALARM";
-        private static String TAG = "DeviceSuspendTestActivity";
+        private static String TAG = "DeviceSuspendSensorTest";
         private SensorManager mSensorManager;
 
         @Override
@@ -169,6 +169,22 @@ public class DeviceSuspendTestActivity
             return runAPWakeUpWhenFIFOFull(wakeUpSensor);
         }
 
+        public String testAccelBatchingInAPSuspendLargeReportLatency() throws Throwable {
+            Sensor accel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            if (accel == null) {
+                throw new SensorNotSupportedException(Sensor.TYPE_ACCELEROMETER, false);
+            }
+            return runAPWakeUpByAlarmNonWakeSensor(accel, (int)TimeUnit.SECONDS.toMicros(1000));
+        }
+
+        public String testAccelBatchingInAPSuspendZeroReportLatency() throws Throwable {
+            Sensor accel = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+           if (accel == null) {
+                throw new SensorNotSupportedException(Sensor.TYPE_ACCELEROMETER, false);
+            }
+            return runAPWakeUpByAlarmNonWakeSensor(accel, 0);
+        }
+
         public String runAPWakeUpWhenReportLatencyExpires(Sensor sensor) throws Throwable {
             int fifoMaxEventCount = sensor.getFifoMaxEventCount();
             if (fifoMaxEventCount == 0) {
@@ -196,9 +212,7 @@ public class DeviceSuspendTestActivity
                     MAX_REPORT_LATENCY_US,
                     true /*isDeviceSuspendTest*/);
 
-            int numEventsToWaitFor = MAX_REPORT_LATENCY_US/maximumExpectedSamplingPeriodUs;
             TestSensorOperation op = TestSensorOperation.createOperation(environment,
-                                                                          numEventsToWaitFor,
                                                                           mDeviceSuspendLock,
                                                                           false);
             final int ALARM_WAKE_UP_DELAY_MS = MAX_REPORT_LATENCY_US/1000 +
@@ -208,6 +222,7 @@ public class DeviceSuspendTestActivity
                                     SystemClock.elapsedRealtime() + ALARM_WAKE_UP_DELAY_MS,
                                     mPendingIntent);
             try {
+                Log.i(TAG, "Running .. " + getCurrentTestNode().getName() + " " + sensor.getName());
                 op.execute(getCurrentTestNode());
             } finally {
                 mAlarmManager.cancel(mPendingIntent);
@@ -244,16 +259,59 @@ public class DeviceSuspendTestActivity
                     MAX_REPORT_LATENCY_US,
                     true /*isDeviceSuspendTest*/);
 
-           int numEventsToWaitFor = fifoMaxEventCount;
-            TestSensorOperation op = TestSensorOperation.createOperation(environment,
-                                                                          numEventsToWaitFor,
-                                                                          mDeviceSuspendLock,
-                                                                         true);
+           TestSensorOperation op = TestSensorOperation.createOperation(environment,
+                                                                        mDeviceSuspendLock,
+                                                                        true);
             mAlarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                                     SystemClock.elapsedRealtime() + ALARM_WAKE_UP_DELAY_MS,
                                     mPendingIntent);
             op.addDefaultVerifications();
             try {
+                Log.i(TAG, "Running .. " + getCurrentTestNode().getName() + " " + sensor.getName());
+                op.execute(getCurrentTestNode());
+            } finally {
+                mAlarmManager.cancel(mPendingIntent);
+            }
+            return null;
+        }
+
+        public String runAPWakeUpByAlarmNonWakeSensor(Sensor sensor, int maxReportLatencyUs)
+            throws  Throwable {
+            int fifoMaxEventCount = sensor.getFifoMaxEventCount();
+            if (fifoMaxEventCount == 0) {
+                throw new SensorTestStateNotSupportedException("Batching not supported.");
+            }
+            int maximumExpectedSamplingPeriodUs = sensor.getMaxDelay();
+            if (maximumExpectedSamplingPeriodUs == 0 ||
+                    maximumExpectedSamplingPeriodUs > 200000) {
+                // If maxDelay is not defined, set the value for 5 Hz.
+                maximumExpectedSamplingPeriodUs = 200000;
+            }
+            int fifoBasedReportLatencyUs = fifoMaxEventCount * maximumExpectedSamplingPeriodUs;
+
+            // Ensure that FIFO based report latency is at least 20 seconds, we need at least 10
+            // seconds of time to allow the device to be in suspend state.
+            if (fifoBasedReportLatencyUs < 20000000L) {
+                throw new SensorTestStateNotSupportedException("FIFO too small to test reliably");
+            }
+
+            TestSensorEnvironment environment = new TestSensorEnvironment(
+                    this,
+                    sensor,
+                    false,
+                    maximumExpectedSamplingPeriodUs,
+                    maxReportLatencyUs,
+                    true /*isDeviceSuspendTest*/);
+
+            final int ALARM_WAKE_UP_DELAY_MS = 20000;
+            TestSensorOperation op = TestSensorOperation.createOperation(environment,
+                                                                         mDeviceSuspendLock,
+                                                                         true);
+            mAlarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    SystemClock.elapsedRealtime() + ALARM_WAKE_UP_DELAY_MS,
+                                    mPendingIntent);
+            try {
+                Log.i(TAG, "Running .. " + getCurrentTestNode().getName() + " " + sensor.getName());
                 op.execute(getCurrentTestNode());
             } finally {
                 mAlarmManager.cancel(mPendingIntent);

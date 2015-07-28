@@ -145,7 +145,6 @@ public class TestSensorOperation extends SensorOperation {
         for (ISensorVerification verification : mVerifications) {
             failed |= evaluateResults(collectedEvents, verification, sb);
         }
-
         if (failed) {
             trySaveCollectedEvents(parent, listener);
 
@@ -250,42 +249,69 @@ public class TestSensorOperation extends SensorOperation {
      */
     public static TestSensorOperation createOperation(
             final TestSensorEnvironment environment,
-            final int eventCount,
             final WakeLock wakeLock,
-            final boolean flushRequested) {
+            final boolean flushBeforeAfterSuspend) {
         Executor executor = new Executor() {
             @Override
             public void execute(TestSensorManager sensorManager, TestSensorEventListener listener)
                     throws InterruptedException {
                 try {
-                    int eventCountForLatch = eventCount;
-                    if (flushRequested) {
-                        eventCountForLatch = eventCount + (int)environment.getFrequencyHz();
+                    sensorManager.registerListener(listener);
+                    if (flushBeforeAfterSuspend) {
+                        int initialNumEvents1 = listener.getCollectedEvents().size();
+                        SensorCtsHelper.sleep(2, TimeUnit.SECONDS);
+                        CountDownLatch flushLatch1 = sensorManager.requestFlush();
+                        listener.waitForFlushComplete(flushLatch1, false);
+                        Assert.assertTrue("1.No sensor events collected on calling flush " +
+                                environment.toString(),
+                                listener.getCollectedEvents().size() - initialNumEvents1 > 0);
                     }
-                    CountDownLatch latch = sensorManager.registerListener(listener,
-                                                                           eventCountForLatch);
-                    if (flushRequested) {
-                        SensorCtsHelper.sleep(1, TimeUnit.SECONDS);
-                        CountDownLatch flushLatch = sensorManager.requestFlush();
-                        listener.waitForFlushComplete(flushLatch, false);
-                    }
+
+                    Log.i(TAG, "Collected sensor events size1=" +
+                            listener.getCollectedEvents().size());
+                    int initialNumEvents2 = listener.getCollectedEvents().size();
                     if (wakeLock.isHeld()) {
                         wakeLock.release();
                     }
                     listener.releaseWakeLock();
-                    Log.v("TestSensorOperation", "waitForEvents " +
-                            environment.getSensor().getName()
-                          + " " + latch.getCount());
-                    listener.waitForEvents(latch, eventCount, false);
-                    Log.v("TestSensorOperation", "waitForEvents DONE " + environment.getSensor().getName());
+
+                    SuspendStateMonitor suspendMonitor = new SuspendStateMonitor();
+                    long approxStartTimeMs = SystemClock.elapsedRealtime();
+                    // Allow the device to go into suspend. Wait for wake-up.
+                    suspendMonitor.waitForWakeUp(15);
+                    suspendMonitor.cancel();
+
                     if (!wakeLock.isHeld()) {
                         wakeLock.acquire();
                     }
-                    if (flushRequested) {
-                        SensorCtsHelper.sleep(1, TimeUnit.SECONDS);
-                        CountDownLatch flushLatch = sensorManager.requestFlush();
-                        listener.waitForFlushComplete(flushLatch, false);
+
+                    CountDownLatch flushLatch2 = sensorManager.requestFlush();
+                    listener.waitForFlushComplete(flushLatch2, false);
+
+                    Log.i(TAG, "Collected sensor events size2=" +
+                            listener.getCollectedEvents().size());
+
+                    if (listener.getCollectedEvents().size() - initialNumEvents2 <= 0 &&
+                            suspendMonitor.getLastWakeUpTime() > 0) {
+                        // Fail
+                        String str = String.format("No Sensor events collected by calling flush " +
+                                "after device wake up. Approx time after which device went into " +
+                                "suspend %dms ,approx AP wake-up time %dms %s",
+                                approxStartTimeMs, suspendMonitor.getLastWakeUpTime(),
+                                environment.toString());
+                        Assert.fail(str);
                     }
+                    if (flushBeforeAfterSuspend) {
+                        int initialNumEvents3 = listener.getCollectedEvents().size();
+                        SensorCtsHelper.sleep(2, TimeUnit.SECONDS);
+                        CountDownLatch flushLatch3 = sensorManager.requestFlush();
+                        listener.waitForFlushComplete(flushLatch3, false);
+                        Assert.assertTrue("3.No sensor events collected on calling flush " +
+                                environment.toString(),
+                                listener.getCollectedEvents().size() - initialNumEvents3 > 0);
+                    }
+                    Log.i(TAG, "Collected sensor events size3=" +
+                            listener.getCollectedEvents().size());
                 } finally {
                     if(!wakeLock.isHeld()) {
                         wakeLock.acquire();
