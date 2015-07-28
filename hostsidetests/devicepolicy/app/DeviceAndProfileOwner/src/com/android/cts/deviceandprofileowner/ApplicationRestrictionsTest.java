@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.deviceowner;
+package com.android.cts.deviceandprofileowner;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * which is fired by the system whenever its restriction is modified,
  * and relays the value back to this test for verification.
  */
-public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
+public class ApplicationRestrictionsTest extends BaseDeviceAdminTest {
 
     private static final String[] testStrings = new String[] {
             "<bad/>",
@@ -55,8 +55,8 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
     protected void setUp() throws Exception {
         super.setUp();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ApplicationRestrictionActivity.REGISTERED_ACTION);
-        filter.addAction(ApplicationRestrictionActivity.RESTRICTION_ACTION);
+        filter.addAction(ApplicationRestrictionsActivity.REGISTERED_ACTION);
+        filter.addAction(ApplicationRestrictionsActivity.RESTRICTION_ACTION);
         mContext.registerReceiver(mReceiver, filter);
     }
 
@@ -76,30 +76,38 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
         Bundle bundle1 = createBundle1();
 
         // Test setting restrictions
-        mDevicePolicyManager.setApplicationRestrictions(getWho(), CTS_PACKAGE, bundle0);
-        mDevicePolicyManager.setApplicationRestrictions(getWho(), OTHER_PACKAGE, bundle1);
+        mDevicePolicyManager.setApplicationRestrictions(ADMIN_RECEIVER_COMPONENT, CTS_PACKAGE,
+                bundle0);
+        mDevicePolicyManager.setApplicationRestrictions(ADMIN_RECEIVER_COMPONENT, OTHER_PACKAGE,
+                bundle1);
 
         // Retrieve restrictions locally and make sure they are what we put in.
-        assertBundle0(mDevicePolicyManager.getApplicationRestrictions(getWho(), CTS_PACKAGE));
-        assertBundle1(mDevicePolicyManager.getApplicationRestrictions(getWho(), OTHER_PACKAGE));
+        assertBundle0(mDevicePolicyManager.getApplicationRestrictions(ADMIN_RECEIVER_COMPONENT,
+                CTS_PACKAGE));
+        assertBundle1(mDevicePolicyManager.getApplicationRestrictions(ADMIN_RECEIVER_COMPONENT,
+                OTHER_PACKAGE));
 
         // The test activity should have received a change_restriction broadcast
         // and relay the value back to us.
         assertBundle0(waitForChangedRestriction());
 
         // Test overwriting
-        mDevicePolicyManager.setApplicationRestrictions(getWho(), CTS_PACKAGE, bundle1);
-        assertBundle1(mDevicePolicyManager.getApplicationRestrictions(getWho(), CTS_PACKAGE));
+        mDevicePolicyManager.setApplicationRestrictions(ADMIN_RECEIVER_COMPONENT, CTS_PACKAGE,
+                bundle1);
+        assertBundle1(mDevicePolicyManager.getApplicationRestrictions(ADMIN_RECEIVER_COMPONENT,
+                CTS_PACKAGE));
         assertBundle1(waitForChangedRestriction());
 
         // Cleanup
-        mDevicePolicyManager.setApplicationRestrictions(getWho(), CTS_PACKAGE, new Bundle());
-        assertTrue(
-                mDevicePolicyManager.getApplicationRestrictions(getWho(), CTS_PACKAGE).isEmpty());
+        mDevicePolicyManager.setApplicationRestrictions(ADMIN_RECEIVER_COMPONENT, CTS_PACKAGE,
+                new Bundle());
+        assertTrue(mDevicePolicyManager.getApplicationRestrictions(
+                ADMIN_RECEIVER_COMPONENT, CTS_PACKAGE).isEmpty());
         assertTrue(waitForChangedRestriction().isEmpty());
-        mDevicePolicyManager.setApplicationRestrictions(getWho(), OTHER_PACKAGE, new Bundle());
-        assertTrue(
-                mDevicePolicyManager.getApplicationRestrictions(getWho(), OTHER_PACKAGE).isEmpty());
+        mDevicePolicyManager.setApplicationRestrictions(ADMIN_RECEIVER_COMPONENT, OTHER_PACKAGE,
+                new Bundle());
+        assertTrue(mDevicePolicyManager.getApplicationRestrictions(
+                ADMIN_RECEIVER_COMPONENT, OTHER_PACKAGE).isEmpty());
 
         finish();
     }
@@ -185,9 +193,9 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (ApplicationRestrictionActivity.REGISTERED_ACTION.equals(action)) {
+            if (ApplicationRestrictionsActivity.REGISTERED_ACTION.equals(action)) {
                 mOnRegisteredSemaphore.release();
-            } else if (ApplicationRestrictionActivity.RESTRICTION_ACTION.equals(action)) {
+            } else if (ApplicationRestrictionsActivity.RESTRICTION_ACTION.equals(action)) {
                 mReceivedRestrictions = intent.getBundleExtra("value");
                 mOnRestrictionSemaphore.release();
             }
@@ -196,7 +204,7 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
 
     private void startTestActivity(String command) {
         Intent intent = new Intent();
-        intent.setClassName(PACKAGE_NAME, ApplicationRestrictionActivity.class.getName());
+        intent.setClassName(PACKAGE_NAME, ApplicationRestrictionsActivity.class.getName());
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 
         if (command != null) {
@@ -227,7 +235,7 @@ public class ApplicationRestrictionsTest extends BaseDeviceOwnerTest {
     }
 
     private void finish() {
-        startTestActivity(ApplicationRestrictionActivity.FINISH);
+        startTestActivity(ApplicationRestrictionsActivity.FINISH);
     }
 
 }

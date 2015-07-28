@@ -52,6 +52,13 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         super.tearDown();
     }
 
+    public void testApplicationRestrictions() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, ".ApplicationRestrictionsTest", mUserId));
+    }
+
     public void testPermissionGrant() throws Exception {
         if (!mHasFeature) {
             return;

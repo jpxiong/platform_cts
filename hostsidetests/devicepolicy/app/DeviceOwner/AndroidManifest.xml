@@ -62,8 +62,6 @@
             android:name="com.android.cts.deviceowner.LockTaskTest$IntentReceivingActivity"
             android:taskAffinity="com.android.cts.deviceowner.LockTaskTest.IntentReceivingActivity"
             />
-        <activity
-            android:name="com.android.cts.deviceowner.ApplicationRestrictionActivity" />
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"

@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.android.cts.deviceowner;
+package com.android.cts.deviceandprofileowner;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -31,16 +30,16 @@ import android.os.UserManager;
  * activity is to listen for the ACTION_APPLICATION_RESTRICTIONS_CHANGED broadcast
  * and relay the retrieved restriction bundle back to the test for validation.
  */
-public class ApplicationRestrictionActivity extends Activity {
+public class ApplicationRestrictionsActivity extends Activity {
 
     // Incoming intent type
     public static final String FINISH = "finishActivity";
 
     // Outgoing broadcast
     public static final String REGISTERED_ACTION =
-            "com.android.cts.deviceowner.APP_RESTRICTION_REGISTERED";
+            "com.android.cts.deviceandprofileowner.APP_RESTRICTION_REGISTERED";
     public static final String RESTRICTION_ACTION =
-            "com.android.cts.deviceowner.APP_RESTRICTION_VALUE";
+            "com.android.cts.deviceandprofileowner.APP_RESTRICTION_VALUE";
 
     private UserManager mUserManager;
 

@@ -66,10 +66,6 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         super.tearDown();
     }
 
-    public void testApplicationRestrictions() throws Exception {
-        executeDeviceOwnerTest("ApplicationRestrictionsTest");
-    }
-
     public void testCaCertManagement() throws Exception {
         executeDeviceOwnerTest("CaCertManagementTest");
     }
