@@ -224,7 +224,7 @@ public class BurstCaptureTest extends Camera2SurfaceViewTestCase {
         mSession.setRepeatingRequest(lockedRequest, resultListener, mHandler);
 
         // Wait for first result with locking
-
+        resultListener.drain();
         CaptureResult lockedResult =
                 resultListener.getCaptureResultForRequest(lockedRequest, maxPipelineDepth);
 
