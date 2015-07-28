@@ -50,6 +50,9 @@ public class TestUtils {
 
     private static final String COMMAND_ENABLE = "telecom set-phone-account-enabled ";
 
+    public static final String MERGE_CALLER_NAME = "calls-merged";
+    public static final String SWAP_CALLER_NAME = "calls-swapped";
+
     public static boolean shouldTestTelecom(Context context) {
         if (!HAS_TELECOM) {
             return false;

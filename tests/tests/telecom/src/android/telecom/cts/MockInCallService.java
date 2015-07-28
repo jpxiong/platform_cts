@@ -44,6 +44,8 @@ public class MockInCallService extends InCallService {
         public void onParentChanged(Call call, Call parent) {};
         public void onChildrenChanged(Call call, List<Call> children) {};
         public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {};
+        public void onCallDestroyed(Call call) {};
+        public void onDetailsChanged(Call call, Call.Details details) {};
 
         final public MockInCallService getService() {
             return mService;
@@ -94,6 +96,22 @@ public class MockInCallService extends InCallService {
             super.onConferenceableCallsChanged(call, conferenceableCalls);
             if (getCallbacks() != null) {
                 getCallbacks().onConferenceableCallsChanged(call, conferenceableCalls);
+            }
+        }
+
+        @Override
+        public void onCallDestroyed(Call call) {
+            super.onCallDestroyed(call);
+            if (getCallbacks() != null) {
+                getCallbacks().onCallDestroyed(call);
+            }
+        }
+
+        @Override
+        public void onDetailsChanged(Call call, Call.Details details) {
+            super.onDetailsChanged(call, details);
+            if (getCallbacks() != null) {
+                getCallbacks().onDetailsChanged(call, details);
             }
         }
     };
