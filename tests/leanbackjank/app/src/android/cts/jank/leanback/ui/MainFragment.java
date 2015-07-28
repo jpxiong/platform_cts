@@ -14,7 +14,9 @@
 
 package android.cts.jank.leanback.ui;
 
+import android.content.Intent;
 import android.content.res.Resources.Theme;
+import android.cts.jank.leanback.IntentKeys;
 import android.cts.jank.leanback.R;
 import android.cts.jank.leanback.data.VideoProvider;
 import android.cts.jank.leanback.model.Movie;
@@ -37,11 +39,18 @@ import android.view.View;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Main class to show BrowseFragment with header and rows of videos
  */
 public class MainFragment extends BrowseFragment {
+    private static final int NUM_ROWS = 20;
+    private final Handler mHandler = new Handler();
+    private Timer mAutoScrollTimer;
+    private int mAutoScrollCount;
+
     private ArrayObjectAdapter mRowsAdapter;
     private DisplayMetrics mMetrics;
     private BackgroundManager mBackgroundManager;
@@ -50,14 +59,27 @@ public class MainFragment extends BrowseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        buildRowAdapterItems(VideoProvider.buildMedia());
+        buildRowAdapterItems(VideoProvider.buildMedia(NUM_ROWS));
         prepareBackgroundManager();
         setupUIElements();
         setupEventListeners();
+        Intent intent = getActivity().getIntent();
+        if (intent.getExtras() != null) {
+            int initialDelay = intent.getExtras().getInt(IntentKeys.SCROLL_DELAY);
+            int scrollCount = intent.getExtras().getInt(IntentKeys.SCROLL_COUNT);
+            int scrollInterval = intent.getExtras().getInt(IntentKeys.SCROLL_INTERVAL);
+            if (scrollInterval != 0 && scrollCount != 0) {
+                startAutoScrollTimer(initialDelay, scrollInterval, scrollCount);
+            }
+        }
     }
 
     @Override
     public void onDestroy() {
+        if (null != mAutoScrollTimer) {
+            mAutoScrollTimer.cancel();
+            mAutoScrollTimer = null;
+        }
         super.onDestroy();
     }
 
@@ -133,5 +155,39 @@ public class MainFragment extends BrowseFragment {
         mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
 
         setAdapter(mRowsAdapter);
+    }
+
+    private class UpdateAutoScrollTask extends TimerTask {
+        @Override
+        public void run() {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (mAutoScrollCount == 0) {
+                      mAutoScrollTimer.cancel();
+                      return;
+                    }
+                    if (mAutoScrollCount % 2 == 0) {
+                      setSelectedPosition(NUM_ROWS - 1);
+                    } else {
+                      setSelectedPosition(0);
+                    }
+                    mAutoScrollCount--;
+                }
+            });
+        }
+    }
+
+    private void startAutoScrollTimer(int initialDelay, int interval, int count) {
+        if (null != mAutoScrollTimer) {
+            mAutoScrollTimer.cancel();
+        }
+        mAutoScrollCount = count;
+        mAutoScrollTimer = new Timer();
+        mAutoScrollTimer.schedule(new UpdateAutoScrollTask(), initialDelay, interval);
+    }
+
+    public void selectRow(int row) {
+        setSelectedPosition(row);
     }
 }

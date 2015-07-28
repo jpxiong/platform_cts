@@ -37,7 +37,7 @@ public class VideoProvider {
         return sMovieList;
     }
 
-    public static HashMap<String, List<Movie>> buildMedia() {
+    public static HashMap<String, List<Movie>> buildMedia(int nCategories) {
         if (null != sMovieList) {
             return sMovieList;
         }
@@ -46,11 +46,10 @@ public class VideoProvider {
 
         String title = new String();
         String studio = new String();
-        int nCategories = 10;
         for (int i = 0; i < nCategories; i++) {
             String category_name = String.format("Category %d",  i);
             List<Movie> categoryList = new ArrayList<Movie>();
-            for (int j = 0; j < 5 + i * 2; j++) {
+            for (int j = 0; j < 20; j++) {
                 String description = "This is description of a movie.";
                 title = String.format("Video %d-%d", i, j);
                 studio = String.format("Studio %d", (i + j) % 7);
