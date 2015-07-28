@@ -68,6 +68,8 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             "VcUyQ1/e7WQgOaBHi9TefUJi+4PSVSluOXon\n" +
             "-----END CERTIFICATE-----";
 
+    private static final String MANAGED_PROVISIONING_PKG = "com.android.managedprovisioning";
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -1018,6 +1020,14 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         fail("No system launcher with version L+ present present on device.");
     }
 
+    /**
+     * Test that managed provisioning is pre-installed if and only if the device declares the
+     * device admin feature.
+     */
+    public void testManagedProvisioningPreInstalled() throws Exception {
+        assertEquals(mDeviceAdmin, isPackageInstalledOnSystemImage(MANAGED_PROVISIONING_PKG));
+    }
+
     private void assertDeviceOwnerMessage(String message) {
         assertTrue("message is: "+ message, message.contains("does not own the device")
                 || message.contains("can only be called by the device owner"));
@@ -1097,6 +1107,16 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
             fail("did not throw expected SecurityException");
         } catch (SecurityException e) {
             assertDeviceOwnerMessage(e.getMessage());
+        }
+    }
+
+    private boolean isPackageInstalledOnSystemImage(String packagename) {
+        try {
+            ApplicationInfo info = mPackageManager.getApplicationInfo(packagename,
+                    0 /* default flags */);
+            return (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+        } catch (NameNotFoundException e) {
+            return false;
         }
     }
 }
