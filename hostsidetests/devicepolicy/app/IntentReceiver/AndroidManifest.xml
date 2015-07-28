@@ -22,13 +22,16 @@
     <uses-permission android:name="com.android.cts.managedprofile.permission.SAMPLE"/>
 
     <application>
+
+        <uses-library android:name="android.test.runner" />
+
         <activity android:name="com.android.cts.intent.receiver.IntentReceiverActivity">
             <intent-filter>
                 <action android:name="com.android.cts.action.COPY_TO_CLIPBOARD" />
                 <action android:name="com.android.cts.action.READ_FROM_URI" />
                 <action android:name="com.android.cts.action.TAKE_PERSISTABLE_URI_PERMISSION" />
                 <action android:name="com.android.cts.action.WRITE_TO_URI" />
-                <action android:name="com.android.cts.action.TEST_LOCK_TASK" />
+                <action android:name="com.android.cts.action.JUST_CREATE" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -55,6 +58,17 @@
             </intent-filter>
         </activity-alias>
 
+        <receiver android:name=".BroadcastIntentReceiver">
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_OWNER_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
     </application>
+
+    <instrumentation
+        android:name="android.support.test.runner.AndroidJUnitRunner"
+        android:targetPackage="com.android.cts.intent.receiver"
+        android:label="Intent Receiver CTS Tests" />
 
 </manifest>
