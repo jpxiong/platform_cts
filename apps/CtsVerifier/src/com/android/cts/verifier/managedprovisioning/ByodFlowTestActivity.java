@@ -16,33 +16,23 @@
 
 package com.android.cts.verifier.managedprovisioning;
 
-import android.app.AlertDialog;
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.cts.verifier.PassFailButtons;
+import com.android.cts.verifier.ArrayTestListAdapter;
+import com.android.cts.verifier.DialogTestListActivity;
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.TestListActivity;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.android.cts.verifier.TestResult;
 
 /**
  * CTS verifier test for BYOD managed provisioning flow.
@@ -55,64 +45,48 @@ import java.util.List;
  * The first two verifications are performed automatically, by interacting with profile owner using
  * cross-profile intents, while the last two are carried out manually by the user.
  */
-public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
+public class ByodFlowTestActivity extends DialogTestListActivity {
 
     private final String TAG = "ByodFlowTestActivity";
+    private static final int REQUEST_MANAGED_PROVISIONING = 0;
     private static final int REQUEST_PROFILE_OWNER_STATUS = 1;
     private static final int REQUEST_INTENT_FILTERS_STATUS = 2;
 
     private ComponentName mAdminReceiverComponent;
 
-    private TestAdapter mTestListAdapter;
-    private View mStartProvisioningButton;
-    private List<TestItem> mTests = new ArrayList<TestItem>();
+    private DialogTestListItem mProfileOwnerInstalled;
+    private DialogTestListItem mProfileAccountVisibleTest;
+    private DialogTestListItem mDeviceAdminVisibleTest;
+    private DialogTestListItem mWorkAppVisibleTest;
+    private DialogTestListItem mCrossProfileIntentFiltersTest;
+    private DialogTestListItem mDisableNonMarketTest;
+    private DialogTestListItem mEnableNonMarketTest;
+    private DialogTestListItem mWorkNotificationBadgedTest;
+    private DialogTestListItem mWorkStatusBarIconTest;
+    private DialogTestListItem mWorkStatusBarToastTest;
+    private DialogTestListItem mAppSettingsVisibleTest;
+    private DialogTestListItem mLocationSettingsVisibleTest;
+    private DialogTestListItem mCredSettingsVisibleTest;
+    private DialogTestListItem mPrintSettingsVisibleTest;
+    private DialogTestListItem mIntentFiltersTest;
+    private DialogTestListItem mCrossProfileImageCaptureSupportTest;
+    private DialogTestListItem mCrossProfileVideoCaptureSupportTest;
+    private DialogTestListItem mCrossProfileAudioCaptureSupportTest;
 
-    protected DevicePolicyManager mDevicePolicyManager;
-
-    private TestItem mProfileOwnerInstalled;
-    private TestItem mProfileAccountVisibleTest;
-    private TestItem mDeviceAdminVisibleTest;
-    private TestItem mWorkAppVisibleTest;
-    private TestItem mCrossProfileIntentFiltersTest;
-    private TestItem mDisableNonMarketTest;
-    private TestItem mEnableNonMarketTest;
-    private TestItem mWorkNotificationBadgedTest;
-    private TestItem mWorkStatusBarIconTest;
-    private TestItem mWorkStatusBarToastTest;
-    private TestItem mAppSettingsVisibleTest;
-    private TestItem mLocationSettingsVisibleTest;
-    private TestItem mCredSettingsVisibleTest;
-    private TestItem mPrintSettingsVisibleTest;
-    private TestItem mIntentFiltersTest;
-    private TestItem mCrossProfileImageCaptureSupportTest;
-    private TestItem mCrossProfileVideoCaptureSupportTest;
-    private TestItem mCrossProfileAudioCaptureSupportTest;
-
-    private int mCurrentTestPosition;
+    public ByodFlowTestActivity() {
+        super(R.layout.provisioning_byod,
+                R.string.provisioning_byod, R.string.provisioning_byod_info,
+                R.string.provisioning_byod_instructions);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdminReceiverComponent = new ComponentName(this, DeviceAdminTestReceiver.class.getName());
-        mDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+
         disableComponent();
-
-        setContentView(R.layout.provisioning_byod);
-        setInfoResources(R.string.provisioning_byod, R.string.provisioning_byod_info, -1);
-        setPassFailButtonClickListeners();
-        getPassButton().setEnabled(false);
-        setResult(RESULT_CANCELED);
-
-        setupTests();
-
-        mTestListAdapter = new TestAdapter(this);
-        setListAdapter(mTestListAdapter);
-        mTestListAdapter.addAll(mTests);
-
-        mCurrentTestPosition = 0;
-
-        mStartProvisioningButton = findViewById(R.id.byod_start);
-        mStartProvisioningButton.setOnClickListener(new OnClickListener() {
+        mPrepareTestButton.setText(R.string.provisioning_byod_start);
+        mPrepareTestButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 startByodProvisioning();
@@ -138,25 +112,34 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         // This is called when managed provisioning completes successfully without reboot.
         super.onNewIntent(intent);
         if (ByodHelperActivity.ACTION_PROFILE_OWNER_STATUS.equals(intent.getAction())) {
-            handleStatusUpdate(intent);
+            handleStatusUpdate(RESULT_OK, intent);
         }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        // Called after queryProfileOwner()
-        if (requestCode == REQUEST_PROFILE_OWNER_STATUS && resultCode == RESULT_OK) {
-            handleStatusUpdate(data);
-            // Called after checkIntentFilters()
-        } else if (requestCode == REQUEST_INTENT_FILTERS_STATUS) {
-            handleIntentFiltersStatus(resultCode);
+    protected void handleActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_MANAGED_PROVISIONING:
+                return;
+            case REQUEST_PROFILE_OWNER_STATUS: {
+                // Called after queryProfileOwner()
+                handleStatusUpdate(resultCode, data);
+            } break;
+            case REQUEST_INTENT_FILTERS_STATUS: {
+                // Called after checkIntentFilters()
+                handleIntentFiltersStatus(resultCode);
+            } break;
+            default: {
+                super.handleActivityResult(requestCode, resultCode, data);
+            }
         }
     }
 
-    private void handleStatusUpdate(Intent data) {
-        boolean provisioned = data.getBooleanExtra(ByodHelperActivity.EXTRA_PROVISIONED, false);
-        setTestResult(mProfileOwnerInstalled, provisioned ? TestResult.Passed : TestResult.Failed);
+    private void handleStatusUpdate(int resultCode, Intent data) {
+        boolean provisioned = data != null &&
+                data.getBooleanExtra(ByodHelperActivity.EXTRA_PROVISIONED, false);
+        setTestResult(mProfileOwnerInstalled, (provisioned && resultCode == RESULT_OK) ?
+                TestResult.TEST_RESULT_PASSED : TestResult.TEST_RESULT_FAILED);
     }
 
     @Override
@@ -167,10 +150,13 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         super.finish();
     }
 
-    private void setupTests() {
-        mProfileOwnerInstalled = new TestItem(this, R.string.provisioning_byod_profileowner) {
+    @Override
+    protected void setupTests(ArrayTestListAdapter adapter) {
+        mProfileOwnerInstalled = new DialogTestListItem(this,
+                R.string.provisioning_byod_profileowner,
+                "BYOD_ProfileOwnerInstalled") {
             @Override
-            public void performTest(ByodFlowTestActivity activity) {
+            public void performTest(DialogTestListActivity activity) {
                 queryProfileOwner(true);
             }
         };
@@ -179,113 +165,135 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
          * To keep the image in this test up to date, use the instructions in
          * {@link ByodIconSamplerActivity}.
          */
-        mWorkAppVisibleTest = new TestItemWithIcon(this,
+        mWorkAppVisibleTest = new DialogTestListItemWithIcon(this,
                 R.string.provisioning_byod_workapps_visible,
+                "BYOD_WorkAppVisibleTest",
                 R.string.provisioning_byod_workapps_visible_instruction,
                 new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
                 R.drawable.badged_icon);
 
-        mWorkNotificationBadgedTest = new TestItemWithIcon(this,
+        mWorkNotificationBadgedTest = new DialogTestListItemWithIcon(this,
                 R.string.provisioning_byod_work_notification,
+                "BYOD_WorkNotificationBadgedTest",
                 R.string.provisioning_byod_work_notification_instruction,
                 new Intent(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION),
                 R.drawable.ic_corp_icon);
 
         Intent workStatusIcon = new Intent(WorkStatusTestActivity.ACTION_WORK_STATUS_ICON);
         workStatusIcon.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mWorkStatusBarIconTest = new TestItemWithIcon(this,
+        mWorkStatusBarIconTest = new DialogTestListItemWithIcon(this,
                 R.string.provisioning_byod_work_status_icon,
+                "BYOD_WorkStatusBarIconTest",
                 R.string.provisioning_byod_work_status_icon_instruction,
                 workStatusIcon,
                 R.drawable.stat_sys_managed_profile_status);
 
         Intent workStatusToast = new Intent(WorkStatusTestActivity.ACTION_WORK_STATUS_TOAST);
         workStatusToast.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mWorkStatusBarToastTest = new TestItem(this,
+        mWorkStatusBarToastTest = new DialogTestListItem(this,
                 R.string.provisioning_byod_work_status_toast,
+                "BYOD_WorkStatusBarToastTest",
                 R.string.provisioning_byod_work_status_toast_instruction,
                 workStatusToast);
 
-        mDisableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_deny,
+        mDisableNonMarketTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_nonmarket_deny,
+                "BYOD_DisableNonMarketTest",
                 R.string.provisioning_byod_nonmarket_deny_info,
                 new Intent(ByodHelperActivity.ACTION_INSTALL_APK)
                         .putExtra(ByodHelperActivity.EXTRA_ALLOW_NON_MARKET_APPS, false));
 
-        mEnableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_allow,
+        mEnableNonMarketTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_nonmarket_allow,
+                "BYOD_EnableNonMarketTest",
                 R.string.provisioning_byod_nonmarket_allow_info,
                 new Intent(ByodHelperActivity.ACTION_INSTALL_APK)
                         .putExtra(ByodHelperActivity.EXTRA_ALLOW_NON_MARKET_APPS, true));
 
-        mProfileAccountVisibleTest = new TestItem(this, R.string.provisioning_byod_profile_visible,
+        mProfileAccountVisibleTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_profile_visible,
+                "BYOD_ProfileAccountVisibleTest",
                 R.string.provisioning_byod_profile_visible_instruction,
                 new Intent(Settings.ACTION_SETTINGS));
 
-        mAppSettingsVisibleTest = new TestItem(this, R.string.provisioning_byod_app_settings,
+        mAppSettingsVisibleTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_app_settings,
+                "BYOD_AppSettingsVisibleTest",
                 R.string.provisioning_byod_app_settings_instruction,
                 new Intent(Settings.ACTION_APPLICATION_SETTINGS));
 
-        mDeviceAdminVisibleTest = new TestItem(this, R.string.provisioning_byod_admin_visible,
+        mDeviceAdminVisibleTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_admin_visible,
+                "BYOD_DeviceAdminVisibleTest",
                 R.string.provisioning_byod_admin_visible_instruction,
                 new Intent(Settings.ACTION_SECURITY_SETTINGS));
 
-        mCredSettingsVisibleTest = new TestItem(this, R.string.provisioning_byod_cred_settings,
+        mCredSettingsVisibleTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_cred_settings,
+                "BYOD_CredSettingsVisibleTest",
                 R.string.provisioning_byod_cred_settings_instruction,
                 new Intent(Settings.ACTION_SECURITY_SETTINGS));
 
-        mLocationSettingsVisibleTest = new TestItem(this,
+        mLocationSettingsVisibleTest = new DialogTestListItem(this,
                 R.string.provisioning_byod_location_settings,
+                "BYOD_LocationSettingsVisibleTest",
                 R.string.provisioning_byod_location_settings_instruction,
                 new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
 
-        mPrintSettingsVisibleTest = new TestItem(this, R.string.provisioning_byod_print_settings,
+        mPrintSettingsVisibleTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_print_settings,
+                "BYOD_PrintSettingsVisibleTest",
                 R.string.provisioning_byod_print_settings_instruction,
                 new Intent(Settings.ACTION_PRINT_SETTINGS));
 
         Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
         Intent chooser = Intent.createChooser(intent,
                 getResources().getString(R.string.provisioning_cross_profile_chooser));
-        mCrossProfileIntentFiltersTest = new TestItem(this,
+        mCrossProfileIntentFiltersTest = new DialogTestListItem(this,
                 R.string.provisioning_byod_cross_profile,
+                "BYOD_CrossProfileIntentFiltersTest",
                 R.string.provisioning_byod_cross_profile_instruction,
                 chooser);
 
         // Test for checking if the required intent filters are set during managed provisioning.
-        mIntentFiltersTest = new TestItem(this,
-                R.string.provisioning_byod_cross_profile_intent_filters) {
+        mIntentFiltersTest = new DialogTestListItem(this,
+                R.string.provisioning_byod_cross_profile_intent_filters,
+                "BYOD_IntentFiltersTest") {
             @Override
-            public void performTest(ByodFlowTestActivity activity) {
+            public void performTest(DialogTestListActivity activity) {
                 checkIntentFilters();
             }
         };
 
-        mTests.add(mProfileOwnerInstalled);
+        adapter.add(mProfileOwnerInstalled);
 
         // Badge related tests
-        mTests.add(mWorkAppVisibleTest);
-        mTests.add(mWorkNotificationBadgedTest);
-        mTests.add(mWorkStatusBarIconTest);
-        mTests.add(mWorkStatusBarToastTest);
+        adapter.add(mWorkAppVisibleTest);
+        adapter.add(mWorkNotificationBadgedTest);
+        adapter.add(mWorkStatusBarIconTest);
+        adapter.add(mWorkStatusBarToastTest);
 
         // Settings related tests.
-        mTests.add(mProfileAccountVisibleTest);
-        mTests.add(mDeviceAdminVisibleTest);
-        mTests.add(mCredSettingsVisibleTest);
-        mTests.add(mAppSettingsVisibleTest);
-        mTests.add(mLocationSettingsVisibleTest);
-        mTests.add(mPrintSettingsVisibleTest);
+        adapter.add(mProfileAccountVisibleTest);
+        adapter.add(mDeviceAdminVisibleTest);
+        adapter.add(mCredSettingsVisibleTest);
+        adapter.add(mAppSettingsVisibleTest);
+        adapter.add(mLocationSettingsVisibleTest);
+        adapter.add(mPrintSettingsVisibleTest);
 
-        mTests.add(mCrossProfileIntentFiltersTest);
-        mTests.add(mDisableNonMarketTest);
-        mTests.add(mEnableNonMarketTest);
-        mTests.add(mIntentFiltersTest);
+        adapter.add(mCrossProfileIntentFiltersTest);
+        adapter.add(mDisableNonMarketTest);
+        adapter.add(mEnableNonMarketTest);
+        adapter.add(mIntentFiltersTest);
 
         if (canResolveIntent(ByodHelperActivity.getCaptureImageIntent())) {
             // Capture image intent can be resolved in primary profile, so test.
-            mCrossProfileImageCaptureSupportTest = new TestItem(this,
+            mCrossProfileImageCaptureSupportTest = new DialogTestListItem(this,
                     R.string.provisioning_byod_capture_image_support,
+                    "BYOD_CrossProfileImageCaptureSupportTest",
                     R.string.provisioning_byod_capture_image_support_info,
                     new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_IMAGE));
-            mTests.add(mCrossProfileImageCaptureSupportTest);
+            adapter.add(mCrossProfileImageCaptureSupportTest);
         } else {
             // Capture image intent cannot be resolved in primary profile, so skip test.
             Toast.makeText(ByodFlowTestActivity.this,
@@ -295,11 +303,12 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
         if (canResolveIntent(ByodHelperActivity.getCaptureVideoIntent())) {
             // Capture video intent can be resolved in primary profile, so test.
-            mCrossProfileVideoCaptureSupportTest = new TestItem(this,
+            mCrossProfileVideoCaptureSupportTest = new DialogTestListItem(this,
                     R.string.provisioning_byod_capture_video_support,
+                    "BYOD_CrossProfileVideoCaptureSupportTest",
                     R.string.provisioning_byod_capture_video_support_info,
                     new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_VIDEO));
-            mTests.add(mCrossProfileVideoCaptureSupportTest);
+            adapter.add(mCrossProfileVideoCaptureSupportTest);
         } else {
             // Capture video intent cannot be resolved in primary profile, so skip test.
             Toast.makeText(ByodFlowTestActivity.this,
@@ -310,11 +319,12 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         /* TODO: reinstate when bug b/20131958 is fixed
         if (canResolveIntent(ByodHelperActivity.getCaptureAudioIntent())) {
             // Capture audio intent can be resolved in primary profile, so test.
-            mCrossProfileAudioCaptureSupportTest = new TestItem(this,
+            mCrossProfileAudioCaptureSupportTest = new DialogTestListItem(this,
                     R.string.provisioning_byod_capture_audio_support,
+                    "BYOD_CrossProfileAudioCaptureSupportTest",
                     R.string.provisioning_byod_capture_audio_support_info,
                     new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_AUDIO));
-            mTests.add(mCrossProfileAudioCaptureSupportTest);
+            adapter.add(mCrossProfileAudioCaptureSupportTest);
         } else {
             // Capture audio intent cannot be resolved in primary profile, so skip test.
             Toast.makeText(ByodFlowTestActivity.this,
@@ -324,85 +334,23 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         */
     }
 
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        mCurrentTestPosition = position;
-        TestItem test = (TestItem) getListAdapter().getItem(position);
-        test.performTest(this);
-    }
-
     // Return whether the intent can be resolved in the current profile
     private boolean canResolveIntent(Intent intent) {
         return intent.resolveActivity(getPackageManager()) != null;
     }
 
-    private void showManualTestDialog(final TestItem test) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_info)
-                .setTitle(R.string.provisioning_byod)
-                .setNeutralButton(R.string.provisioning_byod_go, null)
-                .setPositiveButton(R.string.pass_button_text, new AlertDialog.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.Passed);
-                    }
-                })
-                .setNegativeButton(R.string.fail_button_text, new AlertDialog.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.Failed);
-                    }
-                });
-        View customView = test.getCustomView();
-        if (customView != null) {
-            dialogBuilder.setView(customView);
-        } else {
-            dialogBuilder.setMessage(test.getManualTestInstruction());
-        }
-        final AlertDialog dialog = dialogBuilder.show();
-        // Note: Setting the OnClickListener on the Dialog rather than the Builder, prevents the
-        // dialog being dismissed on onClick.
-        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    ByodFlowTestActivity.this.startActivity(test.getManualTestIntent());
-                } catch (ActivityNotFoundException e) {
-                    Toast.makeText(ByodFlowTestActivity.this,
-                            "Cannot start " + test.getManualTestIntent(), Toast.LENGTH_LONG).show();
-                    setTestResult(test, TestResult.Failed);
-                    dialog.dismiss();
-                }
-            }
-        });
-    }
-
-    private void clearRemainingState(final TestItem test) {
+    @Override
+    protected void clearRemainingState(final DialogTestListItem test) {
+        super.clearRemainingState(test);
         if (WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION.equals(
                 test.getManualTestIntent().getAction())) {
             try {
-                ByodFlowTestActivity.this.startActivity(new Intent(
+                startActivity(new Intent(
                         WorkNotificationTestActivity.ACTION_CLEAR_WORK_NOTIFICATION));
             } catch (ActivityNotFoundException e) {
                 // User shouldn't run this test before work profile is set up.
             }
         }
-    }
-
-    private void setTestResult(TestItem test, TestResult result) {
-        test.setPassFailState(result);
-
-        boolean testSucceeds = true;
-        for(TestItem aTest : mTests) {
-            testSucceeds &= (aTest.getPassFailState() == TestResult.Passed);
-        }
-        getPassButton().setEnabled(testSucceeds);
-        mTestListAdapter.notifyDataSetChanged();
-
-        this.getListView().smoothScrollToPosition(mCurrentTestPosition + 1);
     }
 
     private void startByodProvisioning() {
@@ -413,7 +361,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         if (sending.resolveActivity(getPackageManager()) != null) {
             // ManagedProvisioning must be started with startActivityForResult, but we don't
             // care about the result, so passing 0 as a requestCode
-            startActivityForResult(sending, 0);
+            startActivityForResult(sending, REQUEST_MANAGED_PROVISIONING);
         } else {
             showToast(R.string.provisioning_byod_disabled);
         }
@@ -426,7 +374,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         }
         catch (ActivityNotFoundException e) {
             Log.d(TAG, "queryProfileOwner: ActivityNotFoundException", e);
-            setTestResult(mProfileOwnerInstalled, TestResult.Failed);
+            setTestResult(mProfileOwnerInstalled, TestResult.TEST_RESULT_FAILED);
             if (showToast) {
                 showToast(R.string.provisioning_byod_no_activity);
             }
@@ -452,7 +400,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
             startActivityForResult(intent, REQUEST_INTENT_FILTERS_STATUS);
         } catch (ActivityNotFoundException e) {
             Log.d(TAG, "checkIntentFilters: ActivityNotFoundException", e);
-            setTestResult(mIntentFiltersTest, TestResult.Failed);
+            setTestResult(mIntentFiltersTest, TestResult.TEST_RESULT_FAILED);
             showToast(R.string.provisioning_byod_no_activity);
         }
     }
@@ -470,7 +418,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         final boolean intentFiltersSet =
                 intentFiltersSetForPrimaryIntents & intentFiltersSetForManagedIntents;
         setTestResult(mIntentFiltersTest,
-                intentFiltersSet ? TestResult.Passed : TestResult.Failed);
+                intentFiltersSet ? TestResult.TEST_RESULT_PASSED : TestResult.TEST_RESULT_FAILED);
     }
 
     private void disableComponent() {
@@ -488,124 +436,5 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 this, WorkStatusTestActivity.class),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-    }
-
-    private void showToast(int messageId) {
-        String message = getString(messageId);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-    enum TestResult {
-        Unknown, Failed, Passed
-    }
-
-    static class TestItem {
-
-        private String mDisplayName;
-        private TestResult mPassed;
-        private boolean mManualTest;
-        private String mManualInstruction;
-        private Intent mManualIntent;
-
-        public TestItem(Context context, int nameResId) {
-            mDisplayName = context.getString(nameResId);
-            mPassed = TestResult.Unknown;
-            mManualTest = false;
-        }
-
-        public void performTest(ByodFlowTestActivity activity) {
-            if (isManualTest()) {
-                activity.showManualTestDialog(this);
-            }
-        }
-
-        public TestItem(Context context, int nameResId, int testInstructionResId, Intent testIntent) {
-            mDisplayName = context.getString(nameResId);
-            mPassed = TestResult.Unknown;
-            mManualTest = true;
-            mManualInstruction = context.getString(testInstructionResId);
-            mManualIntent = testIntent;
-        }
-
-        @Override
-        public String toString() {
-            return mDisplayName;
-        }
-
-        TestResult getPassFailState() {
-            return mPassed;
-        }
-
-        void setPassFailState(TestResult state) {
-            mPassed = state;
-        }
-
-        public boolean isManualTest() {
-            return mManualTest;
-        }
-
-        public String getManualTestInstruction() {
-            return mManualInstruction;
-        }
-
-        public Intent getManualTestIntent() {
-            return mManualIntent;
-        }
-
-        public View getCustomView() {
-            return null;
-        }
-    }
-
-    static class TestItemWithIcon extends TestItem {
-
-        private int mImageResId;
-        private Context mContext;
-
-        public TestItemWithIcon(Context context, int nameResId, int testInstructionResId,
-                Intent testIntent, int imageResId) {
-            super(context, nameResId, testInstructionResId, testIntent);
-            mContext = context;
-            mImageResId = imageResId;
-        }
-
-        @Override
-        public View getCustomView() {
-            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            View view = layoutInflater.inflate(R.layout.byod_custom_view,
-                    null /* root */);
-            ((ImageView) view.findViewById(R.id.sample_icon)).setImageResource(mImageResId);
-            ((TextView) view.findViewById(R.id.message)).setText(getManualTestInstruction());
-            return view;
-        }
-    }
-
-    static class TestAdapter extends ArrayAdapter<TestItem> {
-
-        public TestAdapter(Context context) {
-            super(context, android.R.layout.simple_list_item_1);
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            TextView view = (TextView) super.getView(position, convertView, parent);
-
-            TestItem item = getItem(position);
-            int backgroundResource = 0;
-            int iconResource = 0;
-            if (item.getPassFailState() == TestResult.Passed) {
-                backgroundResource = R.drawable.test_pass_gradient;
-                iconResource = R.drawable.fs_good;
-            } else if (item.getPassFailState() == TestResult.Failed){
-                backgroundResource = R.drawable.test_fail_gradient;
-                iconResource = R.drawable.fs_error;
-            }
-            view.setBackgroundResource(backgroundResource);
-            view.setPadding(10, 0, 10, 0);
-            view.setCompoundDrawablePadding(10);
-            view.setCompoundDrawablesWithIntrinsicBounds(0, 0, iconResource, 0);
-
-            return view;
-        }
     }
 }
