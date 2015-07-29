@@ -66,6 +66,10 @@ def main():
     topdir = tempfile.mkdtemp()
     print "Saving output files to:", topdir, "\n"
 
+    device_id = its.device.get_device_id()
+    device_id_arg = "device=" + device_id
+    print "Testing device " + device_id
+
     camera_ids = []
     for s in sys.argv[1:]:
         if s[:7] == "camera=" and len(s) > 7:
@@ -76,7 +80,8 @@ def main():
         camera_ids_path = os.path.join(topdir, "camera_ids.txt")
         out_arg = "out=" + camera_ids_path
         cmd = ['python',
-               os.path.join(os.getcwd(),"tools/get_camera_ids.py"), out_arg]
+               os.path.join(os.getcwd(),"tools/get_camera_ids.py"), out_arg,
+               device_id_arg]
         retcode = subprocess.call(cmd,cwd=topdir)
         assert(retcode == 0)
         with open(camera_ids_path, "r") as f:
@@ -110,7 +115,7 @@ def main():
                 scene_arg = "scene=" + scene_req[scene]
                 cmd = ['python',
                         os.path.join(os.getcwd(),"tools/validate_scene.py"),
-                        camera_id_arg, out_arg, scene_arg]
+                        camera_id_arg, out_arg, scene_arg, device_id_arg]
                 retcode = subprocess.call(cmd,cwd=topdir)
                 assert(retcode == 0)
                 print "Start running tests for", scene
@@ -170,7 +175,7 @@ def main():
         summary_path = os.path.join(topdir, camera_id, "summary.txt")
         with open(summary_path, "w") as f:
             f.write(summary)
-        its.device.report_result(camera_id, result, summary_path)
+        its.device.report_result(device_id, camera_id, result, summary_path)
 
     print "ITS tests finished. Please go back to CtsVerifier and proceed"
 
