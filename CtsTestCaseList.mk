@@ -72,6 +72,8 @@ cts_support_packages := \
     CtsAccelerationTestStubs \
     CtsAlarmClockService \
     CtsAppTestStubs \
+    CtsAssistService \
+    CtsAssistApp \
     CtsAtraceTestApp \
     CtsCertInstallerApp \
     CtsDeviceAdmin \
@@ -136,6 +138,7 @@ cts_test_packages := \
     CtsAnimationTestCases \
     CtsAppTestCases \
     CtsAppWidgetTestCases \
+    CtsAssistTestCases \
     CtsBluetoothTestCases \
     CtsCalendarcommon2TestCases \
     CtsCallLogTestCases \
