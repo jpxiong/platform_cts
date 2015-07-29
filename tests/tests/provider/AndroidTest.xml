@@ -19,22 +19,4 @@
     <option name="cts-apk-installer:test-file-name" value="CtsProviderTestCases.apk" />
     <option name="run-command:run-command"
             value="ime enable com.android.cts.provider/.MockInputMethodService" />
-
-    <option name="run-command:run-command"
-            value="setprop log.tag.CalendarProvider2 VERBOSE" />
-    <option name="run-command:run-command"
-            value="setprop log.tag.CalInstances VERBOSE" />
-    <option name="run-command:run-command"
-            value="setprop log.tag.RecurrenceProcessor VERBOSE" />
-    <option name="run-command:run-command"
-            value="setprop log.tag.CalendarCache VERBOSE" />
-
-    <option name="run-command:teardown-command"
-            value="setprop log.tag.CalendarProvider2 INFO" />
-    <option name="run-command:teardown-command"
-            value="setprop log.tag.CalInstances INFO" />
-    <option name="run-command:teardown-command"
-            value="setprop log.tag.RecurrenceProcessor INFO" />
-    <option name="run-command:teardown-command"
-            value="setprop log.tag.CalendarCache INFO" />
 </configuration>
