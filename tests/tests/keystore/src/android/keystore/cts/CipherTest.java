@@ -221,17 +221,6 @@ public class CipherTest extends AndroidTestCase {
     private static final byte[] AES256_KAT_KEY_BYTES =
             HexEncoding.decode("cf601cc10aaf434d1f01747136aff222af7fb426d101901712214c3fea18125f");
 
-    private static final KeyProtection.Builder GOOD_IMPORT_PARAMS_BUILDER =
-            new KeyProtection.Builder(
-                    KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                    .setBlockModes(KeyProperties.BLOCK_MODE_ECB,
-                            KeyProperties.BLOCK_MODE_CBC,
-                            KeyProperties.BLOCK_MODE_CTR,
-                            KeyProperties.BLOCK_MODE_GCM)
-                    .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-                    .setDigests(KeyProperties.DIGEST_NONE)
-                    .setRandomizedEncryptionRequired(false);
-
     public void testAlgorithmList() {
         // Assert that Android Keystore Provider exposes exactly the expected Cipher
         // transformations. We don't care whether the transformations are exposed via aliases, as
@@ -791,10 +780,12 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenNotAuthorizedToDecrypt() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good, KeyProperties.PURPOSE_ENCRYPT).build());
             } catch (Throwable e) {
@@ -804,14 +795,16 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptSymmetricFailsWhenNotAuthorizedToEncrypt() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
 
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good, KeyProperties.PURPOSE_DECRYPT).build());
             } catch (Throwable e) {
@@ -821,14 +814,16 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptAsymmetricIgnoresAuthorizedPurposes() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
 
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good, 0).build());
             } catch (Throwable e) {
@@ -838,64 +833,78 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenBlockModeNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            if (transformationUpperCase.startsWith("RSA/")) {
+            if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(
+                    TestUtils.getCipherKeyAlgorithm(transformation))) {
                 // Block modes do not apply
                 continue;
             }
-            String authorizedBlockMode =
-                    (transformationUpperCase.contains("/CBC/")) ? "CTR" : "CBC";
+
+            String goodBlockMode = TestUtils.getCipherBlockMode(transformation);
+            String badBlockMode = KeyProperties.BLOCK_MODE_CBC.equalsIgnoreCase(goodBlockMode)
+                    ? KeyProperties.BLOCK_MODE_CTR : KeyProperties.BLOCK_MODE_CBC;
+
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
-                        TestUtils.buildUpon(good).setBlockModes(authorizedBlockMode).build());
+                        TestUtils.buildUpon(good).setBlockModes(badBlockMode).build());
             } catch (Throwable e) {
                 throw new RuntimeException(
                         "Failed for " + transformation + " when authorized only for "
-                                + authorizedBlockMode,
+                                + badBlockMode,
                         e);
             }
         }
     }
 
     public void testInitEncryptSymmetricFailsWhenBlockModeNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
 
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            if (transformationUpperCase.startsWith("RSA/")) {
+            if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(
+                    TestUtils.getCipherKeyAlgorithm(transformation))) {
                 // Block modes do not apply
                 continue;
             }
-            String authorizedBlockMode =
-                    (transformationUpperCase.contains("/CBC/")) ? "CTR" : "CBC";
+
+            String goodBlockMode = TestUtils.getCipherBlockMode(transformation);
+            String badBlockMode = KeyProperties.BLOCK_MODE_CBC.equalsIgnoreCase(goodBlockMode)
+                    ? KeyProperties.BLOCK_MODE_CTR : KeyProperties.BLOCK_MODE_CBC;
+
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
-                        TestUtils.buildUpon(good).setBlockModes(authorizedBlockMode).build());
+                        TestUtils.buildUpon(good).setBlockModes(badBlockMode).build());
             } catch (Throwable e) {
                 throw new RuntimeException(
                         "Failed for " + transformation + " when authorized only for "
-                                + authorizedBlockMode,
+                                + badBlockMode,
                         e);
             }
         }
     }
 
     public void testInitEncryptAsymmetricIgnoresAuthorizedBlockModes() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
 
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good).setBlockModes().build());
             } catch (Throwable e) {
@@ -905,66 +914,85 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenDigestNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            if ((transformationUpperCase.endsWith("/NOPADDING"))
-                    || (transformationUpperCase.endsWith("/PKCS1PADDING"))
-                    || (transformationUpperCase.endsWith("/PKCS7PADDING"))) {
-                // Digest not used
+            String impliedDigest = TestUtils.getCipherDigest(transformation);
+            if (impliedDigest == null) {
+                // No digest used by this transformation
                 continue;
             }
-            String authorizedDigest =
-                    (transformationUpperCase.contains("SHA-256")) ? "SHA-512" : "SHA-256";
+
+            String badDigest = KeyProperties.DIGEST_SHA256.equalsIgnoreCase(impliedDigest)
+                    ? KeyProperties.DIGEST_SHA512 : KeyProperties.DIGEST_SHA256;
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
-                        TestUtils.buildUpon(good).setDigests(authorizedDigest).build());
+                        TestUtils.buildUpon(good).setDigests(badDigest).build());
+
+                if (!KeyProperties.DIGEST_NONE.equalsIgnoreCase(impliedDigest)) {
+                    // Check that authorized digest NONE does not mean ANY digest is authorized.
+                    badDigest = KeyProperties.DIGEST_NONE;
+                    assertInitDecryptThrowsInvalidKeyException(transformation,
+                            TestUtils.buildUpon(good).setDigests(badDigest).build());
+                }
             } catch (Throwable e) {
                 throw new RuntimeException(
-                        "Failed for " + transformation + " when authorized only for "
-                                + authorizedDigest,
+                        "Failed for " + transformation + " when authorized only for " + badDigest,
                         e);
             }
         }
     }
 
     public void testInitEncryptSymmetricFailsWhenDigestNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            if ((transformationUpperCase.endsWith("/NOPADDING"))
-                    || (transformationUpperCase.endsWith("/PKCS1PADDING"))
-                    || (transformationUpperCase.endsWith("/PKCS7PADDING"))) {
-                // Digest not used
+
+            String impliedDigest = TestUtils.getCipherDigest(transformation);
+            if (impliedDigest == null) {
+                // No digest used by this transformation
                 continue;
             }
-            String authorizedDigest =
-                    (transformationUpperCase.contains("SHA-256")) ? "SHA-512" : "SHA-256";
+
+            String badDigest = KeyProperties.DIGEST_SHA256.equalsIgnoreCase(impliedDigest)
+                    ? KeyProperties.DIGEST_SHA512 : KeyProperties.DIGEST_SHA256;
+
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
-                        TestUtils.buildUpon(good).setDigests(authorizedDigest).build());
+                        TestUtils.buildUpon(good).setDigests(badDigest).build());
+
+                if (!KeyProperties.DIGEST_NONE.equalsIgnoreCase(impliedDigest)) {
+                    // Check that authorized digest NONE does not mean ANY digest is authorized.
+                    badDigest = KeyProperties.DIGEST_NONE;
+                    assertInitEncryptThrowsInvalidKeyException(transformation,
+                            TestUtils.buildUpon(good).setDigests(badDigest).build());
+                }
             } catch (Throwable e) {
                 throw new RuntimeException(
-                        "Failed for " + transformation + " when authorized only for "
-                                + authorizedDigest,
+                        "Failed for " + transformation + " when authorized only for " + badDigest,
                         e);
             }
         }
     }
 
     public void testInitEncryptAsymmetricIgnoresAuthorizedDigests() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good).setDigests().build());
             } catch (Throwable e) {
@@ -974,70 +1002,101 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenPaddingSchemeNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            String authorizedPaddingScheme;
-            if (transformationUpperCase.startsWith("RSA/")) {
-                authorizedPaddingScheme = transformationUpperCase.contains("PKCS1PADDING")
-                        ? "OAEPPadding" : "PKCS1Padding";
+            String impliedEncryptionPadding = TestUtils.getCipherEncryptionPadding(transformation);
+            String badEncryptionPadding;
+            if (KeyProperties.KEY_ALGORITHM_RSA.equalsIgnoreCase(
+                    TestUtils.getCipherKeyAlgorithm(transformation))) {
+                badEncryptionPadding =
+                        KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1.equalsIgnoreCase(
+                                impliedEncryptionPadding)
+                        ? KeyProperties.ENCRYPTION_PADDING_RSA_OAEP
+                        : KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1;
             } else {
-                authorizedPaddingScheme = transformationUpperCase.contains("PKCS1PADDING")
-                        ? "NoPadding" : "PKCS1Padding";
+                badEncryptionPadding = KeyProperties.ENCRYPTION_PADDING_PKCS7.equalsIgnoreCase(
+                        impliedEncryptionPadding)
+                        ? KeyProperties.ENCRYPTION_PADDING_NONE
+                        : KeyProperties.ENCRYPTION_PADDING_PKCS7;
             }
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good)
-                                .setEncryptionPaddings(authorizedPaddingScheme)
+                                .setEncryptionPaddings(badEncryptionPadding)
                                 .build());
+
+                if (!KeyProperties.ENCRYPTION_PADDING_NONE.equalsIgnoreCase(
+                        impliedEncryptionPadding)) {
+                    // Check that authorized padding NONE does not mean ANY padding is authorized.
+                    badEncryptionPadding = KeyProperties.ENCRYPTION_PADDING_NONE;
+                    assertInitDecryptThrowsInvalidKeyException(transformation,
+                            TestUtils.buildUpon(good)
+                                    .setEncryptionPaddings(badEncryptionPadding)
+                                    .build());
+                }
             } catch (Throwable e) {
                 throw new RuntimeException(
                         "Failed for " + transformation + " when authorized only for "
-                                + authorizedPaddingScheme,
+                                + badEncryptionPadding,
                         e);
             }
         }
     }
 
     public void testInitEncryptSymmetricFailsWhenPaddingSchemeNotAuthorized() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
-            String transformationUpperCase = transformation.toUpperCase(Locale.US);
-            String authorizedPaddingScheme;
-            if (transformationUpperCase.startsWith("RSA/")) {
-                authorizedPaddingScheme = transformationUpperCase.contains("PKCS1PADDING")
-                        ? "OAEPPadding" : "PKCS1Padding";
-            } else {
-                authorizedPaddingScheme = transformationUpperCase.contains("PKCS1PADDING")
-                        ? "NoPadding" : "PKCS1Padding";
-            }
+            String impliedEncryptionPadding = TestUtils.getCipherEncryptionPadding(transformation);
+            String badEncryptionPadding = KeyProperties.ENCRYPTION_PADDING_PKCS7.equalsIgnoreCase(
+                    impliedEncryptionPadding)
+                    ? KeyProperties.ENCRYPTION_PADDING_NONE
+                    : KeyProperties.ENCRYPTION_PADDING_PKCS7;
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good)
-                                .setEncryptionPaddings(authorizedPaddingScheme)
+                                .setEncryptionPaddings(badEncryptionPadding)
                                 .build());
+
+                if (!KeyProperties.ENCRYPTION_PADDING_NONE.equalsIgnoreCase(
+                        impliedEncryptionPadding)) {
+                    // Check that authorized padding NONE does not mean ANY padding is authorized.
+                    badEncryptionPadding = KeyProperties.ENCRYPTION_PADDING_NONE;
+                    assertInitEncryptThrowsInvalidKeyException(transformation,
+                            TestUtils.buildUpon(good)
+                                    .setEncryptionPaddings(badEncryptionPadding)
+                                    .build());
+                }
             } catch (Throwable e) {
                 throw new RuntimeException(
                         "Failed for " + transformation + " when authorized only for "
-                                + authorizedPaddingScheme,
+                                + badEncryptionPadding,
                         e);
             }
         }
     }
 
     public void testInitEncryptAsymmetricIgnoresAuthorizedPaddingSchemes() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good)
                                 .setEncryptionPaddings()
@@ -1050,11 +1109,14 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenKeyNotYetValid() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
             } catch (Throwable e) {
@@ -1064,14 +1126,17 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptSymmetricFailsWhenKeyNotYetValid() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
             } catch (Throwable e) {
@@ -1081,14 +1146,17 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptAsymmetricIgnoresThatKeyNotYetValid() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badStartDate = new Date(System.currentTimeMillis() + DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good).setKeyValidityStart(badStartDate).build());
             } catch (Throwable e) {
@@ -1098,11 +1166,14 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptFailsWhenKeyNoLongerValidForConsumption() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good)
                                 .setKeyValidityForConsumptionEnd(badEndDate)
@@ -1114,11 +1185,14 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitDecryptIgnoresThatKeyNoLongerValidForOrigination() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             try {
-                assertInitDecryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_DECRYPT);
+
+                assertInitDecryptSucceeds(transformation, good);
                 assertInitDecryptSucceeds(transformation,
                         TestUtils.buildUpon(good)
                                 .setKeyValidityForOriginationEnd(badEndDate)
@@ -1130,14 +1204,17 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptSymmetricFailsWhenKeyNoLongerValidForOrigination() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptThrowsInvalidKeyException(transformation,
                         TestUtils.buildUpon(good)
                                 .setKeyValidityForOriginationEnd(badEndDate)
@@ -1150,14 +1227,17 @@ public class CipherTest extends AndroidTestCase {
 
     public void testInitEncryptSymmetricIgnoresThatKeyNoLongerValidForConsumption()
             throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (!isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good)
                                 .setKeyValidityForConsumptionEnd(badEndDate)
@@ -1169,14 +1249,17 @@ public class CipherTest extends AndroidTestCase {
     }
 
     public void testInitEncryptAsymmetricIgnoresThatKeyNoLongerValid() throws Exception {
-        KeyProtection.Builder good = GOOD_IMPORT_PARAMS_BUILDER;
         Date badEndDate = new Date(System.currentTimeMillis() - DAY_IN_MILLIS);
         for (String transformation : EXPECTED_ALGORITHMS) {
             if (isSymmetric(transformation)) {
                 continue;
             }
             try {
-                assertInitEncryptSucceeds(transformation, good.build());
+                KeyProtection good = TestUtils.getMinimalWorkingImportParametersForCipheringWith(
+                        transformation,
+                        KeyProperties.PURPOSE_ENCRYPT);
+
+                assertInitEncryptSucceeds(transformation, good);
                 assertInitEncryptSucceeds(transformation,
                         TestUtils.buildUpon(good)
                                 .setKeyValidityForOriginationEnd(badEndDate)
