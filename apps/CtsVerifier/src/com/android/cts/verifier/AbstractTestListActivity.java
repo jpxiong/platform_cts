@@ -44,8 +44,13 @@ public abstract class AbstractTestListActivity extends ListActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected final void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        handleActivityResult(requestCode, resultCode, data);
+    }
+
+    /** Override this in subclasses instead of onActivityResult */
+    protected void handleActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case LAUNCH_TEST_REQUEST_CODE:
                 handleLaunchTestResult(resultCode, data);
@@ -66,7 +71,7 @@ public abstract class AbstractTestListActivity extends ListActivity {
         setContentView(R.layout.list_content);
     }
 
-    private void handleLaunchTestResult(int resultCode, Intent data) {
+    protected void handleLaunchTestResult(int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
             TestResult testResult = TestResult.fromActivityResult(resultCode, data);
             mAdapter.setTestResult(testResult);
@@ -75,8 +80,13 @@ public abstract class AbstractTestListActivity extends ListActivity {
 
     /** Launch the activity when its {@link ListView} item is clicked. */
     @Override
-    protected void onListItemClick(ListView listView, View view, int position, long id) {
+    protected final void onListItemClick(ListView listView, View view, int position, long id) {
         super.onListItemClick(listView, view, position, id);
+        handleItemClick(listView, view, position, id);
+    }
+
+    /** Override this in subclasses instead of onListItemClick */
+    protected void handleItemClick(ListView listView, View view, int position, long id) {
         Intent intent = getIntent(position);
         startActivityForResult(intent, LAUNCH_TEST_REQUEST_CODE);
     }
