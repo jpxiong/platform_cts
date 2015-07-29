@@ -393,7 +393,12 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(null, keyInfo.getKeyValidityForConsumptionEnd());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
+                KeyProperties.DIGEST_NONE,
+                KeyProperties.DIGEST_SHA1,
+                KeyProperties.DIGEST_SHA224,
+                KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA384,
+                KeyProperties.DIGEST_SHA512);
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
 
@@ -435,7 +440,12 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(null, keyInfo.getKeyValidityForConsumptionEnd());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
+                KeyProperties.DIGEST_NONE,
+                KeyProperties.DIGEST_SHA1,
+                KeyProperties.DIGEST_SHA224,
+                KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA384,
+                KeyProperties.DIGEST_SHA512);
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
 
@@ -476,7 +486,12 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(null, keyInfo.getKeyValidityForConsumptionEnd());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
+                KeyProperties.DIGEST_NONE,
+                KeyProperties.DIGEST_SHA1,
+                KeyProperties.DIGEST_SHA224,
+                KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA384,
+                KeyProperties.DIGEST_SHA512);
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
     }
@@ -519,10 +534,20 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(null, keyInfo.getKeyValidityForConsumptionEnd());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
+                KeyProperties.DIGEST_NONE,
+                KeyProperties.DIGEST_MD5,
+                KeyProperties.DIGEST_SHA1,
+                KeyProperties.DIGEST_SHA224,
+                KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA384,
+                KeyProperties.DIGEST_SHA512);
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getEncryptionPaddings()),
-                KeyProperties.ENCRYPTION_PADDING_NONE);
-        MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
+                KeyProperties.ENCRYPTION_PADDING_NONE,
+                KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1,
+                KeyProperties.ENCRYPTION_PADDING_RSA_OAEP);
+        MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getSignaturePaddings()),
+                KeyProperties.SIGNATURE_PADDING_RSA_PSS,
+                KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
     }
 
     public void testGenerate_ReplacesOldEntryWithSameAlias()
@@ -849,7 +874,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         generator.initialize(new KeyGenParameterSpec.Builder(
                 TEST_ALIAS_1,
                 KeyProperties.PURPOSE_SIGN | KeyProperties.PURPOSE_VERIFY)
-                .setDigests(KeyProperties.DIGEST_NONE)
+                .setDigests(KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_SHA384)
                 .build());
         KeyPair keyPair = generator.generateKeyPair();
         assertGeneratedKeyPairAndSelfSignedCertificate(
@@ -864,7 +889,7 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
+                KeyProperties.DIGEST_NONE, KeyProperties.DIGEST_SHA384);
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
         assertSelfSignedCertificateSignatureVerifies(TEST_ALIAS_1);
@@ -878,8 +903,13 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 KeyProperties.PURPOSE_SIGN
                         | KeyProperties.PURPOSE_VERIFY
                         | KeyProperties.PURPOSE_DECRYPT)
-                .setDigests(KeyProperties.DIGEST_NONE)
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setDigests(KeyProperties.DIGEST_NONE,
+                        KeyProperties.DIGEST_SHA256,
+                        KeyProperties.DIGEST_SHA512)
+                .setEncryptionPaddings(
+                        KeyProperties.ENCRYPTION_PADDING_NONE,
+                        KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1)
+                .setSignaturePaddings(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1)
                 .build());
         KeyPair keyPair = generator.generateKeyPair();
         assertGeneratedKeyPairAndSelfSignedCertificate(
@@ -894,10 +924,14 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getDigests()),
-                KeyProperties.DIGEST_NONE);
-        MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
+                KeyProperties.DIGEST_NONE,
+                KeyProperties.DIGEST_SHA256,
+                KeyProperties.DIGEST_SHA512);
+        MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getSignaturePaddings()),
+                KeyProperties.SIGNATURE_PADDING_RSA_PKCS1);
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getEncryptionPaddings()),
-                KeyProperties.ENCRYPTION_PADDING_NONE);
+                KeyProperties.ENCRYPTION_PADDING_NONE,
+                KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1);
         assertSelfSignedCertificateSignatureVerifies(TEST_ALIAS_1);
         assertKeyPairAndCertificateUsableForTLSPeerAuthentication(TEST_ALIAS_1);
     }
