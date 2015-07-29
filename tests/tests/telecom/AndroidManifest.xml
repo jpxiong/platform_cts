@@ -20,10 +20,18 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.REGISTER_CALL_PROVIDER" />
     <uses-permission android:name="com.android.voicemail.permission.ADD_VOICEMAIL" />
 
     <application>
         <uses-library android:name="android.test.runner" />
+
+        <service android:name="android.telecom.cts.CtsRemoteConnectionService"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" >
+            <intent-filter>
+                <action android:name="android.telecom.ConnectionService" />
+            </intent-filter>
+        </service>
 
         <service android:name="android.telecom.cts.CtsConnectionService"
             android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE" >

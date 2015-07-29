@@ -59,12 +59,12 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         Icon phoneIcon = Icon.createWithResource(context, R.drawable.ic_phone_24dp);
         Uri tel = Uri.parse("tel:555-TEST");
         PhoneAccount account = PhoneAccount.builder(
-                accountHandle, LABEL)
+                accountHandle, ACCOUNT_LABEL)
                 .setAddress(tel)
                 .setSubscriptionAddress(tel)
                 .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
                 .setHighlightColor(Color.RED)
-                .setShortDescription(LABEL)
+                .setShortDescription(ACCOUNT_LABEL)
                 .setSupportedUriSchemes(Arrays.asList("tel"))
                 .setIcon(phoneIcon)
                 .build();
@@ -74,8 +74,8 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(tel, account.getSubscriptionAddress());
         assertEquals(PhoneAccount.CAPABILITY_CALL_PROVIDER, account.getCapabilities());
         assertEquals(Color.RED, account.getHighlightColor());
-        assertEquals(LABEL, account.getShortDescription());
-        assertEquals(LABEL, account.getLabel());
+        assertEquals(ACCOUNT_LABEL, account.getShortDescription());
+        assertEquals(ACCOUNT_LABEL, account.getLabel());
         assertEquals(Arrays.asList("tel"), account.getSupportedUriSchemes());
         assertEquals(phoneIcon.toString(), account.getIcon().toString());
         assertEquals(0, account.describeContents());
@@ -92,7 +92,7 @@ public class DataObjectUnitTests extends InstrumentationTestCase {
         assertEquals(tel, parcelAccount.getSubscriptionAddress());
         assertEquals(PhoneAccount.CAPABILITY_CALL_PROVIDER, parcelAccount.getCapabilities());
         assertEquals(Color.RED, parcelAccount.getHighlightColor());
-        assertEquals(LABEL, parcelAccount.getShortDescription());
+        assertEquals(ACCOUNT_LABEL, parcelAccount.getShortDescription());
         assertEquals(Arrays.asList("tel"), parcelAccount.getSupportedUriSchemes());
         assertEquals(phoneIcon.toString(), parcelAccount.getIcon().toString());
         assertEquals(0, parcelAccount.describeContents());

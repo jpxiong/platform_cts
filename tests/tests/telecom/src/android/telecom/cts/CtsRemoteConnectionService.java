@@ -16,18 +16,16 @@
 
 package android.telecom.cts;
 
-import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
-import android.telecom.RemoteConnection;
 
 /**
- * This is the official ConnectionService for Telecom's CTS App. Since telecom requires that a
+ * This is the Remote ConnectionService for Telecom's CTS App. Since telecom requires that a
  * CS be registered in the AndroidManifest.xml file, we have to have a single implementation
  * of a CS and this is it. To test specific CS behavior, tests will implement their own CS and
- * tell CtsConnectionService to forward any method invocations to that test's implementation.
+ * tell CtsRemoteConnectionService to forward any method invocations to that test's implementation.
  * This is set up using {@link #setUp} and should be cleaned up before the end of the test using
  * {@link #tearDown}.
  *
@@ -39,14 +37,17 @@ import android.telecom.RemoteConnection;
  *                            test connection service to the Telecom framework.
  *
  */
-public class CtsConnectionService extends ConnectionService {
+public class CtsRemoteConnectionService extends ConnectionService {
     // This is the connection service implemented by the test
     private static ConnectionService sConnectionService;
     // This is the connection service registered with Telecom
     private static ConnectionService sTelecomConnectionService;
 
-    public CtsConnectionService() throws Exception {
+    public CtsRemoteConnectionService() throws Exception {
         super();
+        if (sTelecomConnectionService != null) {
+            throw new Exception("Telecom ConnectionService exists");
+        }
         sTelecomConnectionService = this;
     }
 
@@ -103,52 +104,6 @@ public class CtsConnectionService extends ConnectionService {
                 return mMockConnectionService.onCreateIncomingConnection(
                         connectionManagerPhoneAccount, request);
             }
-        }
-    }
-
-    @Override
-    public void onConference(Connection connection1, Connection connection2) {
-        synchronized(sLock) {
-            if (sConnectionService != null) {
-                sConnectionService.onConference(connection1, connection2);
-            } else {
-                mMockConnectionService.onConference(connection1, connection2);
-            }
-        }
-    }
-
-    @Override
-    public void onRemoteExistingConnectionAdded(RemoteConnection connection) {
-        synchronized(sLock) {
-            if (sConnectionService != null) {
-                sConnectionService.onRemoteExistingConnectionAdded(connection);
-            } else {
-                mMockConnectionService.onRemoteExistingConnectionAdded(connection);
-            }
-        }
-    }
-
-    public static void addConferenceToTelecom(Conference conference) {
-        synchronized(sLock) {
-            sTelecomConnectionService.addConference(conference);
-        }
-    }
-
-    public static RemoteConnection createRemoteOutgoingConnectionToTelecom(
-            PhoneAccountHandle connectionManagerPhoneAccount,
-            ConnectionRequest request) {
-        synchronized(sLock) {
-            return sTelecomConnectionService.createRemoteOutgoingConnection(
-                    connectionManagerPhoneAccount, request);
-        }
-    }
-
-    public static RemoteConnection createRemoteIncomingConnectionToTelecom(
-            PhoneAccountHandle connectionManagerPhoneAccount,
-            ConnectionRequest request) {
-        synchronized(sLock) {
-            return sTelecomConnectionService.createRemoteIncomingConnection(
-                    connectionManagerPhoneAccount, request);
         }
     }
 }
