@@ -34,6 +34,7 @@ import android.view.Surface;
 
 import com.android.cts.util.ResultType;
 import com.android.cts.util.ResultUnit;
+import com.android.cts.util.Stat;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
