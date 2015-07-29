@@ -329,6 +329,30 @@ public class RelativeLayoutTest extends
         assertEquals("Get missing rule", 0, p.getRule(RelativeLayout.ABOVE));
     }
 
+    /**
+     * Tests to prevent regressions in baseline alignment.
+     */
+    public void testBaselineAlignment() {
+        mActivity.runOnUiThread(new Runnable() {
+            public void run() {
+                mActivity.setContentView(R.layout.relative_layout_baseline);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        View button = mActivity.findViewById(R.id.button1);
+        assertTrue(button.getHeight() > 0);
+
+        button = mActivity.findViewById(R.id.button2);
+        assertTrue(button.getHeight() > 0);
+
+        button = mActivity.findViewById(R.id.button3);
+        assertTrue(button.getHeight() > 0);
+
+        button = mActivity.findViewById(R.id.button4);
+        assertTrue(button.getHeight() > 0);
+    }
+
     private class MyRelativeLayout extends RelativeLayout {
         public MyRelativeLayout(Context context) {
             super(context);
