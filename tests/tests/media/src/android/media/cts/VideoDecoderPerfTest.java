@@ -27,6 +27,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecList;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
@@ -39,10 +40,12 @@ import com.android.cts.util.Stat;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     private static final String TAG = "VideoDecoderPerfTest";
-    private static final int TOTAL_FRAMES = 1000;
+    private static final int TOTAL_FRAMES = 3000;
+    private static final int MAX_TIME_MS = 120000;  // 2 minutes
     private static final int NUMBER_OF_REPEAT = 2;
     private static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC;
     private static final String VIDEO_VP8 = MediaFormat.MIMETYPE_VIDEO_VP8;
@@ -50,6 +53,11 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     private static final String VIDEO_HEVC = MediaFormat.MIMETYPE_VIDEO_HEVC;
     private static final String VIDEO_H263 = MediaFormat.MIMETYPE_VIDEO_H263;
     private static final String VIDEO_MPEG4 = MediaFormat.MIMETYPE_VIDEO_MPEG4;
+
+    private static final int MAX_SIZE_SAMPLES_IN_MEMORY_BYTES = 5 * 1024 * 1024;  // 5MB
+    LinkedList<ByteBuffer> mSamplesInMemory = new LinkedList<ByteBuffer>();
+    private static final int MOVING_AVERAGE_NUM = 10;
+    private MediaFormat mDecOutputFormat;
 
     private Resources mResources;
     private DeviceReportLog mReportLog;
@@ -67,11 +75,12 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         super.tearDown();
     }
 
-    private static String[] getDecoderName(String mime) {
+    private static String[] getDecoderName(String mime, boolean isGoog) {
         MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
         ArrayList<String> result = new ArrayList<String>();
         for (MediaCodecInfo info : mcl.getCodecInfos()) {
-            if (info.isEncoder()) {
+            if (info.isEncoder() ||
+                    info.getName().toLowerCase().startsWith("omx.google.") != isGoog) {
                 continue;
             }
             CodecCapabilities caps = null;
@@ -85,45 +94,83 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         return result.toArray(new String[result.size()]);
     }
 
-    private void decode(String mime, int video, int width, int height) throws Exception {
-        String[] names = getDecoderName(mime);
+    private void decode(String mime, int video, int width, int height,
+            boolean isGoog) throws Exception {
+        String[] names = getDecoderName(mime, isGoog);
         for (String name: names) {
             if (!MediaUtils.supports(name, mime, width, height)) {
                 Log.i(TAG, "Codec " + name + " with " + width + "," + height + " not supported");
                 continue;
             }
 
+            boolean pass = false;
             Log.d(TAG, "testing " + name);
             for (int i = 0; i < NUMBER_OF_REPEAT; ++i) {
                 // Decode to Surface.
                 Log.d(TAG, "round #" + i + " decode to surface");
                 Surface s = getActivity().getSurfaceHolder().getSurface();
-                doDecode(name, video, TOTAL_FRAMES, s);
+                // only verify the result for decode to surface case.
+                if (doDecode(name, video, width, height, s, i)) {
+                    pass = true;
+                }
 
                 // Decode to buffer.
                 Log.d(TAG, "round #" + i + " decode to buffer");
-                doDecode(name, video, TOTAL_FRAMES, null);
+                doDecode(name, video, width, height, null, i);
             }
-            // use 0 for summary line, detail for each test config is in the report.
-            mReportLog.printSummary("average fps", 0, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+            assertTrue("Measured fps doesn't match with reported achievable frame rates.", pass);
         }
+        // use 0 for summary line, detail for each test config is in the report.
+        mReportLog.printSummary("average fps", 0, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        mSamplesInMemory.clear();
     }
 
-    private void doDecode(String name, int video, int stopAtSample, Surface surface)
+    private boolean doDecode(String name, int video, int w, int h, Surface surface, int round)
             throws Exception {
         AssetFileDescriptor testFd = mResources.openRawResourceFd(video);
         MediaExtractor extractor = new MediaExtractor();
         extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
                 testFd.getLength());
         extractor.selectTrack(0);
-
         int trackIndex = extractor.getSampleTrackIndex();
         MediaFormat format = extractor.getTrackFormat(trackIndex);
         String mime = format.getString(MediaFormat.KEY_MIME);
         ByteBuffer[] codecInputBuffers;
         ByteBuffer[] codecOutputBuffers;
 
+        if (mSamplesInMemory.size() == 0) {
+            int totalMemory = 0;
+            ByteBuffer tmpBuf = ByteBuffer.allocate(w * h * 3 / 2);
+            int sampleSize = 0;
+            int index = 0;
+            while ((sampleSize = extractor.readSampleData(tmpBuf, 0 /* offset */)) > 0) {
+                if (totalMemory + sampleSize > MAX_SIZE_SAMPLES_IN_MEMORY_BYTES) {
+                    break;
+                }
+                ByteBuffer copied = ByteBuffer.allocate(sampleSize);
+                copied.put(tmpBuf);
+                mSamplesInMemory.addLast(copied);
+                totalMemory += sampleSize;
+                extractor.advance();
+            }
+            Log.d(TAG, mSamplesInMemory.size() + " samples in memory for " +
+                    (totalMemory / 1024) + " KB.");
+        }
+        int sampleIndex = 0;
+
+        extractor.release();
+        testFd.close();
+
         MediaCodec codec = MediaCodec.createByCodecName(name);
+        VideoCapabilities cap = codec.getCodecInfo().getCapabilitiesForType(mime).getVideoCapabilities();
+        int frameRate = 120;
+        try {
+            frameRate = cap.getSupportedFrameRatesFor(w, h).getUpper().intValue();
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "unsupported size");
+            codec.release();
+            return false;
+        }
         codec.configure(format, surface, null /* crypto */, 0 /* flags */);
         codec.start();
         codecInputBuffers = codec.getInputBuffers();
@@ -133,14 +180,12 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
 
         final long kTimeOutUs = 5000; // 5ms timeout
-        long[] frameTimeDiff = new long[TOTAL_FRAMES - 1];
+        double[] frameTimeDiff = new double[TOTAL_FRAMES - 1];
         long lastOutputTimeNs = 0;
         boolean sawInputEOS = false;
         boolean sawOutputEOS = false;
         int inputNum = 0;
         int outputNum = 0;
-        int width = 0;
-        int height = 0;
         long start = System.currentTimeMillis();
         while (!sawOutputEOS) {
             // handle input
@@ -149,26 +194,21 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
 
                 if (inputBufIndex >= 0) {
                     ByteBuffer dstBuf = codecInputBuffers[inputBufIndex];
+                    ByteBuffer sample =
+                            mSamplesInMemory.get(sampleIndex++ % mSamplesInMemory.size());
+                    sample.rewind();
+                    int sampleSize = sample.remaining();
+                    dstBuf.put(sample);
+                    // use 120fps to compute pts
+                    long presentationTimeUs = inputNum * 1000000L / frameRate;
 
-                    int sampleSize =
-                            extractor.readSampleData(dstBuf, 0 /* offset */);
-                    if (sampleSize < 0) {
-                        // repeat from beginning.
-                        extractor.release();
-                        extractor = new MediaExtractor();
-                        extractor.setDataSource(testFd.getFileDescriptor(), testFd.getStartOffset(),
-                                testFd.getLength());
-                        extractor.selectTrack(0);
-                        sampleSize =
-                            extractor.readSampleData(dstBuf, 0 /* offset */);
+                    sawInputEOS = (++inputNum == TOTAL_FRAMES);
+                    if (!sawInputEOS &&
+                            ((System.currentTimeMillis() - start) > MAX_TIME_MS)) {
+                        sawInputEOS = true;
                     }
-                    assert sampleSize >= 0:
-                        "extractor.readSampleData returns negative.";
-                    long presentationTimeUs = extractor.getSampleTime();
-                    extractor.advance();
-                    if (++inputNum == stopAtSample) {
+                    if (sawInputEOS) {
                         Log.d(TAG, "saw input EOS (stop at sample).");
-                        sawInputEOS = true; // tag this sample as EOS
                     }
                     codec.queueInputBuffer(
                             inputBufIndex,
@@ -203,9 +243,9 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
                 codecOutputBuffers = codec.getOutputBuffers();
                 Log.d(TAG, "output buffers have changed.");
             } else if (outputBufIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                MediaFormat oformat = codec.getOutputFormat();
-                width = oformat.getInteger(MediaFormat.KEY_WIDTH);
-                height = oformat.getInteger(MediaFormat.KEY_HEIGHT);
+                mDecOutputFormat = codec.getOutputFormat();
+                int width = mDecOutputFormat.getInteger(MediaFormat.KEY_WIDTH);
+                int height = mDecOutputFormat.getInteger(MediaFormat.KEY_HEIGHT);
                 Log.d(TAG, "output resolution " + width + "x" + height);
             } else {
                 assertEquals(
@@ -215,154 +255,294 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
             }
         }
         long finish = System.currentTimeMillis();
-
+        int validDataNum = outputNum - 1;
+        frameTimeDiff = Arrays.copyOf(frameTimeDiff, validDataNum);
         codec.stop();
         codec.release();
-
-        extractor.release();
-        testFd.close();
 
         Log.d(TAG, "input num " + inputNum + " vs output num " + outputNum);
 
         String testConfig = "codec=" + name +
                 " decodeto=" + ((surface == null) ? "buffer" : "surface") +
-                " size=" + width + "x" + height;
+                " size=" + w + "x" + h + " round=" + round +
+                " DecOutputFormat=" + mDecOutputFormat;
 
         String message = "average fps for " + testConfig;
         double fps = (double)outputNum / ((finish - start) / 1000.0);
         mReportLog.printValue(message, fps, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+
+        double[] avgs = MediaUtils.calculateMovingAverage(frameTimeDiff, MOVING_AVERAGE_NUM);
+        double decMin = Stat.getMin(avgs);
+        double decMax = Stat.getMax(avgs);
+        double decAvg = Stat.getAverage(avgs);
+        double decStdev = MediaUtils.getStdev(avgs);
+        MediaUtils.logResults(mReportLog, testConfig, decMin, decMax, decAvg, decStdev);
+
+        return MediaUtils.verifyResults(name, mime, w, h, 1000000000 / decMin);
     }
 
-    public void testH264320x240() throws Exception {
+    public void testH2640320x0240Other() throws Exception {
         decode(VIDEO_AVC,
                R.raw.video_320x240_mp4_h264_800kbps_30fps_aac_stereo_128kbps_44100hz,
-               320, 240);
+               320, 240, false /* isGoog */);
     }
 
-    public void testH264720x480() throws Exception {
+    public void testH2640320x0240Goog() throws Exception {
+        decode(VIDEO_AVC,
+               R.raw.video_320x240_mp4_h264_800kbps_30fps_aac_stereo_128kbps_44100hz,
+               320, 240, true /* isGoog */);
+    }
+
+    public void testH2640720x0480Other() throws Exception {
         decode(VIDEO_AVC,
                R.raw.video_720x480_mp4_h264_2048kbps_30fps_aac_stereo_128kbps_44100hz,
-               720, 480);
+               720, 480, false /* isGoog */);
     }
 
-    public void testH2641280x720() throws Exception {
+    public void testH2640720x0480Goog() throws Exception {
+        decode(VIDEO_AVC,
+               R.raw.video_720x480_mp4_h264_2048kbps_30fps_aac_stereo_128kbps_44100hz,
+               720, 480, true /* isGoog */);
+    }
+
+    public void testH2641280x0720Other() throws Exception {
         decode(VIDEO_AVC,
                R.raw.video_1280x720_mp4_h264_8192kbps_30fps_aac_stereo_128kbps_44100hz,
-               1280, 720);
+               1280, 720, false /* isGoog */);
     }
 
-    public void testH2641920x1080() throws Exception {
+    public void testH2641280x0720Goog() throws Exception {
+        decode(VIDEO_AVC,
+               R.raw.video_1280x720_mp4_h264_8192kbps_30fps_aac_stereo_128kbps_44100hz,
+               1280, 720, true /* isGoog */);
+    }
+
+    public void testH2641920x1080Other() throws Exception {
         decode(VIDEO_AVC,
                R.raw.video_1920x1080_mp4_h264_20480kbps_30fps_aac_stereo_128kbps_44100hz,
-               1920, 1080);
+               1920, 1080, false /* isGoog */);
     }
 
-    public void testVP8320x240() throws Exception {
+    public void testH2641920x1080Goog() throws Exception {
+        decode(VIDEO_AVC,
+               R.raw.video_1920x1080_mp4_h264_20480kbps_30fps_aac_stereo_128kbps_44100hz,
+               1920, 1080, true /* isGoog */);
+    }
+
+    public void testVP80320x0240Other() throws Exception {
         decode(VIDEO_VP8,
                R.raw.video_320x240_webm_vp8_800kbps_30fps_vorbis_stereo_128kbps_44100hz,
-               320, 240);
+               320, 240, false /* isGoog */);
     }
 
-    public void testVP8640x360() throws Exception {
+    public void testVP80320x0240Goog() throws Exception {
+        decode(VIDEO_VP8,
+               R.raw.video_320x240_webm_vp8_800kbps_30fps_vorbis_stereo_128kbps_44100hz,
+               320, 240, true /* isGoog */);
+    }
+
+    public void testVP80640x0360Other() throws Exception {
         decode(VIDEO_VP8,
                R.raw.video_640x360_webm_vp8_2048kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               640, 360);
+               640, 360, false /* isGoog */);
     }
 
-    public void testVP81280x720() throws Exception {
+    public void testVP80640x0360Goog() throws Exception {
+        decode(VIDEO_VP8,
+               R.raw.video_640x360_webm_vp8_2048kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               640, 360, true /* isGoog */);
+    }
+
+    public void testVP81280x0720Other() throws Exception {
         decode(VIDEO_VP8,
                R.raw.video_1280x720_webm_vp8_8192kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               1280, 720);
+               1280, 720, false /* isGoog */);
     }
 
-    public void testVP81920x1080() throws Exception {
+    public void testVP81280x0720Goog() throws Exception {
+        decode(VIDEO_VP8,
+               R.raw.video_1280x720_webm_vp8_8192kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               1280, 720, true /* isGoog */);
+    }
+
+    public void testVP81920x1080Other() throws Exception {
         decode(VIDEO_VP8,
                R.raw.video_1920x1080_webm_vp8_20480kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               1920, 1080);
+               1920, 1080, false /* isGoog */);
     }
 
-    public void testVP9320x240() throws Exception {
+    public void testVP81920x1080Goog() throws Exception {
+        decode(VIDEO_VP8,
+               R.raw.video_1920x1080_webm_vp8_20480kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               1920, 1080, true /* isGoog */);
+    }
+
+    public void testVP90320x0240Other() throws Exception {
         decode(VIDEO_VP9,
                R.raw.video_320x240_webm_vp9_600kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               320, 240);
+               320, 240, false /* isGoog */);
     }
 
-    public void testVP9640x360() throws Exception {
+    public void testVP90320x0240Goog() throws Exception {
+        decode(VIDEO_VP9,
+               R.raw.video_320x240_webm_vp9_600kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               320, 240, true /* isGoog */);
+    }
+
+    public void testVP90640x0360Other() throws Exception {
         decode(VIDEO_VP9,
                R.raw.video_640x360_webm_vp9_1600kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               640, 360);
+               640, 360, false /* isGoog */);
     }
 
-    public void testVP91280x720() throws Exception {
+    public void testVP90640x0360Goog() throws Exception {
+        decode(VIDEO_VP9,
+               R.raw.video_640x360_webm_vp9_1600kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               640, 360, true /* isGoog */);
+    }
+
+    public void testVP91280x0720Other() throws Exception {
         decode(VIDEO_VP9,
                R.raw.video_1280x720_webm_vp9_4096kbps_30fps_vorbis_stereo_128kbps_44100hz,
-               1280, 720);
+               1280, 720, false /* isGoog */);
     }
 
-    public void testVP91920x1080() throws Exception {
+    public void testVP91280x0720Goog() throws Exception {
+        decode(VIDEO_VP9,
+               R.raw.video_1280x720_webm_vp9_4096kbps_30fps_vorbis_stereo_128kbps_44100hz,
+               1280, 720, true /* isGoog */);
+    }
+
+    public void testVP91920x1080Other() throws Exception {
         decode(VIDEO_VP9,
                R.raw.video_1920x1080_webm_vp9_10240kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               1920, 1080);
+               1920, 1080, false /* isGoog */);
     }
 
-    public void testVP93840x2160() throws Exception {
+    public void testVP91920x1080Goog() throws Exception {
+        decode(VIDEO_VP9,
+               R.raw.video_1920x1080_webm_vp9_10240kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               1920, 1080, true /* isGoog */);
+    }
+
+    public void testVP93840x2160Other() throws Exception {
         decode(VIDEO_VP9,
                R.raw.video_3840x2160_webm_vp9_20480kbps_30fps_vorbis_stereo_128kbps_48000hz,
-               3840, 2160);
+               3840, 2160, false /* isGoog */);
     }
 
-    public void testHEVC352x288() throws Exception {
+    public void testVP93840x2160Goog() throws Exception {
+        decode(VIDEO_VP9,
+               R.raw.video_3840x2160_webm_vp9_20480kbps_30fps_vorbis_stereo_128kbps_48000hz,
+               3840, 2160, true /* isGoog */);
+    }
+
+    public void testHEVC0352x0288Other() throws Exception {
         decode(VIDEO_HEVC,
                R.raw.video_352x288_mp4_hevc_600kbps_30fps_aac_stereo_128kbps_44100hz,
-               352, 288);
+               352, 288, false /* isGoog */);
     }
 
-    public void testHEVC720x480() throws Exception {
+    public void testHEVC0352x0288Goog() throws Exception {
+        decode(VIDEO_HEVC,
+               R.raw.video_352x288_mp4_hevc_600kbps_30fps_aac_stereo_128kbps_44100hz,
+               352, 288, true /* isGoog */);
+    }
+
+    public void testHEVC0720x0480Other() throws Exception {
         decode(VIDEO_HEVC,
                R.raw.video_720x480_mp4_hevc_1638kbps_30fps_aac_stereo_128kbps_44100hz,
-               720, 480);
+               720, 480, false /* isGoog */);
     }
 
-    public void testHEVC1280x720() throws Exception {
+    public void testHEVC0720x0480Goog() throws Exception {
+        decode(VIDEO_HEVC,
+               R.raw.video_720x480_mp4_hevc_1638kbps_30fps_aac_stereo_128kbps_44100hz,
+               720, 480, true /* isGoog */);
+    }
+
+    public void testHEVC1280x0720Other() throws Exception {
         decode(VIDEO_HEVC,
                R.raw.video_1280x720_mp4_hevc_4096kbps_30fps_aac_stereo_128kbps_44100hz,
-               1280, 720);
+               1280, 720, false /* isGoog */);
     }
 
-    public void testHEVC1920x1080() throws Exception {
+    public void testHEVC1280x0720Goog() throws Exception {
+        decode(VIDEO_HEVC,
+               R.raw.video_1280x720_mp4_hevc_4096kbps_30fps_aac_stereo_128kbps_44100hz,
+               1280, 720, true /* isGoog */);
+    }
+
+    public void testHEVC1920x1080Other() throws Exception {
         decode(VIDEO_HEVC,
                R.raw.video_1920x1080_mp4_hevc_10240kbps_30fps_aac_stereo_128kbps_44100hz,
-               1920, 1080);
+               1920, 1080, false /* isGoog */);
     }
 
-    public void testHEVC3840x2160() throws Exception {
+    public void testHEVC1920x1080Goog() throws Exception {
+        decode(VIDEO_HEVC,
+               R.raw.video_1920x1080_mp4_hevc_10240kbps_30fps_aac_stereo_128kbps_44100hz,
+               1920, 1080, true /* isGoog */);
+    }
+
+    public void testHEVC3840x2160Other() throws Exception {
         decode(VIDEO_HEVC,
                R.raw.video_3840x2160_mp4_hevc_20480kbps_30fps_aac_stereo_128kbps_44100hz,
-               3840, 2160);
+               3840, 2160, false /* isGoog */);
     }
 
-    public void testH263176x144() throws Exception {
+    public void testHEVC3840x2160Goog() throws Exception {
+        decode(VIDEO_HEVC,
+               R.raw.video_3840x2160_mp4_hevc_20480kbps_30fps_aac_stereo_128kbps_44100hz,
+               3840, 2160, true /* isGoog */);
+    }
+
+    public void testH2630176x0144Other() throws Exception {
         decode(VIDEO_H263,
                R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-               176, 144);
+               176, 144, false /* isGoog */);
     }
 
-    public void testH263352x288() throws Exception {
+    public void testH2630176x0144Goog() throws Exception {
+        decode(VIDEO_H263,
+               R.raw.video_176x144_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+               176, 144, true /* isGoog */);
+    }
+
+    public void testH2630352x0288Other() throws Exception {
         decode(VIDEO_H263,
                R.raw.video_352x288_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
-               352, 288);
+               352, 288, false /* isGoog */);
     }
 
-    public void testMPEG4480x360() throws Exception {
+    public void testH2630352x0288Goog() throws Exception {
+        decode(VIDEO_H263,
+               R.raw.video_352x288_3gp_h263_300kbps_12fps_aac_stereo_128kbps_22050hz,
+               352, 288, true /* isGoog */);
+    }
+
+    public void testMPEG40480x0360Other() throws Exception {
         decode(VIDEO_MPEG4,
                R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
-               480, 360);
+               480, 360, false /* isGoog */);
     }
 
-    public void testMPEG41280x720() throws Exception {
+    public void testMPEG40480x0360Goog() throws Exception {
+        decode(VIDEO_MPEG4,
+               R.raw.video_480x360_mp4_mpeg4_860kbps_25fps_aac_stereo_128kbps_44100hz,
+               480, 360, true /* isGoog */);
+    }
+
+    public void testMPEG41280x0720Other() throws Exception {
         decode(VIDEO_MPEG4,
                R.raw.video_1280x720_mp4_mpeg4_1000kbps_25fps_aac_stereo_128kbps_44100hz,
-               1280, 720);
+               1280, 720, false /* isGoog */);
+    }
+
+    public void testMPEG41280x0720Goog() throws Exception {
+        decode(VIDEO_MPEG4,
+               R.raw.video_1280x720_mp4_mpeg4_1000kbps_25fps_aac_stereo_128kbps_44100hz,
+               1280, 720, true /* isGoog */);
     }
 }
 
