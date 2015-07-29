@@ -93,22 +93,6 @@ public class CodecInfo {
         return info;
     }
 
-    public static Range<Double> getAchievableFrameRatesFor(
-            String codecName, String mimeType, int width, int height) {
-        MediaCodec codec;
-        try {
-            codec = MediaCodec.createByCodecName(codecName);
-        } catch (IOException e) {
-            return null;
-        }
-
-        VideoCapabilities cap =
-            codec.getCodecInfo().getCapabilitiesForType(mimeType).getVideoCapabilities();
-        Range<Double> results = cap.getAchievableFrameRatesFor(width, height);
-        codec.release();
-        return results;
-    }
-
     // for debugging
     private static void printIntArray(String msg, int[] data) {
         StringBuilder builder = new StringBuilder();
