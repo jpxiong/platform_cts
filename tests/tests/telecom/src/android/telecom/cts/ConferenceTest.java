@@ -23,6 +23,7 @@ import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.VideoProfile;
 
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
@@ -33,9 +34,27 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
             Connection.CAPABILITY_DISCONNECT_FROM_CONFERENCE | Connection.CAPABILITY_HOLD |
             Connection.CAPABILITY_MERGE_CONFERENCE | Connection.CAPABILITY_SWAP_CONFERENCE;
 
-    private Call mCall1;
-    private Call mCall2;
+    private Call mCall1, mCall2;
+    private MockConnection mConnection1, mConnection2;
     MockInCallService mInCallService;
+
+    private void verifyConferenceObject(MockConference conferenceObject, MockConnection connection1,
+            MockConnection connection2) {
+        assertNull(conferenceObject.getCallAudioState());
+        assertTrue(conferenceObject.getConferenceableConnections().isEmpty());
+        assertEquals(connection1.getConnectionCapabilities(),
+                conferenceObject.getConnectionCapabilities());
+        assertEquals(connection1.getState(), conferenceObject.getState());
+        assertEquals(connection2.getState(), conferenceObject.getState());
+        assertTrue(conferenceObject.getConnections().contains(connection1));
+        assertTrue(conferenceObject.getConnections().contains(connection2));
+        assertEquals(connection1.getDisconnectCause(), conferenceObject.getDisconnectCause());
+        assertEquals(connection1.getExtras(), conferenceObject.getExtras());
+        assertEquals(connection1.getPhoneAccountHandle(), conferenceObject.getPhoneAccountHandle());
+        assertEquals(connection1.getStatusHints(), conferenceObject.getStatusHints());
+        assertEquals(VideoProfile.STATE_AUDIO_ONLY, conferenceObject.getVideoState());
+        assertNull(conferenceObject.getVideoProvider());
+    }
 
     @Override
     protected void setUp() throws Exception {
@@ -60,12 +79,12 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
                     }, FLAG_REGISTER | FLAG_ENABLE);
 
             placeAndVerifyCall();
-            verifyConnectionForOutgoingCall(0);
+            mConnection1 = verifyConnectionForOutgoingCall(0);
             mInCallService = mInCallCallbacks.getService();
             mCall1 = mInCallService.getLastCall();
 
             placeAndVerifyCall();
-            verifyConnectionForOutgoingCall(1);
+            mConnection2 = verifyConnectionForOutgoingCall(1);
             mCall2 = mInCallService.getLastCall();
 
             setAndVerifyConferenceablesForOutgoingConnection(0);
@@ -77,7 +96,9 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if (!shouldTestTelecom(mContext)) {
             return;
         }
-        addAndVerifyConferenceCall(mCall1, mCall2);
+        final MockConference conferenceObject = addAndVerifyConferenceCall(mCall1, mCall2);
+        verifyConferenceObject(conferenceObject, mConnection1, mConnection2);
+
         final Call conf = mInCallService.getLastConferenceCall();
 
         if (mCall1.getParent() != conf || mCall2.getParent() != conf) {
@@ -92,11 +113,15 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if (!shouldTestTelecom(mContext)) {
             return;
         }
+        final MockConference conferenceObject = addAndVerifyConferenceCall(mCall1, mCall2);
+        verifyConferenceObject(conferenceObject, mConnection1, mConnection2);
 
-        addAndVerifyConferenceCall(mCall1, mCall2);
         final Call conf = mInCallService.getLastConferenceCall();
-        splitFromConferenceCall(mCall1);
 
+        if (!(mCall1.getParent() == conf) && (conf.getChildren().contains(mCall1))) {
+            fail("Call 1 not conferenced");
+        }
+        splitFromConferenceCall(mCall1);
         if ((mCall1.getParent() == conf) || (conf.getChildren().contains(mCall1))) {
             fail("Call 1 should not be still conferenced");
         }
@@ -106,8 +131,9 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if (!shouldTestTelecom(mContext)) {
             return;
         }
+        final MockConference conferenceObject = addAndVerifyConferenceCall(mCall1, mCall2);
+        verifyConferenceObject(conferenceObject, mConnection1, mConnection2);
 
-        addAndVerifyConferenceCall(mCall1, mCall2);
         final Call conf = mInCallService.getLastConferenceCall();
 
         conf.hold();
@@ -125,8 +151,9 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if (!shouldTestTelecom(mContext)) {
             return;
         }
+        final MockConference conferenceObject = addAndVerifyConferenceCall(mCall1, mCall2);
+        verifyConferenceObject(conferenceObject, mConnection1, mConnection2);
 
-        addAndVerifyConferenceCall(mCall1, mCall2);
         final Call conf = mInCallService.getLastConferenceCall();
 
         conf.mergeConference();

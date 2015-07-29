@@ -46,6 +46,7 @@ public class MockConnectionService extends ConnectionService {
     public List<MockConnection> outgoingConnections = new ArrayList<MockConnection>();
     public List<MockConnection> incomingConnections = new ArrayList<MockConnection>();
     public List<RemoteConnection> remoteConnections = new ArrayList<RemoteConnection>();
+    public List<MockConference> conferences = new ArrayList<MockConference>();
 
     @Override
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
@@ -82,8 +83,10 @@ public class MockConnectionService extends ConnectionService {
     public void onConference(Connection connection1, Connection connection2) {
         // Make sure that these connections are already not conferenced.
         if (connection1.getConference() == null && connection2.getConference() == null) {
-            MockConference conference = new MockConference(connection1, connection2);
+            MockConference conference = new MockConference(
+                    (MockConnection)connection1, (MockConnection)connection2);
             CtsConnectionService.addConferenceToTelecom(conference);
+            conferences.add(conference);
         }
     }
 
