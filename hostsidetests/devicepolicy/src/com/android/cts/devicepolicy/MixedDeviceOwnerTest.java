@@ -36,7 +36,7 @@ public class MixedDeviceOwnerTest extends DeviceAndProfileOwnerTest {
         super.setUp();
 
         if (mHasFeature) {
-            mUserId = 0;
+            mUserId = USER_OWNER;
 
             installApp(DEVICE_ADMIN_APK);
             setDeviceOwner(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
@@ -48,7 +48,6 @@ public class MixedDeviceOwnerTest extends DeviceAndProfileOwnerTest {
         if (mHasFeature) {
             assertTrue("Failed to remove device owner.",
                     runDeviceTests(DEVICE_ADMIN_PKG, CLEAR_DEVICE_OWNER_TEST_CLASS));
-            getDevice().uninstallPackage(DEVICE_ADMIN_PKG);
         }
         super.tearDown();
     }

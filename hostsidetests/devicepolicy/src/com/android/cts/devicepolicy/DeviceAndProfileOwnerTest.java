@@ -40,12 +40,15 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
     private static final String SIMPLE_PRE_M_APP_PKG = "com.android.cts.launcherapps.simplepremapp";
     private static final String SIMPLE_PRE_M_APP_APK = "CtsSimplePreMApp.apk";
 
+    protected static final int USER_OWNER = 0;
+
     // ID of the user all tests are run as. For device owner this will be 0, for profile owner it
     // is the user id of the created profile.
     protected int mUserId;
 
     protected void tearDown() throws Exception {
         if (mHasFeature) {
+            getDevice().uninstallPackage(DEVICE_ADMIN_PKG);
             getDevice().uninstallPackage(PERMISSIONS_APP_PKG);
             getDevice().uninstallPackage(SIMPLE_PRE_M_APP_PKG);
         }
@@ -142,14 +145,22 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         if (!mHasFeature) {
             return;
         }
-        executeDeviceTestClass(".ScreenCaptureDisabledTest");
+        // We need to ensure that the policy is deactivated for the device owner case, so making
+        // sure the second test is run even if the first one fails
+        try {
+            executeDeviceTestMethod(".ScreenCaptureDisabledTest",
+                    "testSetScreenCaptureDisabled_true");
+        } finally {
+            executeDeviceTestMethod(".ScreenCaptureDisabledTest",
+                    "testSetScreenCaptureDisabled_false");
+        }
     }
 
-    private void executeDeviceTestClass(String className) throws Exception {
+    protected void executeDeviceTestClass(String className) throws Exception {
         assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, className, mUserId));
     }
 
-    private void executeDeviceTestMethod(String className, String testName) throws Exception {
+    protected void executeDeviceTestMethod(String className, String testName) throws Exception {
         assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, className, testName, mUserId));
     }
 }

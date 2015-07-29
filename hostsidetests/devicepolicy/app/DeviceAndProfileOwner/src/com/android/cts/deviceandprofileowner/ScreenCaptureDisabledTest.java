@@ -44,7 +44,6 @@ public class ScreenCaptureDisabledTest extends BaseDeviceAdminTest {
 
     protected void tearDown() throws Exception {
         mContext.unregisterReceiver(mReceiver);
-        mDevicePolicyManager.setScreenCaptureDisabled(ADMIN_RECEIVER_COMPONENT, false);
         super.tearDown();
     }
 
@@ -64,6 +63,13 @@ public class ScreenCaptureDisabledTest extends BaseDeviceAdminTest {
         assertNull(getInstrumentation().getUiAutomation().takeScreenshot());
     }
 
+    public void testScreenCapturePossible() throws Exception {
+        assertNotNull(getInstrumentation().getUiAutomation().takeScreenshot());
+    }
+
+    // We need to launch an activity before trying to take a screen shot, because screenshots are
+    // only blocked on a per-user basis in the profile owner case depending on the owner of the
+    // foreground activity.
     private void startTestActivity() throws Exception {
         Intent launchIntent = new Intent();
         launchIntent.setComponent(new ComponentName(PACKAGE_NAME,
@@ -71,6 +77,7 @@ public class ScreenCaptureDisabledTest extends BaseDeviceAdminTest {
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(launchIntent);
         assertTrue(mReceiver.waitForBroadcast());
+        Thread.sleep(1000);
     }
 
     private class ScreenCaptureBroadcastReceiver extends BroadcastReceiver {
