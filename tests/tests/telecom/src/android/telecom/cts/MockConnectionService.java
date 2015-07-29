@@ -20,6 +20,7 @@ import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.RemoteConnection;
 import android.telecom.TelecomManager;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class MockConnectionService extends ConnectionService {
     public Semaphore lock = new Semaphore(0);
     public List<MockConnection> outgoingConnections = new ArrayList<MockConnection>();
     public List<MockConnection> incomingConnections = new ArrayList<MockConnection>();
+    public List<RemoteConnection> remoteConnections = new ArrayList<RemoteConnection>();
 
     @Override
     public Connection onCreateOutgoingConnection(PhoneAccountHandle connectionManagerPhoneAccount,
@@ -83,6 +85,12 @@ public class MockConnectionService extends ConnectionService {
             MockConference conference = new MockConference(connection1, connection2);
             CtsConnectionService.addConferenceToTelecom(conference);
         }
+    }
+
+    @Override
+    public void onRemoteExistingConnectionAdded(RemoteConnection connection) {
+        // Keep track of the remote connections added to the service
+        remoteConnections.add(connection);
     }
 
     public void setCreateVideoProvider(boolean createVideoProvider) {

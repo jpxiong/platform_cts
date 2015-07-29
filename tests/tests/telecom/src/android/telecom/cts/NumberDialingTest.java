@@ -63,6 +63,6 @@ public class NumberDialingTest extends BaseTelecomTestWithMockServices {
         }
         assertEquals(address, res[0]);
 
-        tearDownConnectionService(account);
+        tearDownConnectionService(account.getAccountHandle());
     }
 }

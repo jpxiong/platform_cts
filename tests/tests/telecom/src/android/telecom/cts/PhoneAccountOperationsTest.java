@@ -40,22 +40,22 @@ public class PhoneAccountOperationsTest extends InstrumentationTestCase {
             new PhoneAccountHandle(new ComponentName(PACKAGE, COMPONENT), ACCOUNT_ID);
 
     public static final PhoneAccount TEST_SIM_PHONE_ACCOUNT = PhoneAccount.builder(
-            TEST_PHONE_ACCOUNT_HANDLE, LABEL)
+            TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
             .setAddress(Uri.parse("tel:555-TEST"))
             .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
             .setCapabilities(PhoneAccount.CAPABILITY_SIM_SUBSCRIPTION)
             .setHighlightColor(Color.RED)
-            .setShortDescription(LABEL)
+            .setShortDescription(ACCOUNT_LABEL)
             .setSupportedUriSchemes(Arrays.asList("tel"))
             .build();
 
     public static final PhoneAccount TEST_NO_SIM_PHONE_ACCOUNT = PhoneAccount.builder(
-            TEST_PHONE_ACCOUNT_HANDLE, LABEL)
+            TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
             .setAddress(Uri.parse("tel:555-TEST"))
             .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
             .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
             .setHighlightColor(Color.RED)
-            .setShortDescription(LABEL)
+            .setShortDescription(ACCOUNT_LABEL)
             .setSupportedUriSchemes(Arrays.asList("tel"))
             .build();
 
@@ -113,12 +113,12 @@ public class PhoneAccountOperationsTest extends InstrumentationTestCase {
         }
         Method setIsEnabled = null;
         PhoneAccount.Builder phoneAccountBuilder = PhoneAccount.builder(
-                TEST_PHONE_ACCOUNT_HANDLE, LABEL)
+                TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
                 .setAddress(Uri.parse("tel:555-TEST"))
                 .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
                 .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
                 .setHighlightColor(Color.RED)
-                .setShortDescription(LABEL)
+                .setShortDescription(ACCOUNT_LABEL)
                 .setSupportedUriSchemes(Arrays.asList("tel"));
         try {
             setIsEnabled = PhoneAccount.Builder.class.getDeclaredMethod(

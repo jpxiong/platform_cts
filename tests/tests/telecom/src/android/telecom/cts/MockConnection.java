@@ -21,6 +21,7 @@ import android.telecom.CallAudioState;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.RemoteConnection;
 import android.telecom.VideoProfile;
 import android.util.Log;
 
@@ -37,6 +38,7 @@ public class MockConnection extends Connection {
     private String mDtmfString = "";
     private MockVideoProvider mMockVideoProvider;
     private PhoneAccountHandle mPhoneAccountHandle;
+    private RemoteConnection mRemoteConnection = null;
 
     @Override
     public void onAnswer() {
@@ -48,24 +50,36 @@ public class MockConnection extends Connection {
         super.onAnswer(videoState);
         this.videoState = videoState;
         setActive();
+        if (mRemoteConnection != null) {
+            mRemoteConnection.answer();
+        }
     }
 
     @Override
     public void onReject() {
         super.onReject();
         setDisconnected(new DisconnectCause(DisconnectCause.REJECTED));
+        if (mRemoteConnection != null) {
+            mRemoteConnection.reject();
+        }
     }
 
     @Override
     public void onHold() {
         super.onHold();
         setOnHold();
+        if (mRemoteConnection != null) {
+            mRemoteConnection.hold();
+        }
     }
 
     @Override
     public void onUnhold() {
         super.onUnhold();
         setActive();
+        if (mRemoteConnection != null) {
+            mRemoteConnection.unhold();
+        }
     }
 
     @Override
@@ -73,29 +87,44 @@ public class MockConnection extends Connection {
         super.onDisconnect();
         setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
         destroy();
+        if (mRemoteConnection != null) {
+            mRemoteConnection.disconnect();
+        }
     }
 
     @Override
     public void onAbort() {
         super.onAbort();
+        if (mRemoteConnection != null) {
+            mRemoteConnection.abort();
+        }
     }
 
     @Override
     public void onPlayDtmfTone(char c) {
         super.onPlayDtmfTone(c);
         mDtmfString += c;
+        if (mRemoteConnection != null) {
+            mRemoteConnection.playDtmfTone(c);
+        }
     }
 
     @Override
     public void onStopDtmfTone() {
         super.onStopDtmfTone();
         mDtmfString += ".";
+        if (mRemoteConnection != null) {
+            mRemoteConnection.stopDtmfTone();
+        }
     }
 
     @Override
     public void onCallAudioStateChanged(CallAudioState state) {
         super.onCallAudioStateChanged(state);
         mCallAudioState = state;
+        if (mRemoteConnection != null) {
+            mRemoteConnection.setCallAudioState(state);
+        }
     }
 
     @Override
@@ -165,4 +194,11 @@ public class MockConnection extends Connection {
         return mPhoneAccountHandle;
     }
 
+    public void setRemoteConnection(RemoteConnection remoteConnection)  {
+        mRemoteConnection = remoteConnection;
+    }
+
+    public RemoteConnection getRemoteConnection()  {
+        return mRemoteConnection;
+    }
 }
