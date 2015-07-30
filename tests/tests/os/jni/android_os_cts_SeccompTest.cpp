@@ -33,7 +33,7 @@ extern "C" {
 struct __test_metadata* get_seccomp_test_list();
 }
 
-static const char TAG[] = "SecompBpfTest-Native";
+static const char TAG[] = "SeccompBpfTest-Native";
 
 jboolean android_security_cts_SeccompBpfTest_runKernelUnitTest(
       JNIEnv* env, jobject thiz __unused, jstring name) {
