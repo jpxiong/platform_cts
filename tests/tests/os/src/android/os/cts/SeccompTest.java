@@ -50,6 +50,15 @@ public class SeccompTest extends AndroidTestCase {
         System.loadLibrary("ctsos_jni");
     }
 
+    // As this test validates a kernel system call interface, if the CTS tests
+    // were built for ARM but are running on an x86 CPU, the system call numbers
+    // will not be correct, so skip those tests.
+    private boolean isRunningUnderEmulatedAbi() {
+        final String primaryAbi = Build.SUPPORTED_ABIS[0];
+        return (CpuFeatures.isArmCpu() || CpuFeatures.isArm64Cpu()) &&
+               !(primaryAbi.equals("armeabi-v7a") || primaryAbi.equals("arm64-v8a"));
+    }
+
     public void testSeccomp() {
         if (OSFeatures.needsSeccompSupport()) {
             assertTrue("Please enable seccomp support "
@@ -61,6 +70,11 @@ public class SeccompTest extends AndroidTestCase {
     public void testKernelBasicTests() {
         if (!OSFeatures.needsSeccompSupport())
             return;
+
+        if (isRunningUnderEmulatedAbi()) {
+            Log.d(TAG, "Skipping test running under an emulated ABI");
+            return;
+        }
 
         final String[] tests = {
             "global.mode_strict_support",
@@ -137,6 +151,11 @@ public class SeccompTest extends AndroidTestCase {
         if (!OSFeatures.needsSeccompSupport())
             return;
 
+        if (isRunningUnderEmulatedAbi()) {
+            Log.d(TAG, "Skipping test running under an emulated ABI");
+            return;
+        }
+
         final String[] tests = {
             "global.seccomp_syscall",
             "global.seccomp_syscall_mode_lock",
@@ -175,6 +194,11 @@ public class SeccompTest extends AndroidTestCase {
         if (!OSFeatures.needsSeccompSupport())
             return;
 
+        if (isRunningUnderEmulatedAbi()) {
+            Log.d(TAG, "Skipping test running under an emulated ABI");
+            return;
+        }
+
         final IsolatedServiceConnection peer = new IsolatedServiceConnection();
         final Intent intent = new Intent(getContext(), IsolatedService.class);
         assertTrue(getContext().bindService(intent, peer, Context.BIND_AUTO_CREATE));
@@ -200,6 +224,11 @@ public class SeccompTest extends AndroidTestCase {
            ExecutionException, RemoteException {
         if (!OSFeatures.needsSeccompSupport())
             return;
+
+        if (isRunningUnderEmulatedAbi()) {
+            Log.d(TAG, "Skipping test running under an emulated ABI");
+            return;
+        }
 
         final IsolatedServiceConnection peer = new IsolatedServiceConnection();
         final Intent intent = new Intent(getContext(), IsolatedService.class);
