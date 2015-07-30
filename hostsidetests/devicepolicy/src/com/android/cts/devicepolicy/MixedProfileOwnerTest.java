@@ -39,7 +39,7 @@ public class MixedProfileOwnerTest extends DeviceAndProfileOwnerTest {
             removeTestUsers();
             mUserId = createManagedProfile();
 
-            installApp(DEVICE_ADMIN_APK);
+            installAppAsUser(DEVICE_ADMIN_APK, mUserId);
             setProfileOwner(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId);
             startUser(mUserId);
         }
@@ -49,10 +49,26 @@ public class MixedProfileOwnerTest extends DeviceAndProfileOwnerTest {
     protected void tearDown() throws Exception {
         if (mHasFeature) {
             removeUser(mUserId);
-            getDevice().uninstallPackage(DEVICE_ADMIN_PKG);
         }
         super.tearDown();
     }
 
-    // All tests for this class are defined in DeviceAndProfileOwnerTest
+    // Most tests for this class are defined in DeviceAndProfileOwnerTest
+
+    /**
+     * Verify that screenshots are still possible for activities in the primary user when the policy
+     * is set on the profile owner.
+     */
+    public void testScreenCaptureDisabled_allowedPrimaryUser() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        executeDeviceTestMethod(".ScreenCaptureDisabledTest", "testSetScreenCaptureDisabled_true");
+        // start the ScreenCaptureDisabledActivity in the primary user
+        installAppAsUser(DEVICE_ADMIN_APK, USER_OWNER);
+        String command = "am start -W --user 0 " + DEVICE_ADMIN_PKG + "/"
+                + DEVICE_ADMIN_PKG + ".ScreenCaptureDisabledActivity";
+        getDevice().executeShellCommand(command);
+        executeDeviceTestMethod(".ScreenCaptureDisabledTest", "testScreenCapturePossible");
+    }
 }
