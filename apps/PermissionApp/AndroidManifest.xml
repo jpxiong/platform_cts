@@ -16,13 +16,14 @@
  -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.cts.permission.permissionapp">
+    package="com.android.cts.permissionapp">
 
     <uses-sdk android:minSdkVersion="MNC"/>
 
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
-    <application>
+    <application android:label="CtsPermissionApp"
+            android:icon="@drawable/ic_permissionapp">
         <activity android:name=".PermissionActivity" >
             <intent-filter>
                 <action android:name="com.android.cts.permission.action.CHECK_HAS_PERMISSION" />

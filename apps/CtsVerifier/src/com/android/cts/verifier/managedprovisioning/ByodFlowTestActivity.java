@@ -69,6 +69,7 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
     private DialogTestListItem mCredSettingsVisibleTest;
     private DialogTestListItem mPrintSettingsVisibleTest;
     private DialogTestListItem mIntentFiltersTest;
+    private DialogTestListItem mPermissionLockdownTest;
     private DialogTestListItem mCrossProfileImageCaptureSupportTest;
     private DialogTestListItem mCrossProfileVideoCaptureSupportTest;
     private DialogTestListItem mCrossProfileAudioCaptureSupportTest;
@@ -264,6 +265,14 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
                 checkIntentFilters();
             }
         };
+        
+        Intent permissionCheckIntent = new Intent(
+                PermissionLockdownTestActivity.ACTION_MANAGED_PROFILE_CHECK_PERMISSION_LOCKDOWN);
+        mPermissionLockdownTest = new DialogTestListItem(this,
+                R.string.device_profile_owner_permission_lockdown_test,
+                "BYOD_PermissionLockdownTest",
+                R.string.profile_owner_permission_lockdown_test_info,
+                permissionCheckIntent);
 
         adapter.add(mProfileOwnerInstalled);
 
@@ -285,6 +294,7 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
         adapter.add(mDisableNonMarketTest);
         adapter.add(mEnableNonMarketTest);
         adapter.add(mIntentFiltersTest);
+        adapter.add(mPermissionLockdownTest);
 
         if (canResolveIntent(ByodHelperActivity.getCaptureImageIntent())) {
             // Capture image intent can be resolved in primary profile, so test.
@@ -424,17 +434,16 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
     private void disableComponent() {
         // Disable app components in the current profile, so only the counterpart in the other profile
         // can respond (via cross-profile intent filter)
-        getPackageManager().setComponentEnabledSetting(new ComponentName(
-                this, ByodHelperActivity.class),
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-        getPackageManager().setComponentEnabledSetting(new ComponentName(
-                this, WorkNotificationTestActivity.class),
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-        getPackageManager().setComponentEnabledSetting(new ComponentName(
-                this, WorkStatusTestActivity.class),
-                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
+        final String[] components = {
+            ByodHelperActivity.class.getName(),
+            WorkNotificationTestActivity.class.getName(),
+            WorkStatusTestActivity.class.getName(),
+            PermissionLockdownTestActivity.ACTIVITY_ALIAS
+        };
+        for (String component : components) {
+            getPackageManager().setComponentEnabledSetting(new ComponentName(this, component),
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+        }
     }
 }

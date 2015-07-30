@@ -66,6 +66,8 @@ public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
             filter.addAction(WorkNotificationTestActivity.ACTION_CLEAR_WORK_NOTIFICATION);
             filter.addAction(WorkStatusTestActivity.ACTION_WORK_STATUS_TOAST);
             filter.addAction(WorkStatusTestActivity.ACTION_WORK_STATUS_ICON);
+            filter.addAction(
+                    PermissionLockdownTestActivity.ACTION_MANAGED_PROFILE_CHECK_PERMISSION_LOCKDOWN);
             dpm.addCrossProfileIntentFilter(getWho(context), filter,
                     DevicePolicyManager.FLAG_MANAGED_CAN_ACCESS_PARENT);
 

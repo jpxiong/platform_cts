@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.cts.permission.permissionapp;
+package com.android.cts.permissionapp;
 
 import android.app.Activity;
 import android.content.Intent;
