@@ -68,6 +68,9 @@ cts_security_keysets_list := \
     CtsKeySetSigningAUpgradeEcA \
     CtsKeySetSigningEcAUpgradeA
 
+cts_account_support_packages := \
+    CtsUnaffiliatedAccountAuthenticators
+
 cts_support_packages := \
     CtsAccelerationTestStubs \
     CtsAlarmClockService \
@@ -104,6 +107,7 @@ cts_support_packages := \
     CtsVoiceInteractionService \
     CtsVoiceInteractionApp \
     CtsVoiceSettingsService \
+    $(cts_account_support_packages) \
     $(cts_security_apps_list) \
     $(cts_security_keysets_list)
 
