@@ -18,6 +18,7 @@ package android.cts.leanbackjank;
 
 import android.cts.util.DeviceReportLog;
 import android.os.Bundle;
+import android.support.test.jank.GfxMonitor;
 import android.support.test.jank.JankTestBase;
 import android.support.test.jank.WindowContentFrameStatsMonitor;
 import android.support.test.uiautomator.UiDevice;
@@ -30,20 +31,53 @@ public abstract class CtsJankTestBase extends JankTestBase {
     private UiDevice mDevice;
     private DeviceReportLog mLog;
 
+    private void printIntValueWithKey(String source, Bundle metrics, String key,
+            ResultType resultType, ResultUnit resultUnit) {
+        if (!metrics.containsKey(key)) {
+            return;
+        }
+        mLog.printValue(source, key, metrics.getInt(key), resultType, resultUnit);
+    }
+
+    private void printDoubleValueWithKey(String source, Bundle metrics, String key,
+            ResultType resultType, ResultUnit resultUnit) {
+        if (!metrics.containsKey(key)) {
+            return;
+        }
+        mLog.printValue(source, key, metrics.getDouble(key), resultType, resultUnit);
+    }
+
     @Override
     public void afterTest(Bundle metrics) {
         String source = String.format("%s#%s", getClass().getCanonicalName(), getName());
-        mLog.printValue(source, WindowContentFrameStatsMonitor.KEY_AVG_FPS,
-                metrics.getDouble(WindowContentFrameStatsMonitor.KEY_AVG_FPS),
+        printDoubleValueWithKey(source, metrics, WindowContentFrameStatsMonitor.KEY_AVG_FPS,
                 ResultType.HIGHER_BETTER, ResultUnit.FPS);
-        mLog.printValue(source, WindowContentFrameStatsMonitor.KEY_AVG_LONGEST_FRAME,
-                metrics.getDouble(WindowContentFrameStatsMonitor.KEY_AVG_LONGEST_FRAME),
+        printDoubleValueWithKey(source, metrics,
+                WindowContentFrameStatsMonitor.KEY_AVG_LONGEST_FRAME,
                 ResultType.LOWER_BETTER, ResultUnit.MS);
-        mLog.printValue(source, WindowContentFrameStatsMonitor.KEY_MAX_NUM_JANKY,
-                metrics.getInt(WindowContentFrameStatsMonitor.KEY_MAX_NUM_JANKY),
+        printIntValueWithKey(source, metrics, WindowContentFrameStatsMonitor.KEY_MAX_NUM_JANKY,
                 ResultType.LOWER_BETTER, ResultUnit.COUNT);
         mLog.printSummary(WindowContentFrameStatsMonitor.KEY_AVG_NUM_JANKY,
                 metrics.getDouble(WindowContentFrameStatsMonitor.KEY_AVG_NUM_JANKY),
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_NUM_JANKY,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_FRAME_TIME_90TH_PERCENTILE,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_FRAME_TIME_95TH_PERCENTILE,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_FRAME_TIME_99TH_PERCENTILE,
+                ResultType.LOWER_BETTER, ResultUnit.MS);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_MISSED_VSYNC,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_SLOW_UI_THREAD,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_SLOW_BITMAP_UPLOADS,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_SLOW_DRAW,
+                ResultType.LOWER_BETTER, ResultUnit.COUNT);
+        printDoubleValueWithKey(source, metrics, GfxMonitor.KEY_AVG_HIGH_INPUT_LATENCY,
                 ResultType.LOWER_BETTER, ResultUnit.COUNT);
     }
 
