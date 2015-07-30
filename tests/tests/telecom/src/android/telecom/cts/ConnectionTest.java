@@ -265,7 +265,7 @@ public class ConnectionTest extends AndroidTestCase {
     public void testStateToString() {
         assertEquals("INITIALIZING", Connection.stateToString(Connection.STATE_INITIALIZING));
         assertEquals("NEW", Connection.stateToString(Connection.STATE_NEW));
-        assertEquals("RINGING", Connection.stateToString(Connection.STATE_INITIALIZING));
+        assertEquals("RINGING", Connection.stateToString(Connection.STATE_RINGING));
         assertEquals("DIALING", Connection.stateToString(Connection.STATE_DIALING));
         assertEquals("ACTIVE", Connection.stateToString(Connection.STATE_ACTIVE));
         assertEquals("HOLDING", Connection.stateToString(Connection.STATE_HOLDING));
