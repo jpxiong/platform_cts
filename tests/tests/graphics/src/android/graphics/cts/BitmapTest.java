@@ -359,8 +359,10 @@ public class BitmapTest extends AndroidTestCase {
         mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
         Bitmap ret = mBitmap.extractAlpha();
         assertNotNull(ret);
-        int color = ret.getPixel(10, 20);
-        assertEquals(0x00, Color.alpha(color));
+        int source = mBitmap.getPixel(10, 20);
+        int result = ret.getPixel(10, 20);
+        assertEquals(Color.alpha(source), Color.alpha(result));
+        assertEquals(0xFF, Color.alpha(result));
     }
 
     public void testExtractAlpha2(){
@@ -377,8 +379,10 @@ public class BitmapTest extends AndroidTestCase {
         mBitmap = BitmapFactory.decodeResource(mRes, R.drawable.start, mOptions);
         Bitmap ret = mBitmap.extractAlpha(new Paint(), new int[]{0, 1});
         assertNotNull(ret);
-        int color = ret.getPixel(10, 20);
-        assertEquals(0x00, Color.alpha(color));
+        int source = mBitmap.getPixel(10, 20);
+        int result = ret.getPixel(10, 20);
+        assertEquals(Color.alpha(source), Color.alpha(result));
+        assertEquals(0xFF, Color.alpha(result));
     }
 
     public void testGetAllocationByteCount() {
