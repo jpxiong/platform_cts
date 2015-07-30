@@ -46,6 +46,7 @@ public class MockInCallService extends InCallService {
         public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {};
         public void onCallDestroyed(Call call) {};
         public void onDetailsChanged(Call call, Call.Details details) {};
+        public void onCanAddCallsChanged(boolean canAddCalls) {}
 
         final public MockInCallService getService() {
             return mService;
@@ -170,6 +171,14 @@ public class MockInCallService extends InCallService {
         if (getCallbacks() != null) {
             getCallbacks().onCallRemoved(call, mCalls.size() + mConferenceCalls.size());
             saveVideoCall(call, null /* remove videoCall */);
+        }
+    }
+
+    @Override
+    public void onCanAddCallChanged(boolean canAddCall) {
+        super.onCanAddCallChanged(canAddCall);
+        if (getCallbacks() != null) {
+            getCallbacks().onCanAddCallsChanged(canAddCall);
         }
     }
 
