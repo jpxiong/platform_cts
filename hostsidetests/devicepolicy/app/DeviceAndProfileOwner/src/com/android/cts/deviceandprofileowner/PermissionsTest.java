@@ -42,7 +42,7 @@ public class PermissionsTest extends BaseDeviceAdminTest {
     private static final String TAG = "PermissionsTest";
 
     private static final String PERMISSION_APP_PACKAGE_NAME
-            = "com.android.cts.permission.permissionapp";
+            = "com.android.cts.permissionapp";
     private static final String SIMPLE_PRE_M_APP_PACKAGE_NAME =
             "com.android.cts.launcherapps.simplepremapp";
     private static final String PERMISSION_NAME = "android.permission.READ_CONTACTS";

@@ -1375,6 +1375,23 @@
                 android:label="@string/device_owner_wifi_lockdown_test">
         </activity>
 
+        <activity android:name=".managedprovisioning.PermissionLockdownTestActivity"
+                android:label="@string/device_profile_owner_permission_lockdown_test">
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.managedprovisioning.action.CHECK_PERMISSION_LOCKDOWN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity-alias
+                android:name=".managedprovisioning.ManagedProfilePermissionLockdownTestActivity"
+                android:targetActivity=".managedprovisioning.PermissionLockdownTestActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.managedprovisioning.action.MANAGED_PROFILE_CHECK_PERMISSION_LOCKDOWN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity-alias>
+
         <activity android:name=".managedprovisioning.ByodFlowTestActivity"
                 android:launchMode="singleTask"
                 android:label="@string/provisioning_byod">
