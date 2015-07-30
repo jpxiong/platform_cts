@@ -28,57 +28,13 @@ import android.telecom.VideoProfile;
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
  * verify the functionality of Remote Connections.
- * We make a remote connection via the remote ConnectionService & store it in the
- * connection object. We plumb this connection to the connection created on
- * the remote connection service via RemoteConnection object.
+ * We make 2 connections on the {@link CtsConnectionService} & we create 2 connections on the
+ * {@link CtsRemoteConnectionService} via the {@link RemoteConnection} object. We store this
+ * corresponding RemoteConnection object on the connections to plumb the modifications on
+ * the connections in {@link CtsConnectionService} to the connections on
+ * {@link CtsRemoteConnectionService}.
  */
-public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
-    MockInCallService mInCallService;
-
-    private void verifyRemoteConnectionObject(RemoteConnection remoteConnection,
-            Connection connection) {
-        assertEquals(connection.getAddress(), remoteConnection.getAddress());
-        assertEquals(connection.getAddressPresentation(),
-                remoteConnection.getAddressPresentation());
-        assertEquals(connection.getCallerDisplayName(), remoteConnection.getCallerDisplayName());
-        assertEquals(connection.getCallerDisplayNamePresentation(),
-                remoteConnection.getCallerDisplayNamePresentation());
-        assertEquals(connection.getConnectionCapabilities(),
-                remoteConnection.getConnectionCapabilities());
-        assertEquals(connection.getDisconnectCause(), remoteConnection.getDisconnectCause());
-        assertEquals(connection.getExtras(), remoteConnection.getExtras());
-        assertEquals(connection.getStatusHints(), remoteConnection.getStatusHints());
-        assertEquals(VideoProfile.STATE_AUDIO_ONLY, remoteConnection.getVideoState());
-        assertNull(remoteConnection.getVideoProvider());
-        assertTrue(remoteConnection.getConferenceableConnections().isEmpty());
-    }
-
-    private void addRemoteConnectionOutgoingCall() {
-        try {
-            MockConnectionService connectionManager = new MockConnectionService() {
-                @Override
-                public Connection onCreateOutgoingConnection(
-                        PhoneAccountHandle connectionManagerPhoneAccount,
-                        ConnectionRequest request) {
-                    MockConnection connection = (MockConnection)super.onCreateOutgoingConnection(
-                            connectionManagerPhoneAccount, request);
-                    ConnectionRequest remoteRequest = new ConnectionRequest(
-                            TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
-                            request.getAddress(),
-                            request.getExtras());
-                    RemoteConnection remoteConnection =
-                            CtsConnectionService.createRemoteOutgoingConnectionToTelecom(
-                                    connectionManagerPhoneAccount, remoteRequest);
-                    connection.setRemoteConnection(remoteConnection);
-                    return connection;
-                }
-            };
-            setupConnectionServices(connectionManager, null, FLAG_REGISTER | FLAG_ENABLE);
-        } catch(Exception e) {
-            fail("Error in setting up the connection services");
-        }
-        placeAndVerifyCall();
-    }
+public class RemoteConnectionTest extends BaseRemoteTelecomTest {
 
     public void testRemoteConnectionOutgoingCall() {
         if (!shouldTestTelecom(mContext)) {
@@ -90,10 +46,9 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
          * RemoteConnection object is working.
          */
         final MockConnection connection = verifyConnectionForOutgoingCall();
-        final MockConnection remoteConnection = verifyRemoteConnectionForOutgoingCall();
+        final MockConnection remoteConnection = verifyConnectionForOutgoingCallOnRemoteCS();
         final RemoteConnection remoteConnectionObject = connection.getRemoteConnection();
         final Call call = mInCallCallbacks.getService().getLastCall();
-
         assertCallState(call, Call.STATE_DIALING);
 
         verifyRemoteConnectionObject(remoteConnectionObject, remoteConnection);
@@ -127,7 +82,7 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
 
     private void addRemoteConnectionIncomingCall() {
         try {
-            MockConnectionService connectionManager = new MockConnectionService() {
+            MockConnectionService managerConnectionService = new MockConnectionService() {
                 @Override
                 public Connection onCreateIncomingConnection(
                         PhoneAccountHandle connectionManagerPhoneAccount,
@@ -140,12 +95,12 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
                             request.getExtras());
                     RemoteConnection remoteConnection =
                             CtsConnectionService.createRemoteIncomingConnectionToTelecom(
-                                    connectionManagerPhoneAccount, remoteRequest);
+                                    TEST_REMOTE_PHONE_ACCOUNT_HANDLE, remoteRequest);
                     connection.setRemoteConnection(remoteConnection);
                     return connection;
                 }
             };
-            setupConnectionServices(connectionManager, null, FLAG_REGISTER | FLAG_ENABLE);
+            setupConnectionServices(managerConnectionService, null, FLAG_REGISTER | FLAG_ENABLE);
         } catch(Exception e) {
             fail("Error in setting up the connection services");
         }
@@ -162,13 +117,13 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
          * RemoteConnection object is working.
          */
         final MockConnection connection = verifyConnectionForIncomingCall();
-        final MockConnection remoteConnection = verifyRemoteConnectionForIncomingCall();
+        final MockConnection remoteConnection = verifyConnectionForIncomingCallOnRemoteCS();
         final RemoteConnection remoteConnectionObject = connection.getRemoteConnection();
         final Call call = mInCallCallbacks.getService().getLastCall();
+        assertCallState(call, Call.STATE_RINGING);
 
         verifyRemoteConnectionObject(remoteConnectionObject, remoteConnection);
 
-        assertCallState(call, Call.STATE_RINGING);
         assertConnectionState(connection, Connection.STATE_RINGING);
         assertRemoteConnectionState(remoteConnectionObject, Connection.STATE_RINGING);
         assertConnectionState(remoteConnection, Connection.STATE_RINGING);
@@ -190,13 +145,13 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
          * RemoteConnection object is working.
          */
         final MockConnection connection = verifyConnectionForIncomingCall();
-        final MockConnection remoteConnection = verifyRemoteConnectionForIncomingCall();
+        final MockConnection remoteConnection = verifyConnectionForIncomingCallOnRemoteCS();
         final RemoteConnection remoteConnectionObject = connection.getRemoteConnection();
         final Call call = mInCallCallbacks.getService().getLastCall();
+        assertCallState(call, Call.STATE_RINGING);
 
         verifyRemoteConnectionObject(remoteConnectionObject, remoteConnection);
 
-        assertCallState(call, Call.STATE_RINGING);
         assertConnectionState(connection, Connection.STATE_RINGING);
         assertRemoteConnectionState(remoteConnectionObject, Connection.STATE_RINGING);
         assertConnectionState(remoteConnection, Connection.STATE_RINGING);
@@ -206,5 +161,50 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
         assertConnectionState(connection, Connection.STATE_DISCONNECTED);
         assertRemoteConnectionState(remoteConnectionObject, Connection.STATE_DISCONNECTED);
         assertConnectionState(remoteConnection, Connection.STATE_DISCONNECTED);
+    }
+
+    private void verifyRemoteConnectionObject(RemoteConnection remoteConnection,
+            Connection connection) {
+        assertEquals(connection.getAddress(), remoteConnection.getAddress());
+        assertEquals(connection.getAddressPresentation(),
+                remoteConnection.getAddressPresentation());
+        assertEquals(connection.getCallerDisplayName(), remoteConnection.getCallerDisplayName());
+        assertEquals(connection.getCallerDisplayNamePresentation(),
+                remoteConnection.getCallerDisplayNamePresentation());
+        assertEquals(connection.getConnectionCapabilities(),
+                remoteConnection.getConnectionCapabilities());
+        assertEquals(connection.getDisconnectCause(), remoteConnection.getDisconnectCause());
+        assertEquals(connection.getExtras(), remoteConnection.getExtras());
+        assertEquals(connection.getStatusHints(), remoteConnection.getStatusHints());
+        assertEquals(VideoProfile.STATE_AUDIO_ONLY, remoteConnection.getVideoState());
+        assertNull(remoteConnection.getVideoProvider());
+        assertTrue(remoteConnection.getConferenceableConnections().isEmpty());
+    }
+
+    private void addRemoteConnectionOutgoingCall() {
+        try {
+            MockConnectionService managerConnectionService = new MockConnectionService() {
+                @Override
+                public Connection onCreateOutgoingConnection(
+                        PhoneAccountHandle connectionManagerPhoneAccount,
+                        ConnectionRequest request) {
+                    MockConnection connection = (MockConnection)super.onCreateOutgoingConnection(
+                            connectionManagerPhoneAccount, request);
+                    ConnectionRequest remoteRequest = new ConnectionRequest(
+                            TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
+                            request.getAddress(),
+                            request.getExtras());
+                    RemoteConnection remoteConnection =
+                            CtsConnectionService.createRemoteOutgoingConnectionToTelecom(
+                                    TEST_REMOTE_PHONE_ACCOUNT_HANDLE, remoteRequest);
+                    connection.setRemoteConnection(remoteConnection);
+                    return connection;
+                }
+            };
+            setupConnectionServices(managerConnectionService, null, FLAG_REGISTER | FLAG_ENABLE);
+        } catch(Exception e) {
+            fail("Error in setting up the connection services");
+        }
+        placeAndVerifyCall();
     }
 }
