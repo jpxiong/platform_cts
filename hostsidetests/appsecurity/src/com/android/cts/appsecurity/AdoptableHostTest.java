@@ -272,11 +272,7 @@ public class AdoptableHostTest extends DeviceTestCase implements IAbiReceiver, I
             getDevice().uninstallPackage(PKG);
             getDevice().executeShellCommand("sm mount " + vol.volId);
 
-            try {
-                runDeviceTests(PKG, CLASS, "testNothing");
-                fail("Unexpected app not purged from adopted volume");
-            } catch (AssertionError expected) {
-            }
+            assertEmpty(getDevice().executeShellCommand("pm list packages " + PKG));
         } finally {
             cleanUp(diskId);
         }
