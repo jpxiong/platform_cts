@@ -164,8 +164,13 @@ public class DecoderTest extends MediaPlayerTestBase {
     }
 
     public void testDecodeMonoGsm() throws Exception {
-        monoTest(R.raw.monotestgsm, 8000);
-        testTimeStampOrdering(R.raw.monotestgsm);
+        if (MediaUtils.hasCodecsForResource(mContext, R.raw.monotestgsm)
+                || mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)) {
+            monoTest(R.raw.monotestgsm, 8000);
+            testTimeStampOrdering(R.raw.monotestgsm);
+        } else {
+            MediaUtils.skipTest("not mandatory");
+        }
     }
 
     public void testDecodeAacTs() throws Exception {
