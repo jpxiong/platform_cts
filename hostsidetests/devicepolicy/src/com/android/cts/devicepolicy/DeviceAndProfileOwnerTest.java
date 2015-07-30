@@ -156,6 +156,14 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         }
     }
 
+    public void testApplicationHidden() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        installAppAsUser(PERMISSIONS_APP_APK, mUserId);
+        executeDeviceTestClass(".ApplicationHiddenTest");
+    }
+
     protected void executeDeviceTestClass(String className) throws Exception {
         assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, className, mUserId));
     }
