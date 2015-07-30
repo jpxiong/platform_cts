@@ -1,4 +1,4 @@
-# Copyright (C) 2009 The Android Open Source Project
+# Copyright (C) 2015 The Android Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,25 @@ include $(CLEAR_VARS)
 
 # don't include this package in any target
 LOCAL_MODULE_TAGS := optional
+# LOCAL_MODULE_TAGS := tests
+
 # and when built explicitly put it in the data partition
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_STATIC_JAVA_LIBRARIES := CtsAccountTestsCommon ctstestrunner
+LOCAL_SDK_VERSION := current
+
+LOCAL_STATIC_JAVA_LIBRARIES := \
+        ctstestrunner \
+	CtsAccountTestsCommon
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_PACKAGE_NAME := CtsAccountManagerTestCases
+LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/res
+
+LOCAL_PACKAGE_NAME := CtsUnaffiliatedAccountAuthenticators
 
 LOCAL_SDK_VERSION := current
 
-include $(BUILD_CTS_PACKAGE)
-include $(call all-makefiles-under,$(LOCAL_PATH))
+LOCAL_CERTIFICATE := cts/hostsidetests/appsecurity/certs/cts-testkey2
+
+include $(BUILD_CTS_SUPPORT_PACKAGE)
