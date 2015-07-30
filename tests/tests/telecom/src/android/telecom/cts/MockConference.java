@@ -32,11 +32,14 @@ public class MockConference extends Conference {
         super(phoneAccount);
     }
 
-    public MockConference(Connection a, Connection b) {
-        super(null);
-        setConnectionCapabilities(a.getConnectionCapabilities());
+    public MockConference(MockConnection a, MockConnection b) {
+        super(a.getPhoneAccountHandle());
         addConnection(a);
         addConnection(b);
+        // a is the primary connection, so inherit the properties from it.
+        setConnectionCapabilities(a.getConnectionCapabilities());
+        setStatusHints(a.getStatusHints());
+        setExtras(a.getExtras());
         setActive();
     }
 

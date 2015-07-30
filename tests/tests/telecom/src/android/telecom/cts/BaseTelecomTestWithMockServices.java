@@ -451,7 +451,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals(connection.getConferenceables(), confConnections);
     }
 
-    void addAndVerifyConferenceCall(Call call1, Call call2) {
+    MockConference addAndVerifyConferenceCall(Call call1, Call call2) {
         assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
         int currentConfCallCount = 0;
         if (mInCallCallbacks.getService() != null) {
@@ -480,6 +480,8 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("InCallService should contain 1 more call after adding a conf call.",
                 currentConfCallCount + 1,
                 mInCallCallbacks.getService().getConferenceCallCount());
+        // Return the newly created conference object to the caller
+        return connectionService.conferences.get(currentConfCallCount);
     }
 
     void splitFromConferenceCall(Call call1) {
