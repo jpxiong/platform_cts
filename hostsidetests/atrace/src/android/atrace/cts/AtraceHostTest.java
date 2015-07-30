@@ -208,7 +208,8 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
                     installResult);
 
             // capture a launch of the app with async tracing
-            String atraceArgs = "-a " + TEST_PKG + " -c -b 16000 view"; // TODO: zipping
+            // content traced by 'view' tag tested below, 'sched' used to ensure tgid printed
+            String atraceArgs = "-a " + TEST_PKG + " -c -b 16000 view sched"; // TODO: zipping
             getDevice().executeShellCommand("atrace --async_stop " + atraceArgs);
             getDevice().executeShellCommand("atrace --async_start " + atraceArgs);
             getDevice().executeShellCommand("am start " + TEST_PKG);
