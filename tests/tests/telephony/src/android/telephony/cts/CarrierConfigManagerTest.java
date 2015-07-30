@@ -17,6 +17,7 @@
 package android.telephony.cts;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.os.PersistableBundle;
 import android.telephony.CarrierConfigManager;
 import android.telephony.SubscriptionManager;
@@ -36,8 +37,16 @@ public class CarrierConfigManagerTest extends AndroidTestCase {
                 getContext().getSystemService(Context.CARRIER_CONFIG_SERVICE);
     }
 
-    private boolean hasValidPhone() {
-        return mTelephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
+    /**
+     * Checks whether the telephony stack should be running on this device.
+     *
+     * Note: "Telephony" means only SMS/MMS and voice calls in some contexts, but we also care if
+     * the device supports cellular data.
+     */
+    private boolean hasTelephony() {
+        ConnectivityManager mgr =
+                (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        return mgr.isNetworkSupported(ConnectivityManager.TYPE_MOBILE);
     }
 
     private boolean isSimCardPresent() {
@@ -46,16 +55,15 @@ public class CarrierConfigManagerTest extends AndroidTestCase {
     }
 
     private void checkConfig(PersistableBundle config) {
-        if (!hasValidPhone()) {
-            assertNull(config);
+        if (config == null) {
+            assertFalse("Config should only be null when telephony is not running.", hasTelephony());
             return;
         }
-        if (isSimCardPresent()) {
-            assertNotNull(config);
-        } else {
+        assertNotNull("CarrierConfigManager should not return null config", config);
+        if (!isSimCardPresent()) {
             // Static default in CarrierConfigManager will be returned when no sim card present.
-            assertEquals(config.getBoolean(CarrierConfigManager.KEY_ADDITIONAL_CALL_SETTING_BOOL),
-                         true);
+            assertEquals("Config doesn't match static default.",
+                    config.getBoolean(CarrierConfigManager.KEY_ADDITIONAL_CALL_SETTING_BOOL), true);
         }
     }
 
