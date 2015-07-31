@@ -21,6 +21,7 @@ import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.RemoteConference;
 import android.telecom.RemoteConnection;
 
 /**
@@ -149,6 +150,17 @@ public class CtsConnectionService extends ConnectionService {
         synchronized(sLock) {
             return sTelecomConnectionService.createRemoteIncomingConnection(
                     connectionManagerPhoneAccount, request);
+        }
+    }
+
+    @Override
+    public void onRemoteConferenceAdded(RemoteConference conference) {
+        synchronized(sLock) {
+            if (sConnectionService != null) {
+                sConnectionService.onRemoteConferenceAdded(conference);
+            } else {
+                mMockConnectionService.onRemoteConferenceAdded(conference);
+            }
         }
     }
 }

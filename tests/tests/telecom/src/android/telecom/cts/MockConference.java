@@ -20,6 +20,7 @@ import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.RemoteConference;
 import android.telecom.TelecomManager;
 
 /**
@@ -27,6 +28,8 @@ import android.telecom.TelecomManager;
  * callbacks sent from Telecom.
  */
 public class MockConference extends Conference {
+
+    private RemoteConference mRemoteConference = null;
 
     public MockConference(PhoneAccountHandle phoneAccount) {
         super(phoneAccount);
@@ -40,7 +43,6 @@ public class MockConference extends Conference {
         setConnectionCapabilities(a.getConnectionCapabilities());
         setStatusHints(a.getStatusHints());
         setExtras(a.getExtras());
-        setActive();
     }
 
     @Override
@@ -51,12 +53,19 @@ public class MockConference extends Conference {
             c.destroy();
         }
         destroy();
+        if (mRemoteConference != null) {
+            mRemoteConference.disconnect();
+        }
     }
 
     @Override
     public void onSeparate(Connection connection) {
+        super.onSeparate(connection);
         if (getConnections().contains(connection)) {
             removeConnection(connection);
+        }
+        if (mRemoteConference != null) {
+            mRemoteConference.separate(((MockConnection)connection).getRemoteConnection());
         }
     }
 
@@ -68,6 +77,9 @@ public class MockConference extends Conference {
             c.setCallerDisplayName(
                     TestUtils.MERGE_CALLER_NAME, TelecomManager.PRESENTATION_ALLOWED);
         }
+        if (mRemoteConference != null) {
+            mRemoteConference.merge();
+        }
     }
 
     @Override
@@ -78,6 +90,9 @@ public class MockConference extends Conference {
             c.setCallerDisplayName(
                     TestUtils.SWAP_CALLER_NAME, TelecomManager.PRESENTATION_ALLOWED);
         }
+        if (mRemoteConference != null) {
+            mRemoteConference.swap();
+        }
     }
 
     @Override
@@ -87,6 +102,9 @@ public class MockConference extends Conference {
             c.setOnHold();
         }
         setOnHold();
+        if (mRemoteConference != null) {
+            mRemoteConference.hold();
+        }
     }
 
     @Override
@@ -96,5 +114,16 @@ public class MockConference extends Conference {
             c.setActive();
         }
         setActive();
+        if (mRemoteConference != null) {
+            mRemoteConference.unhold();
+        }
+    }
+
+    public void setRemoteConference(RemoteConference remoteConference) {
+        mRemoteConference = remoteConference;
+    }
+
+    public RemoteConference getRemoteConference() {
+        return mRemoteConference;
     }
 }

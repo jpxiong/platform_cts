@@ -30,11 +30,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.telecom.Call;
 import android.telecom.CallAudioState;
+import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.InCallService;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
-import android.telecom.RemoteConnection;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 import android.telecom.cts.MockInCallService.InCallServiceCallbacks;
@@ -71,10 +71,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             .addSupportedUriScheme(PhoneAccount.SCHEME_VOICEMAIL)
             .build();
 
-    public static final PhoneAccountHandle TEST_REMOTE_PHONE_ACCOUNT_HANDLE =
-            new PhoneAccountHandle(new ComponentName(PACKAGE, REMOTE_COMPONENT), REMOTE_ACCOUNT_ID);
-    public static final String TEST_REMOTE_PHONE_ACCOUNT_ADDRESS = "tel:666-TEST";
-
     private static int sCounter = 9999;
 
     Context mContext;
@@ -82,7 +78,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
     MockConnectionService connectionService = null;
-    MockConnectionService remoteConnectionService = null;
 
     @Override
     protected void setUp() throws Exception {
@@ -104,13 +99,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
             }
-            // Disconnect the remote phone account if the test had set it up.
-            if (remoteConnectionService != null) {
-                tearDownConnectionServices(TEST_PHONE_ACCOUNT_HANDLE,
-                        TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
-            } else {
-                tearDownConnectionService(TEST_PHONE_ACCOUNT_HANDLE);
-            }
+            tearDownConnectionService(TEST_PHONE_ACCOUNT_HANDLE);
         }
         super.tearDown();
     }
@@ -136,47 +125,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         return TEST_PHONE_ACCOUNT;
     }
 
-    protected void setupConnectionServices(MockConnectionService connectionService,
-            MockConnectionService remoteConnectionService, int flags)
-            throws Exception {
-        // Setup the primary connection service first
-        setupConnectionService(connectionService, flags);
-
-        if (remoteConnectionService != null) {
-            this.remoteConnectionService = remoteConnectionService;
-        } else {
-            // Generate a vanilla mock connection service, if not provided.
-            this.remoteConnectionService = new MockConnectionService();
-        }
-        CtsRemoteConnectionService.setUp(TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
-                this.remoteConnectionService);
-
-        if ((flags & FLAG_REGISTER) != 0) {
-            // This needs SIM subscription, so register via adb commands to get system permission.
-            TestUtils.registerSimPhoneAccount(getInstrumentation(),
-                    TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
-                    REMOTE_ACCOUNT_LABEL,
-                    TEST_REMOTE_PHONE_ACCOUNT_ADDRESS);
-        }
-        if ((flags & FLAG_ENABLE) != 0) {
-            TestUtils.enablePhoneAccount(getInstrumentation(), TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
-        }
-    }
-
     protected void tearDownConnectionService(PhoneAccountHandle accountHandle) throws Exception {
         mTelecomManager.unregisterPhoneAccount(accountHandle);
         CtsConnectionService.tearDown();
         this.connectionService = null;
-    }
-
-    protected void tearDownConnectionServices(PhoneAccountHandle accountHandle,
-            PhoneAccountHandle remoteAccountHandle) throws Exception {
-        // Teardown the primary connection service first
-        tearDownConnectionService(accountHandle);
-
-        mTelecomManager.unregisterPhoneAccount(remoteAccountHandle);
-        CtsRemoteConnectionService.tearDown();
-        this.remoteConnectionService = null;
     }
 
     protected void startCallTo(Uri address, PhoneAccountHandle accountHandle) {
@@ -199,16 +151,16 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         mInCallCallbacks = new InCallServiceCallbacks() {
             @Override
             public void onCallAdded(Call call, int numCalls) {
-                Log.i(TAG, "onCallAdded, Call: " + call + "Num Calls: " + numCalls);
+                Log.i(TAG, "onCallAdded, Call: " + call + ", Num Calls: " + numCalls);
                 this.lock.release();
             }
             @Override
             public void onCallRemoved(Call call, int numCalls) {
-                Log.i(TAG, "onCallRemoved, Call: " + call + "Num Calls: " + numCalls);
+                Log.i(TAG, "onCallRemoved, Call: " + call + ", Num Calls: " + numCalls);
             }
             @Override
             public void onParentChanged(Call call, Call parent) {
-                Log.i(TAG, "onParentChanged, Call: " + call + "Parent: " + parent);
+                Log.i(TAG, "onParentChanged, Call: " + call + ", Parent: " + parent);
                 this.lock.release();
             }
             @Override
@@ -218,13 +170,12 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             }
             @Override
             public void onConferenceableCallsChanged(Call call, List<Call> conferenceableCalls) {
-                Log.i(TAG, "onConferenceableCallsChanged, Call: " + call + "Conferenceables: " +
+                Log.i(TAG, "onConferenceableCallsChanged, Call: " + call + ", Conferenceables: " +
                         conferenceableCalls);
-                this.lock.release();
             }
             @Override
             public void onDetailsChanged(Call call, Call.Details details) {
-                Log.i(TAG, "onDetailsChanged, Call: " + call + "Details: " + details);
+                Log.i(TAG, "onDetailsChanged, Call: " + call + ", Details: " + details);
             }
             @Override
             public void onCallDestroyed(Call call) {
@@ -232,7 +183,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             }
             @Override
             public void onCallStateChanged(Call call, int newState) {
-                Log.i(TAG, "onCallStateChanged, Call: " + call + "New State: " + newState);
+                Log.i(TAG, "onCallStateChanged, Call: " + call + ", New State: " + newState);
             }
         };
 
@@ -343,29 +294,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         return connection;
     }
 
-    MockConnection verifyRemoteConnectionForOutgoingCall() {
-        // Assuming only 1 connection present
-        return verifyRemoteConnectionForOutgoingCall(0);
-    }
-
-    MockConnection verifyRemoteConnectionForOutgoingCall(int connectionIndex) {
-        try {
-            if (!remoteConnectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
-                    TimeUnit.MILLISECONDS)) {
-                fail("No outgoing call connection requested by Telecom");
-            }
-        } catch (InterruptedException e) {
-            Log.i(TAG, "Test interrupted!");
-        }
-
-        assertThat("Telecom should create outgoing connection for remote outgoing call",
-                remoteConnectionService.outgoingConnections.size(), not(equalTo(0)));
-        assertEquals("Telecom should not create incoming connections for remote outgoing calls",
-                0, remoteConnectionService.incomingConnections.size());
-        MockConnection connection = remoteConnectionService.outgoingConnections.get(connectionIndex);
-        return connection;
-    }
-
     MockConnection verifyConnectionForIncomingCall() {
         // Assuming only 1 connection present
         return verifyConnectionForIncomingCall(0);
@@ -386,76 +314,46 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("Telecom should not create outgoing connections for incoming calls",
                 0, connectionService.outgoingConnections.size());
         MockConnection connection = connectionService.incomingConnections.get(connectionIndex);
-        setAndverifyConnectionForIncomingCall(connection);
+        setAndVerifyConnectionForIncomingCall(connection);
         return connection;
     }
 
-    MockConnection verifyRemoteConnectionForIncomingCall() {
-        // Assuming only 1 connection present
-        return verifyRemoteConnectionForIncomingCall(0);
-    }
-
-    MockConnection verifyRemoteConnectionForIncomingCall(int connectionIndex) {
-        try {
-            if (!remoteConnectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
-                    TimeUnit.MILLISECONDS)) {
-                fail("No outgoing call connection requested by Telecom");
-            }
-        } catch (InterruptedException e) {
-            Log.i(TAG, "Test interrupted!");
-        }
-
-        assertThat("Telecom should create incoming connections for remote incoming calls",
-                remoteConnectionService.incomingConnections.size(), not(equalTo(0)));
-        assertEquals("Telecom should not create outgoing connections for remote incoming calls",
-                0, remoteConnectionService.outgoingConnections.size());
-        MockConnection connection = remoteConnectionService.incomingConnections.get(connectionIndex);
-        setAndverifyConnectionForIncomingCall(connection);
-        return connection;
-    }
-
-    void setAndverifyConnectionForIncomingCall(MockConnection connection) {
+    void setAndVerifyConnectionForIncomingCall(MockConnection connection) {
         connection.setRinging();
-        assertEquals(Connection.STATE_RINGING, connection.getState());
+        assertConnectionState(connection, Connection.STATE_RINGING);
     }
 
     void setAndVerifyConferenceablesForOutgoingConnection(int connectionIndex) {
-        /**
-         * Make all other outgoing connections as conferenceable with this
-         * new connection.
-         */
+        assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
+        // Make all other outgoing connections as conferenceable with this connection.
         MockConnection connection = connectionService.outgoingConnections.get(connectionIndex);
-        List<Connection> confConnections = new ArrayList<>(connectionService.outgoingConnections.size());
+        List<Connection> confConnections =
+                new ArrayList<>(connectionService.outgoingConnections.size());
         for (Connection c : connectionService.outgoingConnections) {
             if (c != connection) {
                 confConnections.add(c);
             }
         }
         connection.setConferenceableConnections(confConnections);
-
-        try {
-            if (!mInCallCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
-                fail("No call added to the conferenceables list.");
-            }
-        } catch (InterruptedException e) {
-            Log.i(TAG, "Test interrupted!");
-        }
         assertEquals(connection.getConferenceables(), confConnections);
     }
 
-    MockConference addAndVerifyConferenceCall(Call call1, Call call2) {
+    void addConferenceCall(Call call1, Call call2) {
         assertEquals("Lock should have no permits!", 0, mInCallCallbacks.lock.availablePermits());
         int currentConfCallCount = 0;
         if (mInCallCallbacks.getService() != null) {
             currentConfCallCount = mInCallCallbacks.getService().getConferenceCallCount();
         }
-        List<Call> call1ConfList = call1.getConferenceableCalls();
-        List<Call> call2ConfList = call2.getConferenceableCalls();
-        if (call1ConfList.contains(call2) && call2ConfList.contains(call1)) {
-            call1.conference(call2);
-        } else {
-            fail("Calls cannot be conferenced!");
-        }
+        // Verify that the calls have each other on their conferenceable list before proceeding
+        List<Call> callConfList = new ArrayList<>();
+        callConfList.add(call2);
+        assertCallConferenceableList(call1, callConfList);
+
+        callConfList.clear();
+        callConfList.add(call1);
+        assertCallConferenceableList(call2, callConfList);
+
+        call1.conference(call2);
 
         /**
          * We should have 1 onCallAdded, 2 onChildrenChanged and 2 onParentChanged invoked, so
@@ -472,8 +370,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("InCallService should contain 1 more call after adding a conf call.",
                 currentConfCallCount + 1,
                 mInCallCallbacks.getService().getConferenceCallCount());
-        // Return the newly created conference object to the caller
-        return connectionService.conferences.get(currentConfCallCount);
     }
 
     void splitFromConferenceCall(Call call1) {
@@ -491,6 +387,26 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         } catch (InterruptedException e) {
             Log.i(TAG, "Test interrupted!");
         }
+    }
+
+    MockConference verifyConferenceForOutgoingCall() {
+        try {
+            if (!connectionService.lock.tryAcquire(TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                    TimeUnit.MILLISECONDS)) {
+                fail("No outgoing conference requested by Telecom");
+            }
+        } catch (InterruptedException e) {
+            Log.i(TAG, "Test interrupted!");
+        }
+        // Return the newly created conference object to the caller
+        MockConference conference = connectionService.conferences.get(0);
+        setAndVerifyConferenceForOutgoingCall(conference);
+        return conference;
+    }
+
+    void setAndVerifyConferenceForOutgoingCall(MockConference conference) {
+        conference.setActive();
+        assertConferenceState(conference, Connection.STATE_ACTIVE);
     }
 
     /**
@@ -679,6 +595,24 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         );
     }
 
+    void assertCallConferenceableList(final Call call, final List<Call> conferenceableList) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return conferenceableList;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getConferenceableCalls();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call: " + call + " does not have the correct conferenceable call list."
+        );
+    }
+
     void assertDtmfString(final MockConnection connection, final String dtmfString) {
         waitUntilConditionIsTrueOrTimeout(new Condition() {
                 @Override
@@ -714,7 +648,25 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         );
     }
 
-    void assertRemoteConnectionState(final RemoteConnection connection, final int state) {
+    void assertConnectionCallDisplayName(final Connection connection, final String name) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return name;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return connection.getCallerDisplayName();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Connection should have display name: " + name
+        );
+    }
+
+    void assertConferenceState(final Conference conference, final int state) {
         waitUntilConditionIsTrueOrTimeout(
                 new Condition() {
                     @Override
@@ -724,11 +676,11 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        return connection.getState();
+                        return conference.getState();
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
-                "Remote Connection should be in state " + state
+                "Conference should be in state " + state
         );
     }
 
