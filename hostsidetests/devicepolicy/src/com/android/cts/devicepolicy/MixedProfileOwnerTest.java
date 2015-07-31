@@ -40,7 +40,7 @@ public class MixedProfileOwnerTest extends DeviceAndProfileOwnerTest {
             mUserId = createManagedProfile();
 
             installAppAsUser(DEVICE_ADMIN_APK, mUserId);
-            setProfileOwner(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId);
+            setProfileOwnerOrFail(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId);
             startUser(mUserId);
         }
     }

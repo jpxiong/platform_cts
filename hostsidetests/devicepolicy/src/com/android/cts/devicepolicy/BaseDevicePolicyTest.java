@@ -333,13 +333,20 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         return -1;
     }
 
-    protected void setProfileOwner(String componentName, int userId)
+    protected boolean setProfileOwner(String componentName, int userId)
             throws DeviceNotAvailableException {
         String command = "dpm set-profile-owner --user " + userId + " '" + componentName + "'";
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput + " expected to start with \"Success:\"",
-                commandOutput.startsWith("Success:"));
+        return commandOutput.startsWith("Success:");
+    }
+
+    protected void setProfileOwnerOrFail(String componentName, int userId)
+            throws Exception {
+        if (!setProfileOwner(componentName, userId)) {
+            removeUser(userId);
+            fail("Failed to set profile owner");
+        }
     }
 
     protected void setDeviceAdmin(String componentName) throws DeviceNotAvailableException {
@@ -350,11 +357,10 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
                 commandOutput.startsWith("Success:"));
     }
 
-    protected void setDeviceOwner(String componentName) throws DeviceNotAvailableException {
+    protected boolean setDeviceOwner(String componentName) throws DeviceNotAvailableException {
         String command = "dpm set-device-owner '" + componentName + "'";
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
-        assertTrue(commandOutput + " expected to start with \"Success:\"",
-                commandOutput.startsWith("Success:"));
+        return commandOutput.startsWith("Success:");
     }
 }

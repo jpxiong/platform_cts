@@ -30,6 +30,11 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
     private static final String DEVICE_OWNER_PKG = "com.android.cts.deviceowner";
     private static final String DEVICE_OWNER_APK = "CtsDeviceOwnerApp.apk";
 
+    private static final String MANAGED_PROFILE_PKG = "com.android.cts.managedprofile";
+    private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
+    private static final String MANAGED_PROFILE_ADMIN =
+            MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
+
     private static final String TEST_APP_APK = "CtsSimpleApp.apk";
     private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
     private static final String TEST_APP_LOCATION = "/data/local/tmp/";
@@ -51,7 +56,8 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
         super.setUp();
         if (mHasFeature) {
             installApp(DEVICE_OWNER_APK);
-            setDeviceOwner(DEVICE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
+            assertTrue("Failed to set device owner",
+                    setDeviceOwner(DEVICE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS));
         }
     }
 
@@ -113,6 +119,22 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
             } finally {
                 getDevice().uninstallPackage(WIFI_CONFIG_CREATOR_PKG);
             }
+        }
+    }
+
+    public void testCannotSetDeviceOwnerAgain() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        // verify that we can't set the same admin receiver as device owner again
+        assertFalse(setDeviceOwner(DEVICE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS));
+
+        // verify that we can't set a different admin receiver as device owner
+        try {
+            installApp(MANAGED_PROFILE_APK);
+            assertFalse(setDeviceOwner(MANAGED_PROFILE_PKG + "/" + MANAGED_PROFILE_ADMIN));
+        } finally {
+            getDevice().uninstallPackage(MANAGED_PROFILE_PKG);
         }
     }
 
