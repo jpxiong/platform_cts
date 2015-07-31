@@ -29,6 +29,7 @@ import android.hardware.SensorEventListener2;
 import android.hardware.SensorManager;
 import android.hardware.TriggerEvent;
 import android.hardware.TriggerEventListener;
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorNotSupportedException;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.hardware.cts.helpers.TestSensorEnvironment;
@@ -311,6 +312,7 @@ public class SensorTest extends SensorTestCase {
     // TODO: remove when parameterized tests are supported (see SensorBatchingTests.java)
     @TimeoutReq(minutes=20)
     public void testBatchAndFlush() throws Exception {
+        SensorCtsHelper.sleep(3, TimeUnit.SECONDS);
         ArrayList<Throwable> errorsFound = new ArrayList<>();
         for (Sensor sensor : mSensorList) {
             verifyRegisterListenerCallFlush(sensor, null /* handler */, errorsFound);
@@ -323,6 +325,7 @@ public class SensorTest extends SensorTestCase {
      */
     @TimeoutReq(minutes=10)
     public void testBatchAndFlushWithHandler() throws Exception {
+        SensorCtsHelper.sleep(3, TimeUnit.SECONDS);
         Sensor sensor = null;
         for (Sensor s : mSensorList) {
             if (s.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
@@ -359,6 +362,7 @@ public class SensorTest extends SensorTestCase {
      */
     @TimeoutReq(minutes=10)
     public void testBatchAndFlushUseDefaultHandler() throws Exception {
+        SensorCtsHelper.sleep(3, TimeUnit.SECONDS);
         Sensor sensor = null;
         for (Sensor s : mSensorList) {
             if (s.getReportingMode() == Sensor.REPORTING_MODE_CONTINUOUS) {
@@ -391,6 +395,7 @@ public class SensorTest extends SensorTestCase {
     // TODO: after L release move to SensorBatchingTests and run in all sensors with default
     //       verifications enabled
     public void testBatchAndFlushWithMultipleSensors() throws Exception {
+        SensorCtsHelper.sleep(3, TimeUnit.SECONDS);
         final int maxSensors = 3;
         final int maxReportLatencyUs = (int) TimeUnit.SECONDS.toMicros(10);
         List<Sensor> sensorsToTest = new ArrayList<Sensor>();

@@ -19,6 +19,7 @@ package android.hardware.cts;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.cts.helpers.SensorCtsHelper;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.sensoroperations.TestSensorOperation;
@@ -542,6 +543,7 @@ public class SingleSensorTests extends SensorTestCase {
     }
 
     private void runSensorTest(int sensorType, int rateUs) throws Throwable {
+        SensorCtsHelper.sleep(3, TimeUnit.SECONDS);
         TestSensorEnvironment environment = new TestSensorEnvironment(
                 getContext(),
                 sensorType,
