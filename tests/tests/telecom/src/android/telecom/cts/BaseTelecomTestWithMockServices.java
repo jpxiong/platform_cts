@@ -75,7 +75,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             new PhoneAccountHandle(new ComponentName(PACKAGE, REMOTE_COMPONENT), REMOTE_ACCOUNT_ID);
     public static final String TEST_REMOTE_PHONE_ACCOUNT_ADDRESS = "tel:666-TEST";
 
-    private static int sCounter = 0;
+    private static int sCounter = 9999;
 
     Context mContext;
     TelecomManager mTelecomManager;
@@ -340,7 +340,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("Telecom should not create incoming connections for outgoing calls",
                 0, connectionService.incomingConnections.size());
         MockConnection connection = connectionService.outgoingConnections.get(connectionIndex);
-        setAndverifyConnectionForOutgoingCall(connection);
         return connection;
     }
 
@@ -364,14 +363,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         assertEquals("Telecom should not create incoming connections for remote outgoing calls",
                 0, remoteConnectionService.incomingConnections.size());
         MockConnection connection = remoteConnectionService.outgoingConnections.get(connectionIndex);
-        setAndverifyConnectionForOutgoingCall(connection);
         return connection;
-    }
-
-    void setAndverifyConnectionForOutgoingCall(MockConnection connection) {
-        connection.setDialing();
-        connection.setActive();
-        assertEquals(Connection.STATE_ACTIVE, connection.getState());
     }
 
     MockConnection verifyConnectionForIncomingCall() {

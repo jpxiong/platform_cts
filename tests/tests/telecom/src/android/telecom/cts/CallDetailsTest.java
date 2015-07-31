@@ -98,9 +98,12 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
          *  Call details.
          */
         placeAndVerifyCall();
+        verifyConnectionForOutgoingCall();
 
         mInCallService = mInCallCallbacks.getService();
         mCall = mInCallService.getLastCall();
+
+        assertCallState(mCall, Call.STATE_DIALING);
     }
 
     /**

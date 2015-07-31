@@ -93,8 +93,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final Call call = mInCallCallbacks.getService().getLastCall();
+        assertCallState(call, Call.STATE_DIALING);
+
+        connection.setActive();
         assertCallState(call, Call.STATE_ACTIVE);
-        assertConnectionState(connection, Connection.STATE_ACTIVE);
 
         sendMediaButtonLongPress();
         assertCallState(call, Call.STATE_DISCONNECTED);
