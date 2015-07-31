@@ -16,9 +16,10 @@
 package com.android.cts.tradefed.device;
 
 import com.android.ddmlib.Log.LogLevel;
-import com.android.cts.tradefed.build.ICtsBuildInfo;
 import com.android.cts.tradefed.UnitTests;
+import com.android.cts.tradefed.result.CtsXmlResultReporter;
 import com.android.tradefed.build.BuildInfo;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.CollectingTestListener;
@@ -26,6 +27,7 @@ import com.android.tradefed.testtype.DeviceTestCase;
 import com.android.tradefed.util.FileUtil;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.easymock.EasyMock;
@@ -39,25 +41,25 @@ import org.easymock.EasyMock;
 public class DeviceInfoCollectorFuncTest extends DeviceTestCase {
 
     private CollectingTestListener testListener;
-    private BuildInfo buildInfo;
     private File mResultDir;
-    private ICtsBuildInfo mMockCtsBuildInfo;
+    private IFolderBuildInfo mMockBuildInfo;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         testListener = new CollectingTestListener();
-        buildInfo = new BuildInfo();
         mResultDir = FileUtil.createTempDir("cts-result-dir");
-        mMockCtsBuildInfo = EasyMock.createMock(ICtsBuildInfo.class);
-        EasyMock.expect(mMockCtsBuildInfo.getResultDir()).andStubReturn(mResultDir);
-        EasyMock.replay(mMockCtsBuildInfo);
+        mMockBuildInfo = EasyMock.createMock(IFolderBuildInfo.class);
+        Map<String, String> attributes = new HashMap<>();
+        attributes.put(CtsXmlResultReporter.CTS_RESULT_DIR, mResultDir.getAbsolutePath());
+        EasyMock.expect(mMockBuildInfo.getBuildAttributes()).andStubReturn(attributes);
+        EasyMock.replay(mMockBuildInfo);
 
         assertNotNull(getDevice().getSerialNumber());
     }
 
     public void testCollectDeviceInfo() throws DeviceNotAvailableException {
-        testListener.invocationStarted(buildInfo);
+        testListener.invocationStarted(mMockBuildInfo);
         DeviceInfoCollector.collectDeviceInfo(getDevice(), UnitTests.ABI.getName(), new File(
                 System.getProperty("java.io.tmpdir")), testListener);
         assertNotNull(testListener.getCurrentRunResults());
@@ -69,9 +71,9 @@ public class DeviceInfoCollectorFuncTest extends DeviceTestCase {
     }
 
     public void testExtendedDeviceInfo() throws DeviceNotAvailableException {
-        testListener.invocationStarted(buildInfo);
+        testListener.invocationStarted(mMockBuildInfo);
         DeviceInfoCollector.collectExtendedDeviceInfo(getDevice(), UnitTests.ABI.getName(),
-                new File(System.getProperty("java.io.tmpdir")), testListener, mMockCtsBuildInfo);
+                new File(System.getProperty("java.io.tmpdir")), testListener, mMockBuildInfo);
         assertNotNull(testListener.getCurrentRunResults());
 
         Map<String, String> runMetrics = testListener.getCurrentRunResults().getRunMetrics();
