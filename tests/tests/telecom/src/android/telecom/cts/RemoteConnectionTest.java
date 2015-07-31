@@ -94,7 +94,12 @@ public class RemoteConnectionTest extends BaseTelecomTestWithMockServices {
         final RemoteConnection remoteConnectionObject = connection.getRemoteConnection();
         final Call call = mInCallCallbacks.getService().getLastCall();
 
+        assertCallState(call, Call.STATE_DIALING);
+
         verifyRemoteConnectionObject(remoteConnectionObject, remoteConnection);
+
+        connection.setActive();
+        remoteConnection.setActive();
 
         assertCallState(call, Call.STATE_ACTIVE);
         assertConnectionState(connection, Connection.STATE_ACTIVE);
