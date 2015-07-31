@@ -461,13 +461,10 @@ public class MediaUtils {
 
     public static void logResults(ReportLog log, String prefix,
             double min, double max, double avg, double stdev) {
-        log.printValue(prefix + " fps", 1000000000 / min, ResultType.HIGHER_BETTER, ResultUnit.FPS);
-        log.printValue(prefix + " TimeDiffNsMin", min, ResultType.LOWER_BETTER, ResultUnit.NONE);
-        log.printValue(prefix + " TimeDiffNsMax", max, ResultType.LOWER_BETTER, ResultUnit.NONE);
-        log.printValue(prefix + " TimeDiffNsAverage",
-                avg, ResultType.LOWER_BETTER, ResultUnit.NONE);
-        log.printValue(prefix + " TimeDiffNsStdev",
-                stdev, ResultType.LOWER_BETTER, ResultUnit.NONE);
+        String msg = prefix;
+        msg += " min=" + Math.round(min / 1000) + " max=" + Math.round(max / 1000) +
+                " avg=" + Math.round(avg / 1000) + " stdev=" + Math.round(stdev / 1000);
+        log.printValue(msg, 1000000000 / min, ResultType.HIGHER_BETTER, ResultUnit.FPS);
     }
 
     public static VideoCapabilities getVideoCapabilities(String codecName, String mime) {
