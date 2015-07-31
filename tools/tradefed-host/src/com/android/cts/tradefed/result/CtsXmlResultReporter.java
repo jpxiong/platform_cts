@@ -17,13 +17,13 @@
 package com.android.cts.tradefed.result;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.tradefed.build.ICtsBuildInfo;
 import com.android.cts.tradefed.device.DeviceInfoCollector;
 import com.android.cts.tradefed.testtype.CtsTest;
 import com.android.ddmlib.Log;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
 import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
@@ -62,6 +62,7 @@ public class CtsXmlResultReporter
 
     private static final String LOG_TAG = "CtsXmlResultReporter";
 
+    public static final String CTS_RESULT_DIR = "cts-result-dir";
     static final String TEST_RESULT_FILE_NAME = "testResult.xml";
     static final String CTS_RESULT_FILE_VERSION = "4.4";
     private static final String[] CTS_RESULT_RESOURCES = {"cts_result.xsl", "cts_result.css",
@@ -125,10 +126,10 @@ public class CtsXmlResultReporter
     @Override
     public void invocationStarted(IBuildInfo buildInfo) {
         mBuildInfo = buildInfo;
-        if (!(buildInfo instanceof ICtsBuildInfo)) {
-            throw new IllegalArgumentException("build info is not a ICtsBuildInfo");
+        if (!(buildInfo instanceof IFolderBuildInfo)) {
+            throw new IllegalArgumentException("build info is not a IFolderBuildInfo");
         }
-        ICtsBuildInfo ctsBuild = (ICtsBuildInfo)buildInfo;
+        IFolderBuildInfo ctsBuild = (IFolderBuildInfo)buildInfo;
         CtsBuildHelper ctsBuildHelper = getBuildHelper(ctsBuild);
         mDeviceSerial = buildInfo.getDeviceSerial() == null ? "unknown_device" :
             buildInfo.getDeviceSerial();
@@ -156,7 +157,7 @@ public class CtsXmlResultReporter
         mSuiteName = ctsBuildHelper.getSuiteName();
         mReporter = new ResultReporter(mResultServer, mSuiteName);
 
-        ctsBuild.setResultDir(mReportDir);
+        ctsBuild.addBuildAttribute(CTS_RESULT_DIR, mReportDir.getAbsolutePath());
 
         // TODO: allow customization of log dir
         // create a unique directory for saving logs, with same name as result dir
@@ -202,7 +203,7 @@ public class CtsXmlResultReporter
      * Helper method to retrieve the {@link CtsBuildHelper}.
      * @param ctsBuild
      */
-    CtsBuildHelper getBuildHelper(ICtsBuildInfo ctsBuild) {
+    CtsBuildHelper getBuildHelper(IFolderBuildInfo ctsBuild) {
         CtsBuildHelper buildHelper = new CtsBuildHelper(ctsBuild.getRootDir());
         try {
             buildHelper.validateStructure();
@@ -415,7 +416,7 @@ public class CtsXmlResultReporter
         serializer.attribute(ns, "endtime", endTime);
         serializer.attribute(ns, "version", CTS_RESULT_FILE_VERSION);
         serializer.attribute(ns, "suite", mSuiteName);
-        mResults.serialize(serializer);
+        mResults.serialize(serializer, mBuildInfo.getBuildId());
         // TODO: not sure why, but the serializer doesn't like this statement
         //serializer.endTag(ns, RESULT_TAG);
     }
