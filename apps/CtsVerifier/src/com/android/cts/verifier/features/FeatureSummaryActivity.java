@@ -265,7 +265,7 @@ public class FeatureSummaryActivity extends PassFailButtons.ListActivity {
 
         // add features from latest to last so that the latest requirements are put in the set first
         int apiVersion = Build.VERSION.SDK_INT;
-        if (apiVersion >= Build.VERSION_CODES.MNC) {
+        if (apiVersion >= Build.VERSION_CODES.M) {
             Collections.addAll(features, ALL_MNC_FEATURES);
         }
         if (apiVersion >= Build.VERSION_CODES.LOLLIPOP) {
