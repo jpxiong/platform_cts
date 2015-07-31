@@ -39,7 +39,8 @@ public class MixedDeviceOwnerTest extends DeviceAndProfileOwnerTest {
             mUserId = USER_OWNER;
 
             installApp(DEVICE_ADMIN_APK);
-            setDeviceOwner(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
+            assertTrue("Failed to set device owner",
+                    setDeviceOwner(DEVICE_ADMIN_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS));
         }
     }
 

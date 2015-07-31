@@ -44,7 +44,8 @@ public class LauncherAppsProfileTest extends BaseLauncherAppsTest {
             // Create a managed profile
             mProfileUserId = createManagedProfile();
             installApp(MANAGED_PROFILE_APK);
-            setProfileOwner(MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mProfileUserId);
+            setProfileOwnerOrFail(MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS,
+                    mProfileUserId);
             mProfileSerialNumber = getUserSerialNumber(mProfileUserId);
             mMainUserSerialNumber = getUserSerialNumber(0);
             startUser(mProfileUserId);
