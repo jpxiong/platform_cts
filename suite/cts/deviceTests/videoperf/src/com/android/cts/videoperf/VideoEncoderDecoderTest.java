@@ -941,12 +941,17 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                     int writeSize = src.capacity();
                     dstBuf.put(src.array(), 0, writeSize);
 
+                    int flags = srcInfo.flags;
+                    if ((System.currentTimeMillis() - start) > mTestConfig.mMaxTimeMs) {
+                        flags |= MediaCodec.BUFFER_FLAG_END_OF_STREAM;
+                    }
+
                     codec.queueInputBuffer(
                             inputBufIndex,
                             0 /* offset */,
                             writeSize,
                             srcInfo.presentationTimeUs,
-                            srcInfo.flags);
+                            flags);
                     inputLeft --;
                     inputBufferCount ++;
                 }
