@@ -24,6 +24,7 @@ import android.telecom.Connection;
 import android.telecom.ConnectionService;
 import android.telecom.InCallService;
 import android.telecom.VideoProfile;
+import android.telecom.cts.BaseTelecomTestWithMockServices.Condition;
 
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
@@ -224,5 +225,97 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
         assertCallState(call, Call.STATE_DISCONNECTED);
         assertConnectionState(connection, Connection.STATE_DISCONNECTED);
+    }
+
+    public void testCanAddCall_CannotAddForExistingDialingCall() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        verifyConnectionForOutgoingCall();
+
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+
+        final Call call = inCallService.getLastCall();
+        assertCallState(call, Call.STATE_DIALING);
+
+        assertCanAddCall(inCallService, false,
+                "Should not be able to add call with existing dialing call");
+    }
+
+    public void testCanAddCall_CanAddForExistingActiveCall() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
+
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+
+        final Call call = inCallService.getLastCall();
+        assertCallState(call, Call.STATE_DIALING);
+
+        connection.setActive();
+
+        assertCallState(call, Call.STATE_ACTIVE);
+
+        assertCanAddCall(inCallService, true,
+                "Should be able to add call with only one active call");
+    }
+
+    public void testCanAddCall_CannotAddIfTooManyCalls() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        final MockConnection connection1 = verifyConnectionForOutgoingCall(0);
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+        final Call call1 = inCallService.getLastCall();
+        assertCallState(call1, Call.STATE_DIALING);
+
+        connection1.setActive();
+
+        assertCallState(call1, Call.STATE_ACTIVE);
+
+        placeAndVerifyCall();
+        final MockConnection connection2 = verifyConnectionForOutgoingCall(1);
+
+        final Call call2 = inCallService.getLastCall();
+        assertCallState(call2, Call.STATE_DIALING);
+        connection2.setActive();
+        assertCallState(call2, Call.STATE_ACTIVE);
+
+        assertEquals("InCallService should have 2 calls", 2, inCallService.getCallCount());
+
+        assertCanAddCall(inCallService, false,
+                "Should not be able to add call with two calls already present");
+
+        call1.hold();
+        assertCallState(call1, Call.STATE_HOLDING);
+
+        assertCanAddCall(inCallService, false,
+                "Should not be able to add call with two calls already present");
+    }
+
+    private void assertCanAddCall(final InCallService inCallService, final boolean canAddCall,
+            String message) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return canAddCall;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return inCallService.canAddCall();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                message
+        );
     }
 }
