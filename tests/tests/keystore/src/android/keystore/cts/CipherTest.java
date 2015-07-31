@@ -460,6 +460,17 @@ public class CipherTest extends AndroidTestCase {
                                 expectedPlaintext, modulusLengthBytes);
                     }
 
+                    // TODO: Remove this workaround once Android Keystore AES-GCM supports IVs of
+                    // sizes other than 12 bytes. For example, Bouncy Castle auto-generates 16-byte
+                    // long IVs.
+                    if ("AES/GCM/NoPadding".equalsIgnoreCase(algorithm)) {
+                        byte[] iv = cipher.getIV();
+                        if ((iv != null) && (iv.length != 12)) {
+                            // Android Keystore AES-GCM only supports 12-byte long IVs.
+                            continue;
+                        }
+                    }
+
                     // TODO: Remove this workaround for Bug 22319986 once the issue is fixed. The issue
                     // is that Conscrypt and Bouncy Castle's AES/GCM/NoPadding implementations return
                     // AlgorithmParameters of algorithm "AES" from which it's impossible to obtain a
