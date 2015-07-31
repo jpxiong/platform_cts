@@ -65,7 +65,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
         final Call call = inCallService.getLastCall();
 
-        assertCallState(call, Call.STATE_ACTIVE);
+        assertCallState(call, Call.STATE_DIALING);
 
         assertMuteState(connection, false);
 
@@ -91,7 +91,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         final MockInCallService inCallService = mInCallCallbacks.getService();
 
         final Call call = inCallService.getLastCall();
-        assertCallState(call, Call.STATE_ACTIVE);
+        assertCallState(call, Call.STATE_DIALING);
 
         // Only test speaker and earpiece modes because the other modes are dependent on having
         // a bluetooth headset or wired headset connected.
@@ -124,7 +124,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         final MockInCallService inCallService = mInCallCallbacks.getService();
 
         final Call call = inCallService.getLastCall();
-        assertCallState(call, Call.STATE_ACTIVE);
+        assertCallState(call, Call.STATE_DIALING);
 
         assertDtmfString(connection, "");
 
@@ -157,6 +157,10 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         final MockInCallService inCallService = mInCallCallbacks.getService();
 
         final Call call = inCallService.getLastCall();
+
+        assertCallState(call, Call.STATE_DIALING);
+
+        connection.setActive();
 
         assertCallState(call, Call.STATE_ACTIVE);
 

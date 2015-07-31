@@ -58,12 +58,15 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
     public void testMakeTwoWayVideoCall() {
 
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
-        verifyConnectionForOutgoingCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
         final Call call = inCallService.getLastCall();
 
+        assertCallState(call, Call.STATE_DIALING);
+        connection.setActive();
         assertCallState(call, Call.STATE_ACTIVE);
+
         assertVideoState(call, VideoProfile.STATE_BIDIRECTIONAL);
         assertVideoCallbackRegistered(inCallService, call, true);
     }
