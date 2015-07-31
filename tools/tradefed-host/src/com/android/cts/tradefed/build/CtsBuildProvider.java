@@ -15,7 +15,6 @@
  */
 package com.android.cts.tradefed.build;
 
-import com.android.tradefed.build.FolderBuildInfo;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IBuildProvider;
 import com.android.tradefed.build.IFolderBuildInfo;
@@ -42,11 +41,13 @@ public class CtsBuildProvider implements IBuildProvider {
         if (mCtsRootDirPath == null) {
             throw new IllegalArgumentException("Missing --cts-install-path");
         }
-        IFolderBuildInfo ctsBuild = new FolderBuildInfo(
-            Package.getPackage(CTS_PACKAGE).getImplementationVersion(),
-            "cts", "cts");
+        CtsBuildInfo ctsBuild = new CtsBuildInfo(CTS_BUILD_VERSION, "cts", "cts");
         ctsBuild.setRootDir(new File(mCtsRootDirPath));
         return ctsBuild;
+    }
+
+    public static String getBuildNumber() {
+        return Package.getPackage(CTS_PACKAGE).getImplementationVersion();
     }
 
     /**
