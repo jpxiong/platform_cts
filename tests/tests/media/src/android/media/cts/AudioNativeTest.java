@@ -64,15 +64,14 @@ public class AudioNativeTest extends CtsAndroidTestCase {
                 96000,
                 192000,
         };
-        // OpenSL ES Bug: MNC does not support channel counts of 3, 5, 7.
         final int TEST_CHANNELS_ARRAY[] = {
                 1,
                 2,
-                // 3,
+                3,
                 4,
-                // 5,
+                5,
                 6,
-                // 7,
+                7,
                 // 8  // can fail due to memory issues
         };
         final float TEST_SWEEP = 0; // sine wave only
@@ -156,11 +155,11 @@ public class AudioNativeTest extends CtsAndroidTestCase {
         final int TEST_CHANNELS_ARRAY[] = {
                 1,
                 2,
-                // 3,
+                3,
                 4,
-                // 5,
+                5,
                 6,
-                // 7,
+                7,
                 8,
         };
         final int SEGMENT_DURATION_IN_MSEC = 20;
