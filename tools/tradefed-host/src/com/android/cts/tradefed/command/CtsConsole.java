@@ -24,7 +24,6 @@ import com.android.cts.tradefed.result.TestResultRepo;
 import com.android.cts.tradefed.testtype.ITestPackageRepo;
 import com.android.cts.tradefed.testtype.TestPackageRepo;
 import com.android.cts.util.AbiUtils;
-import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.command.Console;
 import com.android.tradefed.config.ArgsOptionParser;
 import com.android.tradefed.config.ConfigurationException;
@@ -49,8 +48,7 @@ public class CtsConsole extends Console {
 
     protected static final String ADD_PATTERN = "a(?:dd)?";
 
-    private IFolderBuildInfo mBuildInfo = null;
-    private CtsBuildHelper mBuildHelper = null;
+    private CtsBuildHelper mCtsBuild = null;
 
     CtsConsole() {
         super();
@@ -59,7 +57,8 @@ public class CtsConsole extends Console {
     @Override
     public void run() {
         printLine(String.format("Android CTS %s build:%s",
-                CtsBuildProvider.CTS_BUILD_VERSION, getCtsBuildInfo().getBuildId()));
+                CtsBuildProvider.CTS_BUILD_VERSION,
+                CtsBuildProvider.getBuildNumber()));
         super.run();
     }
 
@@ -72,7 +71,7 @@ public class CtsConsole extends Console {
         trie.put(new Runnable() {
             @Override
             public void run() {
-                CtsBuildHelper ctsBuild = getCtsBuildHelper();
+                CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
                     listPlans(ctsBuild);
                 }
@@ -81,7 +80,7 @@ public class CtsConsole extends Console {
         trie.put(new Runnable() {
             @Override
             public void run() {
-                CtsBuildHelper ctsBuild = getCtsBuildHelper();
+                CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
                     listPackages(ctsBuild);
                 }
@@ -90,7 +89,7 @@ public class CtsConsole extends Console {
         trie.put(new Runnable() {
             @Override
             public void run() {
-                CtsBuildHelper ctsBuild = getCtsBuildHelper();
+                CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
                     listResults(ctsBuild);
                 }
@@ -117,7 +116,7 @@ public class CtsConsole extends Console {
                 for (int i = 2; i < args.size(); i++) {
                     flatArgs[i - 2] = args.get(i).get(0);
                 }
-                CtsBuildHelper ctsBuild = getCtsBuildHelper();
+                CtsBuildHelper ctsBuild = getCtsBuild();
                 if (ctsBuild != null) {
                     // FIXME may want to only add certain ABIs
                     addDerivedPlan(ctsBuild, AbiUtils.getAbisSupportedByCts(), flatArgs);
@@ -233,28 +232,22 @@ public class CtsConsole extends Console {
         }
     }
 
-    private IFolderBuildInfo getCtsBuildInfo() {
-        if (mBuildInfo == null) {
-            try {
-                mBuildInfo = (IFolderBuildInfo) new CtsBuildProvider().getBuild();
-            } catch (IllegalArgumentException e) {
+    private CtsBuildHelper getCtsBuild() {
+        if (mCtsBuild == null) {
+            String ctsInstallPath = System.getProperty("CTS_ROOT");
+            if (ctsInstallPath != null) {
+                mCtsBuild = new CtsBuildHelper(new File(ctsInstallPath));
+                try {
+                    mCtsBuild.validateStructure();
+                } catch (FileNotFoundException e) {
+                    printLine(String.format("Invalid cts install: %s", e.getMessage()));
+                    mCtsBuild = null;
+                }
+            } else {
                 printLine("Could not find CTS install location: CTS_ROOT env variable not set");
             }
         }
-        return mBuildInfo;
-    }
-
-    private CtsBuildHelper getCtsBuildHelper() {
-        if (mBuildHelper == null) {
-            try {
-                mBuildHelper = new CtsBuildHelper(getCtsBuildInfo());
-                mBuildHelper.validateStructure();
-            } catch (FileNotFoundException e) {
-                printLine(String.format("Invalid cts install: %s", e.getMessage()));
-                mBuildHelper = null;
-            }
-        }
-        return mBuildHelper;
+        return mCtsBuild;
     }
 
     public static void main(String[] args) throws InterruptedException, ConfigurationException {

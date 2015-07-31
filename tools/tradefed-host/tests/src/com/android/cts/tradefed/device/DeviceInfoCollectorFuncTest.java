@@ -50,9 +50,7 @@ public class DeviceInfoCollectorFuncTest extends DeviceTestCase {
         buildInfo = new BuildInfo();
         mResultDir = FileUtil.createTempDir("cts-result-dir");
         mMockCtsBuildInfo = EasyMock.createMock(ICtsBuildInfo.class);
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put(CtsXmlResultReporter.CTS_RESULT_DIR, mResultDir);
-        EasyMock.expect(mMockCtsBuildInfo.getBuildAttributes()).andStubReturn(attributes);
+        EasyMock.expect(mMockCtsBuildInfo.getResultDir()).andStubReturn(mResultDir);
         EasyMock.replay(mMockCtsBuildInfo);
 
         assertNotNull(getDevice().getSerialNumber());
