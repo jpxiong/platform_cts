@@ -648,23 +648,22 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkMisc(String[] parts) {
-        assertTrue(parts.length >= 20);
+        assertTrue(parts.length >= 19);
         assertInteger(parts[4]);      // screenOnTime
         assertInteger(parts[5]);      // phoneOnTime
-        assertInteger(parts[6]);      // wifiOnTime
-        assertInteger(parts[7]);      // wifiRunningTime
-        assertInteger(parts[8]);      // bluetoothOnTime
-        assertInteger(parts[9]);      // mobileRxTotalBytes
-        assertInteger(parts[10]);     // mobileTxTotalBytes
-        assertInteger(parts[11]);     // wifiRxTotalBytes
-        assertInteger(parts[12]);     // wifiTxTotalBytes
-        assertInteger(parts[13]);     // fullWakeLockTimeTotal
-        assertInteger(parts[14]);     // partialWakeLockTimeTotal
-        assertEquals("0", parts[15]); // legacy input event count
-        assertInteger(parts[16]);     // mobileRadioActiveTime
-        assertInteger(parts[17]);     // mobileRadioActiveAdjustedTime
-        assertInteger(parts[18]);     // interactiveTime
-        assertInteger(parts[19]);     // lowPowerModeEnabledTime
+        assertInteger(parts[6]);      // fullWakeLockTimeTotal
+        assertInteger(parts[7]);      // partialWakeLockTimeTotal
+        assertInteger(parts[8]);      // mobileRadioActiveTime
+        assertInteger(parts[9]);      // mobileRadioActiveAdjustedTime
+        assertInteger(parts[10]);     // interactiveTime
+        assertInteger(parts[11]);     // lowPowerModeEnabledTime
+        assertInteger(parts[12]);     // connChanges
+        assertInteger(parts[13]);     // deviceIdleModeEnabledTime
+        assertInteger(parts[14]);     // deviceIdleModeEnabledCount
+        assertInteger(parts[15]);     // deviceIdlingTime
+        assertInteger(parts[16]);     // deviceIdlingCount
+        assertInteger(parts[17]);     // mobileRadioActiveCount
+        assertInteger(parts[18]);     // mobileRadioActiveUnknownTime
     }
 
     private void checkGlobalNetwork(String[] parts) {
@@ -784,13 +783,14 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkChargeDischargeStep(String[] parts) {
-        assertEquals(8, parts.length);
+        assertEquals(9, parts.length);
         assertInteger(parts[4]); // duration
         if (!parts[5].equals("?")) {
             assertInteger(parts[5]); // level
         }
         assertNotNull(parts[6]); // screen
         assertNotNull(parts[7]); // power-save
+        assertNotNull(parts[8]); // device-idle
     }
 
     private void checkDischargeTimeRemain(String[] parts) {
