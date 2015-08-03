@@ -30,6 +30,7 @@ import android.telecom.TelecomManager;
 public class MockConference extends Conference {
 
     private RemoteConference mRemoteConference = null;
+    private String mDtmfString = "";
 
     public MockConference(PhoneAccountHandle phoneAccount) {
         super(phoneAccount);
@@ -119,11 +120,33 @@ public class MockConference extends Conference {
         }
     }
 
+    @Override
+    public void onPlayDtmfTone(char c) {
+        super.onPlayDtmfTone(c);
+        mDtmfString += c;
+        if (mRemoteConference != null) {
+            mRemoteConference.playDtmfTone(c);
+        }
+    }
+
+    @Override
+    public void onStopDtmfTone() {
+        super.onStopDtmfTone();
+        mDtmfString += ".";
+        if (mRemoteConference != null) {
+            mRemoteConference.stopDtmfTone();
+        }
+    }
+
     public void setRemoteConference(RemoteConference remoteConference) {
         mRemoteConference = remoteConference;
     }
 
     public RemoteConference getRemoteConference() {
         return mRemoteConference;
+    }
+
+    public String getDtmfString() {
+        return mDtmfString;
     }
 }
