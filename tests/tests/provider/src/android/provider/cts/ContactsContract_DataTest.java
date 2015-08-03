@@ -22,7 +22,6 @@ import static android.provider.ContactsContract.CommonDataKinds;
 import android.content.ContentProviderClient;
 import android.content.ContentResolver;
 import android.content.ContentValues;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
@@ -402,7 +401,7 @@ public class ContactsContract_DataTest extends InstrumentationTestCase {
                         Data.STATUS_ICON,
                         Data.TIMES_USED,
                         Data.LAST_TIME_USED},
-                new long[]{rawContact.getId()}
+                new long[]{contactId}
         );
     }
 
