@@ -31,6 +31,7 @@ import android.media.MediaCodecInfo.VideoCapabilities;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.util.Log;
+import android.util.Range;
 import android.view.Surface;
 
 import com.android.cts.util.ResultType;
@@ -58,6 +59,8 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
     LinkedList<ByteBuffer> mSamplesInMemory = new LinkedList<ByteBuffer>();
     private static final int MOVING_AVERAGE_NUM = 10;
     private MediaFormat mDecOutputFormat;
+    private double[] mMeasuredFps;
+    private String[] mResultRawData;
 
     private Resources mResources;
     private DeviceReportLog mReportLog;
@@ -104,6 +107,8 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
             }
 
             boolean pass = false;
+            mMeasuredFps = new double[NUMBER_OF_REPEAT];
+            mResultRawData = new String[NUMBER_OF_REPEAT];
             Log.d(TAG, "testing " + name);
             for (int i = 0; i < NUMBER_OF_REPEAT; ++i) {
                 // Decode to Surface.
@@ -118,7 +123,16 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
                 Log.d(TAG, "round #" + i + " decode to buffer");
                 doDecode(name, video, width, height, null, i);
             }
-            assertTrue("Measured fps doesn't match with reported achievable frame rates.", pass);
+
+            if (!pass) {
+                Range<Double> reportedRange =
+                    MediaUtils.getAchievableFrameRatesFor(name, mime, width, height);
+                String failMessage =
+                    MediaUtils.getErrorMessage(reportedRange, mMeasuredFps, mResultRawData);
+                fail(failMessage);
+            }
+            mMeasuredFps = null;
+            mResultRawData = null;
         }
         // use 0 for summary line, detail for each test config is in the report.
         mReportLog.printSummary("average fps", 0, ResultType.HIGHER_BETTER, ResultUnit.FPS);
@@ -276,9 +290,15 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
         double decMax = Stat.getMax(avgs);
         double decAvg = Stat.getAverage(avgs);
         double decStdev = MediaUtils.getStdev(avgs);
-        MediaUtils.logResults(mReportLog, testConfig, decMin, decMax, decAvg, decStdev);
+        String result =
+                MediaUtils.logResults(mReportLog, testConfig, decMin, decMax, decAvg, decStdev);
+        fps = 1000000000 / decMin;
+        if (surface != null) {
+            mMeasuredFps[round] = fps;
+            mResultRawData[round] = result;
+        }
 
-        return MediaUtils.verifyResults(name, mime, w, h, 1000000000 / decMin);
+        return MediaUtils.verifyResults(name, mime, w, h, fps);
     }
 
     public void testH2640320x0240Other() throws Exception {
