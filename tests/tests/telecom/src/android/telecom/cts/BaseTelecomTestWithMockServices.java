@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.telecom.Call;
 import android.telecom.CallAudioState;
 import android.telecom.Conference;
@@ -75,6 +76,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     Context mContext;
     TelecomManager mTelecomManager;
+    InvokeCounter mOnBringToForegroundCounter;
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
     MockConnectionService connectionService = null;
@@ -185,9 +187,17 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             public void onCallStateChanged(Call call, int newState) {
                 Log.i(TAG, "onCallStateChanged, Call: " + call + ", New State: " + newState);
             }
+            @Override
+            public void onBringToForeground(boolean showDialpad) {
+                mOnBringToForegroundCounter.invoke(showDialpad);
+            }
         };
 
         MockInCallService.setCallbacks(mInCallCallbacks);
+
+        // TODO: If more InvokeCounters are added in the future, consider consolidating them into a
+        // single Collection.
+        mOnBringToForegroundCounter = new InvokeCounter("OnBringToForeground");
     }
 
     /**
@@ -722,5 +732,69 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     protected interface Work {
         void doWork();
+    }
+
+    /**
+     * Utility class used to track the number of times a callback was invoked, and the arguments it
+     * was invoked with. This class is prefixed Invoke rather than the more typical Call for
+     * disambiguation purposes.
+     */
+    protected final class InvokeCounter {
+        private final String mName;
+        private final Object mLock = new Object();
+        private final ArrayList<Object[]> mInvokeArgs = new ArrayList<>();
+
+        private int mInvokeCount;
+
+        public InvokeCounter(String callbackName) {
+            mName = callbackName;
+        }
+
+        public void invoke(Object... args) {
+            synchronized (mLock) {
+                mInvokeCount++;
+                mInvokeArgs.add(args);
+                mLock.notifyAll();
+            }
+        }
+
+        public Object[] getArgs(int index) {
+            synchronized (mLock) {
+                return mInvokeArgs.get(index);
+            }
+        }
+
+        public int getInvokeCount() {
+            synchronized (mLock) {
+                return mInvokeCount;
+            }
+        }
+
+        public void waitForCount(int count, long timeoutMillis) {
+            waitForCount(count, timeoutMillis, null);
+        }
+
+        public void waitForCount(int count, long timeoutMillis, String message) {
+            synchronized (mLock) {
+                final long startTimeMillis = SystemClock.uptimeMillis();
+                while (mInvokeCount < count) {
+                    try {
+                        final long elapsedTimeMillis = SystemClock.uptimeMillis() - startTimeMillis;
+                        final long remainingTimeMillis = timeoutMillis - elapsedTimeMillis;
+                        if (remainingTimeMillis <= 0) {
+                            if (message != null) {
+                                fail(message);
+                            } else {
+                                fail(String.format("Expected %s to be called %d times.", mName,
+                                        count));
+                            }
+                        }
+                        mLock.wait(timeoutMillis);
+                    } catch (InterruptedException ie) {
+                        /* ignore */
+                    }
+                }
+            }
+        }
     }
 }
