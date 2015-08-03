@@ -630,6 +630,23 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         );
     }
 
+    void assertDtmfString(final MockConference conference, final String dtmfString) {
+        waitUntilConditionIsTrueOrTimeout(new Condition() {
+                @Override
+                public Object expected() {
+                    return dtmfString;
+                }
+
+                @Override
+                public Object actual() {
+                    return conference.getDtmfString();
+                }
+            },
+            WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+            "DTMF string should be equivalent to entered DTMF characters: " + dtmfString
+        );
+    }
+
     void assertCallDisplayName(final Call call, final String name) {
         waitUntilConditionIsTrueOrTimeout(
                 new Condition() {
