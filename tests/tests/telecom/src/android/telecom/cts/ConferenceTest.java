@@ -18,12 +18,18 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
+import android.os.Bundle;
 import android.telecom.Call;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
+import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccount;
 import android.telecom.PhoneAccountHandle;
+import android.telecom.StatusHints;
+import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
+
+import java.util.ArrayList;
 
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
@@ -135,6 +141,120 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
 
     }
 
+    public void testConferenceSetters() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        final Call conf = mInCallService.getLastConferenceCall();
+        assertCallState(conf, Call.STATE_ACTIVE);
+
+        placeAndVerifyCall();
+        MockConnection newConnection = verifyConnectionForOutgoingCall(2);
+        final Call newCall = mInCallService.getLastCall();
+
+        ArrayList<Connection> connectionList = new ArrayList<>();
+        connectionList.add(newConnection);
+        ArrayList<Call> callList = new ArrayList<>();
+        callList.add(newCall);
+
+        assertFalse(conf.getDetails().can(Call.Details.CAPABILITY_MUTE));
+        int capabilities = mConferenceObject.getConnectionCapabilities() |
+                Connection.CAPABILITY_MUTE;
+        mConferenceObject.setConnectionCapabilities(capabilities);
+        assertCallCapability(conf, Call.Details.CAPABILITY_MUTE);
+
+        assertFalse(conf.getConferenceableCalls().contains(newCall));
+        mConferenceObject.setConferenceableConnections(connectionList);
+        assertCallConferenceableList(conf, callList);
+
+        mConferenceObject.setConnectionTime(0);
+
+        Bundle extras = new Bundle();
+        extras.putString(TelecomManager.EXTRA_CALL_DISCONNECT_MESSAGE, "Test");
+        assertNull(conf.getDetails().getExtras());
+        mConferenceObject.setExtras(extras);
+        assertCallExtras(conf, TelecomManager.EXTRA_CALL_DISCONNECT_MESSAGE, "Test");
+
+        StatusHints hints = new StatusHints("Test", null, null);
+        assertNull(conf.getDetails().getStatusHints());
+        mConferenceObject.setStatusHints(hints);
+        assertCallStatusHints(conf, hints);
+
+        assertFalse(conf.getChildren().contains(newCall));
+        mConferenceObject.addConnection(newConnection);
+        assertCallChildrenContains(conf, newCall, true);
+
+        assertTrue(conf.getChildren().contains(newCall));
+        mConferenceObject.removeConnection(newConnection);
+        assertCallChildrenContains(conf, newCall, false);
+
+        assertVideoState(conf, VideoProfile.STATE_AUDIO_ONLY);
+        final MockVideoProvider mockVideoProvider = mConnection1.getMockVideoProvider();
+        mConferenceObject.setVideoProvider(mConnection1, mockVideoProvider);
+        mConferenceObject.setVideoState(mConnection1, VideoProfile.STATE_BIDIRECTIONAL);
+        assertVideoState(conf, VideoProfile.STATE_BIDIRECTIONAL);
+
+        // Dialing state is unsupported for conference calls. so, the state remains active.
+        mConferenceObject.setDialing();
+        assertCallState(conf, Call.STATE_ACTIVE);
+
+        mConferenceObject.setOnHold();
+        assertCallState(conf, Call.STATE_HOLDING);
+
+        mConferenceObject.setActive();
+        assertCallState(conf, Call.STATE_ACTIVE);
+
+        mConferenceObject.setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
+        assertCallState(conf, Call.STATE_DISCONNECTED);
+
+        // Destroy state is unsupported for conference calls. so, the state remains active.
+        mConferenceObject.destroy();
+        assertCallState(conf, Call.STATE_DISCONNECTED);
+    }
+
+    public void testConferenceAddAndRemoveConnection() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        final Call conf = mInCallService.getLastConferenceCall();
+        assertCallState(conf, Call.STATE_ACTIVE);
+
+        placeAndVerifyCall();
+        MockConnection newConnection = verifyConnectionForOutgoingCall(2);
+        final Call newCall = mInCallService.getLastCall();
+
+        ArrayList<Connection> connectionList = new ArrayList<>();
+        connectionList.add(newConnection);
+        ArrayList<Call> callList = new ArrayList<>();
+        callList.add(newCall);
+
+        assertFalse(conf.getChildren().contains(newCall));
+        mConferenceObject.addConnection(newConnection);
+        assertCallChildrenContains(conf, newCall, true);
+
+        assertTrue(conf.getChildren().contains(newCall));
+        mConferenceObject.removeConnection(newConnection);
+        assertCallChildrenContains(conf, newCall, false);
+    }
+
+    public void testConferenceDTMFTone() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        final Call conf = mInCallService.getLastConferenceCall();
+        assertCallState(conf, Call.STATE_ACTIVE);
+
+        assertTrue(mConferenceObject.getDtmfString().isEmpty());
+        conf.playDtmfTone('1');
+        assertDtmfString(mConferenceObject, "1");
+        conf.stopDtmfTone();
+        assertDtmfString(mConferenceObject, "1.");
+        conf.playDtmfTone('3');
+        assertDtmfString(mConferenceObject, "1.3");
+        conf.stopDtmfTone();
+        assertDtmfString(mConferenceObject, "1.3.");
+    }
+
     private void verifyConferenceObject(MockConference mConferenceObject, MockConnection connection1,
             MockConnection connection2) {
         assertNull(mConferenceObject.getCallAudioState());
@@ -191,5 +311,116 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
 
         setAndVerifyConferenceablesForOutgoingConnection(0);
         setAndVerifyConferenceablesForOutgoingConnection(1);
+    }
+
+    private void assertCallCapability(final Call call, final int capability) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().can(capability);
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should have capability " + capability
+        );
+    }
+
+    private void assertCallConnectTime(final Call call, final int connectTime) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return connectTime;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().getConnectTimeMillis();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should have connect time " + connectTime
+        );
+    }
+
+    private void assertCallExtras(final Call call, final String key, final String value) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return value;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().getExtras() != null ?
+                            call.getDetails().getExtras().getString(key) : null;
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should have extra " + key + "=" + value
+        );
+    }
+
+    private void assertCallStatusHints(final Call call, final StatusHints hints) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return hints;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().getStatusHints();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should have status hints " + hints
+        );
+    }
+
+    private void assertCallChildrenContains(final Call call, final Call childrenCall,
+                                            final boolean expected) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return expected;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getChildren().contains(childrenCall);
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                expected == true ? "Call should have child call " + childrenCall :
+                        "Call should not have child call " + childrenCall
+        );
+    }
+
+    private void assertVideoState(final Call call, final int videoState) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return videoState;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return call.getDetails().getVideoState();
+                    }
+                },
+                TestUtils.WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Call should be in videoState " + videoState
+        );
     }
 }
