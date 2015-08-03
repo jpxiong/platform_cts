@@ -47,6 +47,7 @@ public class MockInCallService extends InCallService {
         public void onCallDestroyed(Call call) {};
         public void onDetailsChanged(Call call, Call.Details details) {};
         public void onCanAddCallsChanged(boolean canAddCalls) {}
+        public void onBringToForeground(boolean showDialpad) {}
 
         final public MockInCallService getService() {
             return mService;
@@ -179,6 +180,14 @@ public class MockInCallService extends InCallService {
         super.onCanAddCallChanged(canAddCall);
         if (getCallbacks() != null) {
             getCallbacks().onCanAddCallsChanged(canAddCall);
+        }
+    }
+
+    @Override
+    public void onBringToForeground(boolean showDialpad) {
+        super.onBringToForeground(showDialpad);
+        if (getCallbacks() != null) {
+            getCallbacks().onBringToForeground(showDialpad);
         }
     }
 

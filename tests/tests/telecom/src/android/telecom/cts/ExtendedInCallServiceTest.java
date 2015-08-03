@@ -18,13 +18,14 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
+import android.content.Context;
 import android.telecom.CallAudioState;
 import android.telecom.Call;
 import android.telecom.Connection;
 import android.telecom.ConnectionService;
 import android.telecom.InCallService;
+import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
-import android.telecom.cts.BaseTelecomTestWithMockServices.Condition;
 
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
@@ -298,6 +299,38 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
 
         assertCanAddCall(inCallService, false,
                 "Should not be able to add call with two calls already present");
+    }
+
+    public void testOnBringToForeground() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        verifyConnectionForOutgoingCall();
+
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+
+        final Call call = inCallService.getLastCall();
+
+        assertCallState(call, Call.STATE_DIALING);
+
+        assertEquals(0, mOnBringToForegroundCounter.getInvokeCount());
+
+        final TelecomManager tm =
+            (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
+
+        tm.showInCallScreen(false);
+
+        mOnBringToForegroundCounter.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+
+        assertFalse((Boolean) mOnBringToForegroundCounter.getArgs(0)[0]);
+
+        tm.showInCallScreen(true);
+
+        mOnBringToForegroundCounter.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+
+        assertTrue((Boolean) mOnBringToForegroundCounter.getArgs(1)[0]);
     }
 
     private void assertCanAddCall(final InCallService inCallService, final boolean canAddCall,
