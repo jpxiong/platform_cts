@@ -40,6 +40,7 @@ import android.provider.Contacts.PeopleColumns;
 import android.provider.Contacts.Phones;
 import android.provider.Contacts.Photos;
 import android.provider.Contacts.Settings;
+import android.provider.ContactsContract;
 import android.telephony.PhoneNumberUtils;
 import android.test.InstrumentationTestCase;
 
@@ -56,7 +57,7 @@ public class ContactsTest extends InstrumentationTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         mContentResolver = getInstrumentation().getTargetContext().getContentResolver();
-        mProvider = mContentResolver.acquireContentProviderClient(Contacts.AUTHORITY);
+        mProvider = mContentResolver.acquireContentProviderClient(ContactsContract.AUTHORITY);
         mCallLogProvider = mContentResolver.acquireContentProviderClient(CallLog.AUTHORITY);
     }
 
