@@ -539,7 +539,7 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 double encMax = Stat.getMax(avgs);
                 double encAvg = MediaUtils.getAverage(mEncoderFrameTimeDiff[i]);
                 double encStdev = MediaUtils.getStdev(avgs);
-                String prefix = "codec=" + encoderName + " size=" + w + "x" + h + " round=" + i +
+                String prefix = "codec=" + encoderName + " round=" + i +
                         " EncInputFormat=" + mEncInputFormat +
                         " EncOutputFormat=" + mEncOutputFormat;
                 MediaUtils.logResults(mReportLog, prefix, encMin, encMax, encAvg, encStdev);

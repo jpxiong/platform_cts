@@ -264,7 +264,7 @@ public class VideoDecoderPerfTest extends MediaPlayerTestBase {
 
         String testConfig = "codec=" + name +
                 " decodeto=" + ((surface == null) ? "buffer" : "surface") +
-                " size=" + w + "x" + h + " round=" + round +
+                " mime=" + mime + " round=" + round +
                 " DecOutputFormat=" + mDecOutputFormat;
 
         String message = "average fps for " + testConfig;
