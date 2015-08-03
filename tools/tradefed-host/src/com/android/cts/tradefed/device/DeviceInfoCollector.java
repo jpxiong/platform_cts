@@ -15,10 +15,11 @@
  */
 package com.android.cts.tradefed.device;
 
-import com.android.cts.tradefed.build.ICtsBuildInfo;
 import com.android.cts.util.AbiUtils;
+import com.android.cts.tradefed.result.CtsXmlResultReporter;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
+import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.result.ITestInvocationListener;
@@ -115,12 +116,12 @@ public class DeviceInfoCollector {
 
     private static void pullExtendedDeviceInfoResults(ITestDevice device, IBuildInfo buildInfo)
             throws DeviceNotAvailableException {
-        if (!(buildInfo instanceof ICtsBuildInfo)) {
+        if (!(buildInfo instanceof IFolderBuildInfo)) {
             Log.e(LOG_TAG, "Invalid instance of buildInfo");
             return;
         }
-        ICtsBuildInfo ctsBuildInfo = (ICtsBuildInfo) buildInfo;
-        File localResultDir = ctsBuildInfo.getResultDir();
+        File localResultDir = new File(buildInfo.getBuildAttributes().get(
+                CtsXmlResultReporter.CTS_RESULT_DIR));
         if (localResultDir == null || !localResultDir.isDirectory()) {
             Log.e(LOG_TAG, "Local result directory is null or is not a directory");
             return;
