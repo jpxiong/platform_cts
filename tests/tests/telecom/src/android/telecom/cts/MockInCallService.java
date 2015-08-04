@@ -17,6 +17,7 @@
 package android.telecom.cts;
 
 import android.telecom.Call;
+import android.telecom.CallAudioState;
 import android.telecom.InCallService;
 import android.util.ArrayMap;
 
@@ -48,6 +49,7 @@ public class MockInCallService extends InCallService {
         public void onDetailsChanged(Call call, Call.Details details) {};
         public void onCanAddCallsChanged(boolean canAddCalls) {}
         public void onBringToForeground(boolean showDialpad) {}
+        public void onCallAudioStateChanged(CallAudioState audioState) {}
 
         final public MockInCallService getService() {
             return mService;
@@ -188,6 +190,14 @@ public class MockInCallService extends InCallService {
         super.onBringToForeground(showDialpad);
         if (getCallbacks() != null) {
             getCallbacks().onBringToForeground(showDialpad);
+        }
+    }
+
+    @Override
+    public void onCallAudioStateChanged(CallAudioState audioState) {
+        super.onCallAudioStateChanged(audioState);
+        if (getCallbacks() != null) {
+            getCallbacks().onCallAudioStateChanged(audioState);
         }
     }
 

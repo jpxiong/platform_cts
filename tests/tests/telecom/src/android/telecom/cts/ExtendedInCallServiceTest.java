@@ -95,15 +95,21 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         final Call call = inCallService.getLastCall();
         assertCallState(call, Call.STATE_DIALING);
 
+        final int currentInvokeCount = mOnCallAudioStateChangedCounter.getInvokeCount();
+
         // Only test speaker and earpiece modes because the other modes are dependent on having
         // a bluetooth headset or wired headset connected.
 
         // Explicitly call super implementation to enable detection of CTS coverage
         ((InCallService) inCallService).setAudioRoute(CallAudioState.ROUTE_SPEAKER);
+        mOnCallAudioStateChangedCounter.waitForCount(currentInvokeCount + 1,
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
         assertAudioRoute(connection, CallAudioState.ROUTE_SPEAKER);
         assertAudioRoute(inCallService, CallAudioState.ROUTE_SPEAKER);
 
         inCallService.setAudioRoute(CallAudioState.ROUTE_EARPIECE);
+        mOnCallAudioStateChangedCounter.waitForCount(currentInvokeCount + 2,
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
         assertAudioRoute(connection, CallAudioState.ROUTE_EARPIECE);
         assertAudioRoute(inCallService, CallAudioState.ROUTE_EARPIECE);
     }
