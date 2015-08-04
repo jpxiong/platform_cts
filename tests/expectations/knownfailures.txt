@@ -33,5 +33,21 @@
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
   name: "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
   bug: 11352697
+},
+{
+  name: "android.os.cts.MemoryFileTest#testLength",
+  bug: 17046287
+},
+{
+  name: "libcore.javax.net.ssl.SSLSocketTest#test_SSLSocket_getSupportedCipherSuites_connect",
+  bug: 18033537
+},
+{
+  name: "libcore.java.net.URLConnectionTest#testSslFallback",
+  bug: 18033285
+},
+{
+  name: "libcore.javax.net.ssl.SSLContextTest#test_SSLContext_getSupportedSSLParameters",
+  bug: 18036008
 }
 ]
