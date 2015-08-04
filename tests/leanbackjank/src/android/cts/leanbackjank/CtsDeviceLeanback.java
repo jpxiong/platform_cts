@@ -16,6 +16,7 @@ package android.cts.leanbackjank;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.cts.jank.leanback.IntentKeys;
 import android.os.SystemClock;
 import android.support.test.jank.GfxMonitor;
 import android.support.test.jank.JankTest;
@@ -26,8 +27,15 @@ import android.util.Log;
 
 public class CtsDeviceLeanback extends CtsJankTestBase {
     private static final String TAG = "CtsDeviceLeanback";
-    private static final long WAIT_TIMEOUT = 5 * 1000;
-    private static final long POST_SCROLL_IDLE_TIME = 3 * 1000;
+    private static final int MILLIS_PER_SECOND = 1000;
+    private static final long WAIT_TIMEOUT = 5 * MILLIS_PER_SECOND;
+    private static final int SCROLL_COUNT = 100;
+    private static final int SCROLL_INTERVAL_MILLIS = 200;
+    private static final int PRE_SCROLL_DELAY_MILLIS = 0;
+    private static final int PRE_SCROLL_IDLE_TIME = 2 * MILLIS_PER_SECOND;
+    private static final int SAMPLING_DURATION_SECONDS = 3;
+    private static final int SAMPLING_DURATION_MILLIS =
+            SAMPLING_DURATION_SECONDS * MILLIS_PER_SECOND;
     private final static String APP_PACKAGE = "android.cts.jank.leanback";
     private final static String JAVA_PACKAGE = "android.cts.jank.leanback.ui";
     private final static String CLASS = JAVA_PACKAGE + ".MainActivity";
@@ -37,11 +45,19 @@ public class CtsDeviceLeanback extends CtsJankTestBase {
         super.setUp();
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setComponent(new ComponentName(APP_PACKAGE, CLASS));
+
+        // Trigger automated scroll of the helper app.
+        intent.putExtra(IntentKeys.SCROLL_DELAY, PRE_SCROLL_DELAY_MILLIS);
+        intent.putExtra(IntentKeys.SCROLL_COUNT, SCROLL_COUNT);
+        intent.putExtra(IntentKeys.SCROLL_INTERVAL, SCROLL_INTERVAL_MILLIS);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getInstrumentation().getTargetContext().startActivity(intent);
         if (!getUiDevice().wait(Until.hasObject(By.pkg(APP_PACKAGE)), WAIT_TIMEOUT)) {
             fail("Test helper app package not found on device");
         }
+
+        // Wait until scroll animation starts.
+        SystemClock.sleep(PRE_SCROLL_IDLE_TIME);
     }
 
     @Override
@@ -50,18 +66,11 @@ public class CtsDeviceLeanback extends CtsJankTestBase {
         super.tearDown();
     }
 
-    @JankTest(expectedFrames = 10, defaultIterationCount = 2)
+    // Requires at least 30 fps on average to pass the test.
+    @JankTest(expectedFrames = 30 * SAMPLING_DURATION_SECONDS, defaultIterationCount = 2)
     @GfxMonitor(processName = APP_PACKAGE)
     @WindowContentFrameStatsMonitor
-    public void testScrollingByDpad() {
-        Log.i(TAG, "testScrolling");
-        getUiDevice().pressDPadDown();
-        getUiDevice().pressDPadDown();
-        getUiDevice().pressDPadDown();
-        getUiDevice().pressDPadUp();
-        getUiDevice().pressDPadUp();
-        getUiDevice().pressDPadUp();
-        SystemClock.sleep(POST_SCROLL_IDLE_TIME);
-        Log.i(TAG, "testScrolling end");
+    public void testScrollingByTimer() {
+        SystemClock.sleep(SAMPLING_DURATION_MILLIS);
     }
 }
