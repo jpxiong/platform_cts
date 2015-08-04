@@ -172,6 +172,29 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
                 TestUtils.SWAP_CALLER_NAME);
     }
 
+    public void testRemoteConferenceDTMFTone() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
+        assertCallState(confCall, Call.STATE_ACTIVE);
+
+        assertTrue(mConference.getDtmfString().isEmpty());
+        assertTrue(mRemoteConference.getDtmfString().isEmpty());
+        confCall.playDtmfTone('1');
+        assertDtmfString(mConference, "1");
+        assertDtmfString(mRemoteConference, "1");
+        confCall.stopDtmfTone();
+        assertDtmfString(mConference, "1.");
+        assertDtmfString(mRemoteConference, "1.");
+        confCall.playDtmfTone('3');
+        assertDtmfString(mConference, "1.3");
+        assertDtmfString(mRemoteConference, "1.3");
+        confCall.stopDtmfTone();
+        assertDtmfString(mConference, "1.3.");
+        assertDtmfString(mRemoteConference, "1.3.");
+    }
+
     private void verifyRemoteConferenceObject(RemoteConference remoteConferenceObject,
             MockConference remoteConference, MockConference conference) {
         assertEquals(remoteConference.getConnectionCapabilities(),
