@@ -80,6 +80,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     InvokeCounter mOnBringToForegroundCounter;
     InvokeCounter mOnCallAudioStateChangedCounter;
     InvokeCounter mOnPostDialWaitCounter;
+    InvokeCounter mOnCannedTextResponsesLoadedCounter;
 
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
@@ -204,6 +205,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             public void onPostDialWait(Call call, String remainingPostDialSequence) {
                 mOnPostDialWaitCounter.invoke(call, remainingPostDialSequence);
             }
+            @Override
+            public void onCannedTextResponsesLoaded(Call call, List<String> cannedTextResponses) {
+                mOnCannedTextResponsesLoadedCounter.invoke(call, cannedTextResponses);
+            }
         };
 
         MockInCallService.setCallbacks(mInCallCallbacks);
@@ -213,6 +218,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         mOnBringToForegroundCounter = new InvokeCounter("OnBringToForeground");
         mOnCallAudioStateChangedCounter = new InvokeCounter("OnCallAudioStateChanged");
         mOnPostDialWaitCounter = new InvokeCounter("OnPostDialWait");
+        mOnCannedTextResponsesLoadedCounter = new InvokeCounter("OnCannedTextResponsesLoaded");
     }
 
     /**
