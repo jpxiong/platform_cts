@@ -33,7 +33,7 @@ public class PhoneNumberTest extends InstrumentationTestCase {
         command.append("appops set ");
         command.append(getInstrumentation().getContext().getPackageName());
         command.append(" WRITE_SMS ");
-        command.append(setToSmsApp ? "allow" : "deny");
+        command.append(setToSmsApp ? "allow" : "default");
 
         ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation()
                 .executeShellCommand(command.toString());
