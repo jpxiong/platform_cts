@@ -16,12 +16,6 @@
 
 package com.android.cts.devicepolicy;
 
-import com.android.ddmlib.Log.LogLevel;
-import com.android.tradefed.device.DeviceNotAvailableException;
-import com.android.tradefed.log.LogUtil.CLog;
-
-import junit.framework.AssertionFailedError;
-
 /**
  * Set of tests for usecases that apply to profile and device owner.
  * This class is the base class of MixedProfileOwnerTest and MixedDeviceOwnerTest and is abstract
@@ -46,6 +40,7 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
     // is the user id of the created profile.
     protected int mUserId;
 
+    @Override
     protected void tearDown() throws Exception {
         if (mHasFeature) {
             getDevice().uninstallPackage(DEVICE_ADMIN_PKG);
@@ -162,6 +157,15 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         }
         installAppAsUser(PERMISSIONS_APP_APK, mUserId);
         executeDeviceTestClass(".ApplicationHiddenTest");
+    }
+
+    // TODO: Remove AccountManagementTest from XTS after GTS is released for MNC.
+    public void testAccountManagement() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+
+        executeDeviceTestClass(".AccountManagementTest");
     }
 
     protected void executeDeviceTestClass(String className) throws Exception {
