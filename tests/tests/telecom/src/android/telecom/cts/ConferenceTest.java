@@ -20,6 +20,7 @@ import static android.telecom.cts.TestUtils.*;
 
 import android.os.Bundle;
 import android.telecom.Call;
+import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.DisconnectCause;
@@ -44,7 +45,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     private Call mCall1, mCall2;
     private MockConnection mConnection1, mConnection2;
     MockInCallService mInCallService;
-    MockConference mConferenceObject;
+    Conference mConferenceObject;
 
     @Override
     protected void setUp() throws Exception {
@@ -53,7 +54,8 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         if (shouldTestTelecom(mContext)) {
             addOutgoingCalls();
             addConferenceCall(mCall1, mCall2);
-            mConferenceObject = verifyConferenceForOutgoingCall();
+            // Use vanilla conference object so that the CTS coverage tool detects the useage.
+            mConferenceObject = (Conference)verifyConferenceForOutgoingCall();
             verifyConferenceObject(mConferenceObject, mConnection1, mConnection2);
         }
     }
@@ -244,18 +246,18 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
         final Call conf = mInCallService.getLastConferenceCall();
         assertCallState(conf, Call.STATE_ACTIVE);
 
-        assertTrue(mConferenceObject.getDtmfString().isEmpty());
+        assertTrue(((MockConference)mConferenceObject).getDtmfString().isEmpty());
         conf.playDtmfTone('1');
-        assertDtmfString(mConferenceObject, "1");
+        assertDtmfString((MockConference)mConferenceObject, "1");
         conf.stopDtmfTone();
-        assertDtmfString(mConferenceObject, "1.");
+        assertDtmfString((MockConference)mConferenceObject, "1.");
         conf.playDtmfTone('3');
-        assertDtmfString(mConferenceObject, "1.3");
+        assertDtmfString((MockConference)mConferenceObject, "1.3");
         conf.stopDtmfTone();
-        assertDtmfString(mConferenceObject, "1.3.");
+        assertDtmfString((MockConference)mConferenceObject, "1.3.");
     }
 
-    private void verifyConferenceObject(MockConference mConferenceObject, MockConnection connection1,
+    private void verifyConferenceObject(Conference mConferenceObject, MockConnection connection1,
             MockConnection connection2) {
         assertNull(mConferenceObject.getCallAudioState());
         assertTrue(mConferenceObject.getConferenceableConnections().isEmpty());

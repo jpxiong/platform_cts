@@ -18,12 +18,17 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.telecom.Call;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
+import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.RemoteConference;
 import android.telecom.RemoteConnection;
+import android.telecom.TelecomManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,6 +200,236 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
         assertDtmfString(mRemoteConference, "1.3.");
     }
 
+    public void testRemoteConferenceCallbacks_StateChange() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_StateChange");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onStateChanged(RemoteConference conference, int oldState, int newState) {
+                super.onStateChanged(conference, oldState, newState);
+                callbackInvoker.invoke(conference, oldState, newState);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        mRemoteConference.setOnHold();
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        assertEquals(Connection.STATE_ACTIVE, callbackInvoker.getArgs(0)[1]);
+        assertEquals(Connection.STATE_HOLDING, callbackInvoker.getArgs(0)[2]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_Disconnect() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_Disconnect");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onDisconnected(RemoteConference conference,
+                                       DisconnectCause disconnectCause) {
+                super.onDisconnected(conference, disconnectCause);
+                callbackInvoker.invoke(conference, disconnectCause);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        DisconnectCause cause = new DisconnectCause(DisconnectCause.LOCAL);
+        mRemoteConference.setDisconnected(cause);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        assertEquals(cause, callbackInvoker.getArgs(0)[1]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_ConnectionAdd() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_ConnectionAdd");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onConnectionAdded(RemoteConference conference,
+                                          RemoteConnection connection) {
+                super.onConnectionAdded(conference, connection);
+                callbackInvoker.invoke(conference, connection);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        placeAndVerifyCall();
+        RemoteConnection newRemoteConnectionObject =
+                verifyConnectionForOutgoingCall(1).getRemoteConnection();
+        MockConnection newConnection = verifyConnectionForOutgoingCallOnRemoteCS(2);
+        mRemoteConference.addConnection(newConnection);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        // No "equals" method in RemoteConnection
+        //assertEquals(newRemoteConnectionObject, callbackInvoker.getArgs(0)[1]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_ConnectionRemove() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_ConnectionRemove");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onConnectionRemoved(RemoteConference conference,
+                                            RemoteConnection connection) {
+                super.onConnectionRemoved(conference, connection);
+                callbackInvoker.invoke(conference, connection);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        placeAndVerifyCall();
+        RemoteConnection newRemoteConnectionObject =
+                verifyConnectionForOutgoingCall(1).getRemoteConnection();
+        MockConnection newConnection = verifyConnectionForOutgoingCallOnRemoteCS(2);
+        mRemoteConference.addConnection(newConnection);
+        mRemoteConference.removeConnection(newConnection);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        //assertEquals(newRemoteConnectionObject, callbackInvoker.getArgs(0)[1]);
+        // No "equals" method in RemoteConnection
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_ConnectionCapabilities() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_ConnectionCapabilities");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onConnectionCapabilitiesChanged(
+                    RemoteConference conference,
+                    int connectionCapabilities) {
+                super.onConnectionCapabilitiesChanged(conference, connectionCapabilities);
+                callbackInvoker.invoke(conference, connectionCapabilities);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        int capabilities = mRemoteConference.getConnectionCapabilities() | Connection.CAPABILITY_MUTE;
+        mRemoteConference.setConnectionCapabilities(capabilities);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        assertEquals(capabilities, callbackInvoker.getArgs(0)[1]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_ConferenceableConnections() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_ConferenceableConnections");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onConferenceableConnectionsChanged(
+                    RemoteConference conference,
+                    List<RemoteConnection> conferenceableConnections) {
+                super.onConferenceableConnectionsChanged(conference, conferenceableConnections);
+                callbackInvoker.invoke(conference, conferenceableConnections);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        placeAndVerifyCall();
+        RemoteConnection newRemoteConnectionObject =
+            verifyConnectionForOutgoingCall(1).getRemoteConnection();
+        MockConnection newConnection = verifyConnectionForOutgoingCallOnRemoteCS(1);
+        ArrayList<Connection> confList = new ArrayList<>();
+        confList.add(newConnection);
+        mRemoteConference.setConferenceableConnections(confList);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        // No "equals" method in RemoteConnection
+        //assertTrue(((List<RemoteConnection>)callbackInvoker.getArgs(0)[1]).contains(
+                //newRemoteConnectionObject));
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_Destroy() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_Destroy");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onDestroyed(RemoteConference conference) {
+                super.onDestroyed(conference);
+                callbackInvoker.invoke(conference);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        mRemoteConference.destroy();
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
+    public void testRemoteConferenceCallbacks_Extras() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        Handler handler = setupRemoteConferenceCallbacksTest();
+
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConferenceCallbacks_Extras");
+        RemoteConference.Callback callback;
+
+        callback = new RemoteConference.Callback() {
+            @Override
+            public void onExtrasChanged(RemoteConference conference, Bundle extras) {
+                super.onExtrasChanged(conference, extras);
+                callbackInvoker.invoke(conference, extras);
+            }
+        };
+        mRemoteConferenceObject.registerCallback(callback, handler);
+        Bundle extras = new Bundle();
+        extras.putString(TelecomManager.EXTRA_CALL_DISCONNECT_MESSAGE, "Test");
+        mRemoteConference.setExtras(extras);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConferenceObject, callbackInvoker.getArgs(0)[0]);
+        assertEquals(extras, callbackInvoker.getArgs(0)[1]);
+        mRemoteConferenceObject.unregisterCallback(callback);
+    }
+
     private void verifyRemoteConferenceObject(RemoteConference remoteConferenceObject,
             MockConference remoteConference, MockConference conference) {
         assertEquals(remoteConference.getConnectionCapabilities(),
@@ -336,5 +571,16 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
         mRemoteConferenceObject = mConference.getRemoteConference();
         mRemoteConnection1 = (MockConnection)mRemoteConference.getConnections().get(0);
         mRemoteConnection2 = (MockConnection)mRemoteConference.getConnections().get(1);
+    }
+
+    private Handler setupRemoteConferenceCallbacksTest() {
+        final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
+        assertCallState(confCall, Call.STATE_ACTIVE);
+
+        // Create a looper thread for the callbacks.
+        HandlerThread workerThread = new HandlerThread("CallbackThread");
+        workerThread.start();
+        Handler handler = new Handler(workerThread.getLooper());
+        return handler;
     }
 }
