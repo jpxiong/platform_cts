@@ -76,7 +76,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     Context mContext;
     TelecomManager mTelecomManager;
+
     InvokeCounter mOnBringToForegroundCounter;
+    InvokeCounter mOnCallAudioStateChangedCounter;
+
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
     MockConnectionService connectionService = null;
@@ -191,6 +194,11 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             public void onBringToForeground(boolean showDialpad) {
                 mOnBringToForegroundCounter.invoke(showDialpad);
             }
+            @Override
+            public void onCallAudioStateChanged(CallAudioState audioState) {
+                Log.i(TAG, "onCallAudioStateChanged, audioState: " + audioState);
+                mOnCallAudioStateChangedCounter.invoke(audioState);
+            }
         };
 
         MockInCallService.setCallbacks(mInCallCallbacks);
@@ -198,6 +206,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         // TODO: If more InvokeCounters are added in the future, consider consolidating them into a
         // single Collection.
         mOnBringToForegroundCounter = new InvokeCounter("OnBringToForeground");
+        mOnCallAudioStateChangedCounter = new InvokeCounter("OnCallAudioStateChanged");
     }
 
     /**
