@@ -297,6 +297,7 @@ public class CtsTestTest extends TestCase {
      * been specified
      */
     public void testRun_nothingToRun() throws DeviceNotAvailableException {
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
@@ -312,6 +313,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_packagePlan() throws DeviceNotAvailableException {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.addPackageName(PACKAGE_NAME);
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
@@ -327,6 +329,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_planClass() throws DeviceNotAvailableException {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.setClassName("class");
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
@@ -342,6 +345,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_packageClass() throws DeviceNotAvailableException {
         mCtsTest.addPackageName(PACKAGE_NAME);
         mCtsTest.setClassName("class");
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
@@ -358,6 +362,7 @@ public class CtsTestTest extends TestCase {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.addPackageName(PACKAGE_NAME);
         mCtsTest.setClassName("class");
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
@@ -373,6 +378,7 @@ public class CtsTestTest extends TestCase {
     public void testRun_planContinue() throws DeviceNotAvailableException {
         mCtsTest.setPlanName(PLAN_NAME);
         mCtsTest.setContinueSessionId(1);
+        replayMocks();
         try {
             mCtsTest.run(mMockListener);
             fail("IllegalArgumentException not thrown");
