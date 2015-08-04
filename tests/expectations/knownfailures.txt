@@ -174,5 +174,32 @@
     "android.hardware.camera2.cts.SurfaceViewPreviewTest#testPreparePerformance"
   ],
   bug: 17989532
+},
+{
+  description: "known failures",
+  names: [
+    "android.hardware.cts.SensorBatchingTests#testAccelerometer_50hz_batching",
+    "android.hardware.cts.SensorBatchingTests#testAccelerometer_fastest_batching",
+    "android.hardware.cts.SensorBatchingTests#testGyroscope_50hz_batching",
+    "android.hardware.cts.SensorBatchingTests#testGyroscope_50hz_flush",
+    "android.hardware.cts.SensorBatchingTests#testMagneticField_50hz_batching",
+    "android.hardware.cts.SensorBatchingTests#testMagneticField_fastest_batching",
+    "android.hardware.cts.SensorBatchingTests#testMagneticFieldUncalibrated_50hz_batching",
+    "android.hardware.cts.SensorBatchingTests#testMagneticFieldUncalibrated_fastest_batching",
+    "android.hardware.cts.SensorBatchingTests#testPressure_50hz_batching",
+    "android.hardware.cts.SensorBatchingTests#testPressure_fastest_batching",
+    "android.hardware.cts.SensorBatchingTests#testRotationVector_50hz_flush",
+    "android.hardware.cts.SensorBatchingTests#testRotationVector_fastest_batching",
+    "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
+    "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
+    "android.hardware.cts.SensorTest#testSensorTimeStamps",
+    "android.hardware.cts.SingleSensorTests#testGyroscope_15hz",
+    "android.hardware.cts.SingleSensorTests#testGyroscope_1hz",
+    "android.hardware.cts.SingleSensorTests#testMagneticField_1hz",
+    "android.hardware.cts.SingleSensorTests#testMagneticField_50hz",
+    "android.hardware.cts.SingleSensorTests#testMagneticFieldUncalibrated_200hz",
+    "android.hardware.cts.SingleSensorTests#testOrientation_5hz"
+  ],
+  bug: 22922206
 }
 ]
