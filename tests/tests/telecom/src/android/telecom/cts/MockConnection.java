@@ -23,13 +23,15 @@ import android.telecom.DisconnectCause;
 import android.telecom.PhoneAccountHandle;
 import android.telecom.RemoteConnection;
 import android.telecom.VideoProfile;
-import android.util.Log;
+import android.telecom.cts.BaseTelecomTestWithMockServices.InvokeCounter;
+import android.util.SparseArray;
 
 /**
  * {@link Connection} subclass that immediately performs any state changes that are a result of
  * callbacks sent from Telecom.
  */
 public class MockConnection extends Connection {
+    public static final int ON_POST_DIAL_WAIT = 1;
 
     private CallAudioState mCallAudioState =
             new CallAudioState(false, CallAudioState.ROUTE_EARPIECE, ROUTE_EARPIECE | ROUTE_SPEAKER);
@@ -39,6 +41,8 @@ public class MockConnection extends Connection {
     private MockVideoProvider mMockVideoProvider;
     private PhoneAccountHandle mPhoneAccountHandle;
     private RemoteConnection mRemoteConnection = null;
+
+    private SparseArray<InvokeCounter> mInvokeCounterMap = new SparseArray<>(10);
 
     @Override
     public void onAnswer() {
@@ -133,6 +137,14 @@ public class MockConnection extends Connection {
         mState = state;
     }
 
+    @Override
+    public void onPostDialContinue(boolean proceed) {
+        super.onPostDialContinue(proceed);
+        if (mInvokeCounterMap.get(ON_POST_DIAL_WAIT) != null) {
+            mInvokeCounterMap.get(ON_POST_DIAL_WAIT).invoke(proceed);
+        }
+    }
+
     public int getCurrentState()  {
         return mState;
     }
@@ -143,6 +155,14 @@ public class MockConnection extends Connection {
 
     public String getDtmfString() {
         return mDtmfString;
+    }
+
+    public InvokeCounter getInvokeCounter(int counterIndex) {
+        if (mInvokeCounterMap.get(counterIndex) == null) {
+            mInvokeCounterMap.put(counterIndex,
+                    new InvokeCounter(getCounterLabel(counterIndex)));
+        }
+        return mInvokeCounterMap.get(counterIndex);
     }
 
     /**
@@ -200,5 +220,14 @@ public class MockConnection extends Connection {
 
     public RemoteConnection getRemoteConnection()  {
         return mRemoteConnection;
+    }
+
+    private static String getCounterLabel(int counterIndex) {
+        switch (counterIndex) {
+            case ON_POST_DIAL_WAIT:
+                return "onPostDialWait";
+            default:
+                return "Callback";
+        }
     }
 }
