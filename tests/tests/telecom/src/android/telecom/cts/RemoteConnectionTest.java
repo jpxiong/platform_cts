@@ -18,6 +18,7 @@ package android.telecom.cts;
 
 import static android.telecom.cts.TestUtils.*;
 
+import android.graphics.SurfaceTexture;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +34,7 @@ import android.telecom.RemoteConnection.VideoProvider;
 import android.telecom.StatusHints;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
+import android.view.Surface;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -772,6 +774,320 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         remoteVideoProvider.unregisterCallback(videoCallback);
     }
 
+    public void testRemoteConnectionVideo_RequestCallDataUsage() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final long callDataUsage = 10000;
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_RequestCallDataUsage");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onRequestConnectionDataUsage() {
+                callbackInvoker.invoke();
+                super.setCallDataUsage(callDataUsage);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+        RemoteConnection.VideoProvider.Callback videoCallback;
+
+        videoCallback = new RemoteConnection.VideoProvider.Callback() {
+            @Override
+            public void onCallDataUsageChanged(VideoProvider videoProvider, long dataUsage) {
+                super.onCallDataUsageChanged(videoProvider, dataUsage);
+                callbackInvoker.invoke(videoProvider, dataUsage);
+            }
+        };
+        remoteVideoProvider.registerCallback(videoCallback);
+        remoteVideoProvider.requestCallDataUsage();
+        callbackInvoker.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(remoteVideoProvider, callbackInvoker.getArgs(1)[0]);
+        assertEquals(callDataUsage, callbackInvoker.getArgs(1)[1]);
+        remoteVideoProvider.unregisterCallback(videoCallback);
+    }
+
+    public void testRemoteConnectionVideo_RequestCameraCapabilities() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final VideoProfile.CameraCapabilities capabilities =
+                new VideoProfile.CameraCapabilities(100, 200);
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_RequestCameraCapabilities");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onRequestCameraCapabilities() {
+                callbackInvoker.invoke();
+                super.changeCameraCapabilities(capabilities);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+        RemoteConnection.VideoProvider.Callback videoCallback;
+
+        videoCallback = new RemoteConnection.VideoProvider.Callback() {
+            @Override
+            public void onCameraCapabilitiesChanged(
+                    VideoProvider videoProvider,
+                    VideoProfile.CameraCapabilities cameraCapabilities) {
+                super.onCameraCapabilitiesChanged(videoProvider, cameraCapabilities);
+                callbackInvoker.invoke(videoProvider, cameraCapabilities);
+            }
+        };
+        remoteVideoProvider.registerCallback(videoCallback);
+        remoteVideoProvider.requestCameraCapabilities();
+        callbackInvoker.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(remoteVideoProvider, callbackInvoker.getArgs(1)[0]);
+        assertEquals(capabilities, callbackInvoker.getArgs(1)[1]);
+        remoteVideoProvider.unregisterCallback(videoCallback);
+    }
+
+    public void testRemoteConnectionVideo_SendSessionModifyRequest() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        VideoProfile fromVideoProfile = new VideoProfile(VideoProfile.STATE_AUDIO_ONLY);
+        VideoProfile toVideoProfile =  new VideoProfile(VideoProfile.STATE_BIDIRECTIONAL);
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SendSessionModifyRequest");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSendSessionModifyRequest(VideoProfile fromProfile,
+                                                   VideoProfile toProfile) {
+                callbackInvoker.invoke(fromProfile, toProfile);
+                super.receiveSessionModifyRequest(toProfile);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+        RemoteConnection.VideoProvider.Callback videoCallback;
+
+        videoCallback = new RemoteConnection.VideoProvider.Callback() {
+            @Override
+            public void onSessionModifyRequestReceived(
+                    VideoProvider videoProvider,
+                    VideoProfile videoProfile) {
+                super.onSessionModifyRequestReceived(videoProvider, videoProfile);
+                callbackInvoker.invoke(videoProvider, videoProfile);
+            }
+        };
+        remoteVideoProvider.registerCallback(videoCallback);
+        remoteVideoProvider.sendSessionModifyRequest(fromVideoProfile, toVideoProfile);
+        callbackInvoker.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(fromVideoProfile, callbackInvoker.getArgs(0)[0]);
+        assertEquals(toVideoProfile, callbackInvoker.getArgs(0)[1]);
+        assertEquals(remoteVideoProvider, callbackInvoker.getArgs(1)[0]);
+        assertEquals(toVideoProfile, callbackInvoker.getArgs(1)[1]);
+        remoteVideoProvider.unregisterCallback(videoCallback);
+    }
+
+    public void testRemoteConnectionVideo_SendSessionModifyResponse() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        VideoProfile toVideoProfile =  new VideoProfile(VideoProfile.STATE_BIDIRECTIONAL);
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SendSessionModifyResponse");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSendSessionModifyResponse(VideoProfile responseProfile) {
+                callbackInvoker.invoke(responseProfile);
+                super.receiveSessionModifyResponse(
+                        Connection.VideoProvider.SESSION_MODIFY_REQUEST_SUCCESS,
+                        responseProfile, responseProfile);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+        RemoteConnection.VideoProvider.Callback videoCallback;
+
+        videoCallback = new RemoteConnection.VideoProvider.Callback() {
+            @Override
+            public void onSessionModifyResponseReceived(
+                    VideoProvider videoProvider,
+                    int status,
+                    VideoProfile requestedProfile,
+                    VideoProfile responseProfile) {
+                super.onSessionModifyResponseReceived(videoProvider, status, requestedProfile,
+                        responseProfile);
+                callbackInvoker.invoke(videoProvider, status, requestedProfile, responseProfile);
+            }
+        };
+        remoteVideoProvider.registerCallback(videoCallback);
+        remoteVideoProvider.sendSessionModifyResponse(toVideoProfile);
+        callbackInvoker.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(toVideoProfile, callbackInvoker.getArgs(0)[0]);
+        assertEquals(remoteVideoProvider, callbackInvoker.getArgs(1)[0]);
+        assertEquals(toVideoProfile, callbackInvoker.getArgs(1)[2]);
+        assertEquals(Connection.VideoProvider.SESSION_MODIFY_REQUEST_SUCCESS,
+            callbackInvoker.getArgs(1)[1]);
+        assertEquals(toVideoProfile, callbackInvoker.getArgs(1)[3]);
+        remoteVideoProvider.unregisterCallback(videoCallback);
+    }
+
+    public void testRemoteConnectionVideo_SetCamera() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final String newCameraId = "5";
+        final VideoProfile.CameraCapabilities capabilities =
+            new VideoProfile.CameraCapabilities(100, 200);
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetCamera");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetCamera(String cameraId) {
+                callbackInvoker.invoke(cameraId);
+                super.changeCameraCapabilities(capabilities);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+        RemoteConnection.VideoProvider.Callback videoCallback;
+
+        videoCallback = new RemoteConnection.VideoProvider.Callback() {
+            @Override
+            public void onCameraCapabilitiesChanged(
+                    VideoProvider videoProvider,
+                    VideoProfile.CameraCapabilities cameraCapabilities) {
+                super.onCameraCapabilitiesChanged(videoProvider, cameraCapabilities);
+                callbackInvoker.invoke(videoProvider, cameraCapabilities);
+            }
+        };
+        remoteVideoProvider.registerCallback(videoCallback);
+        remoteVideoProvider.setCamera(newCameraId);
+        callbackInvoker.waitForCount(2, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newCameraId, callbackInvoker.getArgs(0)[0]);
+        assertEquals(remoteVideoProvider, callbackInvoker.getArgs(1)[0]);
+        assertEquals(capabilities, callbackInvoker.getArgs(1)[1]);
+        remoteVideoProvider.unregisterCallback(videoCallback);
+    }
+
+    public void testRemoteConnectionVideo_SetDeviceOrientation() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final int newRotation = 5;
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetDeviceOrientation");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetDeviceOrientation(int rotation) {
+                callbackInvoker.invoke(rotation);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+
+        remoteVideoProvider.setDeviceOrientation(newRotation);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newRotation, callbackInvoker.getArgs(0)[0]);
+    }
+
+    public void testRemoteConnectionVideo_SetDisplaySurface() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final Surface newSurface = new Surface(new SurfaceTexture(1));
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetDisplaySurface");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetDisplaySurface(Surface surface) {
+                callbackInvoker.invoke(surface);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+
+        remoteVideoProvider.setDisplaySurface(newSurface);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newSurface, callbackInvoker.getArgs(0)[0]);
+    }
+
+    public void testRemoteConnectionVideo_SetPauseImage() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final Uri newUri = Uri.parse("content://");
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetPauseImage");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetPauseImage(Uri uri) {
+                callbackInvoker.invoke(uri);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+
+        remoteVideoProvider.setPauseImage(newUri);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newUri, callbackInvoker.getArgs(0)[0]);
+    }
+
+    public void testRemoteConnectionVideo_SetPreviewSurface() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final Surface newSurface = new Surface(new SurfaceTexture(1));
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetPreviewSurface");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetPreviewSurface(Surface surface) {
+                callbackInvoker.invoke(surface);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+
+        remoteVideoProvider.setPreviewSurface(newSurface);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newSurface, callbackInvoker.getArgs(0)[0]);
+    }
+
+    public void testRemoteConnectionVideo_SetZoom() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        final float newZoom = 1.0f;
+        final InvokeCounter callbackInvoker =
+                new InvokeCounter("testRemoteConnectionVideo_SetPreviewSurface");
+        final MockVideoProvider mockVideoProvider = new MockVideoProvider(mRemoteConnection) {
+            @Override
+            public void onSetZoom(float value) {
+                callbackInvoker.invoke(value);
+            }
+        };
+        setupRemoteConnectionVideoTest(mockVideoProvider);
+
+        final VideoProvider remoteVideoProvider = mRemoteConnectionObject.getVideoProvider();
+
+        remoteVideoProvider.setZoom(newZoom);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(newZoom, callbackInvoker.getArgs(0)[0]);
+    }
 
     private void verifyRemoteConnectionObject(RemoteConnection remoteConnection,
             Connection connection) {
@@ -876,9 +1192,6 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         addRemoteConnectionOutgoingCall();
         final Call call = mInCallCallbacks.getService().getLastCall();
         assertCallState(call, Call.STATE_DIALING);
-        assertNotNull(mConnection);
-        assertNotNull(mRemoteConnection);
-        assertNotNull(mRemoteConnectionObject);
         verifyRemoteConnectionObject(mRemoteConnectionObject, mRemoteConnection);
 
         // Create a looper thread for the callbacks.
@@ -899,8 +1212,36 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         mRemoteConnection.createMockVideoProvider();
         mRemoteConnection.setVideoProvider(mRemoteConnection.getMockVideoProvider());
         callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConnectionObject, callbackInvoker.getArgs(0)[0]);
         mRemoteConnectionObject.unregisterCallback(callback);
         return handler;
     }
 
+    private Handler setupRemoteConnectionVideoTest(MockVideoProvider mockVideoProvider) {
+        addRemoteConnectionOutgoingCall();
+        final Call call = mInCallCallbacks.getService().getLastCall();
+        assertCallState(call, Call.STATE_DIALING);
+        verifyRemoteConnectionObject(mRemoteConnectionObject, mRemoteConnection);
+
+        // Create a looper thread for the callbacks.
+        HandlerThread workerThread = new HandlerThread("CallbackThread");
+        workerThread.start();
+        Handler handler = new Handler(workerThread.getLooper());
+
+        final InvokeCounter callbackInvoker = new InvokeCounter("RemoteConnectionCallbacks");
+
+        RemoteConnection.Callback callback = new RemoteConnection.Callback() {
+            @Override
+            public void onVideoProviderChanged(
+                    RemoteConnection connection, VideoProvider videoProvider) {
+                callbackInvoker.invoke(connection, videoProvider);
+            }
+        };
+        mRemoteConnectionObject.registerCallback(callback, handler);
+        mRemoteConnection.setVideoProvider(mockVideoProvider);
+        callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+        assertEquals(mRemoteConnectionObject, callbackInvoker.getArgs(0)[0]);
+        mRemoteConnectionObject.unregisterCallback(callback);
+        return handler;
+    }
 }
