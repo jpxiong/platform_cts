@@ -33,7 +33,7 @@ selinux_general_seapp_contexts := $(call intermediates-dir-for,ETC,general_seapp
 
 selinux_general_seapp_neverallows := $(call intermediates-dir-for,ETC,general_seapp_neverallows)/general_seapp_neverallows
 
-selinux_general_file_contexts := $(call intermediates-dir-for,ETC,general_file_contexts)/general_file_contexts
+selinux_general_file_contexts := $(call intermediates-dir-for,ETC,general_file_contexts.bin)/general_file_contexts.bin
 
 selinux_general_property_contexts := $(call intermediates-dir-for,ETC,general_property_contexts)/general_property_contexts
 
