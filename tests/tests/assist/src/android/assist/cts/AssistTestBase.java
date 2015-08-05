@@ -19,7 +19,6 @@ package android.assist.cts;
 import android.assist.TestStartActivity;
 import android.assist.common.Utils;
 
-import android.app.Activity;
 import android.app.assist.AssistContent;
 import android.app.assist.AssistStructure;
 import android.content.BroadcastReceiver;
@@ -27,9 +26,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.XmlResourceParser;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
@@ -57,6 +58,11 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getTargetContext();
+        assertEquals("1", Settings.Secure.getString(
+            mContext.getContentResolver(), "assist_structure_enabled"));
+        assertEquals("1", Settings.Secure.getString(
+            mContext.getContentResolver(), "assist_screenshot_enabled"));
+        logContextAndScreenshotSetting();
     }
 
     @Override
@@ -71,7 +77,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         mTestName = testName;
         intent.setAction("android.intent.action.TEST_START_ACTIVITY_" + testName);
         intent.setComponent(new ComponentName(getInstrumentation().getContext(),
-                TestStartActivity.class));
+            TestStartActivity.class));
         setActivityIntent(intent);
         mTestActivity = getActivity();
     }
@@ -86,9 +92,9 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         }
         mReceiver = new TestResultsReceiver();
         mContext.registerReceiver(mReceiver,
-                new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
+            new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
 
-        mTestActivity.start3pApp();
+        mTestActivity.start3pApp(mTestName);
         mTestActivity.startTest(mTestName);
         if (!mLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             fail("Failed to receive broadcast in " + Utils.TIMEOUT_MS + "msec");
@@ -97,6 +103,43 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         return true;
     }
 
+    /**
+     * Checks that the nullness of values are what we expect.
+     * @param isBundleNull True if assistBundle should be null.
+     * @param isStructureNull True if assistStructure should be null.
+     * @param isContentNull True if assistContent should be null.
+     * @param isScreenshotNull True if screenshot should be null.
+     */
+    protected void verifyAssistDataNullness(boolean isBundleNull, boolean isStructureNull,
+            boolean isContentNull, boolean isScreenshotNull) {
+
+        if ((mAssistContent == null) != isContentNull) {
+            fail(String.format("Should %s have been null - AssistContent: %s",
+                    isContentNull? "":"not", mAssistContent));
+        }
+
+        if ((mAssistStructure == null) != isStructureNull) {
+            fail(String.format("Should %s have been null - AssistStructure: %s",
+                isStructureNull ? "" : "not", mAssistStructure));
+        }
+
+        if ((mAssistBundle == null) != isBundleNull) {
+            fail(String.format("Should %s have been null - AssistBundle: %s",
+                    isBundleNull? "":"not", mAssistBundle));
+        }
+
+        if ((mScreenshot == null) != isScreenshotNull) {
+            fail(String.format("Should %s have been null - Screenshot: %s",
+                    isScreenshotNull? "":"not", mScreenshot));
+        }
+    }
+
+    /**
+     * Traverses and compares the view heirarchy of the backgroundApp and the view we expect.
+     *
+     * @param backgroundApp ComponentName of app the assistant is invoked upon
+     * @param isSecureWindow Denotes whether the activity has FLAG_SECURE set
+     */
     protected void verifyAssistStructure(ComponentName backgroundApp, boolean isSecureWindow) {
         // Check component name matches
         assertEquals(backgroundApp.flattenToString(),
@@ -106,8 +149,16 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         assertEquals(1, numWindows);
         for (int i = 0; i < numWindows; i++) {
             AssistStructure.ViewNode node = mAssistStructure.getWindowNodeAt(i).getRootViewNode();
-            // TODO: traverse view heirarchy and verify it matches what we expect
+            // TODO: Actually traverse the view heirarchy and verify it matches what we expect
+            // If isSecureWindow, will not have any children.
         }
+    }
+
+    protected void logContextAndScreenshotSetting() {
+        Log.i(TAG, "Context is: " + Settings.Secure.getString(
+            mContext.getContentResolver(), "assist_structure_enabled"));
+        Log.i(TAG, "Screenshot is: " + Settings.Secure.getString(
+            mContext.getContentResolver(), "assist_screenshot_enabled"));
     }
 
     class TestResultsReceiver extends BroadcastReceiver {

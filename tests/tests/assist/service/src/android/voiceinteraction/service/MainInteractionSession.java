@@ -16,27 +16,19 @@
 
 package android.assist.service;
 
-import android.app.VoiceInteractor;
-import android.app.VoiceInteractor.Prompt;
 import android.app.assist.AssistContent;
 import android.app.assist.AssistStructure;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
-import android.service.voice.VoiceInteractionSession.ConfirmationRequest;
-import android.service.voice.VoiceInteractionSession.PickOptionRequest;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import android.assist.common.Utils;
-import android.webkit.URLUtil;
 
 public class MainInteractionSession extends VoiceInteractionSession {
     static final String TAG = "MainInteractionSession";
@@ -93,7 +85,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
 
     @Override
     public void onHandleScreenshot(/*@Nullable*/ Bitmap screenshot) {
-        Log.i(TAG, "onHandleScreenshot");
+        Log.i(TAG, String.format("onHandleScreenshot - Screenshot: %s", screenshot));
         super.onHandleScreenshot(screenshot);
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
         if (screenshot != null) {
