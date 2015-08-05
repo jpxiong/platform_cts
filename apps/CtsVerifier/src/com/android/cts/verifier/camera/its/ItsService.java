@@ -1094,25 +1094,34 @@ public class ItsService extends Service implements SensorEventListener {
             }
 
             // Initiate the captures.
+            long maxExpTimeNs = -1;
             for (int i = 0; i < requests.size(); i++) {
+                CaptureRequest.Builder req = requests.get(i);
                 // For DNG captures, need the LSC map to be available.
                 if (mCaptureRawIsDng) {
-                    requests.get(i).set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE, 1);
+                    req.set(CaptureRequest.STATISTICS_LENS_SHADING_MAP_MODE, 1);
+                }
+                Long expTimeNs = req.get(CaptureRequest.SENSOR_EXPOSURE_TIME);
+                if (expTimeNs != null && expTimeNs > maxExpTimeNs) {
+                    maxExpTimeNs = expTimeNs;
                 }
 
-                CaptureRequest.Builder req = requests.get(i);
                 for (int j = 0; j < numSurfaces; j++) {
                     req.addTarget(mCaptureReaders[j].getSurface());
                 }
                 mSession.capture(req.build(), mCaptureResultListener, mResultHandler);
             }
 
+            long timeout = TIMEOUT_CALLBACK * 1000;
+            if (maxExpTimeNs > 0) {
+                timeout += maxExpTimeNs / 1000000; // ns to ms
+            }
             // Make sure all callbacks have been hit (wait until captures are done).
             // If no timeouts are received after a timeout, then fail.
             int currentCount = mCountCallbacksRemaining.get();
             while (currentCount > 0) {
                 try {
-                    Thread.sleep(TIMEOUT_CALLBACK*1000);
+                    Thread.sleep(timeout);
                 } catch (InterruptedException e) {
                     throw new ItsException("Timeout failure", e);
                 }

@@ -49,6 +49,7 @@ class ItsSession(object):
 
     # Seconds timeout on each socket operation.
     SOCK_TIMEOUT = 10.0
+    SEC_TO_NSEC = 1000*1000*1000.0
 
     PACKAGE = 'com.android.cts.verifier.camera.its'
     INTENT_START = 'com.android.cts.verifier.camera.its.START'
@@ -483,6 +484,18 @@ class ItsSession(object):
                 "dng" in formats and "raw10" in formats or \
                 "raw" in formats and "raw10" in formats:
             raise its.error.Error('Different raw formats not supported')
+
+        # Detect long exposure time and set timeout accordingly
+        longest_exp_time = 0
+        for req in cmd["captureRequests"]:
+            if "android.sensor.exposureTime" in req and \
+                    req["android.sensor.exposureTime"] > longest_exp_time:
+                longest_exp_time = req["android.sensor.exposureTime"]
+
+        extended_timeout = longest_exp_time / self.SEC_TO_NSEC + \
+                self.SOCK_TIMEOUT
+        self.sock.settimeout(extended_timeout)
+
         print "Capturing %d frame%s with %d format%s [%s]" % (
                   ncap, "s" if ncap>1 else "", nsurf, "s" if nsurf>1 else "",
                   ",".join(formats))
@@ -524,6 +537,7 @@ class ItsSession(object):
                 obj["metadata"] = mds[i]
                 objs.append(obj)
             rets.append(objs if ncap>1 else objs[0])
+        self.sock.settimeout(self.SOCK_TIMEOUT)
         return rets if len(rets)>1 else rets[0]
 
 def report_result(camera_id, success, summary_path=None):
