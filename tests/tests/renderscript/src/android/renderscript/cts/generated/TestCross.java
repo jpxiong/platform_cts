@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestCross extends RSBaseCompute {
 
     private ScriptC_TestCross script;
@@ -41,8 +43,8 @@ public class TestCross extends RSBaseCompute {
     }
 
     private void checkCrossFloat3Float3Float3() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3505ebf7382f1ad4l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe9d27bf3de024b21l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x382f1ad4l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xde024b21l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -63,11 +65,16 @@ public class TestCross extends RSBaseCompute {
 
     private void verifyResultsCrossFloat3Float3Float3(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
             // Create the appropriate sized arrays in args
@@ -92,37 +99,43 @@ public class TestCross extends RSBaseCompute {
                 }
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out[j]);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                        message.append("\n");
                     }
-                    message.append("\n");
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out[j]);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                    }
+                    message.append("Errors at");
                 }
-                assertTrue("Incorrect output for checkCrossFloat3Float3Float3" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkCrossFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkCrossFloat4Float4Float4() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x15fc58a5906fbeffl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb336bd3cb0ddde5al, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x906fbeffl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb0ddde5al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -143,11 +156,16 @@ public class TestCross extends RSBaseCompute {
 
     private void verifyResultsCrossFloat4Float4Float4(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloatN args = new ArgumentsFloatNFloatNFloatN();
             // Create the appropriate sized arrays in args
@@ -172,32 +190,38 @@ public class TestCross extends RSBaseCompute {
                 }
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out[j]);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                        message.append("\n");
                     }
-                    message.append("\n");
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out[j]);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                    }
+                    message.append("Errors at");
                 }
-                assertTrue("Incorrect output for checkCrossFloat4Float4Float4" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkCrossFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testCross() {

@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestPown extends RSBaseCompute {
 
     private ScriptC_TestPown script;
@@ -41,8 +43,8 @@ public class TestPown extends RSBaseCompute {
     }
 
     private void checkPownFloatIntFloat() {
-        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe020952d622f0405l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x9c3888e9096b9f1bl, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x622f0405l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x96b9f1bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -63,11 +65,16 @@ public class TestPown extends RSBaseCompute {
 
     private void verifyResultsPownFloatIntFloat(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInBase = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInBase, (float) 42);
         inBase.copyTo(arrayInBase);
         int[] arrayInExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestPown extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inBase: ");
-                    appendVariableToMessage(message, args.inBase);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inBase: ");
+                        appendVariableToMessage(message, args.inBase);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkPownFloatIntFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkPownFloatIntFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkPownFloat2Int2Float2() {
-        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7571c02be438467l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xe6177b3249076ddl, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xbe438467l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x249076ddl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -129,11 +144,16 @@ public class TestPown extends RSBaseCompute {
 
     private void verifyResultsPownFloat2Int2Float2(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInBase = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInBase, (float) 42);
         inBase.copyTo(arrayInBase);
         int[] arrayInExponent = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestPown extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inBase: ");
-                    appendVariableToMessage(message, args.inBase);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inBase: ");
+                        appendVariableToMessage(message, args.inBase);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkPownFloat2Int2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkPownFloat2Int2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkPownFloat3Int3Float3() {
-        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5e88c45be35ff8a2l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xaf710734144a81a8l, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe35ff8a2l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x144a81a8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -195,11 +223,16 @@ public class TestPown extends RSBaseCompute {
 
     private void verifyResultsPownFloat3Int3Float3(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInBase = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInBase, (float) 42);
         inBase.copyTo(arrayInBase);
         int[] arrayInExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestPown extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inBase: ");
-                    appendVariableToMessage(message, args.inBase);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inBase: ");
+                        appendVariableToMessage(message, args.inBase);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkPownFloat3Int3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkPownFloat3Int3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkPownFloat4Int4Float4() {
-        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb5ba6cb5087c6cddl, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x508096b504048c73l, false);
+        Allocation inBase = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x87c6cddl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x4048c73l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -261,11 +302,16 @@ public class TestPown extends RSBaseCompute {
 
     private void verifyResultsPownFloat4Int4Float4(Allocation inBase, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInBase = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInBase, (float) 42);
         inBase.copyTo(arrayInBase);
         int[] arrayInExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestPown extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inBase: ");
-                    appendVariableToMessage(message, args.inBase);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inBase: ");
+                        appendVariableToMessage(message, args.inBase);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkPownFloat4Int4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkPownFloat4Int4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testPown() {

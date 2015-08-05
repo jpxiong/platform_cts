@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestFastLength extends RSBaseCompute {
 
     private ScriptC_TestFastLength script;
@@ -40,7 +42,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xebac65aea2660e8fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa2660e8fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloatFloat(inV, out);
@@ -59,9 +61,13 @@ public class TestFastLength extends RSBaseCompute {
 
     private void verifyResultsFastLengthFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloat args = new ArgumentsFloatFloat();
             // Create the appropriate sized arrays in args
@@ -76,23 +82,29 @@ public class TestFastLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                message.append("Input inV: ");
-                appendVariableToMessage(message, arrayInV[i]);
-                message.append("\n");
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    message.append("Input inV: ");
+                    appendVariableToMessage(message, arrayInV[i]);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("\n");
-                assertTrue("Incorrect output for checkFastLengthFloatFloat" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkFastLengthFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsFloatNFloat {
@@ -101,7 +113,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloat2Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x95f43650f85e6cadl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf85e6cadl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat2Float(inV, out);
@@ -120,9 +132,13 @@ public class TestFastLength extends RSBaseCompute {
 
     private void verifyResultsFastLengthFloat2Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -140,29 +156,35 @@ public class TestFastLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 2 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 2 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkFastLengthFloat2Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkFastLengthFloat2Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFastLengthFloat3Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x95f440f25764fb0el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5764fb0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat3Float(inV, out);
@@ -181,9 +203,13 @@ public class TestFastLength extends RSBaseCompute {
 
     private void verifyResultsFastLengthFloat3Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -201,29 +227,35 @@ public class TestFastLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkFastLengthFloat3Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkFastLengthFloat3Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFastLengthFloat4Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x95f44b93b66b896fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb66b896fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat4Float(inV, out);
@@ -242,9 +274,13 @@ public class TestFastLength extends RSBaseCompute {
 
     private void verifyResultsFastLengthFloat4Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -262,25 +298,31 @@ public class TestFastLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkFastLengthFloat4Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkFastLengthFloat4Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testFastLength() {

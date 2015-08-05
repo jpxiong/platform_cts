@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeNormalize extends RSBaseCompute {
 
     private ScriptC_TestNativeNormalize script;
@@ -40,7 +42,7 @@ public class TestNativeNormalize extends RSBaseCompute {
     }
 
     private void checkNativeNormalizeFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x487756167e4aac53l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7e4aac53l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeNormalizeFloatFloat(inV, out);
@@ -59,9 +61,13 @@ public class TestNativeNormalize extends RSBaseCompute {
 
     private void verifyResultsNativeNormalizeFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloat args = new ArgumentsFloatFloat();
             // Create the appropriate sized arrays in args
@@ -76,23 +82,29 @@ public class TestNativeNormalize extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                message.append("Input inV: ");
-                appendVariableToMessage(message, arrayInV[i]);
-                message.append("\n");
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    message.append("Input inV: ");
+                    appendVariableToMessage(message, arrayInV[i]);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeNormalizeFloatFloat" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeNormalizeFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsFloatNFloatN {
@@ -101,7 +113,7 @@ public class TestNativeNormalize extends RSBaseCompute {
     }
 
     private void checkNativeNormalizeFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x65c77dbcedd0e45fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xedd0e45fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeNormalizeFloat2Float2(inV, out);
@@ -120,9 +132,13 @@ public class TestNativeNormalize extends RSBaseCompute {
 
     private void verifyResultsNativeNormalizeFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatN args = new ArgumentsFloatNFloatN();
             // Create the appropriate sized arrays in args
@@ -143,31 +159,37 @@ public class TestNativeNormalize extends RSBaseCompute {
                 }
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 2 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out[j]);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out[j].couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 2 + j]);
+                        message.append("\n");
                     }
-                    message.append("\n");
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out[j]);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out[j].couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                    }
+                    message.append("Errors at");
                 }
-                assertTrue("Incorrect output for checkNativeNormalizeFloat2Float2" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeNormalizeFloat2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeNormalizeFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x65c946d7e3ec053dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe3ec053dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeNormalizeFloat3Float3(inV, out);
@@ -186,9 +208,13 @@ public class TestNativeNormalize extends RSBaseCompute {
 
     private void verifyResultsNativeNormalizeFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatN args = new ArgumentsFloatNFloatN();
             // Create the appropriate sized arrays in args
@@ -209,31 +235,37 @@ public class TestNativeNormalize extends RSBaseCompute {
                 }
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out[j]);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
                     }
-                    message.append("\n");
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out[j]);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                    }
+                    message.append("Errors at");
                 }
-                assertTrue("Incorrect output for checkNativeNormalizeFloat3Float3" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeNormalizeFloat3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeNormalizeFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x65cb0ff2da07261bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xda07261bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeNormalizeFloat4Float4(inV, out);
@@ -252,9 +284,13 @@ public class TestNativeNormalize extends RSBaseCompute {
 
     private void verifyResultsNativeNormalizeFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatN args = new ArgumentsFloatNFloatN();
             // Create the appropriate sized arrays in args
@@ -275,27 +311,33 @@ public class TestNativeNormalize extends RSBaseCompute {
                 }
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
-                    message.append("\n");
-                }
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out[j]);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
                     }
-                    message.append("\n");
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out[j]);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out[j].couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                    }
+                    message.append("Errors at");
                 }
-                assertTrue("Incorrect output for checkNativeNormalizeFloat4Float4" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeNormalizeFloat4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeNormalize() {

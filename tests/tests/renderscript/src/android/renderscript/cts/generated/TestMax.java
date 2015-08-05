@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestMax extends RSBaseCompute {
 
     private ScriptC_TestMax script;
@@ -41,8 +43,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxFloatFloatFloat() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2952d868c2162460l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2952d868c2162461l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc2162460l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc2162461l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -63,11 +65,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxFloatFloatFloat(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxFloat2Float2Float2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc6031e7536addadal, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc6031e7536addadbl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x36addadal, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x36addadbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -129,11 +144,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxFloat2Float2Float2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxFloat3Float3Float3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1a67fc95388bdc7bl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1a67fc95388bdc7cl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x388bdc7bl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x388bdc7cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -195,11 +223,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxFloat3Float3Float3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxFloat4Float4Float4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6eccdab53a69de1cl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6eccdab53a69de1dl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3a69de1cl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3a69de1dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -261,11 +302,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxFloat4Float4Float4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsCharCharChar {
@@ -311,8 +365,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxCharCharChar() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x5f77cf3cb6405876l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x5f77cf3cb6405877l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xb6405876l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xb6405877l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -333,11 +387,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxCharCharChar(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -352,32 +411,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxCharCharChar" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxCharCharChar" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxChar2Char2Char2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x94dd090a19e42804l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x94dd090a19e42805l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x19e42804l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x19e42805l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -398,11 +465,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxChar2Char2Char2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -417,32 +489,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar2Char2Char2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxChar2Char2Char2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxChar3Char3Char3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xba9188f3788338d3l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xba9188f3788338d4l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x788338d3l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x788338d4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -463,11 +543,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxChar3Char3Char3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -482,32 +567,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar3Char3Char3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxChar3Char3Char3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxChar4Char4Char4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xe04608dcd72249a2l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xe04608dcd72249a3l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd72249a2l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xd72249a3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -528,11 +621,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxChar4Char4Char4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -547,27 +645,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxChar4Char4Char4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxChar4Char4Char4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsUcharUcharUchar {
@@ -577,8 +683,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxUcharUcharUchar() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x800f9948853a162dl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x800f9948853a162el, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x853a162dl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x853a162el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -599,11 +705,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUcharUcharUchar(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -618,32 +729,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUcharUcharUchar" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUcharUcharUchar" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUchar2Uchar2Uchar2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xd31d5735b7e9a9dbl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xd31d5735b7e9a9dcl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xb7e9a9dbl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xb7e9a9dcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -664,11 +783,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUchar2Uchar2Uchar2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -683,32 +807,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar2Uchar2Uchar2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUchar2Uchar2Uchar2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUchar3Uchar3Uchar3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x27823555b9c7ab7cl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x27823555b9c7ab7dl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xb9c7ab7cl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xb9c7ab7dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -729,11 +861,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUchar3Uchar3Uchar3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -748,32 +885,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar3Uchar3Uchar3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUchar3Uchar3Uchar3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUchar4Uchar4Uchar4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7be71375bba5ad1dl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7be71375bba5ad1el, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xbba5ad1dl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xbba5ad1el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -794,11 +939,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUchar4Uchar4Uchar4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         byte[] arrayInA = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (byte) 42);
         inA.copyTo(arrayInA);
         byte[] arrayInB = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (byte) 42);
         inB.copyTo(arrayInB);
         byte[] arrayOut = new byte[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (byte) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -813,27 +963,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUchar4Uchar4Uchar4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUchar4Uchar4Uchar4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsShortShortShort {
@@ -843,8 +1001,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxShortShortShort() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x920335e143b57294l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x920335e143b57295l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x43b57294l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x43b57295l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -865,11 +1023,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxShortShortShort(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -884,32 +1047,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShortShortShort" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxShortShortShort" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxShort2Short2Short2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x42e9d46b56ecb9del, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x42e9d46b56ecb9dfl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x56ecb9del, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x56ecb9dfl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -930,11 +1101,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxShort2Short2Short2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -949,32 +1125,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort2Short2Short2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxShort2Short2Short2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxShort3Short3Short3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x974eb28b58cabb7fl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x974eb28b58cabb80l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x58cabb7fl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x58cabb80l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -995,11 +1179,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxShort3Short3Short3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -1014,32 +1203,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort3Short3Short3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxShort3Short3Short3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxShort4Short4Short4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xebb390ab5aa8bd20l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xebb390ab5aa8bd21l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x5aa8bd20l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x5aa8bd21l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1060,11 +1257,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxShort4Short4Short4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -1079,27 +1281,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxShort4Short4Short4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxShort4Short4Short4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsUshortUshortUshort {
@@ -1109,8 +1319,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxUshortUshortUshort() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x8f869c73b947704bl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x8f869c73b947704cl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xb947704bl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xb947704cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1131,11 +1341,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUshortUshortUshort(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -1150,32 +1365,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshortUshortUshort" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUshortUshortUshort" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUshort2Ushort2Ushort2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xbe3c50e6150b1f95l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xbe3c50e6150b1f96l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x150b1f95l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x150b1f96l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1196,11 +1419,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUshort2Ushort2Ushort2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -1215,32 +1443,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort2Ushort2Ushort2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUshort2Ushort2Ushort2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUshort3Ushort3Ushort3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x3e2be9df5df0112cl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x3e2be9df5df0112dl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x5df0112cl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x5df0112dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1261,11 +1497,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUshort3Ushort3Ushort3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -1280,32 +1521,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort3Ushort3Ushort3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUshort3Ushort3Ushort3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUshort4Ushort4Ushort4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xbe1b82d8a6d502c3l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xbe1b82d8a6d502c4l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa6d502c3l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa6d502c4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1326,11 +1575,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUshort4Ushort4Ushort4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         short[] arrayInA = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (short) 42);
         inA.copyTo(arrayInA);
         short[] arrayInB = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (short) 42);
         inB.copyTo(arrayInB);
         short[] arrayOut = new short[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (short) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -1345,27 +1599,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUshort4Ushort4Ushort4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUshort4Ushort4Ushort4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsIntIntInt {
@@ -1375,8 +1637,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxIntIntInt() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x773d0d60e43d0fa9l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x773d0d60e43d0faal, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xe43d0fa9l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xe43d0faal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1397,11 +1659,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxIntIntInt(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -1416,32 +1683,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxIntIntInt" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxIntIntInt" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxInt2Int2Int2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x32815a01bb9dccd7l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x32815a01bb9dccd8l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xbb9dccd7l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xbb9dccd8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1462,11 +1737,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxInt2Int2Int2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -1481,32 +1761,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxInt2Int2Int2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxInt2Int2Int2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxInt3Int3Int3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x3f66ddfc867314c0l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x3f66ddfc867314c1l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x867314c0l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x867314c1l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1527,11 +1815,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxInt3Int3Int3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -1546,32 +1839,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxInt3Int3Int3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxInt3Int3Int3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxInt4Int4Int4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x4c4c61f751485ca9l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x4c4c61f751485caal, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x51485ca9l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x51485caal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1592,11 +1893,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxInt4Int4Int4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -1611,27 +1917,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxInt4Int4Int4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxInt4Int4Int4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsUintUintUint {
@@ -1641,8 +1955,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxUintUintUint() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xcd24e58385f73e36l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xcd24e58385f73e37l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x85f73e36l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x85f73e37l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1663,11 +1977,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUintUintUint(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -1682,32 +2001,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUintUintUint" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUintUintUint" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUint2Uint2Uint2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xbd5747860e84d6c4l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xbd5747860e84d6c5l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe84d6c4l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xe84d6c5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1728,11 +2055,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUint2Uint2Uint2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -1747,32 +2079,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUint2Uint2Uint2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUint2Uint2Uint2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUint3Uint3Uint3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe30bc76f6d23e793l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xe30bc76f6d23e794l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x6d23e793l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x6d23e794l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1793,11 +2133,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUint3Uint3Uint3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -1812,32 +2157,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUint3Uint3Uint3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUint3Uint3Uint3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUint4Uint4Uint4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x8c04758cbc2f862l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x8c04758cbc2f863l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xcbc2f862l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xcbc2f863l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1858,11 +2211,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUint4Uint4Uint4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         int[] arrayInA = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (int) 42);
         inA.copyTo(arrayInA);
         int[] arrayInB = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (int) 42);
         inB.copyTo(arrayInB);
         int[] arrayOut = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (int) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -1877,27 +2235,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUint4Uint4Uint4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUint4Uint4Uint4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsLongLongLong {
@@ -1907,8 +2273,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxLongLongLong() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x542587285eceb84l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x542587285eceb85l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x85eceb84l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x85eceb85l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1929,11 +2295,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxLongLongLong(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -1948,32 +2319,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxLongLongLong" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxLongLongLong" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxLong2Long2Long2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xc5c0bac4c249c9dal, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xc5c0bac4c249c9dbl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xc249c9dal, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xc249c9dbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -1994,11 +2373,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxLong2Long2Long2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -2013,32 +2397,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxLong2Long2Long2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxLong2Long2Long2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxLong3Long3Long3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xeb753aae20e8daa9l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xeb753aae20e8daaal, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x20e8daa9l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x20e8daaal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2059,11 +2451,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxLong3Long3Long3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -2078,32 +2475,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxLong3Long3Long3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxLong3Long3Long3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxLong4Long4Long4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x1129ba977f87eb78l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x1129ba977f87eb79l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7f87eb78l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7f87eb79l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2124,11 +2529,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxLong4Long4Long4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -2143,27 +2553,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxLong4Long4Long4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxLong4Long4Long4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsUlongUlongUlong {
@@ -2173,8 +2591,8 @@ public class TestMax extends RSBaseCompute {
     }
 
     private void checkMaxUlongUlongUlong() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x8d1ad8f38f18baafl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x8d1ad8f38f18bab0l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x8f18baafl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x8f18bab0l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2195,11 +2613,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUlongUlongUlong(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -2214,32 +2637,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (args.out != arrayOut[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (args.out != arrayOut[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUlongUlongUlong" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUlongUlongUlong" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUlong2Ulong2Ulong2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x6e2049a55946bc65l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x6e2049a55946bc66l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x5946bc65l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x5946bc66l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2260,11 +2691,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUlong2Ulong2Ulong2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -2279,32 +2715,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (args.out != arrayOut[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (args.out != arrayOut[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUlong2Ulong2Ulong2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUlong2Ulong2Ulong2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUlong3Ulong3Ulong3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xc28527c55b24be06l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xc28527c55b24be07l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x5b24be06l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x5b24be07l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2325,11 +2769,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUlong3Ulong3Ulong3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -2344,32 +2793,40 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUlong3Ulong3Ulong3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUlong3Ulong3Ulong3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkMaxUlong4Ulong4Ulong4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x16ea05e55d02bfa7l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x16ea05e55d02bfa8l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x5d02bfa7l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x5d02bfa8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -2390,11 +2847,16 @@ public class TestMax extends RSBaseCompute {
 
     private void verifyResultsMaxUlong4Ulong4Ulong4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         long[] arrayInA = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (long) 42);
         inA.copyTo(arrayInA);
         long[] arrayInB = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (long) 42);
         inB.copyTo(arrayInB);
         long[] arrayOut = new long[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (long) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -2409,27 +2871,35 @@ public class TestMax extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (args.out != arrayOut[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (args.out != arrayOut[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkMaxUlong4Ulong4Ulong4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkMaxUlong4Ulong4Ulong4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testMax() {
