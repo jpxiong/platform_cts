@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeRecip extends RSBaseCompute {
 
     private ScriptC_TestNativeRecip script;
@@ -40,7 +42,7 @@ public class TestNativeRecip extends RSBaseCompute {
     }
 
     private void checkNativeRecipFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4ec14a4fcc4ed441l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xcc4ed441l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeRecipFloatFloat(inV, out);
@@ -59,9 +61,13 @@ public class TestNativeRecip extends RSBaseCompute {
 
     private void verifyResultsNativeRecipFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -76,28 +82,36 @@ public class TestNativeRecip extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeRecipFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeRecipFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeRecipFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd1ec6fa169d54a5dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x69d54a5dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeRecipFloat2Float2(inV, out);
@@ -116,9 +130,13 @@ public class TestNativeRecip extends RSBaseCompute {
 
     private void verifyResultsNativeRecipFloat2Float2(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -133,28 +151,36 @@ public class TestNativeRecip extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeRecipFloat2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeRecipFloat2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeRecipFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd1ee38bc5ff06b3bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5ff06b3bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeRecipFloat3Float3(inV, out);
@@ -173,9 +199,13 @@ public class TestNativeRecip extends RSBaseCompute {
 
     private void verifyResultsNativeRecipFloat3Float3(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -190,28 +220,36 @@ public class TestNativeRecip extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeRecipFloat3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeRecipFloat3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeRecipFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd1f001d7560b8c19l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x560b8c19l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeRecipFloat4Float4(inV, out);
@@ -230,9 +268,13 @@ public class TestNativeRecip extends RSBaseCompute {
 
     private void verifyResultsNativeRecipFloat4Float4(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -247,24 +289,32 @@ public class TestNativeRecip extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeRecipFloat4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeRecipFloat4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeRecip() {

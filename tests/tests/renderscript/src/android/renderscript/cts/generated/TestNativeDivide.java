@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeDivide extends RSBaseCompute {
 
     private ScriptC_TestNativeDivide script;
@@ -41,8 +43,8 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloatFloatFloat() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x73477387751754efl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5ed4412e19040daal, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x751754efl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x19040daal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -63,11 +65,16 @@ public class TestNativeDivide extends RSBaseCompute {
 
     private void verifyResultsNativeDivideFloatFloatFloat(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestNativeDivide extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, args.inLeftVector);
-                    message.append("\n");
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, args.inRightVector);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, args.inLeftVector);
+                        message.append("\n");
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, args.inRightVector);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeDivideFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeDivideFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeDivideFloat2Float2Float2() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x752d5a1207785d6dl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb071fa74af507ad4l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7785d6dl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xaf507ad4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -129,11 +144,16 @@ public class TestNativeDivide extends RSBaseCompute {
 
     private void verifyResultsNativeDivideFloat2Float2Float2(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestNativeDivide extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, args.inLeftVector);
-                    message.append("\n");
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, args.inRightVector);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, args.inLeftVector);
+                        message.append("\n");
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, args.inRightVector);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeDivideFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeDivideFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeDivideFloat3Float3Float3() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5623c6c05fb90198l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x79d63bbd822c0e0dl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5fb90198l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x822c0e0dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -195,11 +223,16 @@ public class TestNativeDivide extends RSBaseCompute {
 
     private void verifyResultsNativeDivideFloat3Float3Float3(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestNativeDivide extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, args.inLeftVector);
-                    message.append("\n");
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, args.inRightVector);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, args.inLeftVector);
+                        message.append("\n");
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, args.inRightVector);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeDivideFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeDivideFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeDivideFloat4Float4Float4() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x371a336eb7f9a5c3l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x433a7d065507a146l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb7f9a5c3l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x5507a146l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -261,11 +302,16 @@ public class TestNativeDivide extends RSBaseCompute {
 
     private void verifyResultsNativeDivideFloat4Float4Float4(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestNativeDivide extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, args.inLeftVector);
-                    message.append("\n");
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, args.inRightVector);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, args.inLeftVector);
+                        message.append("\n");
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, args.inRightVector);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeDivideFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeDivideFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeDivide() {

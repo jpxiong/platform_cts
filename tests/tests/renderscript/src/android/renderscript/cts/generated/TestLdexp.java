@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestLdexp extends RSBaseCompute {
 
     private ScriptC_TestLdexp script;
@@ -41,8 +43,8 @@ public class TestLdexp extends RSBaseCompute {
     }
 
     private void checkLdexpFloatIntFloat() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdffd225490f0e26fl, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xdffd207c2e4133c4l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x90f0e26fl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x2e4133c4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -63,11 +65,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloatIntFloat(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloatIntFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloatIntFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat2Int2Float2() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7d0b1a44fe92893l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7d0afcbed3979e8l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4fe92893l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xed3979e8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -129,11 +144,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat2Int2Float2(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat2Int2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat2Int2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat3Int3Float3() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa8e041253fa3335el, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xa8e03f4cdcf384b3l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3fa3335el, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xdcf384b3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -195,11 +223,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat3Int3Float3(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat3Int3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat3Int3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat4Int4Float4() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x49efd0a62f5d3e29l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x49efcecdccad8f7el, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2f5d3e29l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xccad8f7el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -261,11 +302,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat4Int4Float4(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,32 +327,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat4Int4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat4Int4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat2IntFloat2() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6a72b89838bd38d1l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6a72b6bfd60d8a26l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x38bd38d1l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xd60d8a26l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -327,11 +381,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat2IntFloat2(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -347,32 +406,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat2IntFloat2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat2IntFloat2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat3IntFloat3() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x49ba40205150f83dl, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x49ba3e47eea14992l, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5150f83dl, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xeea14992l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -393,11 +460,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat3IntFloat3(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -413,32 +485,40 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat3IntFloat3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat3IntFloat3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkLdexpFloat4IntFloat4() {
-        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2901c7a869e4b7a9l, false);
-        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x2901c5d0073508fel, false);
+        Allocation inMantissa = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x69e4b7a9l, false);
+        Allocation inExponent = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x73508fel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInExponent(inExponent);
@@ -459,11 +539,16 @@ public class TestLdexp extends RSBaseCompute {
 
     private void verifyResultsLdexpFloat4IntFloat4(Allocation inMantissa, Allocation inExponent, Allocation out, boolean relaxed) {
         float[] arrayInMantissa = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInMantissa, (float) 42);
         inMantissa.copyTo(arrayInMantissa);
         int[] arrayInExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayInExponent, (int) 42);
         inExponent.copyTo(arrayInExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -479,27 +564,35 @@ public class TestLdexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inMantissa: ");
-                    appendVariableToMessage(message, args.inMantissa);
-                    message.append("\n");
-                    message.append("Input inExponent: ");
-                    appendVariableToMessage(message, args.inExponent);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inMantissa: ");
+                        appendVariableToMessage(message, args.inMantissa);
+                        message.append("\n");
+                        message.append("Input inExponent: ");
+                        appendVariableToMessage(message, args.inExponent);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkLdexpFloat4IntFloat4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkLdexpFloat4IntFloat4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testLdexp() {

@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestFmin extends RSBaseCompute {
 
     private ScriptC_TestFmin script;
@@ -41,8 +43,8 @@ public class TestFmin extends RSBaseCompute {
     }
 
     private void checkFminFloatFloatFloat() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1058l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7b46a8451d7b1059l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1d7b1058l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1d7b1059l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -63,11 +65,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloatFloatFloat(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat2Float2Float2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa42l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12b850a9e75faa43l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe75faa42l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe75faa43l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -129,11 +144,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat2Float2Float2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat3Float3Float3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabe3l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x671d2ec9e93dabe4l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe93dabe3l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe93dabe4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -195,11 +223,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat3Float3Float3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat4Float4Float4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad84l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbb820ce9eb1bad85l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xeb1bad84l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xeb1bad85l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -261,11 +302,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat4Float4Float4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,32 +327,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat2FloatFloat2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4dd5869724457670l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4dd5869724457671l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x24457670l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x24457671l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -327,11 +381,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat2FloatFloat2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -347,32 +406,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat2FloatFloat2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat2FloatFloat2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat3FloatFloat3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa32539af12b06accl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa32539af12b06acdl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x12b06accl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x12b06acdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -393,11 +460,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat3FloatFloat3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -413,32 +485,40 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat3FloatFloat3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat3FloatFloat3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFminFloat4FloatFloat4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf874ecc7011b5f28l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf874ecc7011b5f29l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x11b5f28l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x11b5f29l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -459,11 +539,16 @@ public class TestFmin extends RSBaseCompute {
 
     private void verifyResultsFminFloat4FloatFloat4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -479,27 +564,35 @@ public class TestFmin extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFminFloat4FloatFloat4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFminFloat4FloatFloat4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testFmin() {

@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeSincos extends RSBaseCompute {
 
     private ScriptC_TestNativeSincos script;
@@ -41,7 +43,7 @@ public class TestNativeSincos extends RSBaseCompute {
     }
 
     private void checkNativeSincosFloatFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe15df2366436cc13l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6436cc13l, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -64,11 +66,16 @@ public class TestNativeSincos extends RSBaseCompute {
 
     private void verifyResultsNativeSincosFloatFloatFloat(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOutCos = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOutCos, (float) 42);
         outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -86,37 +93,45 @@ public class TestNativeSincos extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outCos: ");
-                    appendVariableToMessage(message, args.outCos);
-                    message.append("\n");
-                    message.append("Actual   output outCos: ");
-                    appendVariableToMessage(message, arrayOutCos[i * 1 + j]);
-                    if (!args.outCos.couldBe(arrayOutCos[i * 1 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outCos: ");
+                        appendVariableToMessage(message, args.outCos);
+                        message.append("\n");
+                        message.append("Actual   output outCos: ");
+                        appendVariableToMessage(message, arrayOutCos[i * 1 + j]);
+                        if (!args.outCos.couldBe(arrayOutCos[i * 1 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeSincosFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeSincosFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeSincosFloat2Float2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe5a1f1dcda676ea9l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xda676ea9l, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -139,11 +154,16 @@ public class TestNativeSincos extends RSBaseCompute {
 
     private void verifyResultsNativeSincosFloat2Float2Float2(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOutCos = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOutCos, (float) 42);
         outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -161,37 +181,45 @@ public class TestNativeSincos extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outCos: ");
-                    appendVariableToMessage(message, args.outCos);
-                    message.append("\n");
-                    message.append("Actual   output outCos: ");
-                    appendVariableToMessage(message, arrayOutCos[i * 2 + j]);
-                    if (!args.outCos.couldBe(arrayOutCos[i * 2 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outCos: ");
+                        appendVariableToMessage(message, args.outCos);
+                        message.append("\n");
+                        message.append("Actual   output outCos: ");
+                        appendVariableToMessage(message, arrayOutCos[i * 2 + j]);
+                        if (!args.outCos.couldBe(arrayOutCos[i * 2 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeSincosFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeSincosFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeSincosFloat3Float3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3a06cffcdc45704al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdc45704al, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -214,11 +242,16 @@ public class TestNativeSincos extends RSBaseCompute {
 
     private void verifyResultsNativeSincosFloat3Float3Float3(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOutCos = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOutCos, (float) 42);
         outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -236,37 +269,45 @@ public class TestNativeSincos extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outCos: ");
-                    appendVariableToMessage(message, args.outCos);
-                    message.append("\n");
-                    message.append("Actual   output outCos: ");
-                    appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
-                    if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outCos: ");
+                        appendVariableToMessage(message, args.outCos);
+                        message.append("\n");
+                        message.append("Actual   output outCos: ");
+                        appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
+                        if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeSincosFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeSincosFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeSincosFloat4Float4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8e6bae1cde2371ebl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xde2371ebl, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -289,11 +330,16 @@ public class TestNativeSincos extends RSBaseCompute {
 
     private void verifyResultsNativeSincosFloat4Float4Float4(Allocation inV, Allocation outCos, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOutCos = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOutCos, (float) 42);
         outCos.copyTo(arrayOutCos);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -311,33 +357,41 @@ public class TestNativeSincos extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outCos: ");
-                    appendVariableToMessage(message, args.outCos);
-                    message.append("\n");
-                    message.append("Actual   output outCos: ");
-                    appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
-                    if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outCos: ");
+                        appendVariableToMessage(message, args.outCos);
+                        message.append("\n");
+                        message.append("Actual   output outCos: ");
+                        appendVariableToMessage(message, arrayOutCos[i * 4 + j]);
+                        if (!args.outCos.couldBe(arrayOutCos[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeSincosFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeSincosFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeSincos() {

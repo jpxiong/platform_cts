@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestRemainder extends RSBaseCompute {
 
     private ScriptC_TestRemainder script;
@@ -41,8 +43,8 @@ public class TestRemainder extends RSBaseCompute {
     }
 
     private void checkRemainderFloatFloatFloat() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd47c3f07317ea229l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb246eb0ee2ebe35al, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x317ea229l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe2ebe35al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -63,11 +65,16 @@ public class TestRemainder extends RSBaseCompute {
 
     private void verifyResultsRemainderFloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestRemainder extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemainderFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemainderFloat2Float2Float2() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x27d975633fdcf8d5l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xce8489f2aa4be3a6l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3fdcf8d5l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xaa4be3a6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -129,11 +144,16 @@ public class TestRemainder extends RSBaseCompute {
 
     private void verifyResultsRemainderFloat2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestRemainder extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemainderFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemainderFloat3Float3Float3() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3681e9ce2a8e4d6l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x97e8cb3b7d2776dfl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe2a8e4d6l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7d2776dfl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -195,11 +223,16 @@ public class TestRemainder extends RSBaseCompute {
 
     private void verifyResultsRemainderFloat3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestRemainder extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemainderFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkRemainderFloat4Float4Float4() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdef6c7d68574d0d7l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x614d0c8450030a18l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8574d0d7l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x50030a18l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -261,11 +302,16 @@ public class TestRemainder extends RSBaseCompute {
 
     private void verifyResultsRemainderFloat4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestRemainder extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkRemainderFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkRemainderFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testRemainder() {

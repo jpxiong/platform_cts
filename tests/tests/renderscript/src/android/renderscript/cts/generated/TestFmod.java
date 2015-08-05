@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestFmod extends RSBaseCompute {
 
     private ScriptC_TestFmod script;
@@ -41,8 +43,8 @@ public class TestFmod extends RSBaseCompute {
     }
 
     private void checkFmodFloatFloatFloat() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xed70b65ddcc790e8l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeff8dc0a04b044e1l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdcc790e8l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4b044e1l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -63,11 +65,16 @@ public class TestFmod extends RSBaseCompute {
 
     private void verifyResultsFmodFloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestFmod extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFmodFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFmodFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFmodFloat2Float2Float2() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x84bcef91ebd95a82l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb582050adc295e2bl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xebd95a82l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdc295e2bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -129,11 +144,16 @@ public class TestFmod extends RSBaseCompute {
 
     private void verifyResultsFmodFloat2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestFmod extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFmodFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFmodFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFmodFloat3Float3Float3() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x604b98cb8ea54683l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7ee64653af04f164l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8ea54683l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xaf04f164l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -195,11 +223,16 @@ public class TestFmod extends RSBaseCompute {
 
     private void verifyResultsFmodFloat3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestFmod extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFmodFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFmodFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFmodFloat4Float4Float4() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3bda420531713284l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x484a879c81e0849dl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x31713284l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x81e0849dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -261,11 +302,16 @@ public class TestFmod extends RSBaseCompute {
 
     private void verifyResultsFmodFloat4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestFmod extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFmodFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFmodFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testFmod() {

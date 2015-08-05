@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestFdim extends RSBaseCompute {
 
     private ScriptC_TestFdim script;
@@ -41,8 +43,8 @@ public class TestFdim extends RSBaseCompute {
     }
 
     private void checkFdimFloatFloatFloat() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf5dd38fbc3a47366l, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf5dd38fbc3a47367l, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc3a47366l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc3a47367l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -63,11 +65,16 @@ public class TestFdim extends RSBaseCompute {
 
     private void verifyResultsFdimFloatFloatFloat(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestFdim extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFdimFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFdimFloat2Float2Float2() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xca6a96c16f167f4cl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xca6a96c16f167f4dl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6f167f4cl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6f167f4dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -129,11 +144,16 @@ public class TestFdim extends RSBaseCompute {
 
     private void verifyResultsFdimFloat2Float2Float2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestFdim extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFdimFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFdimFloat3Float3Float3() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1ecf74e170f480edl, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1ecf74e170f480eel, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x70f480edl, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x70f480eel, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -195,11 +223,16 @@ public class TestFdim extends RSBaseCompute {
 
     private void verifyResultsFdimFloat3Float3Float3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestFdim extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFdimFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFdimFloat4Float4Float4() {
-        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7334530172d2828el, false);
-        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7334530172d2828fl, false);
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x72d2828el, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x72d2828fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInB(inB);
@@ -261,11 +302,16 @@ public class TestFdim extends RSBaseCompute {
 
     private void verifyResultsFdimFloat4Float4Float4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
         float[] arrayInA = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInA, (float) 42);
         inA.copyTo(arrayInA);
         float[] arrayInB = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInB, (float) 42);
         inB.copyTo(arrayInB);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestFdim extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inA: ");
-                    appendVariableToMessage(message, args.inA);
-                    message.append("\n");
-                    message.append("Input inB: ");
-                    appendVariableToMessage(message, args.inB);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inA: ");
+                        appendVariableToMessage(message, args.inA);
+                        message.append("\n");
+                        message.append("Input inB: ");
+                        appendVariableToMessage(message, args.inB);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFdimFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFdimFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testFdim() {

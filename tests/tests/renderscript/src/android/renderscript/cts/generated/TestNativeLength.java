@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeLength extends RSBaseCompute {
 
     private ScriptC_TestNativeLength script;
@@ -40,7 +42,7 @@ public class TestNativeLength extends RSBaseCompute {
     }
 
     private void checkNativeLengthFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbe51f0c4d1df20ecl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd1df20ecl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLengthFloatFloat(inV, out);
@@ -59,9 +61,13 @@ public class TestNativeLength extends RSBaseCompute {
 
     private void verifyResultsNativeLengthFloatFloat(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloat args = new ArgumentsFloatFloat();
             // Create the appropriate sized arrays in args
@@ -76,23 +82,29 @@ public class TestNativeLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                message.append("Input inV: ");
-                appendVariableToMessage(message, arrayInV[i]);
-                message.append("\n");
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    message.append("Input inV: ");
+                    appendVariableToMessage(message, arrayInV[i]);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeLengthFloatFloat" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeLengthFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsFloatNFloat {
@@ -101,7 +113,7 @@ public class TestNativeLength extends RSBaseCompute {
     }
 
     private void checkNativeLengthFloat2Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf7c2930af1b4824cl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf1b4824cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLengthFloat2Float(inV, out);
@@ -120,9 +132,13 @@ public class TestNativeLength extends RSBaseCompute {
 
     private void verifyResultsNativeLengthFloat2Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -140,29 +156,35 @@ public class TestNativeLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 2 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 2 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeLengthFloat2Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeLengthFloat2Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeLengthFloat3Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf7c29dac50bb10adl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x50bb10adl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLengthFloat3Float(inV, out);
@@ -181,9 +203,13 @@ public class TestNativeLength extends RSBaseCompute {
 
     private void verifyResultsNativeLengthFloat3Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -201,29 +227,35 @@ public class TestNativeLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeLengthFloat3Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeLengthFloat3Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeLengthFloat4Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf7c2a84dafc19f0el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xafc19f0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLengthFloat4Float(inV, out);
@@ -242,9 +274,13 @@ public class TestNativeLength extends RSBaseCompute {
 
     private void verifyResultsNativeLengthFloat4Float(Allocation inV, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloat args = new ArgumentsFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -262,25 +298,31 @@ public class TestNativeLength extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, arrayInV[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeLengthFloat4Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeLengthFloat4Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeLength() {

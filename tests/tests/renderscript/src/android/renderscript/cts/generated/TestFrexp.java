@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestFrexp extends RSBaseCompute {
 
     private ScriptC_TestFrexp script;
@@ -41,7 +43,7 @@ public class TestFrexp extends RSBaseCompute {
     }
 
     private void checkFrexpFloatIntFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x57ae9fe07384e56dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7384e56dl, false);
         try {
             Allocation outExponent = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -64,11 +66,16 @@ public class TestFrexp extends RSBaseCompute {
 
     private void verifyResultsFrexpFloatIntFloat(Allocation inV, Allocation outExponent, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOutExponent = new int[INPUTSIZE * 1];
+        Arrays.fill(arrayOutExponent, (int) 42);
         outExponent.copyTo(arrayOutExponent);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -86,37 +93,45 @@ public class TestFrexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outExponent: ");
-                    appendVariableToMessage(message, args.outExponent);
-                    message.append("\n");
-                    message.append("Actual   output outExponent: ");
-                    appendVariableToMessage(message, arrayOutExponent[i * 1 + j]);
-                    if (args.outExponent != arrayOutExponent[i * 1 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outExponent: ");
+                        appendVariableToMessage(message, args.outExponent);
+                        message.append("\n");
+                        message.append("Actual   output outExponent: ");
+                        appendVariableToMessage(message, arrayOutExponent[i * 1 + j]);
+                        if (args.outExponent != arrayOutExponent[i * 1 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFrexpFloatIntFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFrexpFloatIntFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFrexpFloat2Int2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x544e0a688fe7701l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x88fe7701l, false);
         try {
             Allocation outExponent = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -139,11 +154,16 @@ public class TestFrexp extends RSBaseCompute {
 
     private void verifyResultsFrexpFloat2Int2Float2(Allocation inV, Allocation outExponent, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOutExponent = new int[INPUTSIZE * 2];
+        Arrays.fill(arrayOutExponent, (int) 42);
         outExponent.copyTo(arrayOutExponent);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -161,37 +181,45 @@ public class TestFrexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outExponent: ");
-                    appendVariableToMessage(message, args.outExponent);
-                    message.append("\n");
-                    message.append("Actual   output outExponent: ");
-                    appendVariableToMessage(message, arrayOutExponent[i * 2 + j]);
-                    if (args.outExponent != arrayOutExponent[i * 2 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outExponent: ");
+                        appendVariableToMessage(message, args.outExponent);
+                        message.append("\n");
+                        message.append("Actual   output outExponent: ");
+                        appendVariableToMessage(message, arrayOutExponent[i * 2 + j]);
+                        if (args.outExponent != arrayOutExponent[i * 2 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFrexpFloat2Int2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFrexpFloat2Int2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFrexpFloat3Int3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2afb1f097eb0e3bal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7eb0e3bal, false);
         try {
             Allocation outExponent = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -214,11 +242,16 @@ public class TestFrexp extends RSBaseCompute {
 
     private void verifyResultsFrexpFloat3Int3Float3(Allocation inV, Allocation outExponent, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOutExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOutExponent, (int) 42);
         outExponent.copyTo(arrayOutExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -236,37 +269,45 @@ public class TestFrexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outExponent: ");
-                    appendVariableToMessage(message, args.outExponent);
-                    message.append("\n");
-                    message.append("Actual   output outExponent: ");
-                    appendVariableToMessage(message, arrayOutExponent[i * 4 + j]);
-                    if (args.outExponent != arrayOutExponent[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outExponent: ");
+                        appendVariableToMessage(message, args.outExponent);
+                        message.append("\n");
+                        message.append("Actual   output outExponent: ");
+                        appendVariableToMessage(message, arrayOutExponent[i * 4 + j]);
+                        if (args.outExponent != arrayOutExponent[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFrexpFloat3Int3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFrexpFloat3Int3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkFrexpFloat4Int4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x50b15d6c74635073l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x74635073l, false);
         try {
             Allocation outExponent = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -289,11 +330,16 @@ public class TestFrexp extends RSBaseCompute {
 
     private void verifyResultsFrexpFloat4Int4Float4(Allocation inV, Allocation outExponent, Allocation out, boolean relaxed) {
         float[] arrayInV = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInV, (float) 42);
         inV.copyTo(arrayInV);
         int[] arrayOutExponent = new int[INPUTSIZE * 4];
+        Arrays.fill(arrayOutExponent, (int) 42);
         outExponent.copyTo(arrayOutExponent);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -311,33 +357,41 @@ public class TestFrexp extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inV: ");
-                    appendVariableToMessage(message, args.inV);
-                    message.append("\n");
-                    message.append("Expected output outExponent: ");
-                    appendVariableToMessage(message, args.outExponent);
-                    message.append("\n");
-                    message.append("Actual   output outExponent: ");
-                    appendVariableToMessage(message, arrayOutExponent[i * 4 + j]);
-                    if (args.outExponent != arrayOutExponent[i * 4 + j]) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inV: ");
+                        appendVariableToMessage(message, args.inV);
+                        message.append("\n");
+                        message.append("Expected output outExponent: ");
+                        appendVariableToMessage(message, args.outExponent);
+                        message.append("\n");
+                        message.append("Actual   output outExponent: ");
+                        appendVariableToMessage(message, arrayOutExponent[i * 4 + j]);
+                        if (args.outExponent != arrayOutExponent[i * 4 + j]) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
-                        message.append(" FAIL");
-                    }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkFrexpFloat4Int4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkFrexpFloat4Int4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testFrexp() {

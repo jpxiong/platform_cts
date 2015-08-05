@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeAtan2pi extends RSBaseCompute {
 
     private ScriptC_TestNativeAtan2pi script;
@@ -41,8 +43,8 @@ public class TestNativeAtan2pi extends RSBaseCompute {
     }
 
     private void checkNativeAtan2piFloatFloatFloat() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc2172a04694fc108l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd63229f70853dc01l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x694fc108l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x853dc01l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -63,11 +65,16 @@ public class TestNativeAtan2pi extends RSBaseCompute {
 
     private void verifyResultsNativeAtan2piFloatFloatFloat(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 1 ; j++) {
                 // Extract the inputs.
@@ -83,32 +90,40 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 1 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 1 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 1 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeAtan2piFloatFloatFloat" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeAtan2piFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeAtan2piFloat2Float2Float2() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x305d06618853bce2l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4cc6c68c0c19e58bl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8853bce2l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc19e58bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -129,11 +144,16 @@ public class TestNativeAtan2pi extends RSBaseCompute {
 
     private void verifyResultsNativeAtan2piFloat2Float2Float2(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 2 ; j++) {
                 // Extract the inputs.
@@ -149,32 +169,40 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 2 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeAtan2piFloat2Float2Float2" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeAtan2piFloat2Float2Float2" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeAtan2piFloat3Float3Float3() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xbebaf9b2b1fa8e3l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x162b07d4def578c4l, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2b1fa8e3l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdef578c4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -195,11 +223,16 @@ public class TestNativeAtan2pi extends RSBaseCompute {
 
     private void verifyResultsNativeAtan2piFloat3Float3Float3(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 3 ; j++) {
                 // Extract the inputs.
@@ -215,32 +248,40 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeAtan2piFloat3Float3Float3" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeAtan2piFloat3Float3Float3" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeAtan2piFloat4Float4Float4() {
-        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe77a58d4cdeb94e4l, false);
-        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdf8f491db1d10bfdl, false);
+        Allocation inNumerator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xcdeb94e4l, false);
+        Allocation inDenominator = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb1d10bfdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInDenominator(inDenominator);
@@ -261,11 +302,16 @@ public class TestNativeAtan2pi extends RSBaseCompute {
 
     private void verifyResultsNativeAtan2piFloat4Float4Float4(Allocation inNumerator, Allocation inDenominator, Allocation out, boolean relaxed) {
         float[] arrayInNumerator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInNumerator, (float) 42);
         inNumerator.copyTo(arrayInNumerator);
         float[] arrayInDenominator = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInDenominator, (float) 42);
         inDenominator.copyTo(arrayInDenominator);
         float[] arrayOut = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             for (int j = 0; j < 4 ; j++) {
                 // Extract the inputs.
@@ -281,27 +327,35 @@ public class TestNativeAtan2pi extends RSBaseCompute {
                     valid = false;
                 }
                 if (!valid) {
-                    StringBuilder message = new StringBuilder();
-                    message.append("Input inNumerator: ");
-                    appendVariableToMessage(message, args.inNumerator);
-                    message.append("\n");
-                    message.append("Input inDenominator: ");
-                    appendVariableToMessage(message, args.inDenominator);
-                    message.append("\n");
-                    message.append("Expected output out: ");
-                    appendVariableToMessage(message, args.out);
-                    message.append("\n");
-                    message.append("Actual   output out: ");
-                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
-                    if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
-                        message.append(" FAIL");
+                    if (!errorFound) {
+                        errorFound = true;
+                        message.append("Input inNumerator: ");
+                        appendVariableToMessage(message, args.inNumerator);
+                        message.append("\n");
+                        message.append("Input inDenominator: ");
+                        appendVariableToMessage(message, args.inDenominator);
+                        message.append("\n");
+                        message.append("Expected output out: ");
+                        appendVariableToMessage(message, args.out);
+                        message.append("\n");
+                        message.append("Actual   output out: ");
+                        appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                        if (!args.out.couldBe(arrayOut[i * 4 + j], 0.0005)) {
+                            message.append(" FAIL");
+                        }
+                        message.append("\n");
+                        message.append("Errors at");
                     }
-                    message.append("\n");
-                    assertTrue("Incorrect output for checkNativeAtan2piFloat4Float4Float4" +
-                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                    message.append(" [");
+                    message.append(Integer.toString(i));
+                    message.append(", ");
+                    message.append(Integer.toString(j));
+                    message.append("]");
                 }
             }
         }
+        assertFalse("Incorrect output for checkNativeAtan2piFloat4Float4Float4" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeAtan2pi() {

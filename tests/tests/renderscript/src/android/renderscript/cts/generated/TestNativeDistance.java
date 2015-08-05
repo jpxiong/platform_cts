@@ -22,6 +22,8 @@ import android.renderscript.Allocation;
 import android.renderscript.RSRuntimeException;
 import android.renderscript.Element;
 
+import java.util.Arrays;
+
 public class TestNativeDistance extends RSBaseCompute {
 
     private ScriptC_TestNativeDistance script;
@@ -41,8 +43,8 @@ public class TestNativeDistance extends RSBaseCompute {
     }
 
     private void checkNativeDistanceFloatFloatFloat() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb61d5ec530ae2337l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x98c2c48c9b58b3c2l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x30ae2337l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9b58b3c2l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -63,11 +65,16 @@ public class TestNativeDistance extends RSBaseCompute {
 
     private void verifyResultsNativeDistanceFloatFloatFloat(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
             // Create the appropriate sized arrays in args
@@ -83,26 +90,32 @@ public class TestNativeDistance extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                message.append("Input inLeftVector: ");
-                appendVariableToMessage(message, arrayInLeftVector[i]);
-                message.append("\n");
-                message.append("Input inRightVector: ");
-                appendVariableToMessage(message, arrayInRightVector[i]);
-                message.append("\n");
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
+                if (!errorFound) {
+                    errorFound = true;
+                    message.append("Input inLeftVector: ");
+                    appendVariableToMessage(message, arrayInLeftVector[i]);
+                    message.append("\n");
+                    message.append("Input inRightVector: ");
+                    appendVariableToMessage(message, arrayInRightVector[i]);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeDistanceFloatFloatFloat" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeDistanceFloatFloatFloat" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public class ArgumentsFloatNFloatNFloat {
@@ -112,8 +125,8 @@ public class TestNativeDistance extends RSBaseCompute {
     }
 
     private void checkNativeDistanceFloat2Float2Float() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xef86e1d727286713l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3d7bc89101e219b6l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x27286713l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1e219b6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -134,11 +147,16 @@ public class TestNativeDistance extends RSBaseCompute {
 
     private void verifyResultsNativeDistanceFloat2Float2Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 2];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -160,35 +178,41 @@ public class TestNativeDistance extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, arrayInLeftVector[i * 2 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, arrayInLeftVector[i * 2 + j]);
+                        message.append("\n");
+                    }
+                    for (int j = 0; j < 2 ; j++) {
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, arrayInRightVector[i * 2 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
-                }
-                for (int j = 0; j < 2 ; j++) {
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, arrayInRightVector[i * 2 + j]);
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
                     message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeDistanceFloat2Float2Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeDistanceFloat2Float2Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeDistanceFloat3Float3Float() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xbe30075548c71b61l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf3e514c0a78a62d0l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x48c71b61l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xa78a62d0l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -209,11 +233,16 @@ public class TestNativeDistance extends RSBaseCompute {
 
     private void verifyResultsNativeDistanceFloat3Float3Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -235,35 +264,41 @@ public class TestNativeDistance extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    for (int j = 0; j < 3 ; j++) {
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
-                }
-                for (int j = 0; j < 3 ; j++) {
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
                     message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeDistanceFloat3Float3Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeDistanceFloat3Float3Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     private void checkNativeDistanceFloat4Float4Float() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8cd92cd36a65cfafl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xaa4e60f04d32abeal, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6a65cfafl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4d32abeal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -284,11 +319,16 @@ public class TestNativeDistance extends RSBaseCompute {
 
     private void verifyResultsNativeDistanceFloat4Float4Float(Allocation inLeftVector, Allocation inRightVector, Allocation out, boolean relaxed) {
         float[] arrayInLeftVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInLeftVector, (float) 42);
         inLeftVector.copyTo(arrayInLeftVector);
         float[] arrayInRightVector = new float[INPUTSIZE * 4];
+        Arrays.fill(arrayInRightVector, (float) 42);
         inRightVector.copyTo(arrayInRightVector);
         float[] arrayOut = new float[INPUTSIZE * 1];
+        Arrays.fill(arrayOut, (float) 42);
         out.copyTo(arrayOut);
+        StringBuilder message = new StringBuilder();
+        boolean errorFound = false;
         for (int i = 0; i < INPUTSIZE; i++) {
             ArgumentsFloatNFloatNFloat args = new ArgumentsFloatNFloatNFloat();
             // Create the appropriate sized arrays in args
@@ -310,30 +350,36 @@ public class TestNativeDistance extends RSBaseCompute {
                 valid = false;
             }
             if (!valid) {
-                StringBuilder message = new StringBuilder();
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inLeftVector: ");
-                    appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                if (!errorFound) {
+                    errorFound = true;
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inLeftVector: ");
+                        appendVariableToMessage(message, arrayInLeftVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    for (int j = 0; j < 4 ; j++) {
+                        message.append("Input inRightVector: ");
+                        appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                        message.append("\n");
+                    }
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
                     message.append("\n");
-                }
-                for (int j = 0; j < 4 ; j++) {
-                    message.append("Input inRightVector: ");
-                    appendVariableToMessage(message, arrayInRightVector[i * 4 + j]);
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i]);
+                    if (!args.out.couldBe(arrayOut[i])) {
+                        message.append(" FAIL");
+                    }
                     message.append("\n");
+                    message.append("Errors at");
                 }
-                message.append("Expected output out: ");
-                appendVariableToMessage(message, args.out);
-                message.append("\n");
-                message.append("Actual   output out: ");
-                appendVariableToMessage(message, arrayOut[i]);
-                if (!args.out.couldBe(arrayOut[i])) {
-                    message.append(" FAIL");
-                }
-                message.append("\n");
-                assertTrue("Incorrect output for checkNativeDistanceFloat4Float4Float" +
-                        (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                message.append(" [");
+                message.append(Integer.toString(i));
+                message.append("]");
             }
         }
+        assertFalse("Incorrect output for checkNativeDistanceFloat4Float4Float" +
+                (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
     public void testNativeDistance() {
