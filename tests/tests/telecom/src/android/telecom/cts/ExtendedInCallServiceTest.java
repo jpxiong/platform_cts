@@ -371,6 +371,34 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         assertFalse((Boolean) counter.getArgs(1)[0]);
     }
 
+    public void testOnCannedTextResponsesLoaded() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        verifyConnectionForIncomingCall();
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+
+        final Call call = inCallService.getLastCall();
+
+        assertCallState(call, Call.STATE_RINGING);
+
+        // Canned responses were populated before the call was sent to us for the first time
+        if (call.getCannedTextResponses() != null) {
+            assertFalse("Call.getCannedTextResponses should not be empty",
+                    call.getCannedTextResponses().isEmpty());
+            return;
+        }
+
+        // We can't do much to enforce the number and type of responses that are preloaded on
+        // device, so the best we can do is to make sure that the call back is called and
+        // that the returned list is non-empty.
+        mOnCannedTextResponsesLoadedCounter.waitForCount(1);
+        assertFalse("Call.getCannedTextResponses should not be empty",
+                call.getCannedTextResponses().isEmpty());
+    }
+
     private void assertCanAddCall(final InCallService inCallService, final boolean canAddCall,
             String message) {
         waitUntilConditionIsTrueOrTimeout(

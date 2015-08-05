@@ -51,6 +51,7 @@ public class MockInCallService extends InCallService {
         public void onBringToForeground(boolean showDialpad) {}
         public void onCallAudioStateChanged(CallAudioState audioState) {}
         public void onPostDialWait(Call call, String remainingPostDialSequence) {}
+        public void onCannedTextResponsesLoaded(Call call, List<String> cannedTextResponses) {}
 
         final public MockInCallService getService() {
             return mService;
@@ -125,6 +126,14 @@ public class MockInCallService extends InCallService {
             super.onPostDialWait(call, remainingPostDialSequence);
             if (getCallbacks() != null) {
                 getCallbacks().onPostDialWait(call, remainingPostDialSequence);
+            }
+        }
+
+        @Override
+        public void onCannedTextResponsesLoaded(Call call, List<String> cannedTextResponses) {
+            super.onCannedTextResponsesLoaded(call, cannedTextResponses);
+            if (getCallbacks() != null) {
+                getCallbacks().onCannedTextResponsesLoaded(call, cannedTextResponses);
             }
         }
     };
