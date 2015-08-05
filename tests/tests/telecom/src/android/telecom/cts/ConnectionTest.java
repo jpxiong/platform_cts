@@ -263,6 +263,10 @@ public class ConnectionTest extends AndroidTestCase {
     }
 
     public void testStateToString() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
         assertEquals("INITIALIZING", Connection.stateToString(Connection.STATE_INITIALIZING));
         assertEquals("NEW", Connection.stateToString(Connection.STATE_NEW));
         assertEquals("RINGING", Connection.stateToString(Connection.STATE_RINGING));
@@ -270,6 +274,23 @@ public class ConnectionTest extends AndroidTestCase {
         assertEquals("ACTIVE", Connection.stateToString(Connection.STATE_ACTIVE));
         assertEquals("HOLDING", Connection.stateToString(Connection.STATE_HOLDING));
         assertEquals("DISCONNECTED", Connection.stateToString(Connection.STATE_DISCONNECTED));
+    }
+
+    public void testCapabilitiesToString() {
+        if (!shouldTestTelecom(getContext())) {
+            return;
+        }
+
+        assertEquals("[Capabilities: CAPABILITY_HOLD]",
+                Connection.capabilitiesToString(Connection.CAPABILITY_HOLD));
+        assertEquals("[Capabilities: CAPABILITY_MUTE]",
+                Connection.capabilitiesToString(Connection.CAPABILITY_MUTE));
+        assertEquals("[Capabilities: CAPABILITY_HOLD "
+                + "CAPABILITY_RESPOND_VIA_TEXT "
+                + "CAPABILITY_MANAGE_CONFERENCE]",
+                Connection.capabilitiesToString(Connection.CAPABILITY_HOLD
+                        | Connection.CAPABILITY_RESPOND_VIA_TEXT
+                        | Connection.CAPABILITY_MANAGE_CONFERENCE));
     }
 
     private static Connection createConnection(final Semaphore lock) {
