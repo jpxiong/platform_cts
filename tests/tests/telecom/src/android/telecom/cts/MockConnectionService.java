@@ -74,7 +74,7 @@ public class MockConnectionService extends ConnectionService {
         final MockConnection connection = new MockConnection();
         connection.setAddress(request.getAddress(), CONNECTION_PRESENTATION);
         connection.createMockVideoProvider();
-        connection.setVideoState(request.getVideoState());
+        ((Connection) connection).setVideoState(request.getVideoState());
 
         incomingConnections.add(connection);
         lock.release();

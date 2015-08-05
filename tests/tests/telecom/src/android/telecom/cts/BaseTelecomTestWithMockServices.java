@@ -581,7 +581,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
                     @Override
                     public Object actual() {
-                        final CallAudioState state = connection.getCallAudioState();
+                        final CallAudioState state = ((Connection) connection).getCallAudioState();
                         return state == null ? null : state.getRoute();
                     }
                 },
