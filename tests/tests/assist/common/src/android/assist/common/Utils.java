@@ -18,6 +18,7 @@ package android.assist.common;
 import android.app.VoiceInteractor;
 import android.app.VoiceInteractor.PickOptionRequest.Option;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,10 +29,6 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 
 public class Utils {
-    public enum TestCaseType {
-        ASSIST_STRUCTURE,
-        DISABLE_CONTEXT,
-    }
     public static final String TESTCASE_TYPE = "testcase_type";
     public static final String TESTINFO = "testinfo";
     public static final String BROADCAST_INTENT = "android.intent.action.ASSIST_TESTAPP";
@@ -40,17 +37,39 @@ public class Utils {
 
     public static final String ASSIST_STRUCTURE_KEY = "assist_structure";
     public static final String ASSIST_CONTENT_KEY = "assist_content";
-    public static final String ASSIST_BUNDLE = "assist_bundle";
+    public static final String ASSIST_BUNDLE_KEY = "assist_bundle";
+    public static final String ASSIST_SCREENSHOT_KEY = "assist_screenshot";
 
     public static final int TIMEOUT_MS = 2 * 1000; // TODO(awlee): what is the timeout
 
+    public static final String ASSIST_STRUCTURE = "ASSIST_STRUCTURE";
+    public static final String DISABLE_CONTEXT = "DISABLE_CONTEXT";
+
+    /**
+     * The shim activity that starts the service associated with each test.
+     */
     public static final String getTestActivity(String testCaseType) {
-        if (testCaseType.equals("ASSIST_STRUCTURE")) {
-            return "service.AssistStructureActivity";
-        } else if (testCaseType.equals("DISABLE_CONTEXT")) {
-            return "service.DisableContextActivity";
+        switch (testCaseType) {
+            case ASSIST_STRUCTURE:
+                return "service.AssistStructureActivity";
+            case DISABLE_CONTEXT:
+                return "service.DisableContextActivity";
+            default:
+                return "";
         }
-        return "";
+    }
+
+    /**
+     * The test app associated with each test.
+     */
+    public static final ComponentName getTestAppComponent(String testCaseType) {
+        switch (testCaseType) {
+            case ASSIST_STRUCTURE:
+                return new ComponentName(
+                        "android.assist.testapp", "android.assist.testapp.TestApp");
+            default:
+                return new ComponentName("","");
+        }
     }
 
     public static final String toBundleString(Bundle bundle) {

@@ -48,14 +48,9 @@ public class MainInteractionService extends VoiceInteractionService {
             Log.wtf(TAG, "Can't start session because either intent is null or onReady() "
                     + "has not been called yet. mIntent = " + mIntent + ", mReady = " + mReady);
         } else {
-            Log.i(TAG, "Yay! about to start session with TestApp");
+            Log.i(TAG, "Yay! about to start session");
             if (isActiveService(this, new ComponentName(this, getClass()))) {
-                Bundle args = new Bundle();
-                Intent intent = new Intent();
-                intent.setComponent(new ComponentName("android.assist.testapp",
-                        "android.assist.testapp.TestApp"));
-                args.putParcelable("intent", intent);
-                showSession(args, VoiceInteractionSession.SHOW_WITH_ASSIST |
+                showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
                         VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
             } else {
                 Log.wtf(TAG, "**** Not starting MainInteractionService because" +
