@@ -18,7 +18,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="com.android.cts.verifier"
       android:versionCode="3"
-      android:versionName="4.4_r3">
+      android:versionName="4.4_r4">
 
     <!-- Using 10+ for more complete NFC support... -->
     <uses-sdk android:minSdkVersion="12"></uses-sdk>
