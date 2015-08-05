@@ -34,7 +34,6 @@ import android.telecom.StatusHints;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,6 +171,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onStateChanged(RemoteConnection connection, int state) {
+                super.onStateChanged(connection, state);
                 callbackInvoker.invoke(connection, state);
             }
         };
@@ -197,6 +197,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onRingbackRequested(RemoteConnection connection, boolean ringback) {
+                super.onRingbackRequested(connection, ringback);
                 callbackInvoker.invoke(connection, ringback);
             }
         };
@@ -224,13 +225,13 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             public void onConnectionCapabilitiesChanged(
                     RemoteConnection connection,
                     int connectionCapabilities) {
+                super.onConnectionCapabilitiesChanged(connection, connectionCapabilities);
                 callbackInvoker.invoke(connection, connectionCapabilities);
             }
         };
         mRemoteConnectionObject.registerCallback(callback, handler);
         int capabilities = mRemoteConnection.getConnectionCapabilities() | Connection.CAPABILITY_MUTE;
         mRemoteConnection.setConnectionCapabilities(capabilities);
-        mRemoteConnection.setRingbackRequested(true);
         callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
         assertEquals(mRemoteConnectionObject, callbackInvoker.getArgs(0)[0]);
         assertEquals(capabilities, callbackInvoker.getArgs(0)[1]);
@@ -253,6 +254,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             @Override
             public void onPostDialWait(RemoteConnection connection,
                                        String remainingPostDialSequence) {
+                super.onPostDialWait(connection, remainingPostDialSequence);
                 callbackInvoker.invoke(connection, remainingPostDialSequence);
             }
         };
@@ -279,6 +281,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onPostDialChar(RemoteConnection connection, char nextChar) {
+                super.onPostDialChar(connection, nextChar);
                 callbackInvoker.invoke(connection, nextChar);
             }
         };
@@ -305,6 +308,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onVoipAudioChanged(RemoteConnection connection, boolean isVoip) {
+                super.onVoipAudioChanged(connection, isVoip);
                 callbackInvoker.invoke(connection, isVoip);
             }
         };
@@ -330,6 +334,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onStatusHintsChanged(RemoteConnection connection, StatusHints statusHints) {
+                super.onStatusHintsChanged(connection, statusHints);
                 callbackInvoker.invoke(connection, statusHints);
             }
         };
@@ -357,6 +362,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             @Override
             public void onAddressChanged(RemoteConnection connection, Uri address,
                                          int presentation) {
+                super.onAddressChanged(connection, address, presentation);
                 callbackInvoker.invoke(connection, address, presentation);
             }
         };
@@ -385,6 +391,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             @Override
             public void onCallerDisplayNameChanged(
                     RemoteConnection connection, String callerDisplayName, int presentation) {
+                super.onCallerDisplayNameChanged(connection, callerDisplayName, presentation);
                 callbackInvoker.invoke(connection, callerDisplayName, presentation);
             }
         };
@@ -412,6 +419,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onVideoStateChanged(RemoteConnection connection, int videoState) {
+                super.onVideoStateChanged(connection, videoState);
                 callbackInvoker.invoke(connection, videoState);
             }
         };
@@ -439,6 +447,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             public void onConferenceableConnectionsChanged(
                     RemoteConnection connection,
                     List<RemoteConnection> conferenceableConnections) {
+                super.onConferenceableConnectionsChanged(connection, conferenceableConnections);
                 callbackInvoker.invoke(connection, conferenceableConnections);
             }
         };
@@ -477,6 +486,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             @Override
             public void onVideoProviderChanged(
                     RemoteConnection connection, VideoProvider videoProvider) {
+                super.onVideoProviderChanged(connection, videoProvider);
                 callbackInvoker.invoke(connection, videoProvider);
             }
         };
@@ -503,6 +513,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onExtrasChanged(RemoteConnection connection, Bundle extras) {
+                super.onExtrasChanged(connection, extras);
                 callbackInvoker.invoke(connection, extras);
             }
         };
@@ -533,6 +544,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             public void onDisconnected(
                     RemoteConnection connection,
                     DisconnectCause disconnectCause) {
+                super.onDisconnected(connection, disconnectCause);
                 callbackInvoker.invoke(connection, disconnectCause);
             }
         };
@@ -559,6 +571,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         callback = new RemoteConnection.Callback() {
             @Override
             public void onDestroyed(RemoteConnection connection) {
+                super.onDestroyed(connection);
                 callbackInvoker.invoke(connection);
             }
         };
@@ -587,6 +600,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             public void onSessionModifyRequestReceived(
                     VideoProvider videoProvider,
                     VideoProfile videoProfile) {
+                super.onSessionModifyRequestReceived(videoProvider, videoProfile);
                 callbackInvoker.invoke(videoProvider, videoProfile);
             }
 
@@ -596,6 +610,8 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
                     int status,
                     VideoProfile requestedProfile,
                     VideoProfile responseProfile) {
+                super.onSessionModifyResponseReceived(videoProvider, status, requestedProfile,
+                        responseProfile);
                 callbackInvoker.invoke(videoProvider, status, requestedProfile, responseProfile);
             }
         };
@@ -624,6 +640,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         videoCallback = new RemoteConnection.VideoProvider.Callback() {
             @Override
             public void onCallSessionEvent(VideoProvider videoProvider, int event) {
+                super.onCallSessionEvent(videoProvider, event);
                 callbackInvoker.invoke(videoProvider, event);
             }
         };
@@ -652,6 +669,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             @Override
             public void onPeerDimensionsChanged(VideoProvider videoProvider, int width,
                                                 int height) {
+                super.onPeerDimensionsChanged(videoProvider, width, height);
                 callbackInvoker.invoke(videoProvider, width, height);
             }
         };
@@ -681,6 +699,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         videoCallback = new RemoteConnection.VideoProvider.Callback() {
             @Override
             public void onCallDataUsageChanged(VideoProvider videoProvider, long dataUsage) {
+                super.onCallDataUsageChanged(videoProvider, dataUsage);
                 callbackInvoker.invoke(videoProvider, dataUsage);
             }
         };
@@ -711,6 +730,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
             public void onCameraCapabilitiesChanged(
                     VideoProvider videoProvider,
                     VideoProfile.CameraCapabilities cameraCapabilities) {
+                super.onCameraCapabilitiesChanged(videoProvider, cameraCapabilities);
                 callbackInvoker.invoke(videoProvider, cameraCapabilities);
             }
         };
@@ -739,6 +759,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         videoCallback = new RemoteConnection.VideoProvider.Callback() {
             @Override
             public void onVideoQualityChanged(VideoProvider videoProvider, int videoQuality) {
+                super.onVideoQualityChanged(videoProvider, videoQuality);
                 callbackInvoker.invoke(videoProvider, videoQuality);
             }
         };
