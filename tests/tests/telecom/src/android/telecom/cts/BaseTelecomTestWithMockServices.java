@@ -79,6 +79,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     InvokeCounter mOnBringToForegroundCounter;
     InvokeCounter mOnCallAudioStateChangedCounter;
+    InvokeCounter mOnPostDialWaitCounter;
 
     InCallServiceCallbacks mInCallCallbacks;
     String mPreviousDefaultDialer = null;
@@ -199,6 +200,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 Log.i(TAG, "onCallAudioStateChanged, audioState: " + audioState);
                 mOnCallAudioStateChangedCounter.invoke(audioState);
             }
+            @Override
+            public void onPostDialWait(Call call, String remainingPostDialSequence) {
+                mOnPostDialWaitCounter.invoke(call, remainingPostDialSequence);
+            }
         };
 
         MockInCallService.setCallbacks(mInCallCallbacks);
@@ -207,6 +212,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         // single Collection.
         mOnBringToForegroundCounter = new InvokeCounter("OnBringToForeground");
         mOnCallAudioStateChangedCounter = new InvokeCounter("OnCallAudioStateChanged");
+        mOnPostDialWaitCounter = new InvokeCounter("OnPostDialWait");
     }
 
     /**
@@ -765,7 +771,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
      * was invoked with. This class is prefixed Invoke rather than the more typical Call for
      * disambiguation purposes.
      */
-    protected final class InvokeCounter {
+    protected static final class InvokeCounter {
         private final String mName;
         private final Object mLock = new Object();
         private final ArrayList<Object[]> mInvokeArgs = new ArrayList<>();
@@ -794,6 +800,10 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
             synchronized (mLock) {
                 return mInvokeCount;
             }
+        }
+
+        public void waitForCount(int count) {
+            waitForCount(count, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
         }
 
         public void waitForCount(int count, long timeoutMillis) {

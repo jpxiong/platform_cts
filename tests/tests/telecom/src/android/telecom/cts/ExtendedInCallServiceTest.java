@@ -339,6 +339,38 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         assertTrue((Boolean) mOnBringToForegroundCounter.getArgs(1)[0]);
     }
 
+    public void testOnPostDialWaitAndContinue() {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        final MockConnection connection = verifyConnectionForOutgoingCall();
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+        final Call call = inCallService.getLastCall();
+        assertCallState(call, Call.STATE_DIALING);
+
+        connection.setActive();
+        assertCallState(call, Call.STATE_ACTIVE);
+
+        final String postDialString = "12345";
+        connection.setPostDialWait(postDialString);
+        mOnPostDialWaitCounter.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
+
+        assertEquals(postDialString, mOnPostDialWaitCounter.getArgs(0)[1]);
+        assertEquals(postDialString, call.getRemainingPostDialSequence());
+
+        final InvokeCounter counter = connection.getInvokeCounter(MockConnection.ON_POST_DIAL_WAIT);
+
+        call.postDialContinue(true);
+        counter.waitForCount(1);
+        assertTrue((Boolean) counter.getArgs(0)[0]);
+
+        call.postDialContinue(false);
+        counter.waitForCount(2);
+        assertFalse((Boolean) counter.getArgs(1)[0]);
+    }
+
     private void assertCanAddCall(final InCallService inCallService, final boolean canAddCall,
             String message) {
         waitUntilConditionIsTrueOrTimeout(
