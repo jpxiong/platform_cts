@@ -116,7 +116,11 @@ def main():
             # Verify MINIMAL(3) is not better than HQ(2)
             assert(variances[j][3] >
                    variances[j][2] * (1.0 - RELATIVE_ERROR_TOLERANCE))
-        if its.caps.noise_reduction_mode(props, 4):
+            if its.caps.noise_reduction_mode(props, 4):
+                # Verify ZSL(4) is close to MINIMAL(3)
+                assert(numpy.isclose(variances[j][4], variances[j][3],
+                                     RELATIVE_ERROR_TOLERANCE))
+        elif its.caps.noise_reduction_mode(props, 4):
             # Verify ZSL(4) is close to OFF(0)
             assert(numpy.isclose(variances[j][4], variances[j][0],
                                  RELATIVE_ERROR_TOLERANCE))

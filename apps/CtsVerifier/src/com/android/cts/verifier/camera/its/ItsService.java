@@ -1286,8 +1286,8 @@ public class ItsService extends Service implements SensorEventListener {
                         CaptureRequest.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR));
 
                 inputReqest.set(CaptureRequest.NOISE_REDUCTION_MODE,
-                        CaptureRequest.NOISE_REDUCTION_MODE_OFF);
-                inputReqest.set(CaptureRequest.EDGE_MODE, CaptureRequest.EDGE_MODE_OFF);
+                        CaptureRequest.NOISE_REDUCTION_MODE_ZERO_SHUTTER_LAG);
+                inputReqest.set(CaptureRequest.EDGE_MODE, CaptureRequest.EDGE_MODE_ZERO_SHUTTER_LAG);
                 inputReqest.set(CaptureRequest.REPROCESS_EFFECTIVE_EXPOSURE_FACTOR, null);
                 inputReqest.addTarget(mInputImageReader.getSurface());
                 mSession.capture(inputReqest.build(), captureCallbackWaiter, mResultHandler);
