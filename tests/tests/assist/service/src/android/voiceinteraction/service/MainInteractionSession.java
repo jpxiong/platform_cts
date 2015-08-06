@@ -31,6 +31,7 @@ import android.service.voice.VoiceInteractionSession.ConfirmationRequest;
 import android.service.voice.VoiceInteractionSession.PickOptionRequest;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,9 @@ public class MainInteractionSession extends VoiceInteractionSession {
     Intent mStartIntent;
     Context mContext;
     Bundle mAssistData = new Bundle();
+
+    private boolean hasReceivedAssistData = false;
+    private boolean hasReceivedScreenshot = false;
 
     MainInteractionSession(Context context) {
         super(context);
@@ -64,8 +68,6 @@ public class MainInteractionSession extends VoiceInteractionSession {
     public void onShow(Bundle args, int showFlags) {
         // set some content view.
         // TODO: check that the view takes up the whole screen.
-        mStartIntent = args.getParcelable("intent");
-        startVoiceActivity(mStartIntent); // remove
         // check that interactor mode is for assist
         if ((showFlags & SHOW_WITH_ASSIST) == 0) {
             return;
@@ -73,32 +75,52 @@ public class MainInteractionSession extends VoiceInteractionSession {
         super.onShow(args, showFlags);
     }
 
-
     @Override
     public void onHandleAssist(/*@Nullable */Bundle data, /*@Nullable*/ AssistStructure structure,
         /*@Nullable*/ AssistContent content) {
         Log.i(TAG, "onHandleAssist");
-        Log.i(TAG, String.format("Bundle: %s, Structure: %s, Content: %s", data, structure, content));
+        Log.i(TAG,
+            String.format("Bundle: %s, Structure: %s, Content: %s", data, structure, content));
         super.onHandleAssist(data, structure, content);
 
         // send to test to verify that this is accurate.
         mAssistData.putParcelable(Utils.ASSIST_STRUCTURE_KEY, structure);
         mAssistData.putParcelable(Utils.ASSIST_CONTENT_KEY, content);
-        mAssistData.putBundle(Utils.ASSIST_BUNDLE, data);
-        broadcastResults();
+        mAssistData.putBundle(Utils.ASSIST_BUNDLE_KEY, data);
+        hasReceivedAssistData = true;
+        maybeBroadcastResults();
     }
 
     @Override
     public void onHandleScreenshot(/*@Nullable*/ Bitmap screenshot) {
+        Log.i(TAG, "onHandleScreenshot");
         super.onHandleScreenshot(screenshot);
-        // add this to mAssistData?
+        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        if (screenshot != null) {
+            screenshot.compress(Bitmap.CompressFormat.PNG, 50, bs);
+            mAssistData.putByteArray(Utils.ASSIST_SCREENSHOT_KEY, bs.toByteArray());
+        } else {
+            mAssistData.putByteArray(Utils.ASSIST_SCREENSHOT_KEY, null);
+        }
+        hasReceivedScreenshot = true;
+        maybeBroadcastResults();
     }
 
-    private void broadcastResults() {
-        Intent intent = new Intent(Utils.BROADCAST_ASSIST_DATA_INTENT);
-        intent.putExtras(mAssistData);
-        Log.i(TAG, "broadcasting: " + intent.toString() + ", Bundle = " + mAssistData.toString());
-        mContext.sendBroadcast(intent);
+    private void maybeBroadcastResults() {
+        if (!hasReceivedAssistData) {
+            Log.i(TAG, "waiting for assist data before broadcasting results");
+        } else if (!hasReceivedScreenshot) {
+            Log.i(TAG, "waiting for screenshot before broadcasting results");
+        } else {
+            Intent intent = new Intent(Utils.BROADCAST_ASSIST_DATA_INTENT);
+            intent.putExtras(mAssistData);
+            Log.i(TAG,
+                    "broadcasting: " + intent.toString() + ", Bundle = " + mAssistData.toString());
+            mContext.sendBroadcast(intent);
+
+            hasReceivedAssistData = false;
+            hasReceivedScreenshot = false;
+        }
     }
 
     class DoneReceiver extends BroadcastReceiver {

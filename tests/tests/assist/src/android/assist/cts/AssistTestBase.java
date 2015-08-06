@@ -27,11 +27,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
-import java.lang.Override;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -41,11 +42,11 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected TestStartActivity mTestActivity;
     protected AssistContent mAssistContent;
     protected AssistStructure mAssistStructure;
+    protected Bitmap mScreenshot;
     protected BroadcastReceiver mReceiver;
     protected Bundle mAssistBundle;
     protected Context mContext;
     protected CountDownLatch mLatch;
-    protected Utils.TestCaseType mTestCaseType;
     private String mTestName;
 
     public AssistTestBase() {
@@ -78,8 +79,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     /**
      * Called after startTestActivity
      */
-    protected boolean waitForBroadcast(Utils.TestCaseType testCaseType) throws Exception {
-        mTestCaseType = testCaseType;
+    protected boolean waitForBroadcast() throws Exception {
         mLatch = new CountDownLatch(1);
         if (mReceiver != null) {
             mContext.unregisterReceiver(mReceiver);
@@ -88,6 +88,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         mContext.registerReceiver(mReceiver,
                 new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
 
+        mTestActivity.start3pApp();
         mTestActivity.startTest(mTestName);
         if (!mLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             fail("Failed to receive broadcast in " + Utils.TIMEOUT_MS + "msec");
@@ -96,17 +97,38 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         return true;
     }
 
+    protected void verifyAssistStructure(ComponentName backgroundApp, boolean isSecureWindow) {
+        // Check component name matches
+        assertEquals(backgroundApp.flattenToString(),
+            mAssistStructure.getActivityComponent().flattenToString());
+
+        int numWindows = mAssistStructure.getWindowNodeCount();
+        assertEquals(1, numWindows);
+        for (int i = 0; i < numWindows; i++) {
+            AssistStructure.ViewNode node = mAssistStructure.getWindowNodeAt(i).getRootViewNode();
+            // TODO: traverse view heirarchy and verify it matches what we expect
+        }
+    }
+
     class TestResultsReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equalsIgnoreCase(Utils.BROADCAST_ASSIST_DATA_INTENT)) { // not necessary?
-                Log.i(TAG, "received broadcast with results ");
+                Log.i(TAG, "Received broadcast with assist data.");
                 Bundle assistData = intent.getExtras();
+                AssistTestBase.this.mAssistBundle = assistData.getBundle(Utils.ASSIST_BUNDLE_KEY);
                 AssistTestBase.this.mAssistStructure = assistData.getParcelable(
                         Utils.ASSIST_STRUCTURE_KEY);
-                AssistTestBase.this.mAssistBundle = assistData.getBundle(Utils.ASSIST_BUNDLE);
                 AssistTestBase.this.mAssistContent = assistData.getParcelable(
                         Utils.ASSIST_CONTENT_KEY);
+
+                byte[] bitmapArray = assistData.getByteArray(Utils.ASSIST_SCREENSHOT_KEY);
+                if (bitmapArray != null) {
+                    AssistTestBase.this.mScreenshot = BitmapFactory.decodeByteArray(
+                            bitmapArray, 0, bitmapArray.length);
+                } else {
+                    AssistTestBase.this.mScreenshot = null;
+                }
 
                 if (mLatch != null) {
                     mLatch.countDown();

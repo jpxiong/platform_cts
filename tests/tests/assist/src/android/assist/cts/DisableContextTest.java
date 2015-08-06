@@ -27,7 +27,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.SystemUtil;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
@@ -39,7 +41,7 @@ import java.util.concurrent.CountDownLatch;
 public class DisableContextTest extends AssistTestBase {
     static final String TAG = "DisableContextTest";
 
-    private static final String TEST_CASE_TYPE = "DISABLE_CONTEXT";
+    private static final String TEST_CASE_TYPE = Utils.DISABLE_CONTEXT;
 
     public DisableContextTest() {
         super();
@@ -48,43 +50,65 @@ public class DisableContextTest extends AssistTestBase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        // need to set action/component/activityintent for the test activity?
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure assist_structure_enabled 0");
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure assist_screenshot_enabled 0");
+
         startTestActivity(TEST_CASE_TYPE);
-        waitForBroadcast(Utils.TestCaseType.DISABLE_CONTEXT);
+        waitForBroadcast();
     }
 
-    public void testContextOnAndOff() throws Exception {
-        // filler
+    @Override
+    public void tearDown() throws Exception {
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure assist_structure_enabled 1");
+        SystemUtil.runShellCommand(getInstrumentation(),
+                "settings put secure assist_screenshot_enabled 1");
+        super.tearDown();
+    }
 
+    public void testContextAndScreenshotOff() throws Exception {
+        // Both settings off
+        if (mAssistContent != null || mAssistBundle != null || mAssistStructure != null) {
+            fail(String.format("Should have all been null - Bundle: %s, Structure: %s, Content: %s",
+                    mAssistBundle, mAssistStructure, mAssistContent));
+        }
 
-        // verify assist data contains what we want.
-        // go through all things in the bundle, verify not null, verify contains what we want.
+        if (mScreenshot != null) {
+            fail(String.format("Should have been null - Screenshot: %s", mScreenshot));
+        }
 
-        // TODO(awlee): verify that the context is not off by default.
+        // Screenshot off, context on
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_structure_enabled 1");
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_screenshot_enabled 0");
+        waitForBroadcast();
+
+        if (mScreenshot != null) {
+            fail(String.format("Should have been null - Screenshot: %s", mScreenshot));
+        }
+
         if (mAssistContent == null || mAssistBundle == null) {
-            fail("Received null assistBundle or assistContent.");
-            return;
+            fail(String.format("Should not have been null - Bundle: %s, Content: %s",
+                mAssistBundle, mAssistContent));
         }
 
-        if (mAssistStructure == null) {
-            fail("Received null assistStructure");
-            return;
-        } else {
-            verifyAssistStructure(new ComponentName("android.assist.service",
-                    "android.assist." + Utils.getTestActivity(TEST_CASE_TYPE)), false /*FLAG_SECURE set*/);
+        // Context off, screenshot on
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_screenshot_enabled 1");
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_structure_enabled 0");
+        waitForBroadcast();
+
+        if (mScreenshot == null) {
+            fail(String.format("Should not have been null - Screenshot: %s", mScreenshot));
         }
-    }
 
-    private void verifyAssistStructure(ComponentName backgroundApp,
-            boolean isSecureWindow) {
-        // Check component name matches
-        assertEquals(backgroundApp.flattenToString(),
-                mAssistStructure.getActivityComponent().flattenToString());
-
-        int numWindows = mAssistStructure.getWindowNodeCount();
-        assertEquals(1, numWindows);
-        for (int i = 0; i < numWindows; i++) {
-            AssistStructure.ViewNode node = mAssistStructure.getWindowNodeAt(i).getRootViewNode();
+        if (mAssistContent != null || mAssistBundle != null || mAssistStructure != null) {
+            fail(String.format("Should have all been null - Bundle: %s, Structure: %s, Content: %s",
+                mAssistBundle, mAssistStructure, mAssistContent));
         }
     }
 }

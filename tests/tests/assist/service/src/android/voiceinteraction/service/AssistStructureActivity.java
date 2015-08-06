@@ -35,8 +35,8 @@ public class AssistStructureActivity extends Activity {
         super.onStart();
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(this, MainInteractionService.class));
-        ComponentName serviceName = startService(intent);
-        Log.i(TAG, "Started service: " + serviceName);
-        getLayoutInflater().inflate(R.layout.voice_interaction_main, null);
+        Log.i(TAG, "Starting service.");
+        finish();
+        startService(intent);
     }
 }

@@ -26,6 +26,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.SystemUtil;
 import android.os.Bundle;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class AssistStructureTest extends AssistTestBase {
     static final String TAG = "AssistStructureTest";
 
-    private static final String TEST_CASE_TYPE = "ASSIST_STRUCTURE";
+    private static final String TEST_CASE_TYPE = Utils.ASSIST_STRUCTURE;
 
     public AssistStructureTest() {
         super();
@@ -52,16 +53,17 @@ public class AssistStructureTest extends AssistTestBase {
     protected void setUp() throws Exception {
         super.setUp();
         startTestActivity(TEST_CASE_TYPE);
-        waitForBroadcast(Utils.TestCaseType.ASSIST_STRUCTURE);
+        waitForBroadcast();
     }
 
     public void testAssistStructure() throws Exception {
-        // verify assist data contains what we want.
-        // go through all things in the bundle, verify not null, verify contains what we want.
-
-        // TODO(awlee): verify that the context is not off by default.
-        if (mAssistContent == null || mAssistBundle == null) {
+        // TODO(awlee): verify that the context/screenshot setting is on if appropriate
+        if (mAssistContent == null) {
             fail("Received null assistBundle or assistContent.");
+            return;
+        }
+        if (mAssistBundle == null) {
+            fail("Received null assistBundle.");
             return;
         }
 
@@ -69,21 +71,8 @@ public class AssistStructureTest extends AssistTestBase {
             fail("Received null assistStructure");
             return;
         } else {
-            verifyAssistStructure(new ComponentName("android.assist.service",
-                    "android.assist." + Utils.getTestActivity(TEST_CASE_TYPE)), false /*FLAG_SECURE set*/);
-        }
-    }
-
-    private void verifyAssistStructure(ComponentName backgroundApp,
-            boolean isSecureWindow) {
-        // Check component name matches
-        assertEquals(backgroundApp.flattenToString(),
-                mAssistStructure.getActivityComponent().flattenToString());
-
-        int numWindows = mAssistStructure.getWindowNodeCount();
-        assertEquals(1, numWindows);
-        for (int i = 0; i < numWindows; i++) {
-            AssistStructure.ViewNode node = mAssistStructure.getWindowNodeAt(i).getRootViewNode();
+            verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE),
+                    false /*FLAG_SECURE set*/);
         }
     }
 }
