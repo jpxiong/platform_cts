@@ -115,29 +115,31 @@ public class EnumDevicesTest extends AndroidTestCase {
             // Sample Rates
             int[] sampleRates = deviceInfo.getSampleRates();
             assertNotNull(sampleRates);
-            // "analog" devices won't list any sample rates
+            // Note: an empty array indicates that the device supports arbitrary sample rates.
 
             // Channel Masks
             int[] channelMasks = deviceInfo.getChannelMasks();
             assertNotNull(channelMasks);
-            // "analog" devices won't list any channel masks
+            // Note: an empty array indicates that the device supports arbitrary channel masks.
 
             // Channel Index Masks
             int[] indexMasks = deviceInfo.getChannelIndexMasks();
-            assertNotNull(channelMasks);
+            assertNotNull(indexMasks);
+            // Note: an empty array indicates that the device supports arbitrary channel index
+            // masks.
 
             // Channel Counts
             int[] channelCounts = deviceInfo.getChannelCounts();
             assertNotNull(channelCounts);
-            // "analog" devices won't list any channel Counts
+            // Note: an empty array indicates that the device supports arbitrary channel counts.
 
             // Encodings
             int[] encodings = deviceInfo.getEncodings();
             assertNotNull(encodings);
-            // "analog" devices won't list any encodings
+            // Note: an empty array indicates that the device supports arbitrary encodings.
 
             int type = deviceInfo.getType();
-            assert(type > AudioDeviceInfo.TYPE_UNKNOWN);
+            assertTrue(type != AudioDeviceInfo.TYPE_UNKNOWN);
         }
     }
 
@@ -167,7 +169,7 @@ public class EnumDevicesTest extends AndroidTestCase {
         }
         return myLooper;
     }
-    
+
     public void test_deviceCallback() {
         // null callback?
         mAudioManager.registerAudioDeviceCallback(null,null);
@@ -187,7 +189,7 @@ public class EnumDevicesTest extends AndroidTestCase {
         mAudioManager.unregisterAudioDeviceCallback(callback);
 
         Looper myLooper = prepareIfNeededLooper();
-        
+
         mAudioManager.registerAudioDeviceCallback(callback, new Handler());
         // unregister null callback
         mAudioManager.unregisterAudioDeviceCallback(null);
