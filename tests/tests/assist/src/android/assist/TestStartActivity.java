@@ -52,6 +52,14 @@ public class TestStartActivity extends Activity {
         startActivity(intent);
     }
 
+    public void start3pApp() {
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName("android.assist.testapp",
+                "android.assist.testapp.TestApp"));
+        startActivity(intent);
+
+    }
+
     @Override protected void onPause() {
         Log.i(TAG, " in onPause");
         super.onPause();
