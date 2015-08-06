@@ -354,7 +354,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         assertCallState(call, Call.STATE_ACTIVE);
 
         final String postDialString = "12345";
-        connection.setPostDialWait(postDialString);
+        ((Connection) connection).setPostDialWait(postDialString);
         mOnPostDialWaitCounter.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
 
         assertEquals(postDialString, mOnPostDialWaitCounter.getArgs(0)[1]);
