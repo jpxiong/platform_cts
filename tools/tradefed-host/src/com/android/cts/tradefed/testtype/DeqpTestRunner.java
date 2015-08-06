@@ -64,7 +64,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         new BatchRunConfiguration("rgba8888d24s8", "unspecified", "window");
 
     private static final int UNRESPOSIVE_CMD_TIMEOUT_MS = 60000; // one minute
-    private static final int FILE_REMOVE_RETRY_INTERVAL = 2000; // 2 seconds
 
     private final String mPackageName;
     private final String mName;
@@ -79,7 +78,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
     private Set<String> mDeviceFeatures;
     private Map<String, Boolean> mConfigQuerySupportCache = new HashMap<>();
     private IRunUtil mRunUtil = RunUtil.getDefault();
-    private ISleepProvider mSleepProvider = new SleepProvider();
 
     private IRecovery mDeviceRecovery = new Recovery();
     {
@@ -151,15 +149,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
      */
     public void setRecovery(IRecovery deviceRecovery) {
         mDeviceRecovery = deviceRecovery;
-    }
-
-    /**
-     * Sets the sleep provider DeqpTestRunner works on.
-     *
-     * Exposed for unit testing.
-     */
-    public void setSleepProvider(ISleepProvider sleepProvider) {
-        mSleepProvider = sleepProvider;
     }
 
     /**
@@ -777,12 +766,12 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         public void recoverConnectionRefused() throws DeviceNotAvailableException;
 
         /**
-         * Tries to recover device after abnormal termination of a command or a test run execution
-         * or link failure.
+         * Tries to recover device after abnormal execution termination or link failure.
          *
+         * @param progressedSinceLastCall true if test execution has progressed since last call
          * @throws DeviceNotAvailableException if recovery did not succeed
          */
-        public void recoverCommandNotCompleted() throws DeviceNotAvailableException;
+        public void recoverComLinkKilled() throws DeviceNotAvailableException;
     };
 
     /**
@@ -875,7 +864,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
          * {@inheritDoc}
          */
         @Override
-        public void recoverCommandNotCompleted() throws DeviceNotAvailableException {
+        public void recoverComLinkKilled() throws DeviceNotAvailableException {
             switch (mState) {
                 case WAIT:
                     // First failure, just try to wait and try again
@@ -890,10 +879,10 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         killDeqpProcess();
                     } catch (DeviceNotAvailableException ex) {
                         // chain forward
-                        recoverCommandNotCompleted();
+                        recoverComLinkKilled();
                     } catch (ProcessKillFailureException ex) {
                         // chain forward
-                        recoverCommandNotCompleted();
+                        recoverComLinkKilled();
                     }
                     break;
 
@@ -907,10 +896,10 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         killDeqpProcess();
                     } catch (DeviceNotAvailableException ex) {
                         // chain forward
-                        recoverCommandNotCompleted();
+                        recoverComLinkKilled();
                     } catch (ProcessKillFailureException ex) {
                         // chain forward
-                        recoverCommandNotCompleted();
+                        recoverComLinkKilled();
                     }
                     break;
 
@@ -923,7 +912,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
                         rebootDevice();
                     } catch (DeviceNotAvailableException ex) {
                         // chain forward
-                        recoverCommandNotCompleted();
+                        recoverComLinkKilled();
                     }
                     break;
 
@@ -1408,51 +1397,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         }
     }
 
-    private static final class FileRecreateFailedException extends Exception {
-    };
-
-    /**
-     * Creates a log file suitable for writing.
-     *
-     * Creates an empty file that is suitable for writing. If target file already exists, it will
-     * first be removed and then recreated. This delete-recreate cycle should guarantee that the
-     * target file is always writable and is not affected by file-access flags of the pre-existing
-     * file.
-     *
-     * Precreating a file in the runner makes detecting file-access issues faster and more
-     * reliable. It also avoids issues caused by sdcard FUSE spuriously preventing file creation.
-     */
-    private void precreateLogFile() throws DeviceNotAvailableException,
-            FileRecreateFailedException {
-        final int NUM_ATTEMPTS = 4;
-        int attemptNum = 0;
-        for (;;) {
-            mDevice.executeShellCommand("rm " + LOG_FILE_NAME);
-            ++attemptNum;
-
-            if (!mDevice.doesFileExist(LOG_FILE_NAME)) {
-                // yay, remove works like it should
-                break;
-            } else if (attemptNum < NUM_ATTEMPTS) {
-                // wait if we failed
-                CLog.w("Remote file removal failed, retrying...");
-                mSleepProvider.sleep(FILE_REMOVE_RETRY_INTERVAL);
-            } else {
-                // Bail
-                CLog.e("Could not delete a remote file.");
-                throw new FileRecreateFailedException();
-            }
-        }
-
-        // create & truncate and make world read-writable
-        mDevice.pushString("", LOG_FILE_NAME);
-
-        if (!mDevice.doesFileExist(LOG_FILE_NAME)) {
-            CLog.e("Could not precreate log file.");
-            throw new FileRecreateFailedException();
-        }
-    }
-
     /**
      * Runs one execution pass over the given batch.
      *
@@ -1468,8 +1412,8 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
         final String testCases = generateTestCaseTrie(batch.tests);
 
-        // Caselist file cannot linger.
         mDevice.executeShellCommand("rm " + CASE_LIST_FILE_NAME);
+        mDevice.executeShellCommand("rm " + LOG_FILE_NAME);
         mDevice.pushString(testCases + "\n", CASE_LIST_FILE_NAME);
 
         final String instrumentationName =
@@ -1499,9 +1443,6 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
         Throwable interruptingError = null;
 
         try {
-            // we might have lingering log file from a previous dirty run and it might be somehow
-            // locked (details unknown). Make sure it's writable when test is run.
-            precreateLogFile();
             executeShellCommandAndReadOutput(command, parser);
         } catch (Throwable ex) {
             interruptingError = ex;
@@ -1521,9 +1462,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
             if (interruptingError instanceof AdbComLinkOpenError) {
                 mDeviceRecovery.recoverConnectionRefused();
             } else if (interruptingError instanceof AdbComLinkKilledError) {
-                mDeviceRecovery.recoverCommandNotCompleted();
-            } else if (interruptingError instanceof FileRecreateFailedException) {
-                mDeviceRecovery.recoverCommandNotCompleted();
+                mDeviceRecovery.recoverComLinkKilled();
             } else if (interruptingError instanceof RunInterruptedException) {
                 // external run interruption request. Terminate immediately.
                 throw (RunInterruptedException)interruptingError;
@@ -1534,7 +1473,7 @@ public class DeqpTestRunner implements IBuildReceiver, IDeviceTest, IRemoteTest 
 
             // recoverXXX did not throw => recovery succeeded
         } else if (!parser.wasSuccessful()) {
-            mDeviceRecovery.recoverCommandNotCompleted();
+            mDeviceRecovery.recoverComLinkKilled();
             // recoverXXX did not throw => recovery succeeded
         }
 
