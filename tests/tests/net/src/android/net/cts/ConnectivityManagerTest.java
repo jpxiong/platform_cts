@@ -33,6 +33,7 @@ import android.net.NetworkRequest;
 import android.net.wifi.WifiManager;
 import android.test.AndroidTestCase;
 import android.util.Log;
+import android.os.SystemProperties;
 
 import com.android.internal.telephony.PhoneConstants;
 
@@ -78,10 +79,14 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         // Get com.android.internal.R.array.networkAttributes
         int resId = getContext().getResources().getIdentifier("networkAttributes", "array", "android");
         String[] naStrings = getContext().getResources().getStringArray(resId);
-
+        //TODO: What is the "correct" way to determine if this is a wifi only device?
+        boolean wifiOnly = SystemProperties.getBoolean("ro.radio.noril", false);
         for (String naString : naStrings) {
             try {
                 NetworkConfig n = new NetworkConfig(naString);
+                if (wifiOnly && ConnectivityManager.isNetworkTypeMobile(n.type)) {
+                    continue;
+                }
                 mNetworks.put(n.type, n);
             } catch (Exception e) {}
         }
