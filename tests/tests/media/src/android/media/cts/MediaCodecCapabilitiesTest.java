@@ -19,6 +19,7 @@ import android.content.pm.PackageManager;
 import android.cts.util.MediaUtils;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.AudioCapabilities;
 import android.media.MediaCodecInfo.CodecCapabilities;
 import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.MediaCodecInfo.VideoCapabilities;
@@ -530,24 +531,35 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         }
     }
 
-    private static MediaFormat createMinFormat(String mime, VideoCapabilities vcaps, int color) {
-        int minWidth = vcaps.getSupportedWidths().getLower();
-        int minHeight = vcaps.getSupportedHeightsFor(minWidth).getLower();
-        int minBitrate = vcaps.getBitrateRange().getLower();
+    private static MediaFormat createMinFormat(String mime, CodecCapabilities caps) {
+        MediaFormat format;
+        if (caps.getVideoCapabilities() != null) {
+            VideoCapabilities vcaps = caps.getVideoCapabilities();
+            int minWidth = vcaps.getSupportedWidths().getLower();
+            int minHeight = vcaps.getSupportedHeightsFor(minWidth).getLower();
+            int minBitrate = vcaps.getBitrateRange().getLower();
+            format = MediaFormat.createVideoFormat(mime, minWidth, minHeight);
+            format.setInteger(MediaFormat.KEY_COLOR_FORMAT, caps.colorFormats[0]);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, minBitrate);
+            format.setInteger(MediaFormat.KEY_FRAME_RATE, 10);
+            format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10);
+        } else {
+            AudioCapabilities acaps = caps.getAudioCapabilities();
+            int minSampleRate = acaps.getSupportedSampleRateRanges()[0].getLower();
+            int minChannelCount = 1;
+            int minBitrate = acaps.getBitrateRange().getLower();
+            format = MediaFormat.createAudioFormat(mime, minSampleRate, minChannelCount);
+            format.setInteger(MediaFormat.KEY_BIT_RATE, minBitrate);
+        }
 
-        MediaFormat format = MediaFormat.createVideoFormat(mime, minWidth, minHeight);
-        format.setInteger(MediaFormat.KEY_COLOR_FORMAT, color);
-        format.setInteger(MediaFormat.KEY_BIT_RATE, minBitrate);
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, 10);
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10);
         return format;
     }
 
     private static int getActualMax(
             boolean isEncoder, String name, String mime, CodecCapabilities caps, int max) {
         int flag = isEncoder ? MediaCodec.CONFIGURE_FLAG_ENCODE : 0;
-        MediaFormat format =
-                createMinFormat(mime, caps.getVideoCapabilities(), caps.colorFormats[0]);
+        MediaFormat format = createMinFormat(mime, caps);
+        Log.d(TAG, "Test format " + format);
         Vector<MediaCodec> codecs = new Vector<MediaCodec>();
         MediaCodec codec = null;
         for (int i = 0; i < max; ++i) {
@@ -588,14 +600,6 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
         return actualMax;
     }
 
-    private static boolean shouldTestActual(CodecCapabilities caps) {
-        if (caps.getVideoCapabilities() == null) {
-            // TODO: test audio codecs.
-            return false;
-        }
-        return true;
-    }
-
     public void testGetMaxSupportedInstances() {
         final int MAX_INSTANCES = 32;
         StringBuilder xmlOverrides = new StringBuilder();
@@ -612,21 +616,19 @@ public class MediaCodecCapabilitiesTest extends MediaPlayerTestBase {
                 Log.d(TAG, "getMaxSupportedInstances returns " + max);
                 assertTrue(max > 0);
 
-                if (shouldTestActual(caps)) {
-                    int actualMax = getActualMax(
-                            info.isEncoder(), info.getName(), types[j], caps, MAX_INSTANCES);
-                    Log.d(TAG, "actualMax " + actualMax + " vs reported max " + max);
-                    if (actualMax < (int)(max * 0.9) || actualMax > (int) Math.ceil(max * 1.1)) {
-                        String codec = "<MediaCodec name=\"" + info.getName() +
-                                "\" type=\"" + types[j] + "\" >";
-                        String limit = "    <Limit name=\"concurrent-instances\" max=\"" +
-                                actualMax + "\" />";
-                        xmlOverrides.append(codec);
-                        xmlOverrides.append("\n");
-                        xmlOverrides.append(limit);
-                        xmlOverrides.append("\n");
-                        xmlOverrides.append("</MediaCodec>\n");
-                    }
+                int actualMax = getActualMax(
+                        info.isEncoder(), info.getName(), types[j], caps, MAX_INSTANCES);
+                Log.d(TAG, "actualMax " + actualMax + " vs reported max " + max);
+                if (actualMax < (int)(max * 0.9) || actualMax > (int) Math.ceil(max * 1.1)) {
+                    String codec = "<MediaCodec name=\"" + info.getName() +
+                            "\" type=\"" + types[j] + "\" >";
+                    String limit = "    <Limit name=\"concurrent-instances\" max=\"" +
+                            actualMax + "\" />";
+                    xmlOverrides.append(codec);
+                    xmlOverrides.append("\n");
+                    xmlOverrides.append(limit);
+                    xmlOverrides.append("\n");
+                    xmlOverrides.append("</MediaCodec>\n");
                 }
             }
         }
