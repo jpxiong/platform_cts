@@ -49,5 +49,9 @@
 {
   name: "libcore.javax.net.ssl.SSLContextTest#test_SSLContext_getSupportedSSLParameters",
   bug: 18036008
+},
+{
+  name: "libcore.javax.net.ssl.SSLSocketTest#test_SSLSocket_getSupportedCipherSuites_names",
+  bug: 18033537
 }
 ]
