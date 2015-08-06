@@ -17,8 +17,10 @@
 package com.android.cts.externalstorageapp;
 
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirReadWriteAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getMountPaths;
 
 import android.app.DownloadManager;
 import android.app.DownloadManager.Query;
@@ -34,7 +36,9 @@ import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.text.format.DateUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +75,25 @@ public class ExternalStorageTest extends AndroidTestCase {
             while (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState(path))) {
                 assertDirNoAccess(path);
                 path = path.getParentFile();
+            }
+        }
+    }
+
+    /**
+     * Verify that we don't have read access to any storage mountpoints.
+     */
+    public void testMountPointsNotReadable() throws Exception {
+        final String userId = Integer.toString(android.os.Process.myUid() / 100000);
+        final List<File> mountPaths = getMountPaths();
+        for (File path : mountPaths) {
+            if (path.getAbsolutePath().startsWith("/mnt/")
+                    || path.getAbsolutePath().startsWith("/storage/")) {
+                // Mount points could be multi-user aware, so try probing both
+                // top level and user-specific directory.
+                final File userPath = new File(path, userId);
+
+                assertDirNoAccess(path);
+                assertDirNoAccess(userPath);
             }
         }
     }
