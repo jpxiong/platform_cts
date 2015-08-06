@@ -289,7 +289,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
         };
         mRemoteConnectionObject.registerCallback(callback, handler);
         char postDialChar = '3';
-        mRemoteConnection.setNextPostDialChar(postDialChar);
+        ((Connection) mRemoteConnection).setNextPostDialChar(postDialChar);
         callbackInvoker.waitForCount(1, WAIT_FOR_STATE_CHANGE_TIMEOUT_MS);
         assertEquals(mRemoteConnectionObject, callbackInvoker.getArgs(0)[0]);
         assertEquals(postDialChar, callbackInvoker.getArgs(0)[1]);
