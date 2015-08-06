@@ -39,7 +39,8 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
 
     private static final String FEATURE_BLUETOOTH = "android.hardware.bluetooth";
     private int mUserId;
-
+    private boolean mHasNfcFeature;
+    
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -47,6 +48,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         // We need multi user to be supported in order to create a profile of the user owner.
         mHasFeature = mHasFeature && hasDeviceFeature(
                 "android.software.managed_users");
+        mHasNfcFeature = hasDeviceFeature("android.hardware.nfc");
 
         if (mHasFeature) {
             mUserId = createManagedProfile();
@@ -272,6 +274,30 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
                     "testCurrentProfileContacts_removeContacts", 0);
         }
+    }
+
+    public void testNfcRestriction() throws Exception {
+        if (!mHasFeature || !mHasNfcFeature) {
+            return;
+        }
+
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".NfcTest",
+                "testNfcShareEnabled", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".NfcTest",
+                "testNfcShareEnabled", 0));
+
+        String restriction = "no_outgoing_beam";  // UserManager.DISALLOW_OUTGOING_BEAM
+        String command = "add-restriction";
+
+        String addRestrictionCommandOutput =
+                changeUserRestrictionForUser(restriction, command, mUserId);
+        assertTrue("Command was expected to succeed " + addRestrictionCommandOutput,
+                addRestrictionCommandOutput.contains("Status: ok"));
+
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".NfcTest",
+                "testNfcShareDisabled", mUserId));
+        assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".NfcTest",
+                "testNfcShareEnabled", 0));
     }
 
     private void disableActivityForUser(String activityName, int userId)
