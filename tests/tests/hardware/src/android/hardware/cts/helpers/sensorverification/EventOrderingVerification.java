@@ -49,10 +49,8 @@ public class EventOrderingVerification extends AbstractSensorVerification {
     @SuppressWarnings("deprecation")
     public static EventOrderingVerification getDefault(TestSensorEnvironment environment) {
         int reportingMode = environment.getSensor().getReportingMode();
-        if (reportingMode != Sensor.REPORTING_MODE_CONTINUOUS
-                && reportingMode != Sensor.REPORTING_MODE_ON_CHANGE) {
+        if (reportingMode == Sensor.REPORTING_MODE_ONE_SHOT)
             return null;
-        }
         return new EventOrderingVerification();
     }
 
