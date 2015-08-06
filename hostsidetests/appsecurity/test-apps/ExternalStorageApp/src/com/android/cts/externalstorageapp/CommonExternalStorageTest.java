@@ -26,12 +26,14 @@ import android.provider.MediaStore.Images;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -163,6 +165,21 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         Collections.addAll(
                 paths, dropFirst(context.getExternalFilesDirs(Environment.DIRECTORY_PICTURES)));
         Collections.addAll(paths, dropFirst(context.getObbDirs()));
+        return paths;
+    }
+
+    public static List<File> getMountPaths() throws IOException {
+        final List<File> paths = new ArrayList<>();
+        final BufferedReader br = new BufferedReader(new FileReader("/proc/self/mounts"));
+        try {
+            String line;
+            while ((line = br.readLine()) != null) {
+                final String[] fields = line.split(" ");
+                paths.add(new File(fields[1]));
+            }
+        } finally {
+            br.close();
+        }
         return paths;
     }
 
