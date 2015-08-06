@@ -97,15 +97,15 @@ public class LowRamDeviceTest extends AndroidTestCase {
             } else {
                 assertMinMemoryMb(424);
             }
-        } else if (greaterThanDpi(density, DENSITY_XHIGH, screenSize,
+        } else if (greaterThanDpi(density, DENSITY_560, screenSize,
                 SCREENLAYOUT_SIZE_NORMAL, SCREENLAYOUT_SIZE_SMALL) ||
-                greaterThanDpi(density, DENSITY_TV, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
-                greaterThanDpi(density, DENSITY_MEDIUM, screenSize, SCREENLAYOUT_SIZE_XLARGE)) {
+                greaterThanDpi(density, DENSITY_400, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
+                greaterThanDpi(density, DENSITY_XHIGH, screenSize, SCREENLAYOUT_SIZE_XLARGE)) {
 
             if (supports64Bit) {
-                assertMinMemoryMb(832);
+                assertMinMemoryMb(1824);
             } else {
-                assertMinMemoryMb(512);
+                assertMinMemoryMb(1344);
             }
         } else if (greaterThanDpi(density, DENSITY_400, screenSize,
                 SCREENLAYOUT_SIZE_NORMAL, SCREENLAYOUT_SIZE_SMALL) ||
@@ -117,15 +117,15 @@ public class LowRamDeviceTest extends AndroidTestCase {
             } else {
                 assertMinMemoryMb(896);
             }
-        } else if (greaterThanDpi(density, DENSITY_560, screenSize,
+        } else if (greaterThanDpi(density, DENSITY_XHIGH, screenSize,
                 SCREENLAYOUT_SIZE_NORMAL, SCREENLAYOUT_SIZE_SMALL) ||
-                greaterThanDpi(density, DENSITY_400, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
-                greaterThanDpi(density, DENSITY_XHIGH, screenSize, SCREENLAYOUT_SIZE_XLARGE)) {
+                greaterThanDpi(density, DENSITY_TV, screenSize, SCREENLAYOUT_SIZE_LARGE) ||
+                greaterThanDpi(density, DENSITY_MEDIUM, screenSize, SCREENLAYOUT_SIZE_XLARGE)) {
 
             if (supports64Bit) {
-                assertMinMemoryMb(1824);
+                assertMinMemoryMb(832);
             } else {
-                assertMinMemoryMb(1344);
+                assertMinMemoryMb(512);
             }
         }
     }
