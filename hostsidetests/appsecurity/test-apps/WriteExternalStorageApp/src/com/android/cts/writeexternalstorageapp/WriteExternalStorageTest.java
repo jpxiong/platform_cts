@@ -24,6 +24,7 @@ import static com.android.cts.externalstorageapp.CommonExternalStorageTest.asser
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.buildProbeFile;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.deleteContents;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPaths;
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getMountPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getPrimaryPackageSpecificPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getSecondaryPackageSpecificPaths;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
@@ -35,9 +36,7 @@ import android.util.Log;
 
 import com.android.cts.externalstorageapp.CommonExternalStorageTest;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.util.List;
 import java.util.Random;
 
@@ -273,28 +272,29 @@ public class WriteExternalStorageTest extends AndroidTestCase {
      * {@link CommonExternalStorageTest#testAllPackageDirsWritable()}.
      */
     public void testSecondaryMountPointsNotWritable() throws Exception {
+        // Probe path could be /storage/emulated/0 or /storage/1234-5678
         final File probe = buildProbeFile(Environment.getExternalStorageDirectory());
         assertTrue(probe.createNewFile());
 
-        final BufferedReader br = new BufferedReader(new FileReader("/proc/self/mounts"));
-        try {
-            String line;
-            while ((line = br.readLine()) != null) {
-                final String[] fields = line.split(" ");
-                final File testMount = new File(fields[1]);
-                final File testProbe = new File(testMount, probe.getName());
-                if (testProbe.exists()) {
-                    Log.d(TAG, "Primary external mountpoint " + testMount);
-                } else {
-                    // This mountpoint is not primary external storage; we must
-                    // not be able to write.
-                    Log.d(TAG, "Other mountpoint " + testMount);
-                    assertDirNoWriteAccess(testProbe.getParentFile());
-                }
+        final String userId = Integer.toString(android.os.Process.myUid() / 100000);
+        final List<File> mountPaths = getMountPaths();
+        for (File path : mountPaths) {
+            // Mount points could be multi-user aware, so try probing both top
+            // level and user-specific directory.
+            final File userPath = new File(path, userId);
+
+            final File testProbe = new File(path, probe.getName());
+            final File testUserProbe = new File(userPath, probe.getName());
+
+            if (testProbe.exists() || testUserProbe.exists()) {
+                Log.d(TAG, "Primary external mountpoint " + path);
+            } else {
+                // This mountpoint is not primary external storage; we must
+                // not be able to write.
+                Log.d(TAG, "Other mountpoint " + path);
+                assertDirNoWriteAccess(path);
+                assertDirNoWriteAccess(userPath);
             }
-       } finally {
-           br.close();
-           probe.delete();
-       }
+        }
     }
 }
