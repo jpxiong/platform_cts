@@ -576,10 +576,10 @@ public class DumpsysHostTest extends DeviceTestCase {
     }
 
     private void checkKernelWakelock(String[] parts) {
-        assertEquals(7, parts.length);
-        assertNotNull(parts[4]); // kernel wakelock
-        assertInteger(parts[5]); // totalTime
-        assertInteger(parts[6]); // count
+        assertTrue(parts.length >= 7);
+	assertNotNull(parts[4]); // Kernel wakelock
+	assertInteger(parts[parts.length-2]); // totalTime
+        assertInteger(parts[parts.length-1]); // count
     }
 
     private void checkWakeupReason(String[] parts) {
