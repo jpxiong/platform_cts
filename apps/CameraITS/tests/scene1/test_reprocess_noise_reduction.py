@@ -107,10 +107,12 @@ def main():
             print "Variances with NR mode [0,1,2,3,4]:", variances
 
             # Draw a plot.
-            for nr_mode in range(5):
-                if not its.caps.noise_reduction_mode(props, nr_mode):
-                    continue
-                pylab.plot(range(3), variances[nr_mode], "rgbcm"[nr_mode])
+            for chan in range(3):
+                line = []
+                for nr_mode in range(5):
+                    line.append(variances[nr_mode][chan])
+                pylab.plot(range(5), line, "rgb"[chan])
+
             matplotlib.pyplot.savefig("%s_plot_%s_variances.png" %
                                       (NAME, reprocess_format))
 
@@ -133,9 +135,13 @@ def main():
                     # Verify MINIMAL(3) is not better than HQ(2)
                     assert(variances[3][j] >
                            variances[2][j] * (1.0 - RELATIVE_ERROR_TOLERANCE))
-                # Verify ZSL(4) is close to OFF(0)
-                assert(numpy.isclose(variances[4][j], variances[0][j],
-                                     RELATIVE_ERROR_TOLERANCE))
+                    # Verify ZSL(4) is close to MINIMAL(3)
+                    assert(numpy.isclose(variances[4][j], variances[3][j],
+                                         RELATIVE_ERROR_TOLERANCE))
+                else:
+                    # Verify ZSL(4) is close to OFF(0)
+                    assert(numpy.isclose(variances[4][j], variances[0][j],
+                                         RELATIVE_ERROR_TOLERANCE))
 
 if __name__ == '__main__':
     main()
