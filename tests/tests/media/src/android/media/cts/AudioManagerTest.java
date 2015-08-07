@@ -45,24 +45,27 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.provider.Settings.System;
-import android.test.AndroidTestCase;
+import android.test.InstrumentationTestCase;
 import android.view.SoundEffectConstants;
 
 import java.util.TreeMap;
 
-public class AudioManagerTest extends AndroidTestCase {
+public class AudioManagerTest extends InstrumentationTestCase {
 
     private final static int MP3_TO_PLAY = R.raw.testmp3;
     private final static long TIME_TO_PLAY = 2000;
+    private final static String APPOPS_OP_STR = "android:write_settings";
     private AudioManager mAudioManager;
     private boolean mHasVibrator;
     private boolean mUseFixedVolume;
     private boolean mIsTelevision;
+    private Context mContext;
 
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        mContext = getInstrumentation().getContext();
+        Utils.enableAppOps(mContext.getPackageName(), APPOPS_OP_STR, getInstrumentation());
         Vibrator vibrator = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
         mUseFixedVolume = mContext.getResources().getBoolean(
@@ -71,6 +74,11 @@ public class AudioManagerTest extends AndroidTestCase {
         mIsTelevision = packageManager != null
                 && (packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
                         || packageManager.hasSystemFeature(PackageManager.FEATURE_TELEVISION));
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        Utils.disableAppOps(mContext.getPackageName(), APPOPS_OP_STR, getInstrumentation());
     }
 
     public void testMicrophoneMute() throws Exception {
