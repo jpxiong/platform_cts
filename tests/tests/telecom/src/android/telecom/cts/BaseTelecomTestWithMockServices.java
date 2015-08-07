@@ -86,13 +86,16 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     String mPreviousDefaultDialer = null;
     MockConnectionService connectionService = null;
 
+    boolean mShouldTestTelecom = true;
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getContext();
         mTelecomManager = (TelecomManager) mContext.getSystemService(Context.TELECOM_SERVICE);
 
-        if (shouldTestTelecom(mContext)) {
+        mShouldTestTelecom = shouldTestTelecom(mContext);
+        if (mShouldTestTelecom) {
             mPreviousDefaultDialer = TestUtils.getDefaultDialer(getInstrumentation());
             TestUtils.setDefaultDialer(getInstrumentation(), PACKAGE);
             setupCallbacks();
@@ -101,7 +104,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        if (shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             cleanupCalls();
             if (!TextUtils.isEmpty(mPreviousDefaultDialer)) {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);

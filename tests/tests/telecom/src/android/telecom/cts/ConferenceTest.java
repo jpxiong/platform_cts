@@ -51,17 +51,17 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getContext();
-        if (shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             addOutgoingCalls();
             addConferenceCall(mCall1, mCall2);
             // Use vanilla conference object so that the CTS coverage tool detects the useage.
-            mConferenceObject = (Conference)verifyConferenceForOutgoingCall();
+            mConferenceObject = verifyConferenceForOutgoingCall();
             verifyConferenceObject(mConferenceObject, mConnection1, mConnection2);
         }
     }
 
     public void testConferenceCreate() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -81,7 +81,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceSplit() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -101,7 +101,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceHoldAndUnhold() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -119,7 +119,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceMergeAndSwap() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -144,7 +144,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceSetters() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -215,7 +215,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceAddAndRemoveConnection() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
@@ -240,7 +240,7 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testConferenceDTMFTone() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call conf = mInCallService.getLastConferenceCall();
