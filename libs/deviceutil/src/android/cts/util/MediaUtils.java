@@ -459,12 +459,13 @@ public class MediaUtils {
         return avgs;
     }
 
-    public static void logResults(ReportLog log, String prefix,
+    public static String logResults(ReportLog log, String prefix,
             double min, double max, double avg, double stdev) {
         String msg = prefix;
         msg += " min=" + Math.round(min / 1000) + " max=" + Math.round(max / 1000) +
                 " avg=" + Math.round(avg / 1000) + " stdev=" + Math.round(stdev / 1000);
         log.printValue(msg, 1000000000 / min, ResultType.HIGHER_BETTER, ResultUnit.FPS);
+        return msg;
     }
 
     public static VideoCapabilities getVideoCapabilities(String codecName, String mime) {
@@ -511,5 +512,18 @@ public class MediaUtils {
                 " measured " + measured);
         return (measured >= lowerBoundary1 && measured <= upperBoundary1 &&
                 measured >= lowerBoundary2 && measured <= upperBoundary2);
+    }
+
+    public static String getErrorMessage(
+            Range<Double> reportedRange, double[] measuredFps, String[] rawData) {
+        String msg = "";
+        if (reportedRange == null) {
+            msg += "Failed to get achievable frame rate.\n";
+        } else {
+            msg += "Expected achievable frame rate range: " + reportedRange + ".\n";
+        }
+        msg += "Measured frame rate: " + Arrays.toString(measuredFps) + ".\n";
+        msg += "Raw data: " + Arrays.toString(rawData) + ".\n";
+        return msg;
     }
 }
