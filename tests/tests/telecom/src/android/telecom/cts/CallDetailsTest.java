@@ -65,7 +65,7 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (TestUtils.shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             PhoneAccount account = setupConnectionService(
                     new MockConnectionService() {
                         @Override
@@ -93,23 +93,27 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
                         }
                     }, FLAG_REGISTER | FLAG_ENABLE);
 
+            /** Place a call as a part of the setup before we test the various
+             *  Call details.
+             */
+            placeAndVerifyCall();
+            verifyConnectionForOutgoingCall();
+
+            mInCallService = mInCallCallbacks.getService();
+            mCall = mInCallService.getLastCall();
+
+            assertCallState(mCall, Call.STATE_DIALING);
         }
-        /** Place a call as a part of the setup before we test the various
-         *  Call details.
-         */
-        placeAndVerifyCall();
-        verifyConnectionForOutgoingCall();
-
-        mInCallService = mInCallCallbacks.getService();
-        mCall = mInCallService.getLastCall();
-
-        assertCallState(mCall, Call.STATE_DIALING);
     }
 
     /**
      * Tests whether the getAccountHandle() getter returns the correct object.
      */
     public void testAccountHandle() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getAccountHandle(), is(PhoneAccountHandle.class));
         assertEquals(TEST_PHONE_ACCOUNT_HANDLE, mCall.getDetails().getAccountHandle());
     }
@@ -118,6 +122,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getCallCapabilities() getter returns the correct object.
      */
     public void testCallCapabilities() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getCallCapabilities(), is(Integer.class));
         assertEquals(CALL_CAPABILITIES, mCall.getDetails().getCallCapabilities());
         assertTrue(mCall.getDetails().can(Call.Details.CAPABILITY_HOLD));
@@ -130,6 +138,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getCallerDisplayName() getter returns the correct object.
      */
     public void testCallerDisplayName() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getCallerDisplayName(), is(String.class));
         assertEquals(CALLER_DISPLAY_NAME, mCall.getDetails().getCallerDisplayName());
     }
@@ -138,6 +150,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getCallerDisplayNamePresentation() getter returns the correct object.
      */
     public void testCallerDisplayNamePresentation() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getCallerDisplayNamePresentation(), is(Integer.class));
         assertEquals(CALLER_DISPLAY_NAME_PRESENTATION, mCall.getDetails().getCallerDisplayNamePresentation());
     }
@@ -146,6 +162,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getCallProperties() getter returns the correct object.
      */
     public void testCallProperties() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getCallProperties(), is(Integer.class));
         assertEquals(CALL_PROPERTIES, mCall.getDetails().getCallProperties());
     }
@@ -154,6 +174,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getConnectTimeMillis() getter returns the correct object.
      */
     public void testConnectTimeMillis() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getConnectTimeMillis(), is(Long.class));
     }
 
@@ -161,6 +185,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getDisconnectCause() getter returns the correct object.
      */
     public void testDisconnectCause() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getDisconnectCause(), is(DisconnectCause.class));
     }
 
@@ -168,6 +196,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getExtras() getter returns the correct object.
      */
     public void testExtras() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         if (mCall.getDetails().getExtras() != null) {
             assertThat(mCall.getDetails().getExtras(), is(Bundle.class));
         }
@@ -177,6 +209,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getIntentExtras() getter returns the correct object.
      */
     public void testIntentExtras() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getIntentExtras(), is(Bundle.class));
     }
 
@@ -184,6 +220,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getGatewayInfo() getter returns the correct object.
      */
     public void testGatewayInfo() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         if (mCall.getDetails().getGatewayInfo() != null) {
             assertThat(mCall.getDetails().getGatewayInfo(), is(GatewayInfo.class));
         }
@@ -193,6 +233,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getHandle() getter returns the correct object.
      */
     public void testHandle() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getHandle(), is(Uri.class));
         assertEquals(getTestNumber(), mCall.getDetails().getHandle());
     }
@@ -201,6 +245,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getHandlePresentation() getter returns the correct object.
      */
     public void testHandlePresentation() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getHandlePresentation(), is(Integer.class));
         assertEquals(MockConnectionService.CONNECTION_PRESENTATION, mCall.getDetails().getHandlePresentation());
     }
@@ -209,6 +257,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getStatusHints() getter returns the correct object.
      */
     public void testStatusHints() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getStatusHints(), is(StatusHints.class));
         assertEquals(mStatusHints.getLabel(), mCall.getDetails().getStatusHints().getLabel());
         assertEquals(
@@ -221,6 +273,10 @@ public class CallDetailsTest extends BaseTelecomTestWithMockServices {
      * Tests whether the getVideoState() getter returns the correct object.
      */
     public void testVideoState() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         assertThat(mCall.getDetails().getVideoState(), is(Integer.class));
     }
 }

@@ -30,7 +30,7 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (TestUtils.shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
         }
     }
@@ -45,6 +45,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testIncomingCallShortPress_acceptsCall() throws Exception {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         addAndVerifyNewIncomingCall(getTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
@@ -58,6 +62,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testIncomingCallLongPress_rejectsCall() throws Exception {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         addAndVerifyNewIncomingCall(getTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
@@ -71,6 +79,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testInCallShortPress_togglesMute() throws Exception {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall();
         final MockConnection connection = verifyConnectionForOutgoingCall();
         final MockInCallService incallService = mInCallCallbacks.getService();
@@ -89,6 +101,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testInCallLongPress_hangupCall() throws Exception {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall();
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -104,6 +120,10 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testStartCallWithSpeakerphoneNotProvided_SpeakerphoneOffByDefault() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall();
         verifyConnectionForOutgoingCall();
         assertAudioRoute(mInCallCallbacks.getService(), CallAudioState.ROUTE_EARPIECE);

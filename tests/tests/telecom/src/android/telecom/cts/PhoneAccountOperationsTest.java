@@ -74,6 +74,9 @@ public class PhoneAccountOperationsTest extends InstrumentationTestCase {
 
     @Override
     protected void tearDown() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         mTelecomManager.unregisterPhoneAccount(TEST_PHONE_ACCOUNT_HANDLE);
         PhoneAccount retrievedPhoneAccount = mTelecomManager.getPhoneAccount(
                 TEST_PHONE_ACCOUNT_HANDLE);

@@ -30,7 +30,7 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (TestUtils.shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
         }
     }
@@ -52,6 +52,10 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
      * @see {@link TelecomManager#EXTRA_START_CALL_WITH_SPEAKERPHONE}
      */
     public void testStartCallWithSpeakerphoneTrue_SpeakerphoneOnInCall() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         final Bundle extras = new Bundle();
         extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, true);
         placeAndVerifyCall(extras);
@@ -60,6 +64,10 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testStartCallWithSpeakerphoneFalse_SpeakerphoneOffInCall() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         final Bundle extras = new Bundle();
         extras.putBoolean(TelecomManager.EXTRA_START_CALL_WITH_SPEAKERPHONE, false);
         placeAndVerifyCall(extras);
@@ -68,6 +76,10 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testStartCallWithSpeakerphoneNotProvided_SpeakerphoneOffByDefault() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall();
         verifyConnectionForOutgoingCall();
         assertAudioRoute(mInCallCallbacks.getService(), CallAudioState.ROUTE_EARPIECE);

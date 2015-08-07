@@ -47,7 +47,7 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (TestUtils.shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
         }
     }
@@ -56,6 +56,9 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to start a 2-way video call and retrieve its video state.
      */
     public void testMakeTwoWayVideoCall() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
 
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
@@ -75,6 +78,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to start a 1-way video call and retrieve its video state.
      */
     public void testMakeOneWayVideoCall() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_TX_ENABLED);
         verifyConnectionForOutgoingCall();
 
@@ -89,6 +96,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to upgrade an audio-only call to a video call.
      */
     public void testUpgradeToVideo() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_AUDIO_ONLY);
         verifyConnectionForOutgoingCall();
 
@@ -109,6 +120,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to receive a session modification request.
      */
     public void testReceiveSessionModifyRequest() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_AUDIO_ONLY);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -134,6 +149,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to send a session modification response.
      */
     public void testSendSessionModifyResponse() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_AUDIO_ONLY);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -156,6 +175,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * the call.
      */
     public void testVideoCallDelayProvider() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         // Don't create video provider when call is created initially; we will do this later.
         try {
             connectionService.setCreateVideoProvider(false);
@@ -187,6 +210,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * back in response.
      */
     public void testChangeCamera() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         verifyConnectionForOutgoingCall();
 
@@ -208,6 +235,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to request the camera capabilities from the video provider.
      */
     public void testRequestCameraCapabilities() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         verifyConnectionForOutgoingCall();
 
@@ -232,6 +263,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to request data usage from the video provider.
      */
     public void testRequestDataUsage() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         verifyConnectionForOutgoingCall();
 
@@ -249,6 +284,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to receive changes to the video quality from the video provider.
      */
     public void testReceiveVideoQuality() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -281,6 +320,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to receive call session events from the video provider.
      */
     public void testReceiveCallSessionEvent() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -303,6 +346,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to receive changes to the peer dimensions from the video provider.
      */
     public void testReceivePeerDimensionChange() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -324,6 +371,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to set the device orientation via the provider.
      */
     public void testSetDeviceOrientation() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -342,6 +393,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to set the preview surface via the provider.
      */
     public void testSetPreviewSurface() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -365,6 +420,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to set the display surface via the provider.
      */
     public void testSetDisplaySurface() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
@@ -388,6 +447,10 @@ public class VideoCallTest extends BaseTelecomTestWithMockServices {
      * Tests ability to set the camera zoom via the provider.
      */
     public void testSetZoom() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         placeAndVerifyCall(VideoProfile.STATE_BIDIRECTIONAL);
         final MockConnection connection = verifyConnectionForOutgoingCall();
 
