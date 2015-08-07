@@ -67,7 +67,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
     private PackageManager mPackageManager;
     private final HashMap<Integer, NetworkConfig> mNetworks =
             new HashMap<Integer, NetworkConfig>();
-    private final List<Integer>mProtectedNetworks = new ArrayList<Integer>();
 
     @Override
     protected void setUp() throws Exception {
@@ -89,13 +88,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
                 }
                 mNetworks.put(n.type, n);
             } catch (Exception e) {}
-        }
-
-        // Get com.android.internal.R.array.config_protectedNetworks
-        resId = getContext().getResources().getIdentifier("config_protectedNetworks", "array", "android");
-        int[] protectedNetworks = getContext().getResources().getIntArray(resId);
-        for (int p : protectedNetworks) {
-            mProtectedNetworks.add(p);
         }
     }
 
@@ -190,6 +182,27 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         }
     }
 
+    private void assertStartUsingNetworkFeatureUnsupported(int networkType, String feature) {
+        try {
+            mCm.startUsingNetworkFeature(networkType, feature);
+            fail("startUsingNetworkFeature is no longer supported in the current API version");
+        } catch (UnsupportedOperationException expected) {}
+    }
+
+    private void assertStopUsingNetworkFeatureUnsupported(int networkType, String feature) {
+        try {
+            mCm.startUsingNetworkFeature(networkType, feature);
+            fail("stopUsingNetworkFeature is no longer supported in the current API version");
+        } catch (UnsupportedOperationException expected) {}
+    }
+
+    private void assertRequestRouteToHostUnsupported(int networkType, int hostAddress) {
+        try {
+            mCm.requestRouteToHost(networkType, hostAddress);
+            fail("requestRouteToHost is no longer supported in the current API version");
+        } catch (UnsupportedOperationException expected) {}
+    }
+
     public void testStartUsingNetworkFeature() {
 
         final String invalidateFeature = "invalidateFeature";
@@ -198,27 +211,9 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         final int wifiOnlyStartFailureCode = PhoneConstants.APN_REQUEST_FAILED;
         final int wifiOnlyStopFailureCode = -1;
 
-        NetworkInfo ni = mCm.getNetworkInfo(TYPE_MOBILE);
-        if (ni != null) {
-            assertEquals(PhoneConstants.APN_REQUEST_FAILED,
-                    mCm.startUsingNetworkFeature(TYPE_MOBILE, invalidateFeature));
-            assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE,
-                    invalidateFeature));
-        } else {
-            assertEquals(wifiOnlyStartFailureCode, mCm.startUsingNetworkFeature(TYPE_MOBILE,
-                    invalidateFeature));
-            assertEquals(wifiOnlyStopFailureCode, mCm.stopUsingNetworkFeature(TYPE_MOBILE,
-                    invalidateFeature));
-        }
-
-        ni = mCm.getNetworkInfo(TYPE_WIFI);
-        if (ni != null) {
-            // Should return failure because MMS is not supported on WIFI.
-            assertEquals(PhoneConstants.APN_REQUEST_FAILED, mCm.startUsingNetworkFeature(TYPE_WIFI,
-                    mmsFeature));
-            assertEquals(failureCode, mCm.stopUsingNetworkFeature(TYPE_WIFI,
-                    mmsFeature));
-        }
+        assertStartUsingNetworkFeatureUnsupported(TYPE_MOBILE, invalidateFeature);
+        assertStopUsingNetworkFeatureUnsupported(TYPE_MOBILE, invalidateFeature);
+        assertStartUsingNetworkFeatureUnsupported(TYPE_WIFI, mmsFeature);
     }
 
     private boolean isSupported(int networkType) {
@@ -227,11 +222,6 @@ public class ConnectivityManagerTest extends AndroidTestCase {
         // configuration.
         return mNetworks.containsKey(networkType) ||
                (networkType == ConnectivityManager.TYPE_VPN);
-    }
-
-    // true if only the system can turn it on
-    private boolean isNetworkProtected(int networkType) {
-        return mProtectedNetworks.contains(networkType);
     }
 
     public void testIsNetworkSupported() {
@@ -247,80 +237,12 @@ public class ConnectivityManagerTest extends AndroidTestCase {
 
     public void testRequestRouteToHost() {
         for (int type = -1 ; type <= ConnectivityManager.MAX_NETWORK_TYPE; type++) {
-            NetworkInfo ni = mCm.getNetworkInfo(type);
-            boolean expectToWork = isSupported(type) && !isNetworkProtected(type) &&
-                    ni != null && ni.isConnected();
-
-            try {
-                assertTrue("Network type " + type,
-                        mCm.requestRouteToHost(type, HOST_ADDRESS) == expectToWork);
-            } catch (Exception e) {
-                Log.d(TAG, "got exception in requestRouteToHost for type " + type);
-                assertFalse("Exception received for type " + type, expectToWork);
-            }
-
-            //TODO verify route table
+            assertRequestRouteToHostUnsupported(type, HOST_ADDRESS);
         }
-
-        assertFalse(mCm.requestRouteToHost(-1, HOST_ADDRESS));
     }
 
     public void testTest() {
         mCm.getBackgroundDataSetting();
-    }
-
-    /** Test that hipri can be brought up when Wifi is enabled. */
-    public void testStartUsingNetworkFeature_enableHipri() throws Exception {
-        if (!mPackageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
-                || !mPackageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
-            // This test requires a mobile data connection and WiFi.
-            return;
-        }
-
-        boolean isWifiEnabled = mWifiManager.isWifiEnabled();
-        boolean isWifiConnected = false;
-
-        NetworkInfo nwInfo = mCm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-        if (nwInfo != null) {
-            isWifiConnected = nwInfo.isConnected();
-        }
-        try {
-            // Make sure WiFi is connected to an access point.
-            if (!isWifiConnected) {
-                connectToWifi();
-            }
-
-            // Register a receiver that will capture the connectivity change for hipri.
-            ConnectivityActionReceiver receiver = new ConnectivityActionReceiver(
-                    ConnectivityManager.TYPE_MOBILE_HIPRI, NetworkInfo.State.CONNECTED);
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-            mContext.registerReceiver(receiver, filter);
-
-            // Try to start using the hipri feature...
-            int result = mCm.startUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                    FEATURE_ENABLE_HIPRI);
-            assertTrue("Couldn't start using the HIPRI feature.", result != -1);
-
-            // Check that the ConnectivityManager reported that it connected using hipri...
-            assertTrue("Couldn't connect using hipri...", receiver.waitForState());
-
-            assertTrue("Couldn't requestRouteToHost using HIPRI.",
-                    mCm.requestRouteToHost(ConnectivityManager.TYPE_MOBILE_HIPRI, HOST_ADDRESS));
-            // TODO check dns selection
-            // TODO check routes
-        } catch (InterruptedException e) {
-            fail("Broadcast receiver waiting for ConnectivityManager interrupted.");
-        } finally {
-            mCm.stopUsingNetworkFeature(ConnectivityManager.TYPE_MOBILE,
-                    FEATURE_ENABLE_HIPRI);
-            // TODO wait for HIPRI to go
-            // TODO check dns selection
-            // TODO check routes
-            if (!isWifiEnabled) {
-                disconnectFromWifi();
-            }
-        }
     }
 
     /**
