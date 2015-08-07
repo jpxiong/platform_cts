@@ -93,7 +93,8 @@ static const int kSockaddrStrLen = INET6_ADDRSTRLEN + strlen("[]:65535");
 void sockaddr_ntop(const struct sockaddr *sa, socklen_t salen, char *dst, const size_t size) {
     char addrstr[INET6_ADDRSTRLEN];
     char portstr[sizeof("65535")];
-    char buf[sizeof(addrstr) + sizeof(portstr) + sizeof("[]:")];
+    char buf[kSockaddrStrLen+1];
+
     int ret = getnameinfo(sa, salen,
                           addrstr, sizeof(addrstr),
                           portstr, sizeof(portstr),
@@ -106,7 +107,7 @@ void sockaddr_ntop(const struct sockaddr *sa, socklen_t salen, char *dst, const 
         sprintf(buf, "???");
     }
 
-    strlcpy(dst, buf, (strlen(buf) < size - 1) ? strlen(buf) : size - 1);
+    strlcpy(dst, buf, size);
 }
 
 JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
@@ -122,7 +123,8 @@ JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
     struct addrinfo *res = NULL;
     net_handle_t handle = (net_handle_t) nethandle;
 
-    int rval = android_getaddrinfofornetwork(handle, kHostname, "443", &kHints, &res);
+    static const char kPort[] = "443";
+    int rval = android_getaddrinfofornetwork(handle, kHostname, kPort, &kHints, &res);
     if (rval != 0) {
         ALOGD("android_getaddrinfofornetwork(%llu, %s) returned rval=%d errno=%d",
               handle, kHostname, rval, errno);
@@ -148,9 +150,9 @@ JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
         return -errno;
     }
 
-    char addrstr[kSockaddrStrLen];
+    char addrstr[kSockaddrStrLen+1];
     sockaddr_ntop(res->ai_addr, res->ai_addrlen, addrstr, sizeof(addrstr));
-    ALOGD("Attempting connect() to %s...", addrstr);
+    ALOGD("Attempting connect() to %s ...", addrstr);
 
     rval = connect(fd, res->ai_addr, res->ai_addrlen);
     if (rval != 0) {
@@ -170,10 +172,12 @@ JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
     ALOGD("... from %s", addrstr);
 
     // Don't let reads or writes block indefinitely.
-    const struct timeval timeo = { 5, 0 };  // 5 seconds
+    const struct timeval timeo = { 2, 0 };  // 2 seconds
     setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo));
     setsockopt(fd, SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo));
 
+    // For reference see:
+    //     https://tools.ietf.org/html/draft-tsvwg-quic-protocol-01#section-6.1
     uint8_t quic_packet[] = {
         0x0c,                    // public flags: 64bit conn ID, 8bit sequence number
         0, 0, 0, 0, 0, 0, 0, 0,  // 64bit connection ID
@@ -184,19 +188,36 @@ JNIEXPORT jint Java_android_net_cts_MultinetworkApiTest_runDatagramCheck(
 
     arc4random_buf(quic_packet + 1, 8);  // random connection ID
 
-    ssize_t sent = send(fd, quic_packet, sizeof(quic_packet), 0);
-    if (sent < (ssize_t)sizeof(quic_packet)) {
-        ALOGD("send(QUIC packet) returned sent=%zd, errno=%d", sent, errno);
-        close(fd);
-        return -errno;
-    }
-
     uint8_t response[1500];
-    ssize_t rcvd = recv(fd, response, sizeof(response), 0);
+    ssize_t sent, rcvd;
+    static const int MAX_RETRIES = 5;
+    int i, errnum = 0;
+
+    for (i = 0; i < MAX_RETRIES; i++) {
+        sent = send(fd, quic_packet, sizeof(quic_packet), 0);
+        if (sent < (ssize_t)sizeof(quic_packet)) {
+            errnum = errno;
+            ALOGD("send(QUIC packet) returned sent=%zd, errno=%d", sent, errnum);
+            close(fd);
+            return -errnum;
+        }
+
+        rcvd = recv(fd, response, sizeof(response), 0);
+        if (rcvd > 0) {
+            break;
+        } else {
+            errnum = errno;
+            ALOGD("[%d/%d] recv(QUIC response) returned rcvd=%zd, errno=%d",
+                  i + 1, MAX_RETRIES, rcvd, errnum);
+        }
+    }
     if (rcvd < sent) {
-        ALOGD("recv() returned rcvd=%zd, errno=%d", rcvd, errno);
+        ALOGD("QUIC UDP %s: sent=%zd but rcvd=%zd, errno=%d", kPort, sent, rcvd, errnum);
+        if (rcvd <= 0) {
+            ALOGD("Does this network block UDP port %s?", kPort);
+        }
         close(fd);
-        return -errno;
+        return -EPROTO;
     }
 
     int conn_id_cmp = memcmp(quic_packet + 1, response + 1, 8);
