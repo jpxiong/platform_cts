@@ -516,6 +516,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
 
         boolean encTestPassed = false;
         boolean decTestPassed = false;
+        double[] measuredFps = new double[mTestConfig.mNumberOfRepeat];
+        String[] resultRawData = new String[mTestConfig.mNumberOfRepeat];
         for (int i = 0; i < mTestConfig.mNumberOfRepeat; i++) {
             // make sure that rms error is not too big.
             if (decoderRmsErrorResults[i] >= mRmsErrorMargain) {
@@ -542,8 +544,11 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 String prefix = "codec=" + encoderName + " round=" + i +
                         " EncInputFormat=" + mEncInputFormat +
                         " EncOutputFormat=" + mEncOutputFormat;
-                MediaUtils.logResults(mReportLog, prefix, encMin, encMax, encAvg, encStdev);
+                String result =
+                        MediaUtils.logResults(mReportLog, prefix, encMin, encMax, encAvg, encStdev);
                 double measuredEncFps = 1000000000 / encMin;
+                resultRawData[i] = result;
+                measuredFps[i] = measuredEncFps;
                 if (!encTestPassed) {
                     encTestPassed = MediaUtils.verifyResults(
                             encoderName, mimeType, w, h, measuredEncFps);
@@ -565,10 +570,14 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
                 }
             }
         }
+
         if (mTestConfig.mTestResult) {
             if (!encTestPassed) {
-                fail("Measured fps for " + encoderName +
-                        " doesn't match with reported achievable frame rates.");
+                Range<Double> reportedRange =
+                    MediaUtils.getAchievableFrameRatesFor(encoderName, mimeType, w, h);
+                String failMessage =
+                    MediaUtils.getErrorMessage(reportedRange, measuredFps, resultRawData);
+                fail(failMessage);
             }
             // Decoder result will be verified in VideoDecoderPerfTest
             // if (!decTestPassed) {
@@ -576,6 +585,8 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             //             " doesn't match with reported achievable frame rates.");
             // }
         }
+        measuredFps = null;
+        resultRawData = null;
     }
 
     /**
