@@ -1449,6 +1449,42 @@ You should be prompted to select credentials; choose the ones you just installed
         \n
         Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
     </string>
+    <string name="provisioning_byod_keyguard_disabled_features">Keyguard disabled features</string>
+    <string name="provisioning_byod_keyguard_disabled_features_info">
+        This test exercises Keyguard Disabled Features. Follow instructions above.
+    </string>
+    <string name="provisioning_byod_keyguard_disabled_features_instruction">
+        Please press the \"Prepare test\" button to disable trust agents.\n
+        Then please press through the following verification steps.\n
+        Note: Device password will be set to \"testpassword\". After leaving the screen device password be cleared.
+    </string>
+    <string name="provisioning_byod_keyguard_disabled_features_prepare_button">Prepare test</string>
+    <string name="provisioning_byod_disable_trust_agents">Disable trust agents</string>
+    <string name="provisioning_byod_disable_trust_agents_instruction">
+        Please press the Go button to go to Settings > Security. Then go to Trusted agents and\n
+        check if the agents are shown as disabled by the administrator.
+        Then please press Back and mark the test as \"Pass\" or \"Fail\".
+    </string>
+    <string name="provisioning_byod_fingerprint_disabled_in_settings">Fingerprint is disabled in Settings</string>
+    <string name="provisioning_byod_fingerprint_disabled_in_settings_instruction">
+        Please press the Go button to go to Settings > Security. Then go to Fingerprint and\n
+        check if the screen is shown as disabled by the administrator.
+        Then please press Back and mark the test as \"Pass\" or \"Fail\".
+    </string>
+    <string name="provisioning_byod_disable_fingerprint">Fingerprint disabled on keyguard</string>
+    <string name="provisioning_byod_disable_fingerprint_instruction">
+        Please press the Go button to lock the screen. Then try to log in using the fingerprint reader.\n
+        Expected result is you cannot log in using your fingerprint.\n
+        After you log back in, please navigate back to CtsVerifier and mark the test as \"Pass\" or \"Fail\".
+    </string>
+    <string name="provisioning_byod_disable_notifications">Notifications disabled on keyguard</string>
+    <string name="provisioning_byod_disable_notifications_instruction">
+        Please press the Go button to lock the screen. Wait a couple of seconds and look out for a
+        notification from CtsVerifier.\n
+        Expected result is the notification is shown as \"Contents hidden\", you can not see the contents
+        (Which would read \"This is a work notification\").\n
+        After you log back in, please navigate back to CtsVerifier and mark the test as \"Pass\" or \"Fail\".
+    </string>
     <string name="provisioning_byod_work_notification">Work notification is badged</string>
     <string name="provisioning_byod_work_notification_instruction">
         Please press the Go button to trigger a notification.\n
