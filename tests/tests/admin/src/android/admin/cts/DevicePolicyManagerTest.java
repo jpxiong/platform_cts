@@ -526,6 +526,23 @@ public class DevicePolicyManagerTest extends AndroidTestCase {
         }
     }
 
+    public void testKeyguardDisabledFeatures() {
+        if (!mDeviceAdmin) {
+            Log.w(TAG, "Skipping testKeyguardDisabledFeatures");
+            return;
+        }
+        int originalValue = mDevicePolicyManager.getKeyguardDisabledFeatures(mComponent);
+        try {
+            for (int which = DevicePolicyManager.KEYGUARD_DISABLE_FEATURES_NONE;
+                    which < 2 * DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT; ++which) {
+                mDevicePolicyManager.setKeyguardDisabledFeatures(mComponent, which);
+                assertEquals(which, mDevicePolicyManager.getKeyguardDisabledFeatures(mComponent));
+            }
+        } finally {
+            mDevicePolicyManager.setKeyguardDisabledFeatures(mComponent, originalValue);
+        }
+    }
+
     public void testCreateUser_failIfNotDeviceOwner() {
         if (!mDeviceAdmin) {
             Log.w(TAG, "Skipping testCreateUser_failIfNotDeviceOwner");

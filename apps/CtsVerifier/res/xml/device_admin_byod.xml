@@ -20,6 +20,8 @@
         <encrypted-storage />
         <wipe-data />
         <reset-password />
+        <disable-keyguard-features />
+        <force-lock />
     </uses-policies>
 </device-admin>
 <!-- END_INCLUDE(meta_data) -->
