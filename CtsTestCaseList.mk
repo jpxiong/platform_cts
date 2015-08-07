@@ -172,6 +172,7 @@ cts_test_packages := \
     CtsNativeOpenGLTestCases \
     CtsNdefTestCases \
     CtsNetTestCases \
+    CtsNetTestCasesLegacyApi22 \
     CtsOpenGLTestCases \
     CtsOpenGlPerfTestCases \
     CtsOsTestCases \
