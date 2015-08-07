@@ -1948,4 +1948,22 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="audio_loopback_test_btn">Test</string>
     <string name="audio_loopback_results_text">Results...</string>
 
+   <!-- Audio Frequency Line Test -->
+    <string name="audio_frequency_line_test">Audio Frequency Line Test</string>
+    <string name="audio_frequency_line_info">
+        This test requires the Loopback Plug. Please connect a Loopback Plug on the headset
+        connector, and proceed with the instructions on the screen.
+        The system will measure the input-output audio latency by injecting a pulse on the output,
+        and computing the distance between replicas of the pulse.
+        You can vary the Audio Level slider to ensure the pulse will feed back at adecuate levels.
+        Repeat until a confidence level >= 0.6 is achieved.
+    </string>
+    <string name="audio_frequency_line_instructions">
+          Please connect a "Loopback Plug" and press "Loopback Plug Ready".
+    </string>
+    <string name="audio_frequency_line_plug_ready_btn">Loopback Plug Ready</string>
+
+    <string name="audio_frequency_line_test_btn">Test</string>
+    <string name="audio_frequency_line_results_text">Results...</string>
+
 </resources>
