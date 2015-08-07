@@ -62,14 +62,14 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getContext();
-        if (shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             addRemoteConferenceCall();
             verifyRemoteConferenceObject(mRemoteConferenceObject, mRemoteConference, mConference);
         }
     }
 
     public void testRemoteConferenceCreate() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
@@ -92,7 +92,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceSplit() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
@@ -114,7 +114,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceHoldAndUnhold() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
@@ -146,7 +146,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceMergeAndSwap() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
@@ -178,7 +178,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceDTMFTone() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         final Call confCall = mInCallCallbacks.getService().getLastConferenceCall();
@@ -201,7 +201,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_StateChange() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -227,7 +227,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_Disconnect() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -254,7 +254,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_ConnectionAdd() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -285,7 +285,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_ConnectionRemove() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -317,7 +317,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_ConnectionCapabilities() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -345,7 +345,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_ConferenceableConnections() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -380,7 +380,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_Destroy() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();
@@ -404,7 +404,7 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConferenceCallbacks_Extras() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         Handler handler = setupRemoteConferenceCallbacksTest();

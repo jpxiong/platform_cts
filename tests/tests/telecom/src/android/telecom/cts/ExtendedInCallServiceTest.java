@@ -36,13 +36,13 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        if (TestUtils.shouldTestTelecom(mContext)) {
+        if (mShouldTestTelecom) {
             setupConnectionService(null, FLAG_REGISTER | FLAG_ENABLE);
         }
     }
 
     public void testAddNewOutgoingCallAndThenDisconnect() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -56,7 +56,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testMuteAndUnmutePhone() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -83,7 +83,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testSwitchAudioRoutes() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -122,7 +122,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
      * @see {@link Call#stopDtmfTone()}
      */
     public void testPlayAndStopDtmfTones() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -155,7 +155,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testHoldAndUnholdCall() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -182,6 +182,10 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testAnswerIncomingCallAudioOnly() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         addAndVerifyNewIncomingCall(getTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
@@ -199,6 +203,10 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testAnswerIncomingCallAsVideo_SendsCorrectVideoState() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         addAndVerifyNewIncomingCall(getTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
@@ -218,6 +226,10 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testRejectIncomingCall() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
         addAndVerifyNewIncomingCall(getTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
@@ -235,7 +247,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testCanAddCall_CannotAddForExistingDialingCall() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -252,7 +264,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testCanAddCall_CanAddForExistingActiveCall() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -273,7 +285,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testCanAddCall_CannotAddIfTooManyCalls() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -308,7 +320,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testOnBringToForeground() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -340,7 +352,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testOnPostDialWaitAndContinue() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -372,7 +384,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
     }
 
     public void testOnCannedTextResponsesLoaded() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 

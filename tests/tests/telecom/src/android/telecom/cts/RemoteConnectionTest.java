@@ -55,7 +55,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     RemoteConnection mRemoteConnectionObject;
 
     public void testRemoteConnectionOutgoingCall() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         addRemoteConnectionOutgoingCall();
@@ -92,7 +92,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionIncomingCallAccept() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         addRemoteConnectionIncomingCall();
@@ -113,7 +113,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionIncomingCallReject() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         addRemoteConnectionIncomingCall();
@@ -134,7 +134,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionDTMFTone() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
         addRemoteConnectionIncomingCall();
@@ -160,7 +160,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_StateChange() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -186,7 +186,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_RingbackRequest() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -212,7 +212,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_ConnectionCapabilities() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -242,7 +242,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_PostDialWait() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -270,7 +270,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_PostDialChar() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -297,7 +297,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_VoipAudio() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -323,7 +323,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_StatusHints() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -350,7 +350,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_AddressChange() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -379,7 +379,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_CallerDisplayName() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -408,7 +408,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_VideoState() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -434,7 +434,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_ConferenceableConnections() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -474,7 +474,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_VideoProvider() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -502,7 +502,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_Extras() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -531,7 +531,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_Disconnect() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -560,7 +560,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionCallbacks_Destroy() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -585,7 +585,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_SessionModify() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -627,7 +627,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_SessionEvent() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -655,7 +655,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_PeerDimensions() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -686,7 +686,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_CallDataUsage() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -715,7 +715,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_CameraCapabilities() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -746,7 +746,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideoCallbacks_VideoQuality() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -775,7 +775,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_RequestCallDataUsage() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -810,7 +810,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_RequestCameraCapabilities() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -848,7 +848,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SendSessionModifyRequest() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -889,7 +889,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SendSessionModifyResponse() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -935,7 +935,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetCamera() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -975,7 +975,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetDeviceOrientation() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -998,7 +998,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetDisplaySurface() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -1021,7 +1021,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetPauseImage() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -1044,7 +1044,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetPreviewSurface() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
@@ -1067,7 +1067,7 @@ public class RemoteConnectionTest extends BaseRemoteTelecomTest {
     }
 
     public void testRemoteConnectionVideo_SetZoom() {
-        if (!shouldTestTelecom(mContext)) {
+        if (!mShouldTestTelecom) {
             return;
         }
 
