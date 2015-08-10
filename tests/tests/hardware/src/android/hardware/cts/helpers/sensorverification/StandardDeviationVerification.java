@@ -18,10 +18,13 @@ package android.hardware.cts.helpers.sensorverification;
 
 import junit.framework.Assert;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.cts.helpers.SensorStats;
 import android.hardware.cts.helpers.TestSensorEnvironment;
 import android.hardware.cts.helpers.TestSensorEvent;
+import android.util.Log;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +69,21 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
         if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
+        boolean hasHifiSensors = environment.getContext().getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_HIFI_SENSORS);
 
+        if (hasHifiSensors) {
+            // Max accelerometer deviation: 400uG/√Hz
+            DEFAULTS.put(Sensor.TYPE_ACCELEROMETER, new float[]{0.004f, 0.004f, 0.004f});
+            // Max gyro deviation: 0.014°/s/√Hz
+            float deviationInRadians = (float) (0.014f * (Math.PI / 180));
+            DEFAULTS.put(Sensor.TYPE_GYROSCOPE,
+                    new float[]{deviationInRadians,deviationInRadians, deviationInRadians});
+            // Max magnetometer deviation: 0.1uT/√Hz
+            DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD, new float[]{0.1f, 0.1f, 0.1f});
+            // Max pressure deviation: 2Pa/√Hz
+            DEFAULTS.put(Sensor.TYPE_PRESSURE, new float[]{2.0f, 2.0f, 2.0f});
+        }
         return new StandardDeviationVerification(DEFAULTS.get(sensorType));
     }
 
@@ -107,9 +124,9 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
             if (stdDevs[i] > mThreshold[i]) {
                 failed = true;
             }
-            stddevSb.append(String.format("%.2f", stdDevs[i]));
+            stddevSb.append(String.format("%.3f", stdDevs[i]));
             if (i != stdDevs.length - 1) stddevSb.append(", ");
-            expectedSb.append(String.format("<%.2f", mThreshold[i]));
+            expectedSb.append(String.format("<%.3f", mThreshold[i]));
             if (i != stdDevs.length - 1) expectedSb.append(", ");
         }
         if (stdDevs.length > 1) {
