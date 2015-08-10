@@ -37,6 +37,24 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
 
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             DEVICE_OWNER_PKG + ".BaseDeviceOwnerTest$BasicAdminReceiver";
+    private static final String ADMIN_RECEIVER_COMPONENT =
+            DEVICE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS;
+
+    public void setUp() throws Exception {
+        super.setUp();
+
+        if (mHasFeature) {
+            installApp(DEVICE_OWNER_APK);
+        }
+    }
+
+    public void tearDown() throws Exception {
+        if (mHasFeature) {
+            getDevice().uninstallPackage(DEVICE_OWNER_PKG);
+        }
+
+        super.tearDown();
+    }
 
     public void testOwnerChangedBroadcast() throws Exception {
         if (!mHasFeature) {
@@ -44,7 +62,6 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
         }
         try {
             installApp(INTENT_RECEIVER_APK);
-            installApp(DEVICE_OWNER_APK);
 
             String testClass = INTENT_RECEIVER_PKG + ".OwnerChangedBroadcastTest";
 
@@ -54,15 +71,27 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
                     "testOwnerChangedBroadcastNotReceived", 0));
 
             // Setting the device owner should send the owner changed broadcast.
-            setDeviceOwner(DEVICE_OWNER_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS);
+            assertTrue(setDeviceOwner(ADMIN_RECEIVER_COMPONENT));
 
             assertTrue(runDeviceTests(INTENT_RECEIVER_PKG, testClass,
                     "testOwnerChangedBroadcastReceived", 0));
         } finally {
+            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
             assertTrue("Failed to remove device owner.",
                     runDeviceTests(DEVICE_OWNER_PKG, CLEAR_DEVICE_OWNER_TEST_CLASS));
-            getDevice().uninstallPackage(DEVICE_OWNER_PKG);
-            getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
+        }
+    }
+
+    public void testCannotSetDeviceOwnerWhenSecondaryUserPresent() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        int userId = -1;
+        try {
+            userId = createUser();
+            assertFalse(setDeviceOwner(ADMIN_RECEIVER_COMPONENT));
+        } finally {
+            removeUser(userId);
         }
     }
 }
