@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.UserManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -72,6 +73,8 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
     private static final String DISABLE_KEYGUARD_TEST_ID = "DISABLE_KEYGUARD";
     private static final String CHECK_PERMISSION_LOCKDOWN_TEST_ID =
             PermissionLockdownTestActivity.class.getName();
+    private static final String DISALLOW_CONFIG_BT_ID = "DISALLOW_CONFIG_BT";
+    private static final String DISALLOW_CONFIG_WIFI_ID = "DISALLOW_CONFIG_WIFI";
     private static final String REMOVE_DEVICE_OWNER_TEST_ID = "REMOVE_DEVICE_OWNER";
 
     @Override
@@ -139,15 +142,43 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
                 R.string.device_owner_device_admin_visible,
                 R.string.device_owner_device_admin_visible_info,
                 new ButtonInfo(
-                        R.string.device_owner_device_admin_visible_go,
+                        R.string.device_owner_settings_go,
                         new Intent(Settings.ACTION_SECURITY_SETTINGS))));
 
-        // WiFi Lock down tests
         PackageManager packageManager = getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+            // WiFi Lock down tests
             adapter.add(createTestItem(this, WIFI_LOCKDOWN_TEST_ID,
                     R.string.device_owner_wifi_lockdown_test,
                     new Intent(this, WifiLockdownTestActivity.class)));
+
+            // DISALLOW_CONFIG_WIFI
+            adapter.add(createInteractiveTestItem(this, DISALLOW_CONFIG_WIFI_ID,
+                    R.string.device_owner_disallow_config_wifi,
+                    R.string.device_owner_disallow_config_wifi_info,
+                    new ButtonInfo[] {
+                            new ButtonInfo(
+                                    R.string.device_owner_user_restriction_set,
+                                    createSetUserRestrictionIntent(
+                                            UserManager.DISALLOW_CONFIG_WIFI)),
+                            new ButtonInfo(
+                                    R.string.device_owner_settings_go,
+                                    new Intent(Settings.ACTION_WIFI_SETTINGS))}));
+        }
+
+        // DISALLOW_CONFIG_BLUETOOTH
+        if (packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
+            adapter.add(createInteractiveTestItem(this, DISALLOW_CONFIG_BT_ID,
+                    R.string.device_owner_disallow_config_bt,
+                    R.string.device_owner_disallow_config_bt_info,
+                    new ButtonInfo[] {
+                            new ButtonInfo(
+                                    R.string.device_owner_user_restriction_set,
+                                    createSetUserRestrictionIntent(
+                                            UserManager.DISALLOW_CONFIG_BLUETOOTH)),
+                            new ButtonInfo(
+                                    R.string.device_owner_settings_go,
+                                    new Intent(Settings.ACTION_BLUETOOTH_SETTINGS))}));
         }
 
         // setStatusBarDisabled
@@ -226,6 +257,12 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
                 .putExtra(EXTRA_PARAMETER_1, value);
     }
 
+    private Intent createSetUserRestrictionIntent(String restriction) {
+        return new Intent(this, CommandReceiver.class)
+                .putExtra(EXTRA_COMMAND, COMMAND_ADD_USER_RESTRICTION)
+                .putExtra(EXTRA_RESTRICTION, restriction);
+    }
+
     public static class CommandReceiver extends Activity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -287,6 +324,8 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
 
             dpm.setStatusBarDisabled(admin, false);
             dpm.setKeyguardDisabled(admin, false);
+            dpm.clearUserRestriction(admin, UserManager.DISALLOW_CONFIG_BLUETOOTH);
+            dpm.clearUserRestriction(admin, UserManager.DISALLOW_CONFIG_WIFI);
             dpm.clearDeviceOwnerApp(getPackageName());
         }
     }
