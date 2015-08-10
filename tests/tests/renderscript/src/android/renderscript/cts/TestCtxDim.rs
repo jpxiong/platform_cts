@@ -22,12 +22,12 @@
 int gDimX, gDimY, gDimZ;
 static bool failed = false;
 
-void __attribute__((kernel)) check_kernel(int32_t in /* dummy */, rs_kernel_context ctxt) {
-    uint32_t dimX = rsGetDimX(ctxt);
+void __attribute__((kernel)) check_kernel(int32_t in /* dummy */, rs_kernel_context context) {
+    uint32_t dimX = rsGetDimX(context);
     _RS_ASSERT(gDimX == dimX);
-    uint32_t dimY = rsGetDimY(ctxt);
+    uint32_t dimY = rsGetDimY(context);
     _RS_ASSERT(gDimY == dimY);
-    uint32_t dimZ = rsGetDimZ(ctxt);
+    uint32_t dimZ = rsGetDimZ(context);
     _RS_ASSERT(gDimZ == dimZ);
 }
 
