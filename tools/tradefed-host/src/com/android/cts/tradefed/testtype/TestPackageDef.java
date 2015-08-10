@@ -308,9 +308,6 @@ class TestPackageDef implements ITestPackageDef {
         instrTest.setRunName(mAppPackageName);
         instrTest.setPackageName(mAppNameSpace);
         instrTest.setRunnerName(mRunner);
-        instrTest.setTestPackageName(mTestPackageName);
-        instrTest.setClassName(mClassName);
-        instrTest.setMethodName(mMethodName);
         instrTest.setAbi(mAbi);
         instrTest.setTestsToRun(mTests, false
             /* force batch mode off to always run using testFile */);
