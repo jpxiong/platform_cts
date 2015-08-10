@@ -17,7 +17,6 @@
 package com.android.cts.devicepolicy;
 
 import com.android.cts.tradefed.build.CtsBuildHelper;
-import com.android.cts.util.AbiUtils;
 import com.android.ddmlib.Log.LogLevel;
 import com.android.ddmlib.testrunner.InstrumentationResultParser;
 import com.android.ddmlib.testrunner.RemoteAndroidTestRunner;
@@ -362,5 +361,21 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         String commandOutput = getDevice().executeShellCommand(command);
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
         return commandOutput.startsWith("Success:");
+    }
+
+    protected String getSettings(String namespace, String name, int userId)
+            throws DeviceNotAvailableException {
+        String command = "settings --user " + userId + " get " + namespace + " " + name;
+        String commandOutput = getDevice().executeShellCommand(command);
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
+        return commandOutput.replace("\n", "").replace("\r", "");
+    }
+
+    protected void putSettings(String namespace, String name, String value, int userId)
+            throws DeviceNotAvailableException {
+        String command = "settings --user " + userId + " put " + namespace + " " + name
+                + " " + value;
+        String commandOutput = getDevice().executeShellCommand(command);
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": " + commandOutput);
     }
 }

@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.deviceowner;
+package com.android.cts.packageinstaller;
 
 import android.app.PendingIntent;
+import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageInstaller;
+import android.content.pm.PackageManager;
+import android.support.test.uiautomator.UiDevice;
+import android.test.InstrumentationTestCase;
+
+import com.android.cts.packageinstaller.ClearDeviceOwnerTest.BasicAdminReceiver;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,34 +37,41 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * This class tests silent package install and uninstall by a device owner.
+ * Base test case for testing PackageInstaller.
  */
-public class PackageInstallTest extends BaseDeviceOwnerTest {
-    private static final String TEST_APP_LOCATION = "/data/local/tmp/CtsSimpleApp.apk";
-    private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
-    private static final int PACKAGE_INSTALLER_TIMEOUT_MS = 60000; // 60 seconds
+public class BasePackageInstallTest extends InstrumentationTestCase {
+    protected static final String TEST_APP_LOCATION = "/data/local/tmp/CtsSimpleApp.apk";
+    protected static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
+    protected static final int PACKAGE_INSTALLER_TIMEOUT_MS = 60000; // 60 seconds
     private static final String ACTION_INSTALL_COMMIT =
             "com.android.cts.deviceowner.INTENT_PACKAGE_INSTALL_COMMIT";
-    private static final int PACKAGE_INSTALLER_STATUS_UNDEFINED = -1000;
+    protected static final int PACKAGE_INSTALLER_STATUS_UNDEFINED = -1000;
+    public static final String PACKAGE_NAME = SilentPackageInstallTest.class.getPackage().getName();
 
+    protected Context mContext;
+    protected UiDevice mDevice;
+    protected DevicePolicyManager mDevicePolicyManager;
     private PackageManager mPackageManager;
     private PackageInstaller mPackageInstaller;
     private PackageInstaller.Session mSession;
-    private boolean mCallbackReceived;
-    private int mCallbackStatus;
+    protected boolean mCallbackReceived;
+    protected int mCallbackStatus;
+    protected Intent mCallbackIntent;
 
-    private final Object mPackageInstallerTimeoutLock = new Object();
+    protected final Object mPackageInstallerTimeoutLock = new Object();
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            mContext.unregisterReceiver(this);
             synchronized (mPackageInstallerTimeoutLock) {
                 mCallbackStatus = intent.getIntExtra(PackageInstaller.EXTRA_STATUS,
                         PACKAGE_INSTALLER_STATUS_UNDEFINED);
                 if (mCallbackStatus == PackageInstaller.STATUS_SUCCESS) {
+                    mContext.unregisterReceiver(this);
                     assertEquals(TEST_APP_PKG, intent.getStringExtra(
                             PackageInstaller.EXTRA_PACKAGE_NAME));
+                } else if (mCallbackStatus == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+                    mCallbackIntent = (Intent) intent.getExtras().get(Intent.EXTRA_INTENT);
                 }
                 mCallbackReceived = true;
                 mPackageInstallerTimeoutLock.notify();
@@ -69,6 +82,10 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mContext = getInstrumentation().getContext();
+        mDevice = UiDevice.getInstance(getInstrumentation());
+        mDevicePolicyManager = (DevicePolicyManager)
+                mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         mPackageManager = mContext.getPackageManager();
         mPackageInstaller = mPackageManager.getPackageInstaller();
         assertNotNull(mPackageInstaller);
@@ -79,7 +96,10 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
 
     @Override
     protected void tearDown() throws Exception {
-        mDevicePolicyManager.setUninstallBlocked(getWho(), TEST_APP_PKG, false);
+        if (mDevicePolicyManager.isDeviceOwnerApp(PACKAGE_NAME) ||
+                mDevicePolicyManager.isProfileOwnerApp(PACKAGE_NAME)) {
+            mDevicePolicyManager.setUninstallBlocked(getWho(), TEST_APP_PKG, false);
+        }
         try {
             mContext.unregisterReceiver(mBroadcastReceiver);
         } catch (IllegalArgumentException e) {
@@ -91,33 +111,12 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
         super.tearDown();
     }
 
-    public void testSilentInstallUninstall() throws Exception {
-        // install the app
-        assertInstallPackage();
-
-        // uninstall the app again
-        assertTrue(tryUninstallPackage());
-        assertFalse(isPackageInstalled(TEST_APP_PKG));
+    protected static ComponentName getWho() {
+        return new ComponentName(PACKAGE_NAME, BasicAdminReceiver.class.getName());
     }
 
-    public void testUninstallBlocked() throws Exception {
-        // install the app
-        assertInstallPackage();
-
-        mDevicePolicyManager.setUninstallBlocked(getWho(), TEST_APP_PKG, true);
-        assertTrue(mDevicePolicyManager.isUninstallBlocked(getWho(), TEST_APP_PKG));
-        assertTrue(mDevicePolicyManager.isUninstallBlocked(null, TEST_APP_PKG));
-        assertFalse(tryUninstallPackage());
-        assertTrue(isPackageInstalled(TEST_APP_PKG));
-
-        mDevicePolicyManager.setUninstallBlocked(getWho(), TEST_APP_PKG, false);
-        assertFalse(mDevicePolicyManager.isUninstallBlocked(getWho(), TEST_APP_PKG));
-        assertFalse(mDevicePolicyManager.isUninstallBlocked(null, TEST_APP_PKG));
-        assertTrue(tryUninstallPackage());
+    protected void assertInstallPackage() throws Exception {
         assertFalse(isPackageInstalled(TEST_APP_PKG));
-    }
-
-    private void assertInstallPackage() throws Exception {
         synchronized (mPackageInstallerTimeoutLock) {
             mCallbackReceived = false;
             mCallbackStatus = PACKAGE_INSTALLER_STATUS_UNDEFINED;
@@ -134,7 +133,7 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
         assertTrue(isPackageInstalled(TEST_APP_PKG));
     }
 
-    private boolean tryUninstallPackage() throws Exception {
+    protected boolean tryUninstallPackage() throws Exception {
         assertTrue(isPackageInstalled(TEST_APP_PKG));
         synchronized (mPackageInstallerTimeoutLock) {
             mCallbackReceived = false;
@@ -151,7 +150,7 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
         }
     }
 
-    private void installPackage(String packageLocation) throws Exception {
+    protected void installPackage(String packageLocation) throws Exception {
         PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(
                 PackageInstaller.SessionParams.MODE_FULL_INSTALL);
         int sessionId = mPackageInstaller.createSession(params);
@@ -184,11 +183,11 @@ public class PackageInstallTest extends BaseDeviceOwnerTest {
                 mContext,
                 sessionId,
                 broadcastIntent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT);
+                PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent.getIntentSender();
     }
 
-    private boolean isPackageInstalled(String packageName) {
+    protected boolean isPackageInstalled(String packageName) {
         try {
             PackageInfo pi = mPackageManager.getPackageInfo(packageName, 0);
             return pi != null;

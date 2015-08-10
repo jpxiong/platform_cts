@@ -16,9 +16,7 @@
 
 package com.android.cts.devicepolicy;
 
-import com.android.ddmlib.Log.LogLevel;
-import com.android.tradefed.log.LogUtil.CLog;
-
+import java.io.File;
 import java.lang.Exception;
 
 /**
@@ -49,6 +47,18 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
     private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
     private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
 
+    private static final String TEST_APP_APK = "CtsSimpleApp.apk";
+    private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
+    private static final String TEST_APP_LOCATION = "/data/local/tmp/";
+
+    private static final String PACKAGE_INSTALLER_PKG = "com.android.cts.packageinstaller";
+    private static final String PACKAGE_INSTALLER_APK = "CtsPackageInstallerApp.apk";
+    private static final String PACKAGE_INSTALLER_ADMIN_COMPONENT =
+            PACKAGE_INSTALLER_PKG + "/" + ".ClearDeviceOwnerTest$BasicAdminReceiver";
+    private static final String PACKAGE_INSTALLER_CLEAR_DEVICE_OWNER_TEST_CLASS =
+            PACKAGE_INSTALLER_PKG + ".ClearDeviceOwnerTest";
+
+    @Override
     public void tearDown() throws Exception {
         if (mHasFeature) {
             getDevice().uninstallPackage(DEVICE_OWNER_PKG);
@@ -115,6 +125,30 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
             runDeviceTests(DEVICE_AND_PROFILE_OWNER_PKG, DEVICE_AND_PROFILE_OWNER_CLEAR);
             assertTrue(runDeviceTestsAsUser(DEVICE_AND_PROFILE_OWNER_PKG, ".AccountUtilsTest",
                     "testRemoveAccounts", 0));
+        }
+    }
+
+    public void testSilentPackageInstall() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
+        try {
+            // Install the test and prepare the test apk.
+            installApp(PACKAGE_INSTALLER_APK);
+            assertTrue(setDeviceOwner(PACKAGE_INSTALLER_ADMIN_COMPONENT));
+
+            getDevice().uninstallPackage(TEST_APP_PKG);
+            assertTrue(getDevice().pushFile(apk, TEST_APP_LOCATION + apk.getName()));
+            assertTrue(runDeviceTests(PACKAGE_INSTALLER_PKG,
+                    PACKAGE_INSTALLER_PKG + ".SilentPackageInstallTest"));
+        } finally {
+            assertTrue("Failed to remove device owner.", runDeviceTests(PACKAGE_INSTALLER_PKG,
+                    PACKAGE_INSTALLER_CLEAR_DEVICE_OWNER_TEST_CLASS));
+            String command = "rm " + TEST_APP_LOCATION + apk.getName();
+            String commandOutput = getDevice().executeShellCommand(command);
+            getDevice().uninstallPackage(TEST_APP_PKG);
+            getDevice().uninstallPackage(PACKAGE_INSTALLER_PKG);
         }
     }
 }

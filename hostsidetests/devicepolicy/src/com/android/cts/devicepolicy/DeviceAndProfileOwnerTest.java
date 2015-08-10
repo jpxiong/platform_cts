@@ -20,6 +20,8 @@ import com.android.ddmlib.Log.LogLevel;
 import com.android.tradefed.device.DeviceNotAvailableException;
 import com.android.tradefed.log.LogUtil.CLog;
 
+import java.io.File;
+
 /**
  * Set of tests for usecases that apply to profile and device owner.
  * This class is the base class of MixedProfileOwnerTest and MixedDeviceOwnerTest and is abstract
@@ -41,7 +43,17 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
     private static final String CERT_INSTALLER_PKG = "com.android.cts.certinstaller";
     private static final String CERT_INSTALLER_APK = "CtsCertInstallerApp.apk";
 
+    private static final String TEST_APP_APK = "CtsSimpleApp.apk";
+    private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
+    private static final String TEST_APP_LOCATION = "/data/local/tmp/";
+
+    private static final String PACKAGE_INSTALLER_PKG = "com.android.cts.packageinstaller";
+    private static final String PACKAGE_INSTALLER_APK = "CtsPackageInstallerApp.apk";
+
     protected static final int USER_OWNER = 0;
+
+    private static final String ADD_RESTRICTION_COMMAND = "add-restriction";
+    private static final String CLEAR_RESTRICTION_COMMAND = "clear-restriction";
 
     // ID of the user all tests are run as. For device owner this will be 0, for profile owner it
     // is the user id of the created profile.
@@ -167,7 +179,6 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         executeDeviceTestClass(".ApplicationHiddenTest");
     }
 
-    // TODO: Remove AccountManagementTest from XTS after GTS is released for MNC.
     public void testAccountManagement() throws Exception {
         if (!mHasFeature) {
             return;
@@ -206,11 +217,68 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         }
     }
 
+    public void testPackageInstallUserRestrictions() throws Exception {
+        // UserManager.DISALLOW_INSTALL_UNKNOWN_SOURCES
+        final String DISALLOW_INSTALL_UNKNOWN_SOURCES = "no_install_unknown_sources";
+        final String UNKNOWN_SOURCES_SETTING = "install_non_market_apps";
+        final String SECURE_SETTING_CATEGORY = "secure";
+        final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
+        String unknownSourceSetting = null;
+        try {
+            // Install the test and prepare the test apk.
+            installApp(PACKAGE_INSTALLER_APK);
+            assertTrue(getDevice().pushFile(apk, TEST_APP_LOCATION + apk.getName()));
+
+            // Add restrictions and test if we can install the apk.
+            getDevice().uninstallPackage(TEST_APP_PKG);
+            changeUserRestrictionForUser(DISALLOW_INSTALL_UNKNOWN_SOURCES,
+                    ADD_RESTRICTION_COMMAND, mUserId);
+            assertTrue(runDeviceTestsAsUser(PACKAGE_INSTALLER_PKG, ".ManualPackageInstallTest",
+                    "testManualInstallBlocked", mUserId));
+
+            // Clear restrictions and test if we can install the apk.
+            changeUserRestrictionForUser(DISALLOW_INSTALL_UNKNOWN_SOURCES,
+                    CLEAR_RESTRICTION_COMMAND, mUserId);
+
+            // Enable Unknown sources in Settings.
+            unknownSourceSetting =
+                    getSettings(SECURE_SETTING_CATEGORY, UNKNOWN_SOURCES_SETTING, mUserId);
+            putSettings(SECURE_SETTING_CATEGORY, UNKNOWN_SOURCES_SETTING, "1", mUserId);
+            assertEquals("1",
+                    getSettings(SECURE_SETTING_CATEGORY, UNKNOWN_SOURCES_SETTING, mUserId));
+            assertTrue(runDeviceTestsAsUser(PACKAGE_INSTALLER_PKG, ".ManualPackageInstallTest",
+                    "testManualInstallSucceeded", mUserId));
+        } finally {
+            String command = "rm " + TEST_APP_LOCATION + apk.getName();
+            getDevice().executeShellCommand(command);
+            getDevice().uninstallPackage(TEST_APP_PKG);
+            getDevice().uninstallPackage(PACKAGE_INSTALLER_APK);
+            if (unknownSourceSetting != null) {
+                putSettings(SECURE_SETTING_CATEGORY, UNKNOWN_SOURCES_SETTING, unknownSourceSetting,
+                        mUserId);
+            }
+        }
+    }
+
     protected void executeDeviceTestClass(String className) throws Exception {
         assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, className, mUserId));
     }
 
     protected void executeDeviceTestMethod(String className, String testName) throws Exception {
         assertTrue(runDeviceTestsAsUser(DEVICE_ADMIN_PKG, className, testName, mUserId));
+    }
+
+    private void changeUserRestrictionForUser(String key, String command, int userId)
+            throws DeviceNotAvailableException {
+        String adbCommand = "am start -W --user " + userId
+                + " -c android.intent.category.DEFAULT "
+                + " --es extra-command " + command
+                + " --es extra-restriction-key " + key
+                + " " + DEVICE_ADMIN_PKG + "/.UserRestrictionActivity";
+        String commandOutput = getDevice().executeShellCommand(adbCommand);
+        CLog.logAndDisplay(LogLevel.INFO,
+                "Output for command " + adbCommand + ": " + commandOutput);
+        assertTrue("Command was expected to succeed " + commandOutput,
+                commandOutput.contains("Status: ok"));
     }
 }

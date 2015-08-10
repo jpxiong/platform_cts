@@ -100,6 +100,7 @@ cts_support_packages := \
     CtsManagedProfileApp \
     CtsMonkeyApp \
     CtsMonkeyApp2 \
+    CtsPackageInstallerApp \
     CtsPermissionApp \
     CtsSimpleApp \
     CtsSimplePreMApp \

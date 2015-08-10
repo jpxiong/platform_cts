@@ -16,12 +16,6 @@
 
 package com.android.cts.devicepolicy;
 
-import com.android.ddmlib.Log.LogLevel;
-import com.android.tradefed.device.DeviceNotAvailableException;
-import com.android.tradefed.log.LogUtil.CLog;
-
-import java.io.File;
-
 /**
  * Set of tests for Device Owner use cases.
  */
@@ -34,10 +28,6 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
     private static final String MANAGED_PROFILE_APK = "CtsManagedProfileApp.apk";
     private static final String MANAGED_PROFILE_ADMIN =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
-
-    private static final String TEST_APP_APK = "CtsSimpleApp.apk";
-    private static final String TEST_APP_PKG = "com.android.cts.launcherapps.simpleapp";
-    private static final String TEST_APP_LOCATION = "/data/local/tmp/";
 
     private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
     private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
@@ -90,19 +80,6 @@ public class DeviceOwnerTest extends BaseDevicePolicyTest {
             executeDeviceOwnerTest("LockTaskTest");
         } finally {
             getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
-        }
-    }
-
-    public void testPackageInstall() throws Exception {
-        final File apk = mCtsBuild.getTestApp(TEST_APP_APK);
-        try {
-            getDevice().uninstallPackage(TEST_APP_PKG);
-            assertTrue(getDevice().pushFile(apk, TEST_APP_LOCATION + apk.getName()));
-            executeDeviceOwnerTest("PackageInstallTest");
-        } finally {
-            String command = "rm " + TEST_APP_LOCATION + apk.getName();
-            String commandOutput = getDevice().executeShellCommand(command);
-            getDevice().uninstallPackage(TEST_APP_PKG);
         }
     }
 

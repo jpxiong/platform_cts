@@ -158,6 +158,14 @@
   bug: 17508787
 },
 {
+  description: "This test should be outside of official CTS suite until it is verified for all Nexus devices",
+  names: [
+    "com.android.cts.devicepolicy.MixedDeviceOwnerTest#testPackageInstallUserRestrictions",
+    "com.android.cts.devicepolicy.MixedProfileOwnerTest#testPackageInstallUserRestrictions"
+  ],
+  bug: 18928535
+},
+{
   description: "Test is not yet properly implemented",
   names: [
     "android.voicesettings.cts.ZenModeTest#testAll"

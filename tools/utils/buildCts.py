@@ -490,6 +490,10 @@ def BuildCtsTemporarilyKnownFailureList():
       'com.android.cts.app.os' : [
           'com.android.cts.app.os.OsHostTests#testNonExportedActivities',
       ],
+      'com.android.cts.devicepolicy' : [
+          'com.android.cts.devicepolicy.MixedDeviceOwnerTest#testPackageInstallUserRestrictions',
+          'com.android.cts.devicepolicy.MixedProfileOwnerTest#testPackageInstallUserRestrictions',
+      ],
       '' : []}
 
 def LogGenerateDescription(name):

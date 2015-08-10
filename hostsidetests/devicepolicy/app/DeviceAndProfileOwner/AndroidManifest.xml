@@ -71,6 +71,13 @@
                        android:resource="@xml/authenticator" />
         </service>
 
+        <activity android:name=".UserRestrictionActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </activity>
+
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
