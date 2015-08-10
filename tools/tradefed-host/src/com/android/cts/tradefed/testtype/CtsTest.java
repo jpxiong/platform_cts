@@ -289,9 +289,8 @@ public class CtsTest implements IDeviceTest, IResumableTest, IShardableTest, IBu
         @Override
         public void testFailed(TestIdentifier test, String trace) {
             super.testFailed(test, trace);
-            // sleep a small amount of time to ensure test failure stack trace makes it into logcat
-            // capture
-            RunUtil.getDefault().sleep(10);
+            // sleep 2s to ensure test failure stack trace makes it into logcat capture
+            RunUtil.getDefault().sleep(2 * 1000);
             InputStreamSource logSource = mDevice.getLogcat(mNumLogcatBytes);
             super.testLog(String.format("logcat-%s_%s", test.getClassName(), test.getTestName()),
                     LogDataType.TEXT, logSource);
