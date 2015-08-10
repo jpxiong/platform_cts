@@ -97,9 +97,7 @@ public class MidiSoloTest extends CtsAndroidTestCase {
         MidiManager.DeviceCallback callback = new MidiManager.DeviceCallback();
 
         // These should not crash.
-        midiManager.unregisterDeviceCallback(null);
         midiManager.unregisterDeviceCallback(callback);
-        midiManager.registerDeviceCallback(null, null);
         midiManager.registerDeviceCallback(callback, null);
         midiManager.unregisterDeviceCallback(callback);
         midiManager.registerDeviceCallback(callback, new Handler(Looper.getMainLooper()));
@@ -107,9 +105,6 @@ public class MidiSoloTest extends CtsAndroidTestCase {
         midiManager.unregisterDeviceCallback(callback);
         midiManager.unregisterDeviceCallback(callback);
         midiManager.unregisterDeviceCallback(callback);
-        midiManager.registerDeviceCallback(null, new Handler(Looper.getMainLooper()));
-        midiManager.unregisterDeviceCallback(callback);
-        midiManager.unregisterDeviceCallback(null);
     }
 
     public void testMidiReceiver() throws Exception {
