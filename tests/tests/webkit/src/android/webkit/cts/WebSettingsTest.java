@@ -95,7 +95,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewCts
      * brackets are optional):
      * <p/>
      * Mozilla/5.0 (Linux;[ U;] Android <version>;[ <language>-<country>;]
-     * [<devicemodel>;] Build/<buildID>[; wv]) AppleWebKit/<major>.<minor> (KHTML, like Gecko)
+     * [<devicemodel>;] Build/<buildID>; wv) AppleWebKit/<major>.<minor> (KHTML, like Gecko)
      * Version/<major>.<minor> Chrome/<major>.<minor>.<branch>.<build>[ Mobile]
      * Safari/<major>.<minor>
      */
@@ -107,7 +107,7 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewCts
         Log.i(LOG_TAG, String.format("Checking user agent string %s", actualUserAgentString));
         final String patternString =
                 "Mozilla/5\\.0 \\(Linux;( U;)? Android ([^;]+);( (\\w+)-(\\w+);)?" +
-                "\\s?(.*)\\sBuild/(.+?)(; wv)?\\) AppleWebKit/(\\d+)\\.(\\d+) " +
+                "\\s?(.*)\\sBuild/(.+); wv\\) AppleWebKit/(\\d+)\\.(\\d+) " +
                 "\\(KHTML, like Gecko\\) " +
                 "Version/\\d+\\.\\d+ Chrome/\\d+\\.\\d+\\.\\d+\\.\\d+( Mobile)? " +
                 "Safari/(\\d+)\\.(\\d+)";
@@ -119,12 +119,11 @@ public class WebSettingsTest extends ActivityInstrumentationTestCase2<WebViewCts
         //  5   - language
         //  6 - device model (optional)
         //  7 - build ID
-        //  8 - WebView identifier "; wv" (optional)
-        //  9 - AppleWebKit major version number
-        // 10 - AppleWebKit minor version number
-        // 11 - " Mobile" string (optional)
-        // 12 - Safari major version number
-        // 13 - Safari minor version number
+        //  8 - AppleWebKit major version number
+        //  9 - AppleWebKit minor version number
+        // 10 - " Mobile" string (optional)
+        // 11 - Safari major version number
+        // 12 - Safari minor version number
         Log.i(LOG_TAG, String.format("Trying to match pattern %s", patternString));
         final Pattern userAgentExpr = Pattern.compile(patternString);
         Matcher patternMatcher = userAgentExpr.matcher(actualUserAgentString);
