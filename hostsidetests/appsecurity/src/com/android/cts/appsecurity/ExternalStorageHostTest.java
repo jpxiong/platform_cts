@@ -215,6 +215,10 @@ public class ExternalStorageHostTest extends DeviceTestCase
             // Verify they both have isolated view of storage
             runDeviceTests(MULTIUSER_PKG, MULTIUSER_CLASS, "testReadIsolatedStorage", owner);
             runDeviceTests(MULTIUSER_PKG, MULTIUSER_CLASS, "testReadIsolatedStorage", secondary);
+
+            // Verify they can't poke at each other
+            runDeviceTests(MULTIUSER_PKG, MULTIUSER_CLASS, "testUserIsolation", owner);
+            runDeviceTests(MULTIUSER_PKG, MULTIUSER_CLASS, "testUserIsolation", secondary);
         } finally {
             getDevice().uninstallPackage(MULTIUSER_PKG);
             removeUsersForTest(users);

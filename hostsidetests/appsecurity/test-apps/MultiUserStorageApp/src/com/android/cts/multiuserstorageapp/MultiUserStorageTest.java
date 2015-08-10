@@ -16,6 +16,7 @@
 
 package com.android.cts.multiuserstorageapp;
 
+import static com.android.cts.externalstorageapp.CommonExternalStorageTest.assertDirNoAccess;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.getAllPackageSpecificPathsExceptObb;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.readInt;
 import static com.android.cts.externalstorageapp.CommonExternalStorageTest.writeInt;
@@ -117,6 +118,24 @@ public class MultiUserStorageTest extends AndroidTestCase {
                 readInt(buildEnvObbPath(FILE_OBB_SINGLETON)));
         assertEquals("Failed to read OBB file from raw path", OBB_VALUE,
                 readInt(buildRawObbPath(FILE_OBB_SINGLETON)));
+    }
+
+    /**
+     * Verify that we can't poke at storage of other users.
+     */
+    public void testUserIsolation() throws Exception {
+        final File myPath = Environment.getExternalStorageDirectory();
+        final int myId = android.os.Process.myUid() / 100000;
+        assertEquals(String.valueOf(myId), myPath.getName());
+
+        Log.d(TAG, "My path is " + myPath);
+        final File basePath = myPath.getParentFile();
+        for (int i = 0; i < 128; i++) {
+            if (i == myId) continue;
+
+            final File otherPath = new File(basePath, String.valueOf(i));
+            assertDirNoAccess(otherPath);
+        }
     }
 
     private File buildApiObbPath(String file) {
