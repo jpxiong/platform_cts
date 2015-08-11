@@ -19,16 +19,25 @@
     package="android.assist.testapp">
 
     <application>
-      <uses-library android:name="android.test.runner" />
+        <uses-library android:name="android.test.runner" />
 
-      <activity android:name="TestApp"
+        <activity android:name="TestApp"
                 android:label="Assist Test App"
                 android:theme="@android:style/Theme.Material.Light">
           <intent-filter>
-              <action android:name="android.intent.action.TEST_APP" />
+              <action android:name="android.intent.action.TEST_APP_ASSIST_STRUCTURE" />
               <category android:name="android.intent.category.DEFAULT" />
               <category android:name="android.intent.category.VOICE" />
           </intent-filter>
-      </activity>
+        </activity>
+        <activity android:name="SecureActivity"
+                  android:label="Secure Test App"
+                  android:theme="@android:style/Theme.Material.Light">
+            <intent-filter>
+                <action android:name="android.intent.action.TEST_APP_FLAG_SECURE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

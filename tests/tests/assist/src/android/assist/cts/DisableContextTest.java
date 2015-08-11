@@ -53,8 +53,8 @@ public class DisableContextTest extends AssistTestBase {
         SystemUtil.runShellCommand(getInstrumentation(),
                 "settings put secure assist_structure_enabled 0");
         SystemUtil.runShellCommand(getInstrumentation(),
-                "settings put secure assist_screenshot_enabled 0");
-
+            "settings put secure assist_screenshot_enabled 0");
+        logContextAndScreenshotSetting();
         startTestActivity(TEST_CASE_TYPE);
         waitForBroadcast();
     }
@@ -64,20 +64,14 @@ public class DisableContextTest extends AssistTestBase {
         SystemUtil.runShellCommand(getInstrumentation(),
                 "settings put secure assist_structure_enabled 1");
         SystemUtil.runShellCommand(getInstrumentation(),
-                "settings put secure assist_screenshot_enabled 1");
+            "settings put secure assist_screenshot_enabled 1");
+        logContextAndScreenshotSetting();
         super.tearDown();
     }
 
     public void testContextAndScreenshotOff() throws Exception {
         // Both settings off
-        if (mAssistContent != null || mAssistBundle != null || mAssistStructure != null) {
-            fail(String.format("Should have all been null - Bundle: %s, Structure: %s, Content: %s",
-                    mAssistBundle, mAssistStructure, mAssistContent));
-        }
-
-        if (mScreenshot != null) {
-            fail(String.format("Should have been null - Screenshot: %s", mScreenshot));
-        }
+        verifyAssistDataNullness(true, true, true, true);
 
         // Screenshot off, context on
         SystemUtil.runShellCommand(getInstrumentation(),
@@ -86,29 +80,19 @@ public class DisableContextTest extends AssistTestBase {
             "settings put secure assist_screenshot_enabled 0");
         waitForBroadcast();
 
-        if (mScreenshot != null) {
-            fail(String.format("Should have been null - Screenshot: %s", mScreenshot));
-        }
+        logContextAndScreenshotSetting();
 
-        if (mAssistContent == null || mAssistBundle == null) {
-            fail(String.format("Should not have been null - Bundle: %s, Content: %s",
-                mAssistBundle, mAssistContent));
-        }
+        verifyAssistDataNullness(false, false, false, true);
 
         // Context off, screenshot on
         SystemUtil.runShellCommand(getInstrumentation(),
-            "settings put secure assist_screenshot_enabled 1");
-        SystemUtil.runShellCommand(getInstrumentation(),
             "settings put secure assist_structure_enabled 0");
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_screenshot_enabled 1");
         waitForBroadcast();
 
-        if (mScreenshot == null) {
-            fail(String.format("Should not have been null - Screenshot: %s", mScreenshot));
-        }
+        logContextAndScreenshotSetting();
 
-        if (mAssistContent != null || mAssistBundle != null || mAssistStructure != null) {
-            fail(String.format("Should have all been null - Bundle: %s, Structure: %s, Content: %s",
-                mAssistBundle, mAssistStructure, mAssistContent));
-        }
+        verifyAssistDataNullness(true, true, true, false);
     }
 }

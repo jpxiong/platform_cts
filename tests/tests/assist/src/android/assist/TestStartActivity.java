@@ -21,11 +21,8 @@ import android.assist.common.Utils;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
-
-import android.assist.common.Utils;
 
 public class TestStartActivity extends Activity {
     static final String TAG = "TestStartActivity";
@@ -42,22 +39,21 @@ public class TestStartActivity extends Activity {
         Log.i(TAG, " in onResume");
     }
 
-    public void startTest(String testCaseType) {
-        Log.i(TAG, "Starting test activity for TestCaseType = " + testCaseType);
+    public void startTest(String testCaseName) {
+        Log.i(TAG, "Starting test activity for TestCaseType = " + testCaseName);
         Intent intent = new Intent();
-        intent.putExtra(Utils.TESTCASE_TYPE, testCaseType);
-        intent.setAction("android.intent.action.START_TEST_" + testCaseType);
+        intent.putExtra(Utils.TESTCASE_TYPE, testCaseName);
+        intent.setAction("android.intent.action.START_TEST_" + testCaseName);
         intent.setComponent(new ComponentName("android.assist.service",
-                "android.assist." + Utils.getTestActivity(testCaseType)));
+                "android.assist." + Utils.getTestActivity(testCaseName)));
         startActivity(intent);
     }
 
-    public void start3pApp() {
+    public void start3pApp(String testCaseName) {
         Intent intent = new Intent();
-        intent.setComponent(new ComponentName("android.assist.testapp",
-                "android.assist.testapp.TestApp"));
+        intent.setAction("android.intent.action.TEST_APP_" + testCaseName);
+        intent.setComponent(Utils.getTestAppComponent(testCaseName));
         startActivity(intent);
-
     }
 
     @Override protected void onPause() {

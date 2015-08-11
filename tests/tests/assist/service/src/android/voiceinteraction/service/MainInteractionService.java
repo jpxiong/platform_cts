@@ -17,7 +17,6 @@
 package android.assist.service;
 
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionService;

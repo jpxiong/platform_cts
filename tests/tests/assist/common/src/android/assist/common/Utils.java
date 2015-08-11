@@ -15,18 +15,11 @@
  */
 package android.assist.common;
 
-import android.app.VoiceInteractor;
-import android.app.VoiceInteractor.PickOptionRequest.Option;
-import android.content.BroadcastReceiver;
+import android.R;
 import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.concurrent.CountDownLatch;
 
 public class Utils {
     public static final String TESTCASE_TYPE = "testcase_type";
@@ -42,8 +35,10 @@ public class Utils {
 
     public static final int TIMEOUT_MS = 2 * 1000; // TODO(awlee): what is the timeout
 
+    /** Test name suffixes */
     public static final String ASSIST_STRUCTURE = "ASSIST_STRUCTURE";
     public static final String DISABLE_CONTEXT = "DISABLE_CONTEXT";
+    public static final String FLAG_SECURE = "FLAG_SECURE";
 
     /**
      * The shim activity that starts the service associated with each test.
@@ -51,6 +46,7 @@ public class Utils {
     public static final String getTestActivity(String testCaseType) {
         switch (testCaseType) {
             case ASSIST_STRUCTURE:
+            case FLAG_SECURE:
                 return "service.AssistStructureActivity";
             case DISABLE_CONTEXT:
                 return "service.DisableContextActivity";
@@ -65,8 +61,12 @@ public class Utils {
     public static final ComponentName getTestAppComponent(String testCaseType) {
         switch (testCaseType) {
             case ASSIST_STRUCTURE:
+            case DISABLE_CONTEXT:
                 return new ComponentName(
                         "android.assist.testapp", "android.assist.testapp.TestApp");
+            case FLAG_SECURE:
+                return new ComponentName(
+                        "android.assist.testapp", "android.assist.testapp.SecureActivity");
             default:
                 return new ComponentName("","");
         }
@@ -88,19 +88,6 @@ public class Utils {
             }
         }
         return buf.toString();
-    }
-
-    public static final String toOptionsString(Option[] options) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("{");
-        for (int i = 0; i < options.length; i++) {
-            if (i >= 1) {
-                sb.append(", ");
-            }
-            sb.append(options[i].getLabel());
-        }
-        sb.append("}");
-        return sb.toString();
     }
 
     public static final void addErrorResult(final Bundle testinfo, final String msg) {

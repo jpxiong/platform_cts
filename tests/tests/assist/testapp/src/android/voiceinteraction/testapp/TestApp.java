@@ -17,16 +17,8 @@
 package android.assist.testapp;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
-import java.util.ArrayList;
-
-import android.assist.common.Utils;
 
 public class TestApp extends Activity {
     static final String TAG = "TestApp";
@@ -38,7 +30,7 @@ public class TestApp extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "TestApp created");
-        getLayoutInflater().inflate(R.layout.voice_interaction_main, null);
+        getLayoutInflater().inflate(R.layout.test_app, null);
     }
 
     @Override
