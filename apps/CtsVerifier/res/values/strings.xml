@@ -1727,6 +1727,17 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="activity_not_found">No activity found to handle intent: %s</string>
     <string name="open_settings_button_label">Open Application Settings</string>
     <string name="finish_button_label">Finish</string>
+    <string name="device_owner_device_admin_visible">Device administrator settings</string>
+    <string name="device_owner_device_admin_visible_info">
+        Please press the Go button to open the Security page in Settings.
+        Navigate to Device administrators and confirm that:\n
+        \n
+        - \"CTS Verifier - AfW Admin\" exists and is activated.\n
+        - \"CTS Verifier - AfW Admin\" cannot be disabled.\n
+        \n
+        Use the Back button to return to this page.
+    </string>
+    <string name="device_owner_device_admin_visible_go">Go</string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
