@@ -222,6 +222,7 @@ cts_host_libraries := \
     CtsHostJank \
     CtsHostsideNetworkTests \
     CtsHostUi \
+    CtsJdwpSecurityHostTestCases \
     CtsMonkeyTestCases \
     CtsThemeHostTestCases \
     CtsUsageHostTestCases \
@@ -244,7 +245,8 @@ cts_ui_tests := \
     CtsUiAutomatorTests
 
 cts_device_jars := \
-    CtsDeviceJank
+    CtsDeviceJank \
+    CtsJdwpApp
 
 cts_target_junit_tests := \
     CtsJdwp
