@@ -431,6 +431,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setDivider(d);
+                mListView.requestLayout();
             }
         });
         mInstrumentation.waitForIdleSync();
@@ -440,6 +441,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setDividerHeight(10);
+                mListView.requestLayout();
             }
         });
         mInstrumentation.waitForIdleSync();
