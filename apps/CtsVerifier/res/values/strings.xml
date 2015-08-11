@@ -1737,7 +1737,30 @@ You should be prompted to select credentials; choose the ones you just installed
         \n
         Use the Back button to return to this page.
     </string>
-    <string name="device_owner_device_admin_visible_go">Go</string>
+    <string name="device_owner_disallow_config_bt">Disallow configuring Bluetooth</string>
+    <string name="device_owner_disallow_config_bt_info">
+        Please press the Set restriction button to set the user restriction.
+        Then press Go to open the Bluetooth page in Settings.
+        Confirm that:\n
+        \n
+        - You cannot view Bluetooth devices in range.\n
+        - You cannot edit, add or remove any already paired devices.\n
+        \n
+        Use the Back button to return to this page.
+    </string>
+    <string name="device_owner_disallow_config_wifi">Disallow configuring WiFi</string>
+    <string name="device_owner_disallow_config_wifi_info">
+        Please press the Set restriction button to set the user restriction.
+        Then press Go to open the WiFi page in Settings.
+        Confirm that:\n
+        \n
+        - You cannot view WiFi networks in range.\n
+        - You cannot edit, add or remove any existing WiFi configs.\n
+        \n
+        Use the Back button to return to this page.
+    </string>
+    <string name="device_owner_user_restriction_set">Set restriction</string>
+    <string name="device_owner_settings_go">Go</string>
 
     <!-- Strings for JobScheduler Tests -->
     <string name="js_test_description">This test is mostly automated, but requires some user interaction. You can pass this test once the list items below are checked.</string>
