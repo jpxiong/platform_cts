@@ -24,6 +24,8 @@ import android.telecom.PhoneAccountHandle;
 import android.telecom.RemoteConference;
 import android.telecom.RemoteConnection;
 
+import java.util.Collection;
+
 /**
  * This is the official ConnectionService for Telecom's CTS App. Since telecom requires that a
  * CS be registered in the AndroidManifest.xml file, we have to have a single implementation
@@ -132,6 +134,19 @@ public class CtsConnectionService extends ConnectionService {
     public static void addConferenceToTelecom(Conference conference) {
         synchronized(sLock) {
             sTelecomConnectionService.addConference(conference);
+        }
+    }
+
+    public static void addExistingConnectionToTelecom(
+            PhoneAccountHandle phoneAccountHandle, Connection connection) {
+        synchronized(sLock) {
+            sTelecomConnectionService.addExistingConnection(phoneAccountHandle, connection);
+        }
+    }
+
+    public static Collection<Connection> getAllConnectionsFromTelecom() {
+        synchronized(sLock) {
+            return sTelecomConnectionService.getAllConnections();
         }
     }
 

@@ -322,8 +322,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
         assertThat("Telecom should create outgoing connection for outgoing call",
                 connectionService.outgoingConnections.size(), not(equalTo(0)));
-        assertEquals("Telecom should not create incoming connections for outgoing calls",
-                0, connectionService.incomingConnections.size());
         MockConnection connection = connectionService.outgoingConnections.get(connectionIndex);
         return connection;
     }
@@ -345,8 +343,6 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
 
         assertThat("Telecom should create incoming connections for incoming calls",
                 connectionService.incomingConnections.size(), not(equalTo(0)));
-        assertEquals("Telecom should not create outgoing connections for incoming calls",
-                0, connectionService.outgoingConnections.size());
         MockConnection connection = connectionService.incomingConnections.get(connectionIndex);
         setAndVerifyConnectionForIncomingCall(connection);
         return connection;
