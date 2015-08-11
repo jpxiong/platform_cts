@@ -46,17 +46,31 @@ public class PhoneAccountOperationsTest extends InstrumentationTestCase {
             .setCapabilities(PhoneAccount.CAPABILITY_SIM_SUBSCRIPTION)
             .setHighlightColor(Color.RED)
             .setShortDescription(ACCOUNT_LABEL)
-            .setSupportedUriSchemes(Arrays.asList("tel"))
+            .setSupportedUriSchemes(Arrays.asList(PhoneAccount.SCHEME_TEL))
             .build();
 
     public static final PhoneAccount TEST_NO_SIM_PHONE_ACCOUNT = PhoneAccount.builder(
             TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
             .setAddress(Uri.parse("tel:555-TEST"))
             .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
+                    PhoneAccount.CAPABILITY_VIDEO_CALLING)
             .setHighlightColor(Color.RED)
             .setShortDescription(ACCOUNT_LABEL)
-            .setSupportedUriSchemes(Arrays.asList("tel"))
+            .setSupportedUriSchemes(Arrays.asList(
+                    PhoneAccount.SCHEME_TEL, PhoneAccount.SCHEME_VOICEMAIL))
+            .build();
+
+    public static final PhoneAccount TEST_CALL_MANAGER_PHONE_ACCOUNT = PhoneAccount.builder(
+            TEST_PHONE_ACCOUNT_HANDLE, ACCOUNT_LABEL)
+            .setAddress(Uri.parse("tel:555-TEST"))
+            .setSubscriptionAddress(Uri.parse("tel:555-TEST"))
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
+                    PhoneAccount.CAPABILITY_CONNECTION_MANAGER)
+            .setHighlightColor(Color.RED)
+            .setShortDescription(ACCOUNT_LABEL)
+            .setSupportedUriSchemes(Arrays.asList(
+                    PhoneAccount.SCHEME_TEL, PhoneAccount.SCHEME_VOICEMAIL))
             .build();
 
     private Context mContext;
@@ -154,9 +168,33 @@ public class PhoneAccountOperationsTest extends InstrumentationTestCase {
         final List<PhoneAccountHandle> newAccounts = mTelecomManager.getCallCapablePhoneAccounts();
         assertNotNull("No enabled Phone account found.", newAccounts);
         assertEquals("1 new enabled Phone account expected.", newAccounts.size(),
-                oldAccountsListSize+1);
+                oldAccountsListSize + 1);
         assertTrue("Enabled Phone accounts do not contain the test account.",
                 newAccounts.contains(TEST_PHONE_ACCOUNT_HANDLE));
     }
 
+    public void testRegisterPhoneAccount_CheckCapabilities() throws Exception {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        mTelecomManager.registerPhoneAccount(TEST_NO_SIM_PHONE_ACCOUNT);
+        PhoneAccount retrievedPhoneAccount = mTelecomManager.getPhoneAccount(
+                TEST_PHONE_ACCOUNT_HANDLE);
+        assertTrue("Phone account should have call provider & video calling capability.",
+                retrievedPhoneAccount.hasCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER |
+                        PhoneAccount.CAPABILITY_VIDEO_CALLING));
+    }
+
+    public void testRegisterPhoneAccount_CheckURISchemeSupported() throws Exception {
+        if (!shouldTestTelecom(mContext)) {
+            return;
+        }
+        mTelecomManager.registerPhoneAccount(TEST_NO_SIM_PHONE_ACCOUNT);
+        PhoneAccount retrievedPhoneAccount = mTelecomManager.getPhoneAccount(
+                TEST_PHONE_ACCOUNT_HANDLE);
+        assertTrue("Phone account should support tel URI scheme.",
+                retrievedPhoneAccount.supportsUriScheme(PhoneAccount.SCHEME_TEL));
+        assertTrue("Phone account should support voicemail URI scheme.",
+                retrievedPhoneAccount.supportsUriScheme(PhoneAccount.SCHEME_VOICEMAIL));
+    }
 }
