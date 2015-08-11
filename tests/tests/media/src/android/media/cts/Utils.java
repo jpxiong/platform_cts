@@ -58,8 +58,9 @@ public class Utils {
         query.append(operation);
         String queryStr = query.toString();
 
-        String result = enable ? "allow" : "deny";
-        while(!result.contains(result)) {
+        String expectedResult = enable ? "allow" : "deny";
+        String result = "";
+        while(!result.contains(expectedResult)) {
             ParcelFileDescriptor pfd = instrumentation.getUiAutomation().executeShellCommand(
                                                             queryStr);
             InputStream inputStream = new FileInputStream(pfd.getFileDescriptor());
