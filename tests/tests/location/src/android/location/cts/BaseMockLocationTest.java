@@ -16,13 +16,8 @@
 
 package android.location.cts;
 
-import android.os.ParcelFileDescriptor;
+import android.cts.util.LocationUtils;
 import android.test.InstrumentationTestCase;
-import android.util.Log;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Base class for instrumentations tests that use mock location.
@@ -33,31 +28,12 @@ public abstract class BaseMockLocationTest extends InstrumentationTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        setAsMoskLocationProvider(true);
+        LocationUtils.registerMockLocationProvider(getInstrumentation(), true);
     }
 
     @Override
     protected void tearDown() throws Exception {
-        setAsMoskLocationProvider(false);
+        LocationUtils.registerMockLocationProvider(getInstrumentation(), false);
         super.tearDown();
-    }
-
-    private void setAsMoskLocationProvider(boolean enable) {
-        StringBuilder command = new StringBuilder();
-        command.append("appops set ");
-        command.append(getInstrumentation().getContext().getPackageName());
-        command.append(" android:mock_location ");
-        command.append(enable ? "allow" : "deny");
-
-        ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation()
-                .executeShellCommand(command.toString());
-
-        InputStream is = new FileInputStream(pfd.getFileDescriptor());
-        try {
-            final byte[] buffer = new byte[8192];
-            while ((is.read(buffer)) != -1);
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "Error managing mock locaiton app", e);
-        }
     }
 }
