@@ -66,6 +66,7 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
     static final String EXTRA_SETTING = "extra-setting";
 
     private static final String CHECK_DEVICE_OWNER_TEST_ID = "CHECK_DEVICE_OWNER";
+    private static final String DEVICE_ADMIN_SETTINGS_ID = "DEVICE_ADMIN_SETTINGS";
     private static final String WIFI_LOCKDOWN_TEST_ID = WifiLockdownTestActivity.class.getName();
     private static final String DISABLE_STATUS_BAR_TEST_ID = "DISABLE_STATUS_BAR";
     private static final String DISABLE_KEYGUARD_TEST_ID = "DISABLE_KEYGUARD";
@@ -132,6 +133,16 @@ public class DeviceOwnerPositiveTestActivity extends PassFailButtons.TestListAct
                 new Intent(this, CommandReceiver.class)
                         .putExtra(EXTRA_COMMAND, COMMAND_CHECK_DEVICE_OWNER)
                         ));
+
+        // device admin settings
+        adapter.add(createInteractiveTestItem(this, DEVICE_ADMIN_SETTINGS_ID,
+                R.string.device_owner_device_admin_visible,
+                R.string.device_owner_device_admin_visible_info,
+                new ButtonInfo(
+                        R.string.device_owner_device_admin_visible_go,
+                        new Intent(Settings.ACTION_SECURITY_SETTINGS))));
+
+        // WiFi Lock down tests
         PackageManager packageManager = getPackageManager();
         if (packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
             adapter.add(createTestItem(this, WIFI_LOCKDOWN_TEST_ID,
