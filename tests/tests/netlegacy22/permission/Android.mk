@@ -12,5 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build the API tests and the permissions tests using their own makefiles.
-include $(call all-subdir-makefiles)
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+
+# don't include this package in any target
+LOCAL_MODULE_TAGS := tests
+# and when built explicitly put it in the data partition
+LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+
+LOCAL_SRC_FILES := $(call all-java-files-under, src)
+
+LOCAL_PACKAGE_NAME := CtsNetTestCasesLegacyPermission22
+
+LOCAL_SDK_VERSION := 22
+
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+
+include $(BUILD_CTS_PACKAGE)

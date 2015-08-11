@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.permission.cts;
+package android.net.cts.legacy.api22.permission;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -39,15 +39,15 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that ConnectivityManager#getActiveNetworkInfo() requires permissions.
+     * Verify that ConnectivityManager#startUsingNetworkFeature() requires permissions.
      * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
+     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
     @SmallTest
-    public void testGetActiveNetworkInfo() {
+    public void testStartUsingNetworkFeature() {
         try {
-            mConnectivityManager.getActiveNetworkInfo();
-            fail("ConnectivityManager.getActiveNetworkInfo didn't throw SecurityException as"
+            mConnectivityManager.startUsingNetworkFeature(TEST_NETWORK_TYPE, TEST_FEATURE);
+            fail("ConnectivityManager.startUsingNetworkFeature didn't throw SecurityException as"
                     + " expected");
         } catch (SecurityException e) {
             // expected
@@ -55,43 +55,18 @@ public class NoNetworkStatePermissionTest extends AndroidTestCase {
     }
 
     /**
-     * Verify that ConnectivityManager#getNetworkInfo() requires permissions.
+     * Verify that ConnectivityManager#requestRouteToHost() requires permissions.
      * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
+     *   {@link android.Manifest.permission#CHANGE_NETWORK_STATE}.
      */
     @SmallTest
-    public void testGetNetworkInfo() {
+    public void testRequestRouteToHost() {
         try {
-            mConnectivityManager.getNetworkInfo(TEST_NETWORK_TYPE);
-            fail("ConnectivityManager.getNetworkInfo didn't throw SecurityException as"
+            mConnectivityManager.requestRouteToHost(TEST_NETWORK_TYPE, 0xffffffff);
+            fail("ConnectivityManager.requestRouteToHost didn't throw SecurityException as"
                     + " expected");
         } catch (SecurityException e) {
             // expected
-        }
-    }
-
-    /**
-     * Verify that ConnectivityManager#getAllNetworkInfo() requires permissions.
-     * <p>Requires Permission:
-     *   {@link android.Manifest.permission#ACCESS_NETWORK_STATE}.
-     */
-    @SmallTest
-    public void testGetAllNetworkInfo() {
-        try {
-            mConnectivityManager.getAllNetworkInfo();
-            fail("ConnectivityManager.getAllNetworkInfo didn't throw SecurityException as"
-                    + " expected");
-        } catch (SecurityException e) {
-            // expected
-        }
-    }
-
-    @SmallTest
-    public void testSecurityExceptionFromDns() throws Exception {
-        try {
-            InetAddress.getByName("www.google.com");
-            fail();
-        } catch (SecurityException expected) {
         }
     }
 }

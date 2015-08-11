@@ -176,6 +176,7 @@ cts_test_packages := \
     CtsNdefTestCases \
     CtsNetTestCases \
     CtsNetTestCasesLegacyApi22 \
+    CtsNetTestCasesLegacyPermission22 \
     CtsOpenGLTestCases \
     CtsOpenGlPerfTestCases \
     CtsOsTestCases \
