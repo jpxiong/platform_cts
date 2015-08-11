@@ -1097,13 +1097,12 @@
         respecting user preferences about notification ranking and filtering.
     </string>
     <string name="attention_ready">I\'m done</string>
-    <string name="attention_filter_all">Please set the notification filter to \"All\" in the dialog
-        that appears when you change the device\'s volume.</string>
-    <string name="attention_filter_priority">Please set the notification filter to \"Priority\" in
-        the dialog that appears when you change the device\'s volume, and allow messages from
-        starred contacts.</string>
-    <string name="attention_filter_none">Please set the notification filter to \"None\" in the dialog
-        that appears when you change the device\'s volume.</string>
+    <string name="attention_filter_all">Please disable \"Do not disturb\" by tapping the Quick Settings tile.</string>
+    <string name="attention_filter_priority">Please select \"Priority only\" in the dialog that appears
+        when you tap the \"Do not disturb\" tile in Quick Settings, and customize the setting to allow messages from
+        starred contacts only by tapping "More settings".</string>
+    <string name="attention_filter_none">Please select \"Total silence\" in the dialog that appears
+        when you tap the \"Do not disturb\" tile in Quick Settings.</string>
     <string name="attention_create_contacts">Create contacts for notification annotations.</string>
     <string name="attention_delete_contacts">Delete test contacts.</string>
     <string name="attention_default_order">Check that ranker defaults to time order.</string>
