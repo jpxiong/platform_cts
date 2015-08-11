@@ -149,6 +149,17 @@ public class MediaUtils {
         return result;
     }
 
+    public static MediaCodec getDecoder(MediaFormat format) {
+        String decoder = sMCL.findDecoderForFormat(format);
+        if (decoder != null) {
+            try {
+                return MediaCodec.createByCodecName(decoder);
+            } catch (IOException e) {
+            }
+        }
+        return null;
+    }
+
     public static boolean canDecode(MediaFormat format) {
         if (sMCL.findDecoderForFormat(format) == null) {
             Log.i(TAG, "no decoder for " + format);
