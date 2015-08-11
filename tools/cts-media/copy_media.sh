@@ -45,24 +45,24 @@ echo "adb options "$adb_options""
 
 if [ $max_resolution -ge 3 ]; then
   echo "copying 1920x1080"
-  adb $adb_options push bbb_short/1920x1080 /mnt/sdcard/test/bbb_short/1920x1080
-  adb $adb_options push bbb_full/1920x1080 /mnt/sdcard/test/bbb_full/1920x1080
+  adb $adb_options push bbb_short/1920x1080 /sdcard/test/bbb_short/1920x1080
+  adb $adb_options push bbb_full/1920x1080 /sdcard/test/bbb_full/1920x1080
 fi
 
 if [ $max_resolution -ge 2 ]; then
   echo "copying 1280x720"
-  adb $adb_options push bbb_short/1280x720 /mnt/sdcard/test/bbb_short/1280x720
-  adb $adb_options push bbb_full/1280x720 /mnt/sdcard/test/bbb_full/1280x720
+  adb $adb_options push bbb_short/1280x720 /sdcard/test/bbb_short/1280x720
+  adb $adb_options push bbb_full/1280x720 /sdcard/test/bbb_full/1280x720
 fi
 
 if [ $max_resolution -ge 1 ]; then
   echo "copying 720x480"
-  adb $adb_options push bbb_short/720x480 /mnt/sdcard/test/bbb_short/720x480
-  adb $adb_options push bbb_full/720x480 /mnt/sdcard/test/bbb_full/720x480
+  adb $adb_options push bbb_short/720x480 /sdcard/test/bbb_short/720x480
+  adb $adb_options push bbb_full/720x480 /sdcard/test/bbb_full/720x480
 fi
 
 echo "copying all others"
-adb $adb_options push bbb_short/176x144 /mnt/sdcard/test/bbb_short/176x144
-adb $adb_options push bbb_full/176x144 /mnt/sdcard/test/bbb_full/176x144
-adb $adb_options push bbb_short/480x360 /mnt/sdcard/test/bbb_short/480x360
-adb $adb_options push bbb_full/480x360 /mnt/sdcard/test/bbb_full/480x360
+adb $adb_options push bbb_short/176x144 /sdcard/test/bbb_short/176x144
+adb $adb_options push bbb_full/176x144 /sdcard/test/bbb_full/176x144
+adb $adb_options push bbb_short/480x360 /sdcard/test/bbb_short/480x360
+adb $adb_options push bbb_full/480x360 /sdcard/test/bbb_full/480x360
