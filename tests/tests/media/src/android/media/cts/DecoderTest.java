@@ -1284,6 +1284,10 @@ public class DecoderTest extends MediaPlayerTestBase {
         }
     }
 
+    private static MediaCodec createDecoder(MediaFormat format) {
+        return MediaUtils.getDecoder(format);
+    }
+
     // for video
     private int countFrames(int video, int resetMode, int eosframe, Surface s)
             throws Exception {
@@ -1396,7 +1400,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         ByteBuffer[] codecInputBuffers;
         ByteBuffer[] codecOutputBuffers;
 
-        MediaCodec codec = createDecoder(mime);
+        MediaCodec codec = createDecoder(format);
         Log.i("@@@@", "using codec: " + codec.getName());
         codec.configure(format, surface, null /* crypto */, 0 /* flags */);
         codec.start();

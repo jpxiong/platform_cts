@@ -17,6 +17,7 @@ package android.cts.util;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
+import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
@@ -137,6 +138,17 @@ public class MediaUtils {
             skipTest(message);
         }
         return result;
+    }
+
+    public static MediaCodec getDecoder(MediaFormat format) {
+        String decoder = sMCL.findDecoderForFormat(format);
+        if (decoder != null) {
+            try {
+                return MediaCodec.createByCodecName(decoder);
+            } catch (IOException e) {
+            }
+        }
+        return null;
     }
 
     public static boolean canDecode(MediaFormat format) {
