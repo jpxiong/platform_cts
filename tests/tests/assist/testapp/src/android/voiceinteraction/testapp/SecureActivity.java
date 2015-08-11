@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 The Android Open Source Project
+ * Copyright (C) 2015 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,23 @@
  * limitations under the License.
  */
 
-package android.assist.service;
+package android.assist.testapp;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.Log;
 
-/**
- * TODO(awlee): Change context on/off settings and test
- */
-public class DisableContextActivity extends Activity {
-    static final String TAG = "DisableContextActivity";
+import android.view.WindowManager;
+
+public class SecureActivity extends Activity {
+    static final String TAG = "SecureActivity";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Intent intent = new Intent();
-        intent.setComponent(new ComponentName(this, MainInteractionService.class));
-        finish();
-        ComponentName serviceName = startService(intent);
-        Log.i(TAG, "Started service: " + serviceName);
+        Log.i(TAG, "SecureActivity created");
+        setContentView(R.layout.secure_app);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE);
     }
 }

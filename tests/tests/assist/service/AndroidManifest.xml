@@ -34,6 +34,7 @@
       <activity android:name=".AssistStructureActivity" >
           <intent-filter>
               <action android:name="android.intent.action.START_TEST_ASSIST_STRUCTURE" />
+              <action android:name="android.intent.action.START_TEST_FLAG_SECURE" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>
       </activity>

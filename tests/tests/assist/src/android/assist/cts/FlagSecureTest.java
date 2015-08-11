@@ -18,35 +18,38 @@ package android.assist.cts;
 
 import android.assist.common.Utils;
 
-import android.provider.Settings;
-
+import java.util.concurrent.CountDownLatch;
 
 /**
- *  Test that the AssistStructure returned is properly formatted.
+ * Test we receive proper assist data (root assistStructure with no children) when the assistant is
+ * invoked on an app with FLAG_SECURE set.
  */
+public class FlagSecureTest extends AssistTestBase {
 
-public class AssistStructureTest extends AssistTestBase {
-    static final String TAG = "AssistStructureTest";
+    static final String TAG = "DisableContextTest";
 
-    private static final String TEST_CASE_TYPE = Utils.ASSIST_STRUCTURE;
+    private static final String TEST_CASE_TYPE = Utils.FLAG_SECURE;
 
-    public AssistStructureTest() {
+    public FlagSecureTest() {
         super();
     }
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         startTestActivity(TEST_CASE_TYPE);
         waitForBroadcast();
     }
 
-    public void testAssistStructure() throws Exception {
-        assertEquals("1", Settings.Secure.getString(
-            mContext.getContentResolver(), "assist_structure_enabled"));
+    @Override
+    public void tearDown() throws Exception {
+        super.tearDown();
+    }
 
-        verifyAssistDataNullness(false, false, false, false);
-        verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE),
-                    false /*FLAG_SECURE set*/);
+    public void testSecureActivity() throws Exception {
+        verifyAssistDataNullness(false, false, false, true);
+
+        // verify that we have only the root window and not its children.
+        verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE), true);
     }
 }
