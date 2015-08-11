@@ -72,7 +72,7 @@
                 <action android:name="com.android.cts.managedprofile.ACTION_TEST_ALL_ACTIVITY" />
             </intent-filter>
         </activity>
-        <activity android:name=".UserRestrictionActivity" >
+        <activity android:name=".SetPolicyActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT"/>

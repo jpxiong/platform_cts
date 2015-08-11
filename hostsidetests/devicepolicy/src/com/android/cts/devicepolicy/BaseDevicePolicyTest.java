@@ -185,9 +185,6 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     protected boolean runDeviceTestsAsUser(
             String pkgName, @Nullable String testClassName, String testMethodName, int userId)
             throws DeviceNotAvailableException {
-        if (testClassName.startsWith(".")) {
-            testClassName = pkgName + testClassName;
-        }
         return runDeviceTests(pkgName, testClassName, testMethodName, userId);
     }
 
@@ -200,6 +197,9 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
     protected boolean runDeviceTests(String pkgName, @Nullable String testClassName,
             @Nullable String testMethodName, @Nullable Integer userId, @Nullable String params)
                    throws DeviceNotAvailableException {
+        if (testClassName != null && testClassName.startsWith(".")) {
+            testClassName = pkgName + testClassName;
+        }
         TestRunResult runResult = (userId == null && params == null)
                 ? doRunTests(pkgName, testClassName, testMethodName)
                 : doRunTestsAsUser(pkgName, testClassName, testMethodName,
