@@ -27,7 +27,7 @@ import android.os.Bundle;
 /* package */ class MockAccountAuthenticator extends AbstractAccountAuthenticator {
     private static MockAccountAuthenticator sMockAuthenticator = null;
     private static final String ACCOUNT_NAME = "com.android.cts.deviceandprofileowner.account.name";
-    private static final String ACCOUNT_TYPE = "com.android.cts.deviceandprofileowner.account.type";
+    static final String ACCOUNT_TYPE = "com.android.cts.deviceandprofileowner.account.type";
     private static final String AUTH_TOKEN = "mockAuthToken";
     private static final String AUTH_TOKEN_LABEL = "mockAuthTokenLabel";
 

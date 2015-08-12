@@ -33,14 +33,13 @@ import java.io.IOException;
  * Fire up a remote unprivileged service and attempt to add/remove/list
  * accounts from it to verify the enforcement is in place.
  *
- * This test depend on MockAccountService, which provides authenticator of type
- * {@code com.android.cts.deviceandprofileowner.account.type}
+ * This test depend on {@link MockAccountService}, which provides authenticator of type
+ * {@link MockAccountService#ACCOUNT_TYPE}.
  */
 public class AccountManagementTest extends BaseDeviceAdminTest {
 
     // Account type for MockAccountAuthenticator
-    private final static String ACCOUNT_TYPE_1 =
-            "com.android.cts.deviceandprofileowner.account.type";
+    private final static String ACCOUNT_TYPE_1 = MockAccountAuthenticator.ACCOUNT_TYPE;
     private final static String ACCOUNT_TYPE_2 = "com.dummy.account";
     private final static Account ACCOUNT_0 = new Account("user0", ACCOUNT_TYPE_1);
     private final static Account ACCOUNT_1 = new Account("user1", ACCOUNT_TYPE_1);
@@ -52,13 +51,13 @@ public class AccountManagementTest extends BaseDeviceAdminTest {
         super.setUp();
         mAccountManager = (AccountManager) mContext.getSystemService(Context.ACCOUNT_SERVICE);
         clearAllAccountManagementDisabled();
-        removeAllAccounts();
+        AccountUtilsTest.removeAllAccountsForType(mAccountManager, ACCOUNT_TYPE_1);
     }
 
     @Override
     protected void tearDown() throws Exception {
         clearAllAccountManagementDisabled();
-        removeAllAccounts();
+        AccountUtilsTest.removeAllAccountsForType(mAccountManager, ACCOUNT_TYPE_1);
         super.tearDown();
     }
 
@@ -165,15 +164,4 @@ public class AccountManagementTest extends BaseDeviceAdminTest {
         }
         assertEquals(0, mDevicePolicyManager.getAccountTypesWithManagementDisabled().length);
     }
-
-    private void removeAllAccounts() throws OperationCanceledException, AuthenticatorException,
-            IOException {
-        for (Account account : mAccountManager.getAccountsByType(ACCOUNT_TYPE_1)) {
-            AccountManagerFuture<Boolean> result = mAccountManager.removeAccount(account, null,
-                    null);
-            assertTrue(result.getResult());
-        }
-        assertEquals(0, mAccountManager.getAccountsByType(ACCOUNT_TYPE_1).length);
-    }
-
 }
