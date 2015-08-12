@@ -25,15 +25,15 @@ import java.io.InputStreamReader;
 /**
  * Test for {@link DeviceInfoActivity}.
  */
-public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<SampleDeviceInfo> {
+public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<TestDeviceInfo> {
 
     private static final String EXPECTED_FILE_PATH =
-            "/storage/emulated/0/device-info-files/SampleDeviceInfo.deviceinfo.json";
+            "/storage/emulated/0/device-info-files/TestDeviceInfo.deviceinfo.json";
 
-    private SampleDeviceInfo mActivity;
+    private TestDeviceInfo mActivity;
 
     public DeviceInfoActivityTest() {
-        super(SampleDeviceInfo.class);
+        super(TestDeviceInfo.class);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class DeviceInfoActivityTest extends ActivityInstrumentationTestCase2<Sam
         assertEquals("Incorrect file path", EXPECTED_FILE_PATH, resultFilePath);
         // Check json file content
         String jsonContent = readFile(resultFilePath);
-        assertEquals("Incorrect json output", ExampleObjects.sampleDeviceInfoJson(), jsonContent);
+        assertEquals("Incorrect json output", ExampleObjects.testDeviceInfoJson(), jsonContent);
     }
 
     private String readFile(String filePath) throws IOException {

@@ -182,6 +182,17 @@ public abstract class DeviceInfoActivity extends Activity {
     /**
      * Start a new group of result.
      */
+    public void startGroup() {
+        try {
+            mJsonWriter.beginObject();
+        } catch (Exception e) {
+            error("Failed to begin JSON group: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start a new group of result with specified name.
+     */
     public void startGroup(String name) {
         try {
             mJsonWriter.name(name);
@@ -197,6 +208,41 @@ public abstract class DeviceInfoActivity extends Activity {
     public void endGroup() {
         try {
             mJsonWriter.endObject();
+        } catch (Exception e) {
+            error("Failed to end JSON group: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start a new array of result.
+     */
+    public void startArray() {
+        try {
+            mJsonWriter.beginArray();
+        } catch (Exception e) {
+            error("Failed to begin JSON array: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Start a new array of result with specified name.
+     */
+    public void startArray(String name) {
+        checkName(name);
+        try {
+            mJsonWriter.name(name);
+            mJsonWriter.beginArray();
+        } catch (Exception e) {
+            error("Failed to begin JSON array: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Complete adding result to the last started array.
+     */
+    public void endArray() {
+        try {
+            mJsonWriter.endArray();
         } catch (Exception e) {
             error("Failed to end JSON group: " + e.getMessage());
         }

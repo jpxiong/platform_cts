@@ -20,53 +20,73 @@ package com.android.compatibility.common.deviceinfo;
  */
 public final class ExampleObjects {
 
+    // Must match DeviceInfoActivity.MAX_STRING_VALUE_LENGTH and
+    // DeviceInfoActivity.MAX_ARRAY_LENGTH
     private static final int MAX_LENGTH = 1000;
 
-    private static final String SAMPLE_DEVICE_INFO_JSON = "{\n" +
-        "  \"foo\": {\n" +
-        "    \"foo_boolean\": true,\n" +
-        "    \"bar\": {\n" +
-        "      \"bar_string\": [\n" +
-        "        \"bar-string-1\",\n" +
-        "        \"bar-string-2\",\n" +
-        "        \"bar-string-3\"\n" +
-        "      ],\n" +
-        "      \"bar_boolean\": [\n" +
-        "        true,\n" +
-        "        false\n" +
-        "      ],\n" +
-        "      \"bar_double\": [\n" +
-        "        1.7976931348623157E308,\n" +
-        "        4.9E-324\n" +
-        "      ],\n" +
-        "      \"bar_int\": [\n" +
-        "        2147483647,\n" +
-        "        -2147483648\n" +
-        "      ],\n" +
-        "      \"bar_long\": [\n" +
-        "        9223372036854775807,\n" +
-        "        -9223372036854775808\n" +
+    private static final String TEST_DEVICE_INFO_JSON = "{\n" +
+        "  \"test_boolean\": true,\n" +
+        "  \"test_double\": 1.23456789,\n" +
+        "  \"test_int\": 123456789,\n" +
+        "  \"test_long\": 9223372036854775807,\n" +
+        "  \"test_string\": \"test string\",\n" +
+        "  \"test_strings\": [\n" +
+        "    \"test string 1\",\n" +
+        "    \"test string 2\",\n" +
+        "    \"test string 3\"\n" +
+        "  ],\n" +
+        "  \"test_group\": {\n" +
+        "    \"test_boolean\": false,\n" +
+        "    \"test_double\": 9.87654321,\n" +
+        "    \"test_int\": 987654321,\n" +
+        "    \"test_long\": 9223372036854775807,\n" +
+        "    \"test_string\": \"test group string\",\n" +
+        "    \"test_strings\": [\n" +
+        "      \"test group string 1\",\n" +
+        "      \"test group string 2\",\n" +
+        "      \"test group string 3\"\n" +
+        "    ]\n" +
+        "  },\n" +
+        "  \"test_groups\": [\n" +
+        "    {\n" +
+        "      \"test_string\": \"test groups string 1\",\n" +
+        "      \"test_strings\": [\n" +
+        "        \"test groups string 1-1\",\n" +
+        "        \"test groups string 1-2\",\n" +
+        "        \"test groups string 1-3\"\n" +
         "      ]\n" +
         "    },\n" +
-        "    \"foo_double\": 1.7976931348623157E308,\n" +
-        "    \"foo_int\": 2147483647,\n" +
-        "    \"foo_long\": 9223372036854775807,\n" +
-        "    \"foo_string\": \"foo-string\",\n" +
-        "    \"long_string\": \"%s\",\n" +
-        "    \"long_int_array\": [\n%s" +
-        "    ]\n" +
-        "  }\n" +
+        "    {\n" +
+        "      \"test_string\": \"test groups string 2\",\n" +
+        "      \"test_strings\": [\n" +
+        "        \"test groups string 2-1\",\n" +
+        "        \"test groups string 2-2\",\n" +
+        "        \"test groups string 2-3\"\n" +
+        "      ]\n" +
+        "    },\n" +
+        "    {\n" +
+        "      \"test_string\": \"test groups string 3\",\n" +
+        "      \"test_strings\": [\n" +
+        "        \"test groups string 3-1\",\n" +
+        "        \"test groups string 3-2\",\n" +
+        "        \"test groups string 3-3\"\n" +
+        "      ]\n" +
+        "    }\n" +
+        "  ],\n" +
+        "  \"max_length_string\": \"%s\",\n" +
+        "  \"max_num_ints\": [\n%s" +
+        "  ]\n" +
         "}\n";
 
-    public static String sampleDeviceInfoJson() {
+    public static String testDeviceInfoJson() {
         StringBuilder longStringSb = new StringBuilder();
         StringBuilder longArraySb = new StringBuilder();
         int lastNum = MAX_LENGTH - 1;
         for (int i = 0; i < MAX_LENGTH; i++) {
             longStringSb.append("a");
-            longArraySb.append(String.format("      %d%s\n", i, ((i == lastNum)? "" : ",")));
+            longArraySb.append(String.format("    %d%s\n", i, ((i == lastNum)? "" : ",")));
         }
-        return String.format(SAMPLE_DEVICE_INFO_JSON,
+        return String.format(TEST_DEVICE_INFO_JSON,
             longStringSb.toString(), longArraySb.toString());
     }
 }
