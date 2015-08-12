@@ -1984,13 +1984,11 @@ You should be prompted to select credentials; choose the ones you just installed
    <!-- Audio Frequency Line Test -->
     <string name="audio_frequency_line_test">Audio Frequency Line Test</string>
     <string name="audio_frequency_line_info">
+        The system will measure the frequency response of the left and right line outputs, 
+        by feeding them back thru the microphone conection with the loopback jack.
         This test requires the Loopback Plug. Please connect a Loopback Plug on the headset
         connector, and proceed with the instructions on the screen.
-        The system will measure the input-output audio latency by injecting a pulse on the output,
-        and computing the distance between replicas of the pulse.
-        You can vary the Audio Level slider to ensure the pulse will feed back at adecuate levels.
-        Repeat until a confidence level >= 0.6 is achieved.
-    </string>
+        </string>
     <string name="audio_frequency_line_instructions">
           Please connect a "Loopback Plug" and press "Loopback Plug Ready".
     </string>
@@ -1998,5 +1996,23 @@ You should be prompted to select credentials; choose the ones you just installed
 
     <string name="audio_frequency_line_test_btn">Test</string>
     <string name="audio_frequency_line_results_text">Results...</string>
+    
+    <!-- Audio Frequency Speaker Test -->
+    <string name="audio_frequency_speaker_test">Audio Frequency Speaker Test</string>
+    <string name="audio_frequency_speaker_info">
+        This test requires an external USB reference microphone. Please connect the USB microphone and proceed with the instructions on the screen.
+        The system will measure frequency response of the left and right speakers (if there are two speakers), or twice the response of the mono speaker.
+       </string>
+    <string name="audio_frequency_speaker_instructions">
+          Please connect an USB reference microphone and press "USB Reference microphone ready".
+    </string>
+    <string name="audio_frequency_speaker_usb_status">Waiting for USB microphone...</string>
+    <string name="audio_frequency_speaker_mic_ready_btn">USB Reference microphone ready</string>
+    <string name="audio_frequency_speaker_mic_ready_text">USB Audio device detected\n\nPlease set up Device Under test 
+    in quiet room, and Microphone 20 cms perpendicular to center of screen, then press TEST</string>
+    <string name="audio_frequency_speaker_mic_not_ready_text">"No USB Audio device detected. Please reconnect."</string>
+    <string name="audio_frequency_speaker_test_btn">Test</string>
+    <string name="audio_frequency_speaker_results_text">Results...</string>
+    
 
 </resources>
