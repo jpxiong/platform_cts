@@ -1564,6 +1564,29 @@ You should be prompted to select credentials; choose the ones you just installed
         Then use the Back button to return to this test and mark accordingly.
     </string>
 
+    <string name="provisioning_byod_battery_settings">Profile-aware battery settings</string>
+    <string name="provisioning_byod_battery_settings_instruction">
+        Please press the Go button to open Battery page in settings.\n
+        \n
+        Verify that Battery page shows both badged and unbadged apps in the usage list.\n
+        \n
+        Note that the usage list only displays usage since last charge,
+        so you may need to unplug your device and use a badged and unbadged app
+        for a little while before they will appear in the list.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
+    <string name="provisioning_byod_data_usage_settings">Profile-aware data usage settings</string>
+    <string name="provisioning_byod_data_usage_settings_instruction">
+        Please press the Go button to open the Settings page.\n
+        \n
+        Navigate to Data usage page and confirm that it includes a Work profile section,
+        and that tapping it shows just work profile data usage.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
     <string name="provisioning_byod_cred_settings">Profile-aware trusted credential settings</string>
     <string name="provisioning_byod_cred_settings_instruction">
         Please press the Go button to open the Security settings.
