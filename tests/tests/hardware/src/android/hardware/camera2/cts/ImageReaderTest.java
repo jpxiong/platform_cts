@@ -66,8 +66,12 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     private static final boolean VERBOSE = Log.isLoggable(TAG, Log.VERBOSE);
     private static final boolean DEBUG = Log.isLoggable(TAG, Log.DEBUG);
 
-    // number of frame (for streaming requests) to be verified.
+    // Number of frame (for streaming requests) to be verified.
     private static final int NUM_FRAME_VERIFIED = 2;
+    // Number of frame (for streaming requests) to be verified with log processing time.
+    private static final int NUM_LONG_PROCESS_TIME_FRAME_VERIFIED = 10;
+    // The time to hold each image for to simulate long processing time.
+    private static final int LONG_PROCESS_TIME_MS = 300;
     // Max number of images can be accessed simultaneously from ImageReader.
     private static final int MAX_NUM_IMAGES = 5;
     // Max difference allowed between YUV and JPEG patches. This tolerance is intentionally very
@@ -148,6 +152,30 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 openDevice(id);
 
                 bufferFormatTestByCamera(ImageFormat.RAW_SENSOR, /*repeating*/true);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testLongProcessingRepeatingRaw() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing long processing on repeating raw for camera " + id);
+                openDevice(id);
+                bufferFormatLongProcessingTimeTestByCamera(ImageFormat.RAW_SENSOR);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testLongProcessingRepeatingFlexibleYuv() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.v(TAG, "Testing long processing on repeating YUV for camera " + id);
+                openDevice(id);
+                bufferFormatLongProcessingTimeTestByCamera(ImageFormat.YUV_420_888);
             } finally {
                 closeDevice(id);
             }
@@ -652,6 +680,94 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
                 closeDefaultImageReader();
             }
 
+        }
+    }
+
+    private void bufferFormatLongProcessingTimeTestByCamera(int format)
+            throws Exception {
+
+        final int TEST_SENSITIVITY_VALUE = mStaticInfo.getSensitivityClampToRange(204);
+        final long TEST_EXPOSURE_TIME_NS = mStaticInfo.getExposureClampToRange(28000000);
+        final long EXPOSURE_TIME_ERROR_MARGIN_NS = 100000;
+
+        Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(format,
+                StaticMetadata.StreamDirection.Output);
+
+        // for each resolution, test imageReader:
+        for (Size sz : availableSizes) {
+            Log.v(TAG, "testing size " + sz.toString());
+            try {
+                if (VERBOSE) {
+                    Log.v(TAG, "Testing long processing time: size " + sz.toString() + " format " +
+                            format + " for camera " + mCamera.getId());
+                }
+
+                // Create ImageReader.
+                mListener  = new SimpleImageListener();
+                createDefaultImageReader(sz, format, MAX_NUM_IMAGES, mListener);
+
+                // Setting manual controls
+                List<Surface> outputSurfaces = new ArrayList<Surface>();
+                outputSurfaces.add(mReader.getSurface());
+                CaptureRequest.Builder requestBuilder = prepareCaptureRequestForSurfaces(
+                        outputSurfaces, CameraDevice.TEMPLATE_STILL_CAPTURE);
+
+                requestBuilder.set(
+                        CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_OFF);
+                requestBuilder.set(CaptureRequest.CONTROL_AE_LOCK, true);
+                requestBuilder.set(CaptureRequest.CONTROL_AWB_LOCK, true);
+                requestBuilder.set(CaptureRequest.CONTROL_AE_MODE,
+                        CaptureRequest.CONTROL_AE_MODE_OFF);
+                requestBuilder.set(CaptureRequest.CONTROL_AWB_MODE,
+                        CaptureRequest.CONTROL_AWB_MODE_OFF);
+                requestBuilder.set(CaptureRequest.SENSOR_SENSITIVITY, TEST_SENSITIVITY_VALUE);
+                requestBuilder.set(CaptureRequest.SENSOR_EXPOSURE_TIME, TEST_EXPOSURE_TIME_NS);
+
+                SimpleCaptureCallback listener = new SimpleCaptureCallback();
+                startCapture(requestBuilder.build(), /*repeating*/true, listener, mHandler);
+
+                for (int i = 0; i < NUM_LONG_PROCESS_TIME_FRAME_VERIFIED; i++) {
+                    mListener.waitForAnyImageAvailable(CAPTURE_WAIT_TIMEOUT_MS);
+
+                    // Verify image.
+                    Image img = mReader.acquireNextImage();
+                    assertNotNull("Unable to acquire next image", img);
+                    CameraTestUtils.validateImage(img, sz.getWidth(), sz.getHeight(), format,
+                            DEBUG_FILE_NAME_BASE);
+
+                    // Verify the exposure time and iso match the requested values.
+                    CaptureResult result = listener.getCaptureResult(CAPTURE_RESULT_TIMEOUT_MS);
+
+                    long exposureTimeDiff = TEST_EXPOSURE_TIME_NS -
+                            getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME);
+                    int sensitivityDiff = TEST_SENSITIVITY_VALUE -
+                            getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY);
+
+                    mCollector.expectTrue(
+                            String.format("Long processing frame %d format %d size %s " +
+                                    "exposure time was %d expecting %d.", i, format, sz.toString(),
+                                    getValueNotNull(result, CaptureResult.SENSOR_EXPOSURE_TIME),
+                                    TEST_EXPOSURE_TIME_NS),
+                            exposureTimeDiff < EXPOSURE_TIME_ERROR_MARGIN_NS &&
+                            exposureTimeDiff > 0);
+
+                    mCollector.expectTrue(
+                            String.format("Long processing frame %d format %d size %s " +
+                                    "sensitivity was %d expecting %d.", i, format, sz.toString(),
+                                    getValueNotNull(result, CaptureResult.SENSOR_SENSITIVITY),
+                                    TEST_SENSITIVITY_VALUE),
+                            sensitivityDiff == 0);
+
+
+                    // Sleep to Simulate long porcessing before closing the image.
+                    Thread.sleep(LONG_PROCESS_TIME_MS);
+                    img.close();
+                }
+                // stop capture.
+                stopCapture(/*fast*/false);
+            } finally {
+                closeDefaultImageReader();
+            }
         }
     }
 

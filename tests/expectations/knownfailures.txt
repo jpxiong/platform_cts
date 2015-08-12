@@ -193,6 +193,14 @@
   bug: 22092756
 },
 {
+  description: "The new long processing test is not yet passing on all devices",
+  names: [
+    "android.hardware.camera2.cts.ImageReaderTest#testLongProcessingRepeatingRaw",
+    "android.hardware.camera2.cts.ImageReaderTest#testLongProcessingRepeatingFlexibleYuv"
+  ],
+  bug: 22861512
+},
+{
   description: "known failures",
   names: [
     "android.hardware.cts.SensorBatchingTests#testAccelerometer_50hz_batching",
