@@ -19,7 +19,6 @@ package android.keystore.cts;
 import android.security.keystore.KeyProperties;
 import android.security.keystore.KeyProtection;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -28,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -40,58 +38,142 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AESCipherNistCavpKatTest extends AndroidTestCase {
 
-    private static final String TAG = AESCipherNistCavpKatTest.class.getSimpleName();
+    public void testECBVarKey128() throws Exception {
+        runTestsForKatFile("ECBVarKey128.rsp");
+    }
 
-    public void testSomething() throws Exception {
+    public void testECBVarKey192() throws Exception {
+        runTestsForKatFile("ECBVarKey192.rsp");
+    }
+    public void testECBVarKey256() throws Exception {
+        runTestsForKatFile("ECBVarKey256.rsp");
+    }
+
+    public void testECBVarTxt128() throws Exception {
+        runTestsForKatFile("ECBVarTxt128.rsp");
+    }
+
+    public void testECBVarTxt192() throws Exception {
+        runTestsForKatFile("ECBVarTxt192.rsp");
+    }
+
+    public void testECBVarTxt256() throws Exception {
+        runTestsForKatFile("ECBVarTxt256.rsp");
+    }
+
+    public void testECBGFSbox128() throws Exception {
+        runTestsForKatFile("ECBGFSbox128.rsp");
+    }
+
+    public void testECBGFSbox192() throws Exception {
+        runTestsForKatFile("ECBGFSbox192.rsp");
+    }
+
+    public void testECBGFSbox256() throws Exception {
+        runTestsForKatFile("ECBGFSbox256.rsp");
+    }
+
+    public void testECBKeySbox128() throws Exception {
+        runTestsForKatFile("ECBKeySbox128.rsp");
+    }
+
+    public void testECBKeySbox192() throws Exception {
+        runTestsForKatFile("ECBKeySbox192.rsp");
+    }
+
+    public void testECBKeySbox256() throws Exception {
+        runTestsForKatFile("ECBKeySbox256.rsp");
+    }
+
+    public void testCBCVarKey128() throws Exception {
+        runTestsForKatFile("CBCVarKey128.rsp");
+    }
+
+    public void testCBCVarKey192() throws Exception {
+        runTestsForKatFile("CBCVarKey192.rsp");
+    }
+    public void testCBCVarKey256() throws Exception {
+        runTestsForKatFile("CBCVarKey256.rsp");
+    }
+
+    public void testCBCVarTxt128() throws Exception {
+        runTestsForKatFile("CBCVarTxt128.rsp");
+    }
+
+    public void testCBCVarTxt192() throws Exception {
+        runTestsForKatFile("CBCVarTxt192.rsp");
+    }
+
+    public void testCBCVarTxt256() throws Exception {
+        runTestsForKatFile("CBCVarTxt256.rsp");
+    }
+
+    public void testCBCGFSbox128() throws Exception {
+        runTestsForKatFile("CBCGFSbox128.rsp");
+    }
+
+    public void testCBCGFSbox192() throws Exception {
+        runTestsForKatFile("CBCGFSbox192.rsp");
+    }
+
+    public void testCBCGFSbox256() throws Exception {
+        runTestsForKatFile("CBCGFSbox256.rsp");
+    }
+
+    public void testCBCKeySbox128() throws Exception {
+        runTestsForKatFile("CBCKeySbox128.rsp");
+    }
+
+    public void testCBCKeySbox192() throws Exception {
+        runTestsForKatFile("CBCKeySbox192.rsp");
+    }
+
+    public void testCBCKeySbox256() throws Exception {
+        runTestsForKatFile("CBCKeySbox256.rsp");
+    }
+
+    private void runTestsForKatFile(String fileName) throws Exception {
         try (ZipInputStream zipIn = new ZipInputStream(
                 getContext().getResources().getAssets().open("nist_cavp_aes_kat.zip"))) {
             ZipEntry zipEntry;
+            byte[] entryContents = null;
             while ((zipEntry = zipIn.getNextEntry()) != null) {
                 String entryName = zipEntry.getName();
-                if (!entryName.endsWith(".rsp")) {
-                    continue;
-                }
 
-                if (zipEntry.getSize() > 1024 * 1024) {
-                    fail("Entry " + entryName + " too large: " + zipEntry.getSize() + " bytes");
-                }
-                byte[] entryContents = new byte[(int) zipEntry.getSize()];
+                // We have to read the contents of all entries because there's no way to skip an
+                // entry without reading its contents.
+                entryContents = new byte[(int) zipEntry.getSize()];
                 readFully(zipIn, entryContents);
-                runTestsForKatFile(entryName, entryContents);
+
+                if (fileName.equals(entryName)) {
+                    break;
+                }
             }
+
+            if (entryContents == null) {
+                fail(fileName + " not found");
+                return;
+            }
+
+            String blockMode = fileName.substring(0, 3);
+            if ("CFB".equals(blockMode)) {
+                blockMode = fileName.substring(0, 4);
+            }
+            runTestsForKatFile(blockMode, entryContents);
         }
     }
 
-    private void runTestsForKatFile(String fileName, byte[] contents) throws Exception {
-        if ((!fileName.endsWith(".rsp")) || (fileName.length() < 10)) {
-            Log.i(TAG, "Ignoring " + fileName + " -- not a KAT file");
-            return;
-        }
-        String mode = fileName.substring(0, 3);
-        if ("CFB".equals(mode)) {
-            mode = fileName.substring(0, 4);
-        }
-        try {
-            Cipher.getInstance("AES/" + mode + "/NoPadding", "AndroidKeyStoreBCWorkaround");
-        } catch (NoSuchAlgorithmException e) {
-            if (("CBC".equals(mode)) || ("ECB".equals(mode))) {
-                fail("Supported mode is apparently not supported: " + mode);
-            }
-            Log.i(TAG, "Skipping " + fileName
-                    + " -- transformation not supported by AndroidKeyStore");
-            return;
-        }
-
+    private void runTestsForKatFile(String blockMode, byte[] fileContents) throws Exception {
         BufferedReader in = null;
+        int testNumber = 0;
         try {
             in = new BufferedReader(new InputStreamReader(
-                    new ByteArrayInputStream(contents), "ISO-8859-1"));
+                    new ByteArrayInputStream(fileContents), "ISO-8859-1"));
             String line;
             int lineNumber = 0;
             String section = null; // ENCRYPT or DECRYPT
 
             boolean insideTestDefinition = false;
-            int testNumber = 0;
             TestVector testVector = null;
 
             while ((line = in.readLine()) != null) {
@@ -145,8 +227,7 @@ public class AESCipherNistCavpKatTest extends AndroidTestCase {
                         } else {
                             throw new IOException("Unexpected test operation: " + section);
                         }
-                        Log.d(TAG, "Running test #" + testNumber + ": AES/" + mode + " from " + fileName);
-                        runKatTest(mode, encrypt, testVector);
+                        runKatTest(blockMode, encrypt, testVector);
                         insideTestDefinition = false;
                         testVector = null;
                     } else {
@@ -174,6 +255,8 @@ public class AESCipherNistCavpKatTest extends AndroidTestCase {
                     }
                 }
             }
+        } catch (Throwable e) {
+            throw new RuntimeException("Test #" + testNumber + " failed", e);
         } finally {
             if (in != null) {
                 try {
@@ -225,7 +308,7 @@ public class AESCipherNistCavpKatTest extends AndroidTestCase {
         while (remaining > 0) {
             int chunkSize = in.read(buf, offset, remaining);
             if (chunkSize == -1) {
-                throw new EOFException("Premature EOF. Remainig: " + remaining);
+                throw new EOFException("Premature EOF. Remaining: " + remaining);
             }
             offset += chunkSize;
             remaining -= chunkSize;
