@@ -27,6 +27,8 @@ import android.telecom.InCallService;
 import android.telecom.TelecomManager;
 import android.telecom.VideoProfile;
 
+import java.util.List;
+
 /**
  * Extended suite of tests that use {@link CtsConnectionService} and {@link MockInCallService} to
  * verify the functionality of the Telecom service.
@@ -405,6 +407,35 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         // mOnCannedTextResponsesLoadedCounter.waitForCount(1);
 
         assertGetCannedTextResponsesNotEmpty(call);
+    }
+
+    public void testGetCalls() {
+        if (!mShouldTestTelecom) {
+            return;
+        }
+
+        placeAndVerifyCall();
+        final MockConnection connection1 = verifyConnectionForOutgoingCall(0);
+        final MockInCallService inCallService = mInCallCallbacks.getService();
+        final Call call1 = inCallService.getLastCall();
+        assertCallState(call1, Call.STATE_DIALING);
+
+        connection1.setActive();
+
+        assertCallState(call1, Call.STATE_ACTIVE);
+
+        List<Call> calls = inCallService.getCalls();
+        assertEquals("InCallService.getCalls() should return list with 1 call.", 1, calls.size());
+        assertEquals(call1, calls.get(0));
+
+        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        verifyConnectionForIncomingCall();
+
+        final Call call2 = inCallService.getLastCall();
+        calls = inCallService.getCalls();
+        assertEquals("InCallService.getCalls() should return list with 2 calls.", 2, calls.size());
+        assertEquals(call1, calls.get(0));
+        assertEquals(call2, calls.get(1));
     }
 
     private void assertGetCannedTextResponsesNotEmpty(final Call call) {
