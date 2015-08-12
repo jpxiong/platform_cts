@@ -195,8 +195,10 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
             }
             counter++;
         }
-        mReportLog.printSummary("Camera launch average time for all cameras ",
-                Stat.getAverage(avgCameraLaunchTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
+        if (mCameraIds.length != 0) {
+            mReportLog.printSummary("Camera launch average time for all cameras ",
+                    Stat.getAverage(avgCameraLaunchTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
+        }
     }
 
     /**
@@ -306,8 +308,10 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         }
 
         // Result will not be reported in CTS report if no summary is printed.
-        mReportLog.printSummary("Camera capture result average latency for all cameras ",
-                Stat.getAverage(avgResultTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
+        if (mCameraIds.length != 0) {
+            mReportLog.printSummary("Camera capture result average latency for all cameras ",
+                    Stat.getAverage(avgResultTimes), ResultType.LOWER_BETTER, ResultUnit.MS);
+        }
     }
 
     /**

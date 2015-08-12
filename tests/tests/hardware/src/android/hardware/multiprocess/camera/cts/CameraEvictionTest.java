@@ -241,7 +241,12 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
         CameraManager manager = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
         assertNotNull(manager);
         String[] cameraIds = manager.getCameraIdList();
-        assertNotEmpty(cameraIds);
+
+        if (cameraIds.length == 0) {
+            Log.i(TAG, "Skipping testBasicCamera2ActivityEviction, device has no cameras.");
+            return;
+        }
+
         assertTrue(mContext.getMainLooper() != null);
 
         // Setup camera manager
