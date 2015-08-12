@@ -25,7 +25,6 @@ import com.android.ddmlib.testrunner.TestIdentifier;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
 import com.android.tradefed.config.Option;
-import com.android.tradefed.config.Option.Importance;
 import com.android.tradefed.log.LogUtil.CLog;
 import com.android.tradefed.result.ILogSaver;
 import com.android.tradefed.result.ILogSaverListener;
@@ -42,6 +41,7 @@ import com.android.tradefed.util.StreamUtil;
 import org.kxml2.io.KXmlSerializer;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -98,6 +98,9 @@ public class CtsXmlResultReporter
     @Option(name = "include-test-log-tags", description = "Include test log tags in XML report.")
     private boolean mIncludeTestLogTags = false;
 
+    @Option(name = "use-log-saver", description = "Also saves generated result XML with log saver")
+    private boolean mUseLogSaver = false;
+
     protected IBuildInfo mBuildInfo;
     private String mStartTime;
     private String mDeviceSerial;
@@ -110,6 +113,7 @@ public class CtsXmlResultReporter
     private File mLogDir;
     private String mSuiteName;
     private String mReferenceUrl;
+    private ILogSaver mLogSaver;
 
     public void setReportDir(File reportDir) {
         mReportDir = reportDir;
@@ -253,7 +257,7 @@ public class CtsXmlResultReporter
 
     @Override
     public void setLogSaver(ILogSaver logSaver) {
-      // Don't need to keep a reference to logSaver, because we don't save extra logs in this class.
+        mLogSaver = logSaver;
     }
 
     @Override
@@ -351,6 +355,18 @@ public class CtsXmlResultReporter
 
         File reportFile = getResultFile(mReportDir);
         createXmlResult(reportFile, mStartTime, elapsedTime);
+        if (mUseLogSaver) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(reportFile);
+                mLogSaver.saveLogData("cts-result", LogDataType.XML, fis);
+            } catch (IOException ioe) {
+                CLog.e("error saving XML with log saver");
+                CLog.e(ioe);
+            } finally {
+                StreamUtil.close(fis);
+            }
+        }
         copyFormattingFiles(mReportDir);
         zipResults(mReportDir);
 
