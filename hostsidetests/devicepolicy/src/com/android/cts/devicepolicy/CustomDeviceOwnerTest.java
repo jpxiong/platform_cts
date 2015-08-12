@@ -83,7 +83,7 @@ public class CustomDeviceOwnerTest extends BaseDevicePolicyTest {
     }
 
     public void testCannotSetDeviceOwnerWhenSecondaryUserPresent() throws Exception {
-        if (!mHasFeature) {
+        if (!mHasFeature || getMaxNumberOfUsersSupported() < 2) {
             return;
         }
         int userId = -1;
