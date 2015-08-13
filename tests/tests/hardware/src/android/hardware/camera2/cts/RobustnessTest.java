@@ -81,10 +81,17 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
 
+                List<Size> testSizes = null;
+                int format = mStaticInfo.isColorOutputSupported() ?
+                    ImageFormat.YUV_420_888 : ImageFormat.DEPTH16;
+
+                testSizes = CameraTestUtils.getSortedSizesForFormat(id, mCameraManager,
+                        format, null);
+
                 // Find some size not supported by the camera
                 Size weirdSize = new Size(643, 577);
                 int count = 0;
-                while(mOrderedPreviewSizes.contains(weirdSize)) {
+                while(testSizes.contains(weirdSize)) {
                     // Really, they can't all be supported...
                     weirdSize = new Size(weirdSize.getWidth() + 1, weirdSize.getHeight() + 1);
                     count++;
@@ -93,7 +100,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
                 // Setup imageReader with invalid dimension
                 ImageReader imageReader = ImageReader.newInstance(weirdSize.getWidth(),
-                        weirdSize.getHeight(), ImageFormat.YUV_420_888, 3);
+                        weirdSize.getHeight(), format, 3);
 
                 // Setup ImageReaderListener
                 SimpleImageReaderListener imageListener = new SimpleImageReaderListener();
@@ -138,7 +145,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 Size actualSize = new Size(imageWidth, imageHeight);
 
                 assertTrue("Camera does not contain outputted image resolution " + actualSize,
-                        mOrderedPreviewSizes.contains(actualSize));
+                        testSizes.contains(actualSize));
             } finally {
                 closeDevice(id);
             }
@@ -221,10 +228,12 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 Log.v(TAG, "StreamConfigurationMap: " + streamConfigurationMapString);
             }
 
-            // Always run legacy-level tests
+            // Always run legacy-level tests for color-supporting devices
 
-            for (int[] config : LEGACY_COMBINATIONS) {
-                testOutputCombination(id, config, maxSizes);
+            if (mStaticInfo.isColorOutputSupported()) {
+                for (int[] config : LEGACY_COMBINATIONS) {
+                    testOutputCombination(id, config, maxSizes);
+                }
             }
 
             // Then run higher-level tests if applicable
@@ -233,8 +242,10 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
                 // If not legacy, at least limited, so run limited-level tests
 
-                for (int[] config : LIMITED_COMBINATIONS) {
-                    testOutputCombination(id, config, maxSizes);
+                if (mStaticInfo.isColorOutputSupported()) {
+                    for (int[] config : LIMITED_COMBINATIONS) {
+                        testOutputCombination(id, config, maxSizes);
+                    }
                 }
 
                 // Check for BURST_CAPTURE, FULL and RAW and run those if appropriate
@@ -368,6 +379,11 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 // Legacy devices do not support precapture trigger; don't test devices that
                 // can't focus
                 if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+                // Depth-only devices won't support AE
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
                     continue;
                 }
 
@@ -506,6 +522,11 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
                     continue;
                 }
+                // Depth-only devices won't support AE
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
 
                 int[] availableAfModes = mStaticInfo.getCharacteristics().get(
                     CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
@@ -603,6 +624,11 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 // Legacy devices do not support precapture trigger; don't test devices that
                 // can't focus
                 if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+                // Depth-only devices won't support AE
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
                     continue;
                 }
 
@@ -716,6 +742,11 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 // Legacy devices do not support precapture trigger; don't test devices that
                 // can't focus
                 if (mStaticInfo.isHardwareLevelLegacy() || !mStaticInfo.hasFocuser()) {
+                    continue;
+                }
+                // Depth-only devices won't support AE
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
                     continue;
                 }
 
@@ -1043,17 +1074,25 @@ public class RobustnessTest extends Camera2AndroidTestCase {
 
             maxRawSize = (rawSizes.length != 0) ? CameraTestUtils.getMaxSize(rawSizes) : null;
 
-            maxPrivSizes[PREVIEW] = getMaxSize(privSizes, maxPreviewSize);
-            maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, maxPreviewSize);
-            maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, maxPreviewSize);
+            if (sm.isColorOutputSupported()) {
+                maxPrivSizes[PREVIEW] = getMaxSize(privSizes, maxPreviewSize);
+                maxYuvSizes[PREVIEW]  = getMaxSize(yuvSizes, maxPreviewSize);
+                maxJpegSizes[PREVIEW] = getMaxSize(jpegSizes, maxPreviewSize);
 
-            maxPrivSizes[RECORD] = getMaxRecordingSize(cameraId);
-            maxYuvSizes[RECORD]  = getMaxRecordingSize(cameraId);
-            maxJpegSizes[RECORD] = getMaxRecordingSize(cameraId);
+                maxPrivSizes[RECORD] = getMaxRecordingSize(cameraId);
+                maxYuvSizes[RECORD]  = getMaxRecordingSize(cameraId);
+                maxJpegSizes[RECORD] = getMaxRecordingSize(cameraId);
 
-            maxPrivSizes[MAXIMUM] = CameraTestUtils.getMaxSize(privSizes);
-            maxYuvSizes[MAXIMUM] = CameraTestUtils.getMaxSize(yuvSizes);
-            maxJpegSizes[MAXIMUM] = CameraTestUtils.getMaxSize(jpegSizes);
+                maxPrivSizes[MAXIMUM] = CameraTestUtils.getMaxSize(privSizes);
+                maxYuvSizes[MAXIMUM] = CameraTestUtils.getMaxSize(yuvSizes);
+                maxJpegSizes[MAXIMUM] = CameraTestUtils.getMaxSize(jpegSizes);
+
+                // Must always be supported, add unconditionally
+                final Size vgaSize = new Size(640, 480);
+                maxPrivSizes[VGA] = vgaSize;
+                maxYuvSizes[VGA] = vgaSize;
+                maxJpegSizes[VGA] = vgaSize;
+            }
 
             StreamConfigurationMap configs = sm.getCharacteristics().get(
                     CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
@@ -1064,11 +1103,6 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             maxInputYuvSize = yuvInputSizes != null ?
                     CameraTestUtils.getMaxSize(yuvInputSizes) : null;
 
-            // Must always be supported, add unconditionally
-            final Size vgaSize = new Size(640, 480);
-            maxPrivSizes[VGA] = vgaSize;
-            maxJpegSizes[VGA] = vgaSize;
-            maxYuvSizes[VGA] = vgaSize;
         }
 
         public final Size[] maxPrivSizes = new Size[RESOLUTION_COUNT];

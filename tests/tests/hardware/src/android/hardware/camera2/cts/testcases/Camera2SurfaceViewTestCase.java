@@ -563,14 +563,16 @@ public class Camera2SurfaceViewTestCase extends
         mCollector.setCameraId(cameraId);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.ASSERT, /*collector*/null);
-        mOrderedPreviewSizes = getSupportedPreviewSizes(cameraId, mCameraManager,
-                getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
-        mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
-        mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
-        // Use ImageFormat.YUV_420_888 for now. TODO: need figure out what's format for preview
-        // in public API side.
-        mMinPreviewFrameDurationMap =
+        if (mStaticInfo.isColorOutputSupported()) {
+            mOrderedPreviewSizes = getSupportedPreviewSizes(cameraId, mCameraManager,
+                    getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
+            mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+            mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
+            // Use ImageFormat.YUV_420_888 for now. TODO: need figure out what's format for preview
+            // in public API side.
+            mMinPreviewFrameDurationMap =
                 mStaticInfo.getAvailableMinFrameDurationsForFormatChecked(ImageFormat.YUV_420_888);
+        }
     }
 
     /**

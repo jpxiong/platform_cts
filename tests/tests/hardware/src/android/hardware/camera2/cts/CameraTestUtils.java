@@ -817,9 +817,10 @@ public class CameraTestUtils extends Assert {
 
         ByteBuffer buffer = null;
         // JPEG doesn't have pixelstride and rowstride, treat it as 1D buffer.
-        if (format == ImageFormat.JPEG) {
+        // Same goes for DEPTH_POINT_CLOUD
+        if (format == ImageFormat.JPEG || format == ImageFormat.DEPTH_POINT_CLOUD) {
             buffer = planes[0].getBuffer();
-            assertNotNull("Fail to get jpeg ByteBuffer", buffer);
+            assertNotNull("Fail to get jpeg or depth ByteBuffer", buffer);
             data = new byte[buffer.remaining()];
             buffer.get(data);
             buffer.rewind();
@@ -897,7 +898,9 @@ public class CameraTestUtils extends Assert {
                 break;
             case ImageFormat.JPEG:
             case ImageFormat.RAW_SENSOR:
-                assertEquals("Jpeg Image should have one plane", 1, planes.length);
+            case ImageFormat.DEPTH16:
+            case ImageFormat.DEPTH_POINT_CLOUD:
+                assertEquals("JPEG/RAW/depth Images should have one plane", 1, planes.length);
                 break;
             default:
                 fail("Unsupported Image Format: " + format);
@@ -1164,6 +1167,16 @@ public class CameraTestUtils extends Assert {
     }
 
     /**
+     * Get max depth size for a camera device.
+     */
+    static public Size getMaxDepthSize(String cameraId, CameraManager cameraManager)
+            throws CameraAccessException {
+        List<Size> sizes = getSortedSizesForFormat(cameraId, cameraManager, ImageFormat.DEPTH16,
+                /*bound*/ null);
+        return sizes.get(0);
+    }
+
+    /**
      * Get the largest size by area.
      *
      * @param sizes an array of sizes, must have at least 1 element
@@ -1172,7 +1185,7 @@ public class CameraTestUtils extends Assert {
      *
      * @throws IllegalArgumentException if sizes was null or had 0 elements
      */
-    public static Size getMaxSize(Size[] sizes) {
+    public static Size getMaxSize(Size... sizes) {
         if (sizes == null || sizes.length == 0) {
             throw new IllegalArgumentException("sizes was empty");
         }
@@ -1267,10 +1280,6 @@ public class CameraTestUtils extends Assert {
 
     /**
      * Validate image based on format and size.
-     * <p>
-     * Only RAW_SENSOR, YUV420_888 and JPEG formats are supported. Calling this
-     * method with other formats will cause a UnsupportedOperationException.
-     * </p>
      *
      * @param image The image to be validated.
      * @param width The image width.
@@ -1278,8 +1287,7 @@ public class CameraTestUtils extends Assert {
      * @param format The image format.
      * @param filePath The debug dump file path, null if don't want to dump to
      *            file.
-     * @throws UnsupportedOperationException if calling with format other than
-     *             RAW_SENSOR, YUV420_888 or JPEG.
+     * @throws UnsupportedOperationException if calling with an unknown format
      */
     public static void validateImage(Image image, int width, int height, int format,
             String filePath) {
@@ -1305,6 +1313,12 @@ public class CameraTestUtils extends Assert {
                 break;
             case ImageFormat.RAW_SENSOR:
                 validateRaw16Data(data, width, height, format, image.getTimestamp(), filePath);
+                break;
+            case ImageFormat.DEPTH16:
+                validateDepth16Data(data, width, height, format, image.getTimestamp(), filePath);
+                break;
+            case ImageFormat.DEPTH_POINT_CLOUD:
+                validateDepthPointCloudData(data, width, height, format, image.getTimestamp(), filePath);
                 break;
             default:
                 throw new UnsupportedOperationException("Unsupported format for validation: "
@@ -1389,7 +1403,7 @@ public class CameraTestUtils extends Assert {
             long ts, String filePath) {
         if (VERBOSE) Log.v(TAG, "Validating raw data");
         int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
-        assertEquals("Yuv data doesn't match", expectedSize, rawData.length);
+        assertEquals("Raw data doesn't match", expectedSize, rawData.length);
 
         // TODO: Can add data validation for test pattern.
 
@@ -1400,6 +1414,41 @@ public class CameraTestUtils extends Assert {
         }
 
         return;
+    }
+
+    private static void validateDepth16Data(byte[] depthData, int width, int height, int format,
+            long ts, String filePath) {
+
+        if (VERBOSE) Log.v(TAG, "Validating depth16 data");
+        int expectedSize = width * height * ImageFormat.getBitsPerPixel(format) / 8;
+        assertEquals("Depth data doesn't match", expectedSize, depthData.length);
+
+
+        if (DEBUG && filePath != null) {
+            String fileName =
+                    filePath + "/" + width + "x" + height + "_" + ts / 1e6 + ".depth16";
+            dumpFile(fileName, depthData);
+        }
+
+        return;
+
+    }
+
+    private static void validateDepthPointCloudData(byte[] depthData, int width, int height, int format,
+            long ts, String filePath) {
+
+        if (VERBOSE) Log.v(TAG, "Validating depth point cloud data");
+
+        // Can't validate size since it is variable
+
+        if (DEBUG && filePath != null) {
+            String fileName =
+                    filePath + "/" + width + "x" + height + "_" + ts / 1e6 + ".depth_point_cloud";
+            dumpFile(fileName, depthData);
+        }
+
+        return;
+
     }
 
     public static <T> T getValueNotNull(CaptureResult result, CaptureResult.Key<T> key) {

@@ -93,6 +93,10 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             try {
                 Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 readerWriterFormatTestByCamera(ImageFormat.YUV_420_888);
             } finally {
                 closeDevice(id);
@@ -124,6 +128,10 @@ public class ImageWriterTest extends Camera2AndroidTestCase {
             try {
                 Log.i(TAG, "Testing Camera " + id);
                 openDevice(id);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 readerWriterFormatTestByCamera(CAMERA_PRIVATE_FORMAT);
             } finally {
                 closeDevice(id);
