@@ -21,10 +21,12 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.DeadObjectException;
 import android.os.IBinder;
 import android.security.cts.activity.ISecureRandomService;
 import android.security.cts.activity.SecureRandomService;
 import android.test.AndroidTestCase;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -35,10 +37,11 @@ import java.util.BitSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+@LargeTest
 public class ClonedSecureRandomTest extends AndroidTestCase {
-    private static final int MAX_SHUTDOWN_TRIES = 10;
+    private static final int MAX_SHUTDOWN_TRIES = 50;
 
-    private static final int ANSWER_TIMEOUT_SECONDS = 60;
+    private static final int ANSWER_TIMEOUT_SECONDS = 180;
 
     private static final String SEPARATE_PROCESS_NAME = ":secureRandom";
 
