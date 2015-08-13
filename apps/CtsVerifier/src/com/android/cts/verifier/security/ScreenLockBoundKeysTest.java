@@ -53,7 +53,7 @@ import javax.crypto.SecretKey;
 public class ScreenLockBoundKeysTest extends PassFailButtons.Activity {
 
     /** Alias for our key in the Android Key Store. */
-    private static final String KEY_NAME = "my_key";
+    private static final String KEY_NAME = "my_lock_key";
     private static final byte[] SECRET_BYTE_ARRAY = new byte[] {1, 2, 3, 4, 5, 6};
     private static final int AUTHENTICATION_DURATION_SECONDS = 5;
     private static final int CONFIRM_CREDENTIALS_REQUEST_CODE = 1;
