@@ -201,6 +201,7 @@
     "android.hardware.cts.SensorIntegrationTests#testSensorsMovingRates",
     "android.hardware.cts.SensorIntegrationTests#testSensorsWithSeveralClients",
     "android.hardware.cts.SensorTest#testSensorTimeStamps",
+    "android.hardware.cts.SensorTest#testBatchAndFlush",
     "android.hardware.cts.SingleSensorTests#testGyroscope_15hz",
     "android.hardware.cts.SingleSensorTests#testGyroscope_1hz",
     "android.hardware.cts.SingleSensorTests#testMagneticField_1hz",
