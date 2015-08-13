@@ -81,14 +81,8 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
                 Size[] rawSizes = mStaticInfo.getRawOutputSizesChecked();
                 assertTrue("No capture sizes available for RAW format!", rawSizes.length != 0);
 
-                Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-                Size size = new Size(activeArray.width(), activeArray.height());
-                mCollector.expectTrue("Missing ActiveArraySize",
-                        activeArray.width() > 0 && activeArray.height() > 0);
-                mCollector.expectContains(
-                        "Available sizes for RAW format must include ActiveArraySize",
-                        rawSizes, size);
-
+                // Check happens in getRawDimensChecked.
+                Size rawSize = mStaticInfo.getRawDimensChecked();
             } finally {
                 closeDevice();
             }
@@ -500,8 +494,7 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
     {
         // capture size
         Size previewSize = mOrderedPreviewSizes.get(0);
-        Rect activeArray = mStaticInfo.getActiveArraySizeChecked();
-        Size rawSize = new Size(activeArray.width(), activeArray.height());
+        Size rawSize = mStaticInfo.getRawDimensChecked();
 
         // builder
         CaptureRequest.Builder previewCaptureBuilder = mCamera.createCaptureRequest(
