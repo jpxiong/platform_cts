@@ -476,7 +476,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < maxCaptureGapsMs.length; i++) {
             double stallDurationBound = averageFrameDurationMs[i] *
                     (maxCaptureStallFrames + 1) * (1 + REPROCESS_STALL_MARGIN);
-            assertTrue("max capture stall duration should be no larger than ",
+            assertTrue("max capture stall duration should be no larger than " + stallDurationBound,
                     maxCaptureGapsMs[i] <= stallDurationBound);
         }
     }
