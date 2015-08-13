@@ -77,7 +77,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing preview for Camera " + mCameraIds[i]);
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 previewTestByCamera();
             } finally {
                 closeDevice();
@@ -97,7 +101,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing preview for Camera " + mCameraIds[i]);
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 previewTestPatternTestByCamera();
             } finally {
                 closeDevice();
@@ -113,7 +121,10 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         for (String id : mCameraIds) {
             try {
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 previewFpsRangeTestByCamera();
             } finally {
                 closeDevice();
@@ -134,7 +145,11 @@ public class SurfaceViewPreviewTest extends Camera2SurfaceViewTestCase {
         for (int i = 0; i < mCameraIds.length; i++) {
             try {
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 preparePerformanceTestByCamera(mCameraIds[i]);
             }
             finally {

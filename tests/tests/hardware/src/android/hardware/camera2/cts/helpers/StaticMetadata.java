@@ -437,7 +437,7 @@ public class StaticMetadata {
      * @return AE max regions supported by the camera device
      */
     public int getAeMaxRegionsChecked() {
-        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
+        Integer regionCount = mCharacteristics.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AE);
         if (regionCount == null) {
             return 0;
         }
@@ -450,7 +450,7 @@ public class StaticMetadata {
      * @return AWB max regions supported by the camera device
      */
     public int getAwbMaxRegionsChecked() {
-        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
+        Integer regionCount = mCharacteristics.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AWB);
         if (regionCount == null) {
             return 0;
         }
@@ -463,7 +463,7 @@ public class StaticMetadata {
      * @return AF max regions supported by the camera device
      */
     public int getAfMaxRegionsChecked() {
-        Integer regionCount = getValueFromKeyNonNull(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
+        Integer regionCount = mCharacteristics.get(CameraCharacteristics.CONTROL_MAX_REGIONS_AF);
         if (regionCount == null) {
             return 0;
         }
@@ -2187,6 +2187,23 @@ public class StaticMetadata {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Check if depth output is supported, based on the depth capability
+     */
+    public boolean isDepthOutputSupported() {
+        return isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT);
+    }
+
+    /**
+     * Check if standard outputs (PRIVATE, YUV, JPEG) outputs are supported, based on the
+     * backwards-compatible capability
+     */
+    public boolean isColorOutputSupported() {
+        return isCapabilitySupported(
+                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE);
     }
 
     /**

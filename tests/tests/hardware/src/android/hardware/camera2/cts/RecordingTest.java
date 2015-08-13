@@ -109,7 +109,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Re-use the MediaRecorder object for the same camera device.
                 mMediaRecorder = new MediaRecorder();
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 initSupportedVideoSize(mCameraIds[i]);
 
                 basicRecordingTestByCamera(mCamcorderProfileList);
@@ -174,7 +178,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Re-use the MediaRecorder object for the same camera device.
                 mMediaRecorder = new MediaRecorder();
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 initSupportedVideoSize(mCameraIds[i]);
 
                 recordingSizeTestByCamera();
@@ -271,7 +279,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Re-use the MediaRecorder object for the same camera device.
                 mMediaRecorder = new MediaRecorder();
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 initSupportedVideoSize(mCameraIds[i]);
 
                 int minFpsProfileId = -1, minFps = 1000;
@@ -323,7 +335,11 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 // Re-use the MediaRecorder object for the same camera device.
                 mMediaRecorder = new MediaRecorder();
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 if (!mStaticInfo.isHighSpeedVideoSupported()) {
                     continue;
                 }
@@ -707,6 +723,12 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     mMediaRecorder = new MediaRecorder();
 
                     openDevice(id);
+
+                    if (!mStaticInfo.isColorOutputSupported()) {
+                        Log.i(TAG, "Camera " + id +
+                                " does not support color outputs, skipping");
+                        continue;
+                    }
 
                     initSupportedVideoSize(id);
 

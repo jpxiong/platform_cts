@@ -146,7 +146,17 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                     mIds[counter]), config);
             int[] outputFormats = config.getOutputFormats();
 
+            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    actualCapabilities);
+
             // Check required formats exist (JPEG, and YUV_420_888).
+            if (!arrayContains(actualCapabilities, BC)) {
+                Log.i(TAG, "Camera " + mIds[counter] +
+                    ": BACKWARD_COMPATIBLE capability not supported, skipping test");
+                continue;
+            }
+
             assertArrayContains(
                     String.format("No valid YUV_420_888 preview formats found for: ID %s",
                             mIds[counter]), outputFormats, ImageFormat.YUV_420_888);
@@ -291,75 +301,76 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
              * for a fact most keys are going to be illegal there so they should never be
              * available.
              *
-             * (TODO: Codegen this)
+             * For LIMITED-level keys, if the level is >= LIMITED, then the capabilities are used to
+             * do the actual checking.
              */
             {
                 //                                           (Key Name)                                     (HW Level)  (Capabilities <Var-Arg>)
-                expectKeyAvailable(c, CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES     , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_MODES                         , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES          , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES                      , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES          , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE                   , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP                    , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE                       , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES                      , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS                       , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES                   , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES     , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES                     , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE                      , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AE                          , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AF                          , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AWB                         , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.COLOR_CORRECTION_AVAILABLE_ABERRATION_MODES     , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_MODES                         , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_ANTIBANDING_MODES          , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_MODES                      , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES          , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_RANGE                   , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_COMPENSATION_STEP                    , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AE_LOCK_AVAILABLE                       , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES                      , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_EFFECTS                       , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_SCENE_MODES                   , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AVAILABLE_VIDEO_STABILIZATION_MODES     , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_AVAILABLE_MODES                     , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_AWB_LOCK_AVAILABLE                      , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AE                          , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AF                          , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.CONTROL_MAX_REGIONS_AWB                         , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.EDGE_AVAILABLE_EDGE_MODES                       , FULL     ,   NONE                 );
-                expectKeyAvailable(c, CameraCharacteristics.FLASH_INFO_AVAILABLE                            , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.FLASH_INFO_AVAILABLE                            , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.HOT_PIXEL_AVAILABLE_HOT_PIXEL_MODES             , OPT      ,   RAW                  );
-                expectKeyAvailable(c, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL                   , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES                  , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.LENS_FACING                                     , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL                   , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.JPEG_AVAILABLE_THUMBNAIL_SIZES                  , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.LENS_FACING                                     , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_APERTURES                   , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_FILTER_DENSITIES            , FULL     ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS               , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION       , LIMITED  ,   MANUAL_SENSOR        );
+                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_FOCAL_LENGTHS               , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_AVAILABLE_OPTICAL_STABILIZATION       , LIMITED  ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_FOCUS_DISTANCE_CALIBRATION            , LIMITED  ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE                   , LIMITED  ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE                , LIMITED  ,   NONE                 );
-                expectKeyAvailable(c, CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES                  , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_HYPERFOCAL_DISTANCE                   , LIMITED  ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE                , LIMITED  ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.NOISE_REDUCTION_AVAILABLE_NOISE_REDUCTION_MODES , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES                  , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_INPUT_STREAMS                   , OPT      ,   YUV_REPROCESS, OPAQUE_REPROCESS);
                 expectKeyAvailable(c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP                 , OPT      ,   CONSTRAINED_HIGH_SPEED);
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC                     , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING            , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW                      , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_PARTIAL_RESULT_COUNT                    , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH                      , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM               , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP                 , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SCALER_CROPPING_TYPE                            , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES             , LEGACY   ,   NONE                 );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC                     , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_PROC_STALLING            , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_MAX_NUM_OUTPUT_RAW                      , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_PARTIAL_RESULT_COUNT                    , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.REQUEST_PIPELINE_MAX_DEPTH                      , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SCALER_AVAILABLE_MAX_DIGITAL_ZOOM               , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP                 , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SCALER_CROPPING_TYPE                            , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_AVAILABLE_TEST_PATTERN_MODES             , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_BLACK_LEVEL_PATTERN                      , FULL     ,   MANUAL_SENSOR, RAW   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_CALIBRATION_TRANSFORM1                   , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_COLOR_TRANSFORM1                         , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_FORWARD_MATRIX1                          , OPT      ,   RAW                  );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE                   , LEGACY   ,   BC, RAW              );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE                   , OPT      ,   BC, RAW              );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_COLOR_FILTER_ARRANGEMENT            , FULL     ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_EXPOSURE_TIME_RANGE                 , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_MAX_FRAME_DURATION                  , FULL     ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE                       , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE                    , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PHYSICAL_SIZE                       , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_PIXEL_ARRAY_SIZE                    , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_SENSITIVITY_RANGE                   , FULL     ,   MANUAL_SENSOR        );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_WHITE_LEVEL                         , OPT      ,   RAW                  );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_TIMESTAMP_SOURCE                    , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_INFO_TIMESTAMP_SOURCE                    , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_MAX_ANALOG_SENSITIVITY                   , FULL     ,   MANUAL_SENSOR        );
-                expectKeyAvailable(c, CameraCharacteristics.SENSOR_ORIENTATION                              , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SENSOR_ORIENTATION                              , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.SENSOR_REFERENCE_ILLUMINANT1                    , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.SHADING_AVAILABLE_MODES                         , LIMITED  ,   MANUAL_POSTPROC, RAW );
-                expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES     , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_FACE_DETECT_MODES     , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_HOT_PIXEL_MAP_MODES   , OPT      ,   RAW                  );
                 expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_AVAILABLE_LENS_SHADING_MAP_MODES, LIMITED  ,   RAW                  );
-                expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT                  , LEGACY   ,   BC                   );
-                expectKeyAvailable(c, CameraCharacteristics.SYNC_MAX_LATENCY                                , LEGACY   ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.STATISTICS_INFO_MAX_FACE_COUNT                  , OPT      ,   BC                   );
+                expectKeyAvailable(c, CameraCharacteristics.SYNC_MAX_LATENCY                                , OPT      ,   BC                   );
                 expectKeyAvailable(c, CameraCharacteristics.TONEMAP_AVAILABLE_TONE_MAP_MODES                , FULL     ,   MANUAL_POSTPROC      );
                 expectKeyAvailable(c, CameraCharacteristics.TONEMAP_MAX_CURVE_POINTS                        , FULL     ,   MANUAL_POSTPROC      );
 
@@ -476,6 +487,14 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             // Check if the burst capability is defined
             boolean haveBurstCapability = arrayContains(actualCapabilities,
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BURST_CAPTURE);
+            boolean haveBC = arrayContains(actualCapabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_BACKWARD_COMPATIBLE);
+
+            if(haveBurstCapability && !haveBC) {
+                fail("Must have BACKWARD_COMPATIBLE capability if BURST_CAPTURE capability is defined");
+            }
+
+            if (!haveBC) continue;
 
             StreamConfigurationMap config =
                     c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
@@ -730,31 +749,41 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             assertNotNull(String.format("No stream configuration map found for: ID %s",
                             mIds[counter]), config);
 
-            assertTrue("ImageReader must be supported",
+            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    actualCapabilities);
+
+            if (arrayContains(actualCapabilities, BC)) {
+                assertTrue("ImageReader must be supported",
                     config.isOutputSupportedFor(android.media.ImageReader.class));
-            assertTrue("MediaRecorder must be supported",
+                assertTrue("MediaRecorder must be supported",
                     config.isOutputSupportedFor(android.media.MediaRecorder.class));
-            assertTrue("MediaCodec must be supported",
+                assertTrue("MediaCodec must be supported",
                     config.isOutputSupportedFor(android.media.MediaCodec.class));
-            assertTrue("Allocation must be supported",
+                assertTrue("Allocation must be supported",
                     config.isOutputSupportedFor(android.renderscript.Allocation.class));
-            assertTrue("SurfaceHolder must be supported",
+                assertTrue("SurfaceHolder must be supported",
                     config.isOutputSupportedFor(android.view.SurfaceHolder.class));
-            assertTrue("SurfaceTexture must be supported",
+                assertTrue("SurfaceTexture must be supported",
                     config.isOutputSupportedFor(android.graphics.SurfaceTexture.class));
 
-            assertTrue("YUV_420_888 must be supported",
+                assertTrue("YUV_420_888 must be supported",
                     config.isOutputSupportedFor(ImageFormat.YUV_420_888));
-            assertTrue("JPEG must be supported",
+                assertTrue("JPEG must be supported",
                     config.isOutputSupportedFor(ImageFormat.JPEG));
+            } else {
+                assertTrue("YUV_420_88 may not be supported if BACKWARD_COMPATIBLE capability is not listed",
+                    !config.isOutputSupportedFor(ImageFormat.YUV_420_888));
+                assertTrue("JPEG may not be supported if BACKWARD_COMPATIBLE capability is not listed",
+                    !config.isOutputSupportedFor(ImageFormat.JPEG));
+            }
 
             // Legacy YUV formats should not be listed
             assertTrue("NV21 must not be supported",
                     !config.isOutputSupportedFor(ImageFormat.NV21));
 
-            int[] actualCapabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
-            assertNotNull("android.request.availableCapabilities must never be null",
-                    actualCapabilities);
+            // Check RAW
+
             if (arrayContains(actualCapabilities,
                     CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_RAW)) {
                 assertTrue("RAW_SENSOR must be supported if RAW capability is advertised",
@@ -872,49 +901,50 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
             } // formats
 
             // Cross-check opaque format and sizes
+            if (arrayContains(actualCapabilities, BC)) {
+                SurfaceTexture st = new SurfaceTexture(1);
+                Surface surf = new Surface(st);
 
-            SurfaceTexture st = new SurfaceTexture(1);
-            Surface surf = new Surface(st);
+                Size[] opaqueSizes = CameraTestUtils.getSupportedSizeForClass(SurfaceTexture.class,
+                        mIds[counter], mCameraManager);
+                assertTrue("Opaque format has no sizes listed",
+                        opaqueSizes.length > 0);
+                for (Size size : opaqueSizes) {
+                    long stallDuration = config.getOutputStallDuration(SurfaceTexture.class, size);
+                    assertTrue("Opaque output may not have a non-zero stall duration",
+                            stallDuration == 0);
 
-            Size[] opaqueSizes = CameraTestUtils.getSupportedSizeForClass(SurfaceTexture.class,
-                    mIds[counter], mCameraManager);
-            assertTrue("Opaque format has no sizes listed",
-                    opaqueSizes.length > 0);
-            for (Size size : opaqueSizes) {
-                long stallDuration = config.getOutputStallDuration(SurfaceTexture.class, size);
-                assertTrue("Opaque output may not have a non-zero stall duration",
-                        stallDuration == 0);
+                    long minDuration = config.getOutputMinFrameDuration(SurfaceTexture.class, size);
+                    if (arrayContains(actualCapabilities,
+                                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
+                        assertTrue("MANUAL_SENSOR capability, need positive min frame duration for"
+                                + "opaque format",
+                                minDuration > 0);
+                    } else {
+                        assertTrue("Need non-negative min frame duration for opaque format ",
+                                minDuration >= 0);
+                    }
+                    st.setDefaultBufferSize(size.getWidth(), size.getHeight());
 
-                long minDuration = config.getOutputMinFrameDuration(SurfaceTexture.class, size);
-                if (arrayContains(actualCapabilities,
-                                CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR)) {
-                    assertTrue("MANUAL_SENSOR capability, need positive min frame duration for"
-                            + "opaque format",
-                            minDuration > 0);
-                } else {
-                    assertTrue("Need non-negative min frame duration for opaque format ",
-                            minDuration >= 0);
-                }
-                st.setDefaultBufferSize(size.getWidth(), size.getHeight());
+                    assertTrue(
+                            String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
+                                    size.toString()),
+                            config.isOutputSupportedFor(surf));
 
+                } // opaque sizes
+
+                // Try invalid opaque size, should get rounded
+                Size invalidSize = findInvalidSize(opaqueSizes);
+                st.setDefaultBufferSize(invalidSize.getWidth(), invalidSize.getHeight());
                 assertTrue(
-                    String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
-                            size.toString()),
-                    config.isOutputSupportedFor(surf));
+                        String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
+                                invalidSize.toString()),
+                        config.isOutputSupportedFor(surf));
 
-            } // opaque sizes
+                counter++;
+            }
 
-            // Try invalid opaque size, should get rounded
-            Size invalidSize = findInvalidSize(opaqueSizes);
-            st.setDefaultBufferSize(invalidSize.getWidth(), invalidSize.getHeight());
-            assertTrue(
-                String.format("isOutputSupportedFor fails for SurfaceTexture config %s",
-                        invalidSize.toString()),
-                config.isOutputSupportedFor(surf));
-
-            counter++;
         } // mCharacteristics
-
     }
 
     /**
@@ -1036,7 +1066,8 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
 
         T value = c.get(key);
 
-        if (compareHardwareLevel(actualHwLevel, hwLevel) >= 0) {
+        // For LIMITED-level targeted keys, rely on capability check, not level
+        if ((compareHardwareLevel(actualHwLevel, hwLevel) >= 0) && (hwLevel != LIMITED)) {
             mCollector.expectTrue(
                     String.format("Key (%s) must be in characteristics for this hardware level " +
                             "(required minimal HW level %s, actual HW level %s)",
@@ -1050,18 +1081,21 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
                             toStringHardwareLevel(actualHwLevel)),
                     allKeys.contains(key));
         } else if (arrayContainsAnyOf(actualCapabilities, capabilities)) {
-            mCollector.expectTrue(
+            if (!(hwLevel == LIMITED && compareHardwareLevel(actualHwLevel, hwLevel) < 0)) {
+                // Don't enforce LIMITED-starting keys on LEGACY level, even if cap is defined
+                mCollector.expectTrue(
                     String.format("Key (%s) must be in characteristics for these capabilities " +
                             "(required capabilities %s, actual capabilities %s)",
                             key.getName(), Arrays.toString(capabilities),
                             Arrays.toString(actualCapabilities)),
                     value != null);
-            mCollector.expectTrue(
+                mCollector.expectTrue(
                     String.format("Key (%s) must be in characteristics list of keys for " +
                             "these capabilities (required capabilities %s, actual capabilities %s)",
                             key.getName(), Arrays.toString(capabilities),
                             Arrays.toString(actualCapabilities)),
                     allKeys.contains(key));
+            }
         } else {
             if (actualHwLevel == LEGACY && hwLevel != OPT) {
                 if (value != null || allKeys.contains(key)) {

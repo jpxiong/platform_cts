@@ -108,6 +108,30 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
         }
     }
 
+    public void testDepth16() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing Camera " + id);
+                openDevice(id);
+                bufferFormatTestByCamera(ImageFormat.DEPTH16, /*repeating*/true);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
+    public void testDepthPointCloud() throws Exception {
+        for (String id : mCameraIds) {
+            try {
+                Log.i(TAG, "Testing Camera " + id);
+                openDevice(id);
+                bufferFormatTestByCamera(ImageFormat.DEPTH_POINT_CLOUD, /*repeating*/true);
+            } finally {
+                closeDevice(id);
+            }
+        }
+    }
+
     public void testJpeg() throws Exception {
         for (String id : mCameraIds) {
             try {
@@ -213,7 +237,11 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "YUV and JPEG testing for camera " + id);
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 bufferFormatWithYuvTestByCamera(ImageFormat.JPEG);
             } finally {
                 closeDevice(id);
@@ -230,7 +258,11 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "YUV and RAW testing for camera " + id);
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 bufferFormatWithYuvTestByCamera(ImageFormat.RAW_SENSOR);
             } finally {
                 closeDevice(id);
@@ -247,6 +279,11 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             try {
                 Log.v(TAG, "Testing all YUV image resolutions for camera " + id);
                 openDevice(id);
+
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
 
                 // Skip warmup on FULL mode devices.
                 int warmupCaptureNumber = (mStaticInfo.isHardwareLevelLegacy()) ?
@@ -622,7 +659,9 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
     }
 
     private void invalidAccessTestAfterClose() throws Exception {
-        final int FORMAT = ImageFormat.YUV_420_888;
+        final int FORMAT = mStaticInfo.isColorOutputSupported() ?
+            ImageFormat.YUV_420_888 : ImageFormat.DEPTH16;
+
         Size[] availableSizes = mStaticInfo.getAvailableSizesForFormatChecked(FORMAT,
                 StaticMetadata.StreamDirection.Output);
         Image img = null;
@@ -869,7 +908,7 @@ public class ImageReaderTest extends Camera2AndroidTestCase {
             if (VERBOSE) Log.v(TAG, "Got the latest image");
             CameraTestUtils.validateImage(img, sz.getWidth(), sz.getHeight(), format,
                     DEBUG_FILE_NAME_BASE);
-            if (VERBOSE) Log.v(TAG, "finish vaildation of image " + numImageVerified);
+            if (VERBOSE) Log.v(TAG, "finish validation of image " + numImageVerified);
             img.close();
             numImageVerified++;
             reTryCount = 0;

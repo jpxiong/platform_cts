@@ -192,11 +192,13 @@ public class Camera2AndroidTestCase extends AndroidTestCase {
         mCollector.setCameraId(cameraId);
         mStaticInfo = new StaticMetadata(mCameraManager.getCameraCharacteristics(cameraId),
                 CheckLevel.ASSERT, /*collector*/null);
-        mOrderedPreviewSizes = getSupportedPreviewSizes(
-                cameraId, mCameraManager,
-                getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
-        mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
-        mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
+        if (mStaticInfo.isColorOutputSupported()) {
+            mOrderedPreviewSizes = getSupportedPreviewSizes(
+                    cameraId, mCameraManager,
+                    getPreviewSizeBound(mWindowManager, PREVIEW_SIZE_BOUND));
+            mOrderedVideoSizes = getSupportedVideoSizes(cameraId, mCameraManager, PREVIEW_SIZE_BOUND);
+            mOrderedStillSizes = getSupportedStillSizes(cameraId, mCameraManager, null);
+        }
 
         if (VERBOSE) {
             Log.v(TAG, "Camera " + cameraId + " is opened");

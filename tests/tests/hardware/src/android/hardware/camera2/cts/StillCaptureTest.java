@@ -83,7 +83,11 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing JPEG exif for Camera " + mCameraIds[i]);
                 openDevice(mCameraIds[i]);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + mCameraIds[i] +
+                            " does not support color outputs, skipping");
+                    continue;
+                }
                 jpegExifTestByCamera();
             } finally {
                 closeDevice();
@@ -107,7 +111,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing basic take picture for Camera " + id);
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null);
             } finally {
                 closeDevice();
@@ -185,7 +192,11 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                 if (!(mStaticInfo.hasFocuser() && maxAfRegions > 0)) {
                     continue;
                 }
-
+                // TODO: Relax test to use non-SurfaceView output for depth cases
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 touchForFocusTestByCamera();
             } finally {
                 closeDevice();
@@ -206,7 +217,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing Still preview capture combination for Camera " + id);
                 openDevice(id);
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 previewStillCombinationTestByCamera();
             } finally {
                 closeDevice();
@@ -235,7 +249,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     Log.i(TAG, "Skipping test on legacy devices");
                     continue;
                 }
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 aeCompensationTestByCamera();
             } finally {
                 closeDevice();
@@ -327,6 +344,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing preview persistence for Camera " + id);
                 openDevice(id);
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 previewPersistenceTestByCamera();
             } finally {
                 closeDevice();
@@ -346,7 +367,10 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
                     Log.i(TAG, "Skipping AE precapture trigger cancel test on legacy devices");
                     continue;
                 }
-
+                if (!mStaticInfo.isColorOutputSupported()) {
+                    Log.i(TAG, "Camera " + id + " does not support color outputs, skipping");
+                    continue;
+                }
                 takePictureTestByCamera(/*aeRegions*/null, /*awbRegions*/null, /*afRegions*/null,
                         /*addAeTriggerCancel*/true);
             } finally {
