@@ -114,10 +114,10 @@ public class SELinuxHostTest extends DeviceTestCase {
         deviceSeappFile.deleteOnExit();
         mDevice.pullFile("/seapp_contexts", deviceSeappFile);
 
-        /* obtain file_contexts file from running device */
-        deviceFcFile = File.createTempFile("file_contexts", ".tmp");
+        /* obtain file_contexts.bin file from running device */
+        deviceFcFile = File.createTempFile("file_contexts", ".bin");
         deviceFcFile.deleteOnExit();
-        mDevice.pullFile("/file_contexts", deviceFcFile);
+        mDevice.pullFile("/file_contexts.bin", deviceFcFile);
 
         /* obtain property_contexts file from running device */
         devicePcFile = File.createTempFile("property_contexts", ".tmp");
@@ -131,7 +131,7 @@ public class SELinuxHostTest extends DeviceTestCase {
 
         /* retrieve the AOSP *_contexts files from jar */
         aospSeappFile = copyResourceToTempFile("/general_seapp_contexts");
-        aospFcFile = copyResourceToTempFile("/general_file_contexts");
+        aospFcFile = copyResourceToTempFile("/general_file_contexts.bin");
         aospPcFile = copyResourceToTempFile("/general_property_contexts");
         aospSvcFile = copyResourceToTempFile("/general_service_contexts");
         seappNeverAllowFile = copyResourceToTempFile("/general_seapp_neverallows");
@@ -257,13 +257,25 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
-     * Tests that the file_contexts file on the device contains
+     * Tests that the file_contexts.bin file on the device contains
      * the standard AOSP entries.
      *
      * @throws Exception
      */
     public void testAospFileContexts() throws Exception {
-        assertFileStartsWith(aospFcFile, deviceFcFile);
+        /* run checkfc -c general_file_contexts.bin file_contexts.bin */
+        ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
+                "-c", aospFcFile.getAbsolutePath(),
+                deviceFcFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line = result.readLine();
+        assertTrue("The file_contexts.bin file did not include the AOSP entries:\n"
+                   + line + "\n",
+                   line.equals("equal") || line.equals("subset"));
     }
 
     /**
@@ -287,13 +299,13 @@ public class SELinuxHostTest extends DeviceTestCase {
     }
 
     /**
-     * Tests that the file_contexts file on the device is valid.
+     * Tests that the file_contexts.bin file on the device is valid.
      *
      * @throws Exception
      */
     public void testValidFileContexts() throws Exception {
 
-        /* run checkfc on file_contexts */
+        /* run checkfc sepolicy file_contexts.bin */
         ProcessBuilder pb = new ProcessBuilder(checkFc.getAbsolutePath(),
                 devicePolicyFile.getAbsolutePath(),
                 deviceFcFile.getAbsolutePath());
@@ -308,7 +320,7 @@ public class SELinuxHostTest extends DeviceTestCase {
             errorString.append(line);
             errorString.append("\n");
         }
-        assertTrue("The file_contexts file was invalid:\n"
+        assertTrue("The file_contexts.bin file was invalid:\n"
                    + errorString, errorString.length() == 0);
     }
 
