@@ -427,21 +427,18 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
 
         final Drawable d = mActivity.getResources().getDrawable(R.drawable.scenery);
 
-        Rect r2 = d.getBounds();
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setDivider(d);
-                mListView.requestLayout();
             }
         });
         mInstrumentation.waitForIdleSync();
         assertSame(d, mListView.getDivider());
-        assertEquals(r2.bottom - r2.top, mListView.getDividerHeight());
+        assertEquals(d.getBounds().height(), mListView.getDividerHeight());
 
         mInstrumentation.runOnMainSync(new Runnable() {
             public void run() {
                 mListView.setDividerHeight(10);
-                mListView.requestLayout();
             }
         });
         mInstrumentation.waitForIdleSync();
