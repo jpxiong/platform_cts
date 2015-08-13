@@ -1648,8 +1648,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_audio" />
             <meta-data android:name="test_required_features" android:value="android.hardware.microphone" />
-            <meta-data android:name="test_excluded_features" android:value="android.hardware.type.watch" />
-            <meta-data android:name="test_excluded_features" android:value="android.hardware.type.television" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.audio.output" />
         </activity>
 
         <activity android:name=".audio.AudioFrequencySpeakerActivity"
@@ -1659,9 +1658,20 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_audio" />
-            <!-- <meta-data android:name="test_required_features" android:value="android.hardware.microphone" /> -->
-            <meta-data android:name="test_excluded_features" android:value="android.hardware.type.watch" />
-            <meta-data android:name="test_excluded_features" android:value="android.hardware.type.television" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.audio.output" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.usb.host" />
+        </activity>
+
+        <activity android:name=".audio.AudioFrequencyMicActivity"
+                  android:label="@string/audio_frequency_mic_test">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_audio" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.microphone" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.audio.output" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.usb.host" />
         </activity>
 
         <service android:name=".tv.MockTvInputService"
