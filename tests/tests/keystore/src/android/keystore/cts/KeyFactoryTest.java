@@ -46,9 +46,11 @@ import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.security.Provider.Service;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -121,9 +123,20 @@ public class KeyFactoryTest extends AndroidTestCase {
                 assertEquals(purposes, keyInfo.getPurposes());
                 TestUtils.assertContentsInAnyOrder(
                         Arrays.asList(blockModes), keyInfo.getBlockModes());
+                List<String> encryptionPaddingsList =
+                        new ArrayList<String>(Arrays.asList(encryptionPaddings));
+                if (keyInfo.getEncryptionPaddings().length > encryptionPaddingsList.size()) {
+                    // Keystore may have added ENCRYPTION_PADDING_NONE to allow software digesting.
+                    encryptionPaddingsList.add(KeyProperties.ENCRYPTION_PADDING_NONE);
+                }
                 TestUtils.assertContentsInAnyOrder(
-                        Arrays.asList(encryptionPaddings), keyInfo.getEncryptionPaddings());
-                TestUtils.assertContentsInAnyOrder(Arrays.asList(digests), keyInfo.getDigests());
+                        encryptionPaddingsList, keyInfo.getEncryptionPaddings());
+                List<String> digestsList = new ArrayList<String>(Arrays.asList(digests));
+                if (keyInfo.getDigests().length > digestsList.size()) {
+                    // Keystore may have added DIGEST_NONE to allow software digesting.
+                    digestsList.add(KeyProperties.DIGEST_NONE);
+                }
+                TestUtils.assertContentsInAnyOrder(digestsList, keyInfo.getDigests());
                 MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
                 assertEquals(keyValidityStart, keyInfo.getKeyValidityStart());
                 assertEquals(keyValidityForOriginationEnd,
