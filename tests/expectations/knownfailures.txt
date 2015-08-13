@@ -201,6 +201,13 @@
   bug: 22861512
 },
 {
+  description: "The timing measurements for preview callbacks are not reliable",
+  names: [
+    "android.hardware.cts.CameraTest#testPreviewFpsRange"
+  ],
+  bug: 23008511
+},
+{
   description: "known failures",
   names: [
     "android.hardware.cts.SensorBatchingTests#testAccelerometer_50hz_batching",
