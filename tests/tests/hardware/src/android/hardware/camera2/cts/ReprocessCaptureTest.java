@@ -54,7 +54,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
     private static final int CAPTURE_TIMEOUT_MS = 3000;
     private static final int WAIT_FOR_SURFACE_CHANGE_TIMEOUT_MS = 1000;
     private static final int CAPTURE_TEMPLATE = CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG;
-    private static final int PREVIEW_TEMPLATE = CameraDevice.TEMPLATE_PREVIEW;
+    private static final int ZSL_TEMPLATE = CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG;
     private static final int NUM_REPROCESS_TEST_LOOP = 3;
     private static final int NUM_REPROCESS_CAPTURES = 3;
     private static final int NUM_REPROCESS_BURST = 3;
@@ -1242,7 +1242,7 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
      * Start preview without a listener.
      */
     private void startPreview(Surface previewSurface) throws Exception {
-        CaptureRequest.Builder builder = mCamera.createCaptureRequest(PREVIEW_TEMPLATE);
+        CaptureRequest.Builder builder = mCamera.createCaptureRequest(ZSL_TEMPLATE);
         builder.addTarget(previewSurface);
         mSession.setRepeatingRequest(builder.build(), null, mHandler);
     }
