@@ -443,7 +443,7 @@ public class ListViewTest extends ActivityInstrumentationTestCase2<ListViewCtsAc
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(10, mListView.getDividerHeight());
-        assertEquals(10, r2.bottom - r2.top);
+        assertEquals(10, d.getBounds().height());
     }
 
     public void testSetSelection() {
