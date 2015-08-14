@@ -118,20 +118,12 @@ public class AppIdleHostTest extends DeviceTestCase implements IBuildReceiver {
     }
 
     /**
-     * Tests that the app is idle when the idle threshold is passed, and that the app is not-idle
-     * before the threshold is passed.
-     *
-     * @throws Exception
+     * Tests that the app is not idle right after it is launched.
      */
-    public void testAppIsIdle() throws Exception {
+    public void testAppIsNotIdleAfterBeingLaunched() throws Exception {
         final String previousState = getAppIdleSettings();
         try {
-            // Set the app idle time to be super low.
-            setAppIdleSettings("idle_duration=5,wallclock_threshold=5");
-            startAndStopTestApp();
-            assertTrue(isAppIdle(TEST_APP_PACKAGE));
-
-            // Set the app idle time to something larger.
+            // Set the app idle time to something large.
             setAppIdleSettings("idle_duration=10000,wallclock_threshold=10000");
             startAndStopTestApp();
             assertFalse(isAppIdle(TEST_APP_PACKAGE));
