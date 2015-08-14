@@ -83,6 +83,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mCrossProfileImageCaptureSupportTest;
     private TestItem mCrossProfileVideoCaptureSupportTest;
     private TestItem mCrossProfileAudioCaptureSupportTest;
+    private TestItem mDisableNfcBeamTest;
 
     private int mCurrentTestPosition;
 
@@ -273,6 +274,35 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                     .show();
         }
 
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC)) {
+            mDisableNfcBeamTest = new TestItem(this, R.string.provisioning_byod_nfc_beam,
+                    R.string.provisioning_byod_nfc_beam_allowed_instruction,
+                    new Intent(ByodHelperActivity.ACTION_TEST_NFC_BEAM)) {
+                @Override
+                public void performTest(final ByodFlowTestActivity activity) {
+                    activity.showManualTestDialog(mDisableNfcBeamTest,
+                            new DefaultTestCallback(mDisableNfcBeamTest) {
+                        @Override
+                        public void onPass() {
+                            // Start a second test with beam disallowed by policy.
+                            Intent testNfcBeamIntent = new Intent(
+                                    ByodHelperActivity.ACTION_TEST_NFC_BEAM);
+                            testNfcBeamIntent.putExtra(NfcTestActivity.EXTRA_DISALLOW_BY_POLICY,
+                                    true);
+                            TestItem disableNfcBeamTest2 = new TestItem(activity,
+                                    R.string.provisioning_byod_nfc_beam,
+                                    R.string.provisioning_byod_nfc_beam_disallowed_instruction,
+                                    testNfcBeamIntent);
+                            // The result should be reflected on the original test.
+                            activity.showManualTestDialog(disableNfcBeamTest2,
+                                    new DefaultTestCallback(mDisableNfcBeamTest));
+                        }
+                    });
+                }
+            };
+            mTests.add(mDisableNfcBeamTest);
+        }
+
         /* TODO: reinstate when bug b/20131958 is fixed
         if (canResolveIntent(ByodHelperActivity.getCaptureAudioIntent())) {
             // Capture audio intent can be resolved in primary profile, so test.
@@ -303,7 +333,31 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         return intent.resolveActivity(getPackageManager()) != null;
     }
 
+    private class DefaultTestCallback implements TestItem.TestCallback {
+        final private TestItem mTest;
+
+        public DefaultTestCallback(TestItem test) {
+            mTest = test;
+        }
+
+        @Override
+        public void onPass() {
+            clearRemainingState(mTest);
+            setTestResult(mTest, TestResult.Passed);
+        }
+
+        @Override
+        public void onFail() {
+            clearRemainingState(mTest);
+            setTestResult(mTest, TestResult.Failed);
+        }
+    }
+
     private void showManualTestDialog(final TestItem test) {
+        showManualTestDialog(test, new DefaultTestCallback(test));
+    }
+
+    private void showManualTestDialog(final TestItem test, final TestItem.TestCallback callback) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle(R.string.provisioning_byod)
@@ -311,15 +365,13 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 .setPositiveButton(R.string.pass_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.Passed);
+                        callback.onPass();
                     }
                 })
                 .setNegativeButton(R.string.fail_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.Failed);
+                        callback.onFail();
                     }
                 });
         View customView = test.getCustomView();
@@ -434,6 +486,11 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     }
 
     static class TestItem {
+
+        public interface TestCallback {
+            void onPass();
+            void onFail();
+        }
 
         private String mDisplayName;
         private TestResult mPassed;
