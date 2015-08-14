@@ -122,21 +122,21 @@ public class KeyFactoryTest extends AndroidTestCase {
                 assertEquals("test1", keyInfo.getKeystoreAlias());
                 assertEquals(purposes, keyInfo.getPurposes());
                 TestUtils.assertContentsInAnyOrder(
-                        Arrays.asList(blockModes), keyInfo.getBlockModes());
-                List<String> encryptionPaddingsList =
-                        new ArrayList<String>(Arrays.asList(encryptionPaddings));
-                if (keyInfo.getEncryptionPaddings().length > encryptionPaddingsList.size()) {
-                    // Keystore may have added ENCRYPTION_PADDING_NONE to allow software digesting.
-                    encryptionPaddingsList.add(KeyProperties.ENCRYPTION_PADDING_NONE);
-                }
+                        Arrays.asList(keyInfo.getBlockModes()), blockModes);
+
+                List<String> actualEncryptionPaddings =
+                        new ArrayList<String>(Arrays.asList(keyInfo.getEncryptionPaddings()));
+                // Keystore may have added ENCRYPTION_PADDING_NONE to allow software padding.
+                actualEncryptionPaddings.remove(KeyProperties.ENCRYPTION_PADDING_NONE);
                 TestUtils.assertContentsInAnyOrder(
-                        encryptionPaddingsList, keyInfo.getEncryptionPaddings());
-                List<String> digestsList = new ArrayList<String>(Arrays.asList(digests));
-                if (keyInfo.getDigests().length > digestsList.size()) {
-                    // Keystore may have added DIGEST_NONE to allow software digesting.
-                    digestsList.add(KeyProperties.DIGEST_NONE);
-                }
-                TestUtils.assertContentsInAnyOrder(digestsList, keyInfo.getDigests());
+                        actualEncryptionPaddings, encryptionPaddings);
+
+                List<String> actualDigests =
+                        new ArrayList<String>(Arrays.asList(keyInfo.getDigests()));
+                // Keystore may have added DIGEST_NONE to allow software digesting.
+                actualDigests.remove(KeyProperties.DIGEST_NONE);
+                TestUtils.assertContentsInAnyOrder(actualDigests, digests);
+
                 MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
                 assertEquals(keyValidityStart, keyInfo.getKeyValidityStart());
                 assertEquals(keyValidityForOriginationEnd,
