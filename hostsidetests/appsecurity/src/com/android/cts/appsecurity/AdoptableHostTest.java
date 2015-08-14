@@ -292,13 +292,17 @@ public class AdoptableHostTest extends DeviceTestCase implements IAbiReceiver, I
     }
 
     private LocalVolumeInfo getAdoptionVolume() throws Exception {
-        final String[] lines = getDevice().executeShellCommand("sm list-volumes private")
-                .split("\n");
-        for (String line : lines) {
-            final LocalVolumeInfo info = new LocalVolumeInfo(line.trim());
-            if (!"private".equals(info.volId)) {
-                return info;
+        String[] lines = null;
+        int attempt = 0;
+        while (attempt++ < 5) {
+            lines = getDevice().executeShellCommand("sm list-volumes private").split("\n");
+            for (String line : lines) {
+                final LocalVolumeInfo info = new LocalVolumeInfo(line.trim());
+                if (!"private".equals(info.volId) && "mounted".equals(info.state)) {
+                    return info;
+                }
             }
+            Thread.sleep(1000);
         }
         throw new AssertionError("Expected private volume; found " + Arrays.toString(lines));
     }
