@@ -1586,6 +1586,28 @@ You should be prompted to select credentials; choose the ones you just installed
     </string>
 
     <string name="provisioning_byod_cross_profile_intent_filters">Cross profile intent filters are set</string>
+
+    <string name="provisioning_byod_nfc_beam">Disable Nfc beam</string>
+    <string name="provisioning_byod_nfc_beam_allowed_instruction">
+        Please press the Go button to test if Nfc beam can be triggered in the work profile.\n
+        \n
+        For the first test, press \"Send manual beam\" to trigger a beam, then bump into another device to send the file. Verify that the file is successfully received.\n
+        \n
+        For the second test, press \"Send share intent\" to trigger a beam, then bump into another device to send the file. Verify that the file is successfully received.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+    <string name="provisioning_byod_nfc_beam_disallowed_instruction">
+        Please press the Go button to test if Nfc beam is disallowed by policy
+        \n
+        Verify that Nfc beam is not triggered when pressing the button.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+    <string name="provisioning_byod_send_manual_beam">Send manual beam</string>
+    <string name="provisioning_byod_send_share_intent">Send share intent</string>
+    <string name="provisioning_byod_cannot_resolve_beam_activity">Cannot find beam activity</string>
+
     <string name="provisioning_byod_no_activity">Cannot communicate with activity in the work profile.</string>
     <string name="provisioning_byod_delete_profile">Initiate deletion of work profile.</string>
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
