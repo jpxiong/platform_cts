@@ -255,6 +255,9 @@ public class CodecState {
             Log.d(TAG, "saw input EOS on track " + mTrackIndex);
 
             mSawInputEOS = true;
+            if (mTunneled && !mIsAudio) {
+                mSawOutputEOS = true;
+            }
 
             mCodec.queueInputBuffer(
                     index, 0 /* offset */, 0 /* sampleSize */,
@@ -328,12 +331,10 @@ public class CodecState {
         if (mAudioTrack != null) {
             ByteBuffer buffer = mCodecOutputBuffers[index];
             buffer.clear();
-            buffer.position(0 /* offset */);
+            ByteBuffer audioBuffer = ByteBuffer.allocate(buffer.remaining());
+            audioBuffer.put(buffer);
 
-            byte[] audioCopy = new byte[info.size];
-            buffer.get(audioCopy, 0, info.size);
-
-            mAudioTrack.write(audioCopy, info.size);
+            mAudioTrack.write(audioBuffer, info.size, info.presentationTimeUs*1000);
 
             mCodec.releaseOutputBuffer(index, false /* render */);
 
