@@ -1300,8 +1300,13 @@
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_IMAGE" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.TEST_NFC_BEAM" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
+        </activity>
+
+        <activity android:name=".managedprovisioning.NfcTestActivity">
+            <meta-data android:name="test_required_features" android:value="android.hardware.nfc" />
         </activity>
 
         <provider
