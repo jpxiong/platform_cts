@@ -328,21 +328,21 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
                 KeyInfo keyInfo = TestUtils.getKeyInfo(keyPair.getPrivate());
                 assertEquals(purposes, keyInfo.getPurposes());
                 TestUtils.assertContentsInAnyOrder(
-                        Arrays.asList(blockModes), keyInfo.getBlockModes());
-                List<String> encryptionPaddingsList =
-                        new ArrayList<String>(Arrays.asList(encryptionPaddings));
-                if (keyInfo.getEncryptionPaddings().length > encryptionPaddingsList.size()) {
-                    // Keystore may have added ENCRYPTION_PADDING_NONE to allow software OAEP
-                    encryptionPaddingsList.add(KeyProperties.ENCRYPTION_PADDING_NONE);
-                }
+                        Arrays.asList(keyInfo.getBlockModes()), blockModes);
+
+                List<String> actualEncryptionPaddings =
+                        new ArrayList<String>(Arrays.asList(keyInfo.getEncryptionPaddings()));
+                // Keystore may have added ENCRYPTION_PADDING_NONE to allow software OAEP
+                actualEncryptionPaddings.remove(KeyProperties.ENCRYPTION_PADDING_NONE);
                 TestUtils.assertContentsInAnyOrder(
-                        encryptionPaddingsList, keyInfo.getEncryptionPaddings());
-                List<String> digestsList = new ArrayList<String>(Arrays.asList(digests));
-                if (keyInfo.getDigests().length > digestsList.size()) {
-                    // Keystore may have added DIGEST_NONE, to allow software digesting.
-                    digestsList.add(KeyProperties.DIGEST_NONE);
-                }
-                TestUtils.assertContentsInAnyOrder(digestsList, keyInfo.getDigests());
+                        actualEncryptionPaddings, encryptionPaddings);
+
+                List<String> actualDigests =
+                        new ArrayList<String>(Arrays.asList(keyInfo.getDigests()));
+                // Keystore may have added DIGEST_NONE, to allow software digesting.
+                actualDigests.remove(KeyProperties.DIGEST_NONE);
+                TestUtils.assertContentsInAnyOrder(actualDigests, digests);
+
                 MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
                 assertEquals(keyValidityStart, keyInfo.getKeyValidityStart());
                 assertEquals(keyValidityForOriginationEnd,
@@ -803,14 +803,13 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(keyValidityEndDateForOrigination, keyInfo.getKeyValidityForOriginationEnd());
         assertEquals(keyValidityEndDateForConsumption, keyInfo.getKeyValidityForConsumptionEnd());
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getBlockModes()));
-        List<String> digestsList = Arrays.asList(keyInfo.getDigests());
-        assertTrue(digestsList.contains(KeyProperties.DIGEST_SHA384));
-        assertTrue(digestsList.contains(KeyProperties.DIGEST_SHA512));
-        if (digestsList.size() > 2) {
-            // Keystore may have added DIGEST_NONE, to allow software digesting.
-            assertTrue(digestsList.size() == 3);
-            assertTrue(digestsList.contains(KeyProperties.DIGEST_NONE));
-        }
+
+        List<String> actualDigests = new ArrayList<String>(Arrays.asList(keyInfo.getDigests()));
+        // Keystore may have added DIGEST_NONE, to allow software digesting.
+        actualDigests.remove(KeyProperties.DIGEST_NONE);
+        TestUtils.assertContentsInAnyOrder(
+                actualDigests, KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512);
+
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getSignaturePaddings()));
         MoreAsserts.assertEmpty(Arrays.asList(keyInfo.getEncryptionPaddings()));
         assertFalse(keyInfo.isUserAuthenticationRequired());
@@ -872,22 +871,27 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(keyValidityStart, keyInfo.getKeyValidityStart());
         assertEquals(keyValidityEndDateForOrigination, keyInfo.getKeyValidityForOriginationEnd());
         assertEquals(keyValidityEndDateForConsumption, keyInfo.getKeyValidityForConsumptionEnd());
-        List<String> digestsList = Arrays.asList(keyInfo.getDigests());
-        assertTrue(digestsList.contains(KeyProperties.DIGEST_SHA384));
-        assertTrue(digestsList.contains(KeyProperties.DIGEST_SHA512));
-        if (digestsList.size() > 2) {
-            // Keystore may have added DIGEST_NONE, to allow software digesting.
-            assertTrue(digestsList.size() == 3);
-            assertTrue(digestsList.contains(KeyProperties.DIGEST_NONE));
-        }
-        List<String> signaturePaddingsList = Arrays.asList(keyInfo.getSignaturePaddings());
-        assertTrue(signaturePaddingsList.contains(KeyProperties.SIGNATURE_PADDING_RSA_PKCS1));
-        assertTrue(signaturePaddingsList.contains(KeyProperties.SIGNATURE_PADDING_RSA_PSS));
+
+        List<String> actualDigests = Arrays.asList(keyInfo.getDigests());
+        // Keystore may have added DIGEST_NONE, to allow software digesting.
+        actualDigests.remove(KeyProperties.DIGEST_NONE);
+        TestUtils.assertContentsInAnyOrder(
+                actualDigests, KeyProperties.DIGEST_SHA384, KeyProperties.DIGEST_SHA512);
+
+        TestUtils.assertContentsInAnyOrder(Arrays.asList(keyInfo.getSignaturePaddings()),
+                KeyProperties.SIGNATURE_PADDING_RSA_PKCS1,
+                KeyProperties.SIGNATURE_PADDING_RSA_PSS);
         MoreAsserts.assertContentsInAnyOrder(Arrays.asList(keyInfo.getBlockModes()),
                 KeyProperties.BLOCK_MODE_ECB);
-        List<String> encryptionPaddingsList = Arrays.asList(keyInfo.getEncryptionPaddings());
-        assertTrue(encryptionPaddingsList.contains(KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1));
-        assertTrue(encryptionPaddingsList.contains(KeyProperties.ENCRYPTION_PADDING_RSA_OAEP));
+
+        List<String> actualEncryptionPaddings =
+                new ArrayList<String>(Arrays.asList(keyInfo.getEncryptionPaddings()));
+        // Keystore may have added ENCRYPTION_PADDING_NONE, to allow software padding.
+        actualEncryptionPaddings.remove(KeyProperties.ENCRYPTION_PADDING_NONE);
+        TestUtils.assertContentsInAnyOrder(actualEncryptionPaddings,
+                KeyProperties.ENCRYPTION_PADDING_RSA_OAEP,
+                KeyProperties.ENCRYPTION_PADDING_RSA_PKCS1);
+
         assertFalse(keyInfo.isUserAuthenticationRequired());
         assertEquals(-1, keyInfo.getUserAuthenticationValidityDurationSeconds());
     }
