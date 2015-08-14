@@ -101,7 +101,32 @@ public abstract class DialogTestListActivity extends PassFailButtons.TestListAct
         getPassButton().setEnabled(mAdapter.allTestsPassed());
     }
 
-    private void showManualTestDialog(final DialogTestListItem test) {
+    public class DefaultTestCallback implements DialogTestListItem.TestCallback {
+        final private DialogTestListItem mTest;
+
+        public DefaultTestCallback(DialogTestListItem test) {
+            mTest = test;
+        }
+
+        @Override
+        public void onPass() {
+            clearRemainingState(mTest);
+            setTestResult(mTest, TestResult.TEST_RESULT_PASSED);
+        }
+
+        @Override
+        public void onFail() {
+            clearRemainingState(mTest);
+            setTestResult(mTest, TestResult.TEST_RESULT_FAILED);
+        }
+    }
+
+    public void showManualTestDialog(final DialogTestListItem test) {
+        showManualTestDialog(test, new DefaultTestCallback(test));
+    }
+
+    public void showManualTestDialog(final DialogTestListItem test,
+            final DialogTestListItem.TestCallback callback) {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setTitle(mTitleStringId)
@@ -109,15 +134,13 @@ public abstract class DialogTestListActivity extends PassFailButtons.TestListAct
                 .setPositiveButton(R.string.pass_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.TEST_RESULT_PASSED);
+                        callback.onPass();
                     }
                 })
                 .setNegativeButton(R.string.fail_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        clearRemainingState(test);
-                        setTestResult(test, TestResult.TEST_RESULT_FAILED);
+                        callback.onFail();
                     }
                 });
         View customView = test.getCustomView();
@@ -188,6 +211,11 @@ public abstract class DialogTestListActivity extends PassFailButtons.TestListAct
     }
 
     protected static class DialogTestListItem extends TestListAdapter.TestListItem {
+
+        public interface TestCallback {
+            void onPass();
+            void onFail();
+        }
 
         private String mManualInstruction;
 

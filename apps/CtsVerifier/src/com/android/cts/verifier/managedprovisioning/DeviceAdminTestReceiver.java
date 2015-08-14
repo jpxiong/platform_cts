@@ -63,6 +63,7 @@ public class DeviceAdminTestReceiver extends DeviceAdminReceiver {
             filter.addAction(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_AUDIO);
             filter.addAction(ByodHelperActivity.ACTION_KEYGUARD_DISABLED_FEATURES);
             filter.addAction(ByodHelperActivity.ACTION_LOCKNOW);
+            filter.addAction(ByodHelperActivity.ACTION_TEST_NFC_BEAM);
             filter.addAction(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
             filter.addAction(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION);
             filter.addAction(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION_ON_LOCKSCREEN);

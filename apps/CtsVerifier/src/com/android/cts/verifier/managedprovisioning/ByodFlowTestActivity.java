@@ -75,6 +75,7 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
     private DialogTestListItem mCrossProfileVideoCaptureSupportTest;
     private DialogTestListItem mCrossProfileAudioCaptureSupportTest;
     private TestListItem mKeyguardDisabledFeaturesTest;
+    private DialogTestListItem mDisableNfcBeamTest;
 
     public ByodFlowTestActivity() {
         super(R.layout.provisioning_byod,
@@ -332,6 +333,38 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
             Toast.makeText(ByodFlowTestActivity.this,
                     R.string.provisioning_byod_no_video_capture_resolver, Toast.LENGTH_SHORT)
                     .show();
+        }
+
+        if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC)) {
+            mDisableNfcBeamTest = new DialogTestListItem(this, R.string.provisioning_byod_nfc_beam,
+                    "BYOD_DisableNfcBeamTest",
+                    R.string.provisioning_byod_nfc_beam_allowed_instruction,
+                    new Intent(ByodHelperActivity.ACTION_TEST_NFC_BEAM)) {
+                @Override
+                public void performTest(final DialogTestListActivity activity) {
+                    activity.showManualTestDialog(mDisableNfcBeamTest,
+                            new DefaultTestCallback(mDisableNfcBeamTest) {
+                        @Override
+                        public void onPass() {
+                            // Start a second test with beam disallowed by policy.
+                            Intent testNfcBeamIntent = new Intent(
+                                    ByodHelperActivity.ACTION_TEST_NFC_BEAM);
+                            testNfcBeamIntent.putExtra(NfcTestActivity.EXTRA_DISALLOW_BY_POLICY,
+                                    true);
+                            DialogTestListItem disableNfcBeamTest2 =
+                                    new DialogTestListItem(activity,
+                                    R.string.provisioning_byod_nfc_beam,
+                                    "BYOD_DisableNfcBeamTest",
+                                    R.string.provisioning_byod_nfc_beam_disallowed_instruction,
+                                    testNfcBeamIntent);
+                            // The result should be reflected on the original test.
+                            activity.showManualTestDialog(disableNfcBeamTest2,
+                                    new DefaultTestCallback(mDisableNfcBeamTest));
+                        }
+                    });
+                }
+            };
+            adapter.add(mDisableNfcBeamTest);
         }
 
         /* TODO: reinstate when bug b/20131958 is fixed
