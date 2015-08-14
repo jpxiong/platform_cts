@@ -50,6 +50,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
 
 /**
  * CameraDevice video recording use case tests by using MediaRecorder and
@@ -809,27 +810,58 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             // For LEGACY, find closest supported smaller or equal JPEG size to the current video
             // size; if no size is smaller than the video, pick the smallest JPEG size.  The assert
             // for video size above guarantees that for LIMITED or FULL, we select videoSz here.
+            // Also check for minFrameDuration here to make sure jpeg stream won't slow down
+            // video capture
             Size videoSnapshotSz = mOrderedStillSizes.get(mOrderedStillSizes.size() - 1);
+            // Allow a bit tolerance so we don't fail for a few nano seconds of difference
+            final float FRAME_DURATION_TOLERANCE = 0.01f;
+            long videoFrameDuration = (long) (1e9 / profile.videoFrameRate *
+                    (1.0 + FRAME_DURATION_TOLERANCE));
+            HashMap<Size, Long> minFrameDurationMap = mStaticInfo.
+                    getAvailableMinFrameDurationsForFormatChecked(ImageFormat.JPEG);
             for (int i = mOrderedStillSizes.size() - 2; i >= 0; i--) {
                 Size candidateSize = mOrderedStillSizes.get(i);
+                Long jpegFrameDuration = minFrameDurationMap.get(candidateSize);
+                assertTrue("Cannot find minimum frame duration for jpeg size " + candidateSize,
+                        jpegFrameDuration != null);
                 if (candidateSize.getWidth() <= videoSz.getWidth() &&
-                        candidateSize.getHeight() <= videoSz.getHeight()) {
+                        candidateSize.getHeight() <= videoSz.getHeight() &&
+                        jpegFrameDuration <= videoFrameDuration) {
                     videoSnapshotSz = candidateSize;
                 }
             }
-            if (videoSnapshotSz.getWidth() * videoSnapshotSz.getHeight() > FRAME_SIZE_15M)
-                kFrameDrop_Tolerence = (int)(FRAMEDROP_TOLERANCE * FRAME_DROP_TOLERENCE_FACTOR);
 
             /**
              * Only test full res snapshot when below conditions are all true.
              * 1. Camera is a FULL device
              * 2. video size is up to max preview size, which will be bounded by 1080p.
+             * 3. Full resolution jpeg stream can keep up to video stream speed.
+             *    When full res jpeg stream cannot keep up to video stream speed, search
+             *    the largest jpeg size that can susptain video speed instead.
              */
             if (mStaticInfo.isHardwareLevelFull() &&
                     videoSz.getWidth() <= maxPreviewSize.getWidth() &&
                     videoSz.getHeight() <= maxPreviewSize.getHeight()) {
-                videoSnapshotSz = mOrderedStillSizes.get(0);
+                for (Size jpegSize : mOrderedStillSizes) {
+                    Long jpegFrameDuration = minFrameDurationMap.get(jpegSize);
+                    assertTrue("Cannot find minimum frame duration for jpeg size " + jpegSize,
+                            jpegFrameDuration != null);
+                    if (jpegFrameDuration <= videoFrameDuration) {
+                        videoSnapshotSz = jpegSize;
+                        break;
+                    }
+                    if (jpegSize.equals(videoSz)) {
+                        throw new AssertionFailedError(
+                                "Cannot find adequate video snapshot size for video size" +
+                                        videoSz);
+                    }
+                }
             }
+
+            Log.i(TAG, "Testing video snapshot size " + videoSnapshotSz +
+                    " for video size " + videoSz);
+            if (videoSnapshotSz.getWidth() * videoSnapshotSz.getHeight() > FRAME_SIZE_15M)
+                kFrameDrop_Tolerence = (int)(FRAMEDROP_TOLERANCE * FRAME_DROP_TOLERENCE_FACTOR);
 
             createImageReader(
                     videoSnapshotSz, ImageFormat.JPEG,
