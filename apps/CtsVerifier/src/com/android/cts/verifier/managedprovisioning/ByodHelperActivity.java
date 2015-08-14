@@ -68,6 +68,7 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
     public static final String ACTION_CAPTURE_AND_CHECK_VIDEO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO";
     // Primage -> managed intent: request to capture and check an audio recording
     public static final String ACTION_CAPTURE_AND_CHECK_AUDIO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO";
+    public static final String ACTION_TEST_NFC_BEAM = "com.android.cts.verifier.managedprovisioning.TEST_NFC_BEAM";
 
     public static final String EXTRA_PROVISIONED = "extra_provisioned";
 
@@ -175,6 +176,12 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
                 showToast(R.string.provisioning_byod_capture_media_error);
                 finish();
             }
+            return;
+        } else if (action.equals(ACTION_TEST_NFC_BEAM)) {
+            Intent testNfcBeamIntent = new Intent(this, NfcTestActivity.class);
+            testNfcBeamIntent.putExtras(intent);
+            startActivity(testNfcBeamIntent);
+            finish();
             return;
         }
         // This activity has no UI and is only used to respond to CtsVerifier in the primary side.
