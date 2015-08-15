@@ -41,6 +41,7 @@ public class SensorStats {
     public static final String DELIMITER = "__";
 
     public static final String ERROR = "error";
+    public static final String EVENT_FIFO_LENGTH = "event_fifo_length_observed";
     public static final String EVENT_GAP_COUNT_KEY = "event_gap_count";
     public static final String EVENT_GAP_POSITIONS_KEY = "event_gap_positions";
     public static final String EVENT_OUT_OF_ORDER_COUNT_KEY = "event_out_of_order_count";
