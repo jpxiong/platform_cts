@@ -748,10 +748,10 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
         resultKeys.add(CaptureResult.LENS_OPTICAL_STABILIZATION_MODE);
         resultKeys.add(CaptureResult.LENS_POSE_ROTATION);
         resultKeys.add(CaptureResult.LENS_POSE_TRANSLATION);
-        resultKeys.add(CaptureResult.LENS_INTRINSIC_CALIBRATION);
-        resultKeys.add(CaptureResult.LENS_RADIAL_DISTORTION);
         resultKeys.add(CaptureResult.LENS_FOCUS_RANGE);
         resultKeys.add(CaptureResult.LENS_STATE);
+        resultKeys.add(CaptureResult.LENS_INTRINSIC_CALIBRATION);
+        resultKeys.add(CaptureResult.LENS_RADIAL_DISTORTION);
         resultKeys.add(CaptureResult.NOISE_REDUCTION_MODE);
         resultKeys.add(CaptureResult.REQUEST_PIPELINE_DEPTH);
         resultKeys.add(CaptureResult.SCALER_CROP_REGION);
