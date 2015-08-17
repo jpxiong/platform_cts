@@ -47,7 +47,7 @@ public class FlagSecureTest extends AssistTestBase {
     }
 
     public void testSecureActivity() throws Exception {
-        verifyAssistDataNullness(false, false, false, true);
+        verifyAssistDataNullness(false, false, false, false);
 
         // verify that we have only the root window and not its children.
         verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE), true);

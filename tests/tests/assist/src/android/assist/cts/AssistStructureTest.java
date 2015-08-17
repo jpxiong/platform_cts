@@ -42,9 +42,6 @@ public class AssistStructureTest extends AssistTestBase {
     }
 
     public void testAssistStructure() throws Exception {
-        assertEquals("1", Settings.Secure.getString(
-            mContext.getContentResolver(), "assist_structure_enabled"));
-
         verifyAssistDataNullness(false, false, false, false);
         verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE),
                     false /*FLAG_SECURE set*/);

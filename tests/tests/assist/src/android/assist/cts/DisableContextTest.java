@@ -50,13 +50,7 @@ public class DisableContextTest extends AssistTestBase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        SystemUtil.runShellCommand(getInstrumentation(),
-                "settings put secure assist_structure_enabled 0");
-        SystemUtil.runShellCommand(getInstrumentation(),
-            "settings put secure assist_screenshot_enabled 0");
-        logContextAndScreenshotSetting();
         startTestActivity(TEST_CASE_TYPE);
-        waitForBroadcast();
     }
 
     @Override
@@ -71,6 +65,14 @@ public class DisableContextTest extends AssistTestBase {
 
     public void testContextAndScreenshotOff() throws Exception {
         // Both settings off
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_structure_enabled 0");
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_screenshot_enabled 0");
+        waitForBroadcast();
+
+        logContextAndScreenshotSetting();
+
         verifyAssistDataNullness(true, true, true, true);
 
         // Screenshot off, context on
@@ -93,6 +95,6 @@ public class DisableContextTest extends AssistTestBase {
 
         logContextAndScreenshotSetting();
 
-        verifyAssistDataNullness(true, true, true, false);
+        verifyAssistDataNullness(true, true, true, true);
     }
 }
