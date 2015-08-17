@@ -92,6 +92,9 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
         String screenSize = getScreenSize();
         addResult(SCREEN_SIZE, screenSize);
 
+        Configuration configuration = getContext().getResources().getConfiguration();
+        addResult(SMALLEST_SCREEN_WIDTH_DP, configuration.smallestScreenWidthDp);
+
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClass(this.getContext(), DeviceInfoActivity.class);
