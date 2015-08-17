@@ -119,6 +119,9 @@ public class DefaultDialerOperationsNoPermissionsTest extends InstrumentationTes
     }
 
     public void testIsVoicemailNumber() throws Exception {
+        if (!TestUtils.shouldTestTelecom(mContext)) {
+            return;
+        }
         verifyForReadPhoneStateOrDefaultDialer(new Runnable() {
             @Override
             public void run() {
