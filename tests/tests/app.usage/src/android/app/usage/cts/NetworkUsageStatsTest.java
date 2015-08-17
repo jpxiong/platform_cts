@@ -28,6 +28,7 @@ import android.net.NetworkRequest;
 import android.os.ParcelFileDescriptor;
 import android.os.Process;
 import android.os.RemoteException;
+import android.telephony.TelephonyManager;
 import android.test.InstrumentationTestCase;
 import android.util.Log;
 
@@ -37,6 +38,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.MessageFormat;
+import java.util.Scanner;
 import javax.net.ssl.HttpsURLConnection;
 
 import libcore.io.IoUtils;
@@ -44,8 +46,8 @@ import libcore.io.Streams;
 
 public class NetworkUsageStatsTest extends InstrumentationTestCase {
     private static final String LOG_TAG = "NetworkUsageStatsTest";
-    private static final String APPOPS_SET_SHELL_COMMAND = "appops set {0} " +
-            AppOpsManager.OPSTR_GET_USAGE_STATS + " {1}";
+    private static final String APPOPS_SET_SHELL_COMMAND = "appops set {0} {1} {2}";
+    private static final String APPOPS_GET_SHELL_COMMAND = "appops get {0} {1}";
 
     private static final long MINUTE = 1000 * 60;
 
@@ -66,11 +68,14 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
     private long mEndTime;
 
     private long mBytesRead;
+    private String mWriteSettingsMode;
+    private String mUsageStatsMode;
 
     private void exerciseRemoteHost(int transportType) throws Exception {
         final int timeout = 15000;
         mCm.requestNetwork(new NetworkRequest.Builder()
             .addTransportType(transportType)
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .build(), new ConnectivityManager.NetworkCallback() {
                 @Override
                 public void onAvailable(Network network) {
@@ -133,17 +138,55 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
 
         mCm = (ConnectivityManager) getInstrumentation().getContext()
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        mWriteSettingsMode = getAppOpsMode(AppOpsManager.OPSTR_WRITE_SETTINGS);
+        setAppOpsMode(AppOpsManager.OPSTR_WRITE_SETTINGS, "allow");
+        mUsageStatsMode = getAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS);
     }
 
-    private void setAppOpsMode(String mode) throws Exception {
+    @Override
+    protected void tearDown() throws Exception {
+        if (mWriteSettingsMode != null) {
+            setAppOpsMode(AppOpsManager.OPSTR_WRITE_SETTINGS, mWriteSettingsMode);
+        }
+        if (mUsageStatsMode != null) {
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, mUsageStatsMode);
+        }
+        super.tearDown();
+    }
+
+    private void setAppOpsMode(String appop, String mode) throws Exception {
         final String command = MessageFormat.format(APPOPS_SET_SHELL_COMMAND,
-                getInstrumentation().getContext().getPackageName(), mode);
+                getInstrumentation().getContext().getPackageName(), appop, mode);
         ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation()
                 .executeShellCommand(command);
         try {
             Streams.readFully(new FileInputStream(pfd.getFileDescriptor()));
         } finally {
             IoUtils.closeQuietly(pfd.getFileDescriptor());
+        }
+    }
+
+    private String getAppOpsMode(String appop) throws Exception {
+        String result;
+        final String command = MessageFormat.format(APPOPS_GET_SHELL_COMMAND,
+                getInstrumentation().getContext().getPackageName(), appop);
+        ParcelFileDescriptor pfd = getInstrumentation().getUiAutomation()
+                .executeShellCommand(command);
+        try {
+            result = convertStreamToString(new FileInputStream(pfd.getFileDescriptor()));
+        } finally {
+            IoUtils.closeQuietly(pfd.getFileDescriptor());
+        }
+        if (result == null) {
+            Log.w(LOG_TAG, "App op " + appop + " could not be read.");
+        }
+        return result;
+    }
+
+    private static String convertStreamToString(InputStream is) {
+        try (Scanner scanner = new Scanner(is).useDelimiter("\\A")) {
+            return scanner.hasNext() ? scanner.next() : null;
         }
     }
 
@@ -159,16 +202,26 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
         return true;
     }
 
+    private String getSubscriberId(int networkType) {
+        if (ConnectivityManager.TYPE_MOBILE == networkType) {
+            TelephonyManager tm = (TelephonyManager) getInstrumentation().getContext()
+                    .getSystemService(Context.TELEPHONY_SERVICE);
+            return tm.getSubscriberId();
+        }
+        return "";
+    }
+
     public void testDeviceSummary() throws Exception {
         for (int i = 0; i < sNetworkTypesToTest.length; ++i) {
             if (!shouldTestThisNetworkType(i, MINUTE/2)) {
                 continue;
             }
-            setAppOpsMode("allow");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "allow");
             NetworkStats.Bucket bucket = null;
             try {
                 bucket = mNsm.querySummaryForDevice(
-                        sNetworkTypesToTest[i], "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
             } catch (RemoteException | SecurityException e) {
                 fail("testDeviceSummary fails with exception: " + e.toString());
             }
@@ -176,10 +229,11 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             assertTimestamps(bucket);
             assertEquals(bucket.getState(), NetworkStats.Bucket.STATE_ALL);
             assertEquals(bucket.getUid(), NetworkStats.Bucket.UID_ALL);
-            setAppOpsMode("deny");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "deny");
             try {
                 bucket = mNsm.querySummaryForDevice(
-                        ConnectivityManager.TYPE_WIFI, "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 fail("negative testDeviceSummary fails: no exception thrown.");
             } catch (RemoteException e) {
                 fail("testDeviceSummary fails with exception: " + e.toString());
@@ -194,11 +248,12 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             if (!shouldTestThisNetworkType(i, MINUTE/2)) {
                 continue;
             }
-            setAppOpsMode("allow");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "allow");
             NetworkStats.Bucket bucket = null;
             try {
                 bucket = mNsm.querySummaryForUser(
-                        sNetworkTypesToTest[i], "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
             } catch (RemoteException | SecurityException e) {
                 fail("testUserSummary fails with exception: " + e.toString());
             }
@@ -206,10 +261,11 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             assertTimestamps(bucket);
             assertEquals(bucket.getState(), NetworkStats.Bucket.STATE_ALL);
             assertEquals(bucket.getUid(), NetworkStats.Bucket.UID_ALL);
-            setAppOpsMode("deny");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "deny");
             try {
                 bucket = mNsm.querySummaryForUser(
-                        ConnectivityManager.TYPE_WIFI, "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 fail("negative testUserSummary fails: no exception thrown.");
             } catch (RemoteException e) {
                 fail("testUserSummary fails with exception: " + e.toString());
@@ -224,11 +280,12 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             if (!shouldTestThisNetworkType(i, MINUTE/2)) {
                 continue;
             }
-            setAppOpsMode("allow");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "allow");
             NetworkStats result = null;
             try {
                 result = mNsm.querySummary(
-                        sNetworkTypesToTest[i], "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 assertTrue(result != null);
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                 long totalTxPackets = 0;
@@ -257,10 +314,11 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
                     result.close();
                 }
             }
-            setAppOpsMode("deny");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "deny");
             try {
                 result = mNsm.querySummary(
-                        ConnectivityManager.TYPE_WIFI, "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 fail("negative testAppSummary fails: no exception thrown.");
             } catch (RemoteException e) {
                 fail("testAppSummary fails with exception: " + e.toString());
@@ -276,11 +334,12 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             if (!shouldTestThisNetworkType(i, MINUTE * 120)) {
                 continue;
             }
-            setAppOpsMode("allow");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "allow");
             NetworkStats result = null;
             try {
                 result = mNsm.queryDetails(
-                        sNetworkTypesToTest[i], "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 assertTrue(result != null);
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                 long totalTxPackets = 0;
@@ -310,10 +369,11 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
                     result.close();
                 }
             }
-            setAppOpsMode("deny");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "deny");
             try {
                 result = mNsm.queryDetails(
-                        ConnectivityManager.TYPE_WIFI, "", mStartTime, mEndTime);
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime);
                 fail("negative testAppDetails fails: no exception thrown.");
             } catch (RemoteException e) {
                 fail("testAppDetails fails with exception: " + e.toString());
@@ -329,11 +389,12 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
             if (!shouldTestThisNetworkType(i, MINUTE * 120)) {
                 continue;
             }
-            setAppOpsMode("allow");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "allow");
             NetworkStats result = null;
             try {
                 result = mNsm.queryDetailsForUid(
-                        sNetworkTypesToTest[i], "", mStartTime, mEndTime, Process.myUid());
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime, Process.myUid());
                 assertTrue(result != null);
                 NetworkStats.Bucket bucket = new NetworkStats.Bucket();
                 long totalTxPackets = 0;
@@ -362,10 +423,11 @@ public class NetworkUsageStatsTest extends InstrumentationTestCase {
                     result.close();
                 }
             }
-            setAppOpsMode("deny");
+            setAppOpsMode(AppOpsManager.OPSTR_GET_USAGE_STATS, "deny");
             try {
                 result = mNsm.queryDetailsForUid(
-                        ConnectivityManager.TYPE_WIFI, "", mStartTime, mEndTime, Process.myUid());
+                        sNetworkTypesToTest[i], getSubscriberId(sNetworkTypesToTest[i]),
+                        mStartTime, mEndTime, Process.myUid());
                 fail("negative testUidDetails fails: no exception thrown.");
             } catch (RemoteException e) {
                 fail("testUidDetails fails with exception: " + e.toString());
