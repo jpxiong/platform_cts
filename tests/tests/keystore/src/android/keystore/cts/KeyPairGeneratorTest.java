@@ -872,7 +872,8 @@ public class KeyPairGeneratorTest extends AndroidTestCase {
         assertEquals(keyValidityEndDateForOrigination, keyInfo.getKeyValidityForOriginationEnd());
         assertEquals(keyValidityEndDateForConsumption, keyInfo.getKeyValidityForConsumptionEnd());
 
-        List<String> actualDigests = Arrays.asList(keyInfo.getDigests());
+        List<String> actualDigests =
+	    new ArrayList<String>(Arrays.asList(keyInfo.getDigests()));
         // Keystore may have added DIGEST_NONE, to allow software digesting.
         actualDigests.remove(KeyProperties.DIGEST_NONE);
         TestUtils.assertContentsInAnyOrder(
