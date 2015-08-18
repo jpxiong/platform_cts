@@ -84,6 +84,7 @@ cts_support_packages := \
     CtsWifiConfigCreator \
     CtsDeviceAndProfileOwnerApp \
     CtsDeviceInfo \
+    CtsDeviceOsTestApp \
     CtsDeviceOwnerApp \
     CtsDeviceTaskswitchingAppA \
     CtsDeviceTaskswitchingAppB \
@@ -223,6 +224,7 @@ cts_host_libraries := \
     CtsHostsideNetworkTests \
     CtsHostUi \
     CtsMonkeyTestCases \
+    CtsOsHostTestCases \
     CtsThemeHostTestCases \
     CtsUsageHostTestCases \
     CtsSecurityHostTestCases \
