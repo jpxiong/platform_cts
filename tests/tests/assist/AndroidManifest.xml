@@ -29,6 +29,7 @@
               <action android:name="android.intent.action.TEST_START_ACTIVITY_ASSIST_STRUCTURE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_DISABLE_CONTEXT" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_FLAG_SECURE" />
+              <action android:name="android.intent.action.TEST_START_ACTIVITY_LIFECYCLE" />
               <category android:name="android.intent.category.LAUNCHER" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>

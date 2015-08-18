@@ -21,23 +21,40 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import android.view.WindowManager;
+public class LifecycleActivity extends Activity {
+    private static final String TAG = "LifecycleActivity";
 
-public class SecureActivity extends Activity {
-    static final String TAG = "SecureActivity";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "SecureActivity created");
-        setContentView(R.layout.secure_app);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE);
+        Log.i(TAG, "LifecycleActivity created");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "Activity has resumed");     
-        sendBroadcast(new Intent("android.intent.action.flag_secure_hasResumed"));
+        Log.i(TAG, "Activity has resumed");
+        sendBroadcast(new Intent("android.intent.action.lifecycle_hasResumed"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i(TAG, "activity was paused");
+        sendBroadcast(new Intent("android.intent.action.lifecycle_onpause"));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i(TAG, "activity was stopped");
+        sendBroadcast(new Intent("android.intent.action.lifecycle_onstop"));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i(TAG, "activity was destroyed");
+        sendBroadcast(new Intent("android.intent.action.lifecycle_ondestroy"));
     }
 }

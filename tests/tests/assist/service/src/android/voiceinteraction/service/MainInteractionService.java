@@ -16,8 +16,15 @@
 
 package android.assist.service;
 
+import static android.service.voice.VoiceInteractionSession.SHOW_WITH_ASSIST;
+import static android.service.voice.VoiceInteractionSession.SHOW_WITH_SCREENSHOT;
+
+import android.assist.common.Utils;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionService;
 import android.service.voice.VoiceInteractionSession;
@@ -27,6 +34,7 @@ public class MainInteractionService extends VoiceInteractionService {
     static final String TAG = "MainInteractionService";
     private Intent mIntent;
     private boolean mReady = false;
+    private BroadcastReceiver mBroadcastReceiver;
 
     @Override
     public void onReady() {
@@ -36,7 +44,7 @@ public class MainInteractionService extends VoiceInteractionService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "onStartCommand received");
+        Log.i(TAG, "onStartCommand received - intent: " + intent);
         mIntent = intent;
         maybeStart();
         return START_NOT_STICKY;
@@ -47,14 +55,40 @@ public class MainInteractionService extends VoiceInteractionService {
             Log.wtf(TAG, "Can't start session because either intent is null or onReady() "
                     + "has not been called yet. mIntent = " + mIntent + ", mReady = " + mReady);
         } else {
-            Log.i(TAG, "Yay! about to start session");
             if (isActiveService(this, new ComponentName(this, getClass()))) {
-                showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
-                        VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
+                if (mIntent.getBooleanExtra(Utils.EXTRA_REGISTER_RECEIVER, false)) {
+                    Log.i(TAG, "Registering receiver to start session later");
+                    if (mBroadcastReceiver == null) {
+                        mBroadcastReceiver = new MainInteractionServiceBroadcastReceiver();
+                        registerReceiver(mBroadcastReceiver, 
+                                new IntentFilter(Utils.BROADCAST_INTENT_START_ASSIST));
+                    }
+                    sendBroadcast(new Intent(Utils.ASSIST_RECEIVER_REGISTERED));
+                } else {
+                    Log.i(TAG, "Yay! about to start session");
+                    showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
+                                VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
+                }
             } else {
                 Log.wtf(TAG, "**** Not starting MainInteractionService because" +
                     " it is not set as the current voice interaction service");
             }
+        }
+    }
+
+    private class MainInteractionServiceBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Utils.BROADCAST_INTENT_START_ASSIST)) {
+                showSession(new Bundle(), SHOW_WITH_ASSIST | SHOW_WITH_SCREENSHOT);
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mBroadcastReceiver != null) {
+            unregisterReceiver(mBroadcastReceiver);
         }
     }
 }

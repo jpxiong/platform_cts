@@ -18,13 +18,17 @@ package android.assist.service;
 
 import android.app.assist.AssistContent;
 import android.app.assist.AssistStructure;
+import android.assist.service.R;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
 import java.io.ByteArrayOutputStream;
 
@@ -39,6 +43,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
 
     private boolean hasReceivedAssistData = false;
     private boolean hasReceivedScreenshot = false;
+    private BroadcastReceiver mReceiver;
 
     MainInteractionSession(Context context) {
         super(context);
@@ -48,12 +53,27 @@ public class MainInteractionSession extends VoiceInteractionSession {
     @Override
     public void onCreate() {
         super.onCreate();
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (action.equals(Utils.HIDE_SESSION)) {
+                    hide();
+                }
+            }
+        };
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.HIDE_SESSION);
+        mContext.registerReceiver(mReceiver, filter);
     }
 
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy()");
         super.onDestroy();
+        if (mReceiver != null) {
+            mContext.unregisterReceiver(mReceiver);
+        }
     }
 
     @Override
@@ -113,6 +133,15 @@ public class MainInteractionSession extends VoiceInteractionSession {
             hasReceivedAssistData = false;
             hasReceivedScreenshot = false;
         }
+    }
+
+    @Override
+    public View onCreateContentView() {
+        LayoutInflater f = getLayoutInflater();
+        if (f == null) {
+            Log.wtf(TAG, "layout inflater was null");
+        }
+        return f.inflate(R.layout.assist_layer,null);
     }
 
     class DoneReceiver extends BroadcastReceiver {
