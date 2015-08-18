@@ -21,7 +21,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.test.AndroidTestCase;
 
-public class ClearDeviceOwnerTest extends BaseDeviceAdminTest {
+public class ClearDeviceOwnerTest extends AndroidTestCase {
 
     private DevicePolicyManager mDevicePolicyManager;
 
@@ -30,12 +30,13 @@ public class ClearDeviceOwnerTest extends BaseDeviceAdminTest {
         mDevicePolicyManager = (DevicePolicyManager)
                 mContext.getSystemService(Context.DEVICE_POLICY_SERVICE);
         if (mDevicePolicyManager != null) {
-            removeActiveAdmin(ADMIN_RECEIVER_COMPONENT);
-            if (mDevicePolicyManager.isDeviceOwnerApp(PACKAGE_NAME)) {
-                mDevicePolicyManager.clearDeviceOwnerApp(PACKAGE_NAME);
+            removeActiveAdmin(BaseDeviceAdminTest.ADMIN_RECEIVER_COMPONENT);
+            if (mDevicePolicyManager.isDeviceOwnerApp(BaseDeviceAdminTest.PACKAGE_NAME)) {
+                mDevicePolicyManager.clearDeviceOwnerApp(BaseDeviceAdminTest.PACKAGE_NAME);
             }
-            assertFalse(mDevicePolicyManager.isAdminActive(ADMIN_RECEIVER_COMPONENT));
-            assertFalse(mDevicePolicyManager.isDeviceOwnerApp(PACKAGE_NAME));
+            assertFalse(mDevicePolicyManager.isAdminActive(
+                    BaseDeviceAdminTest.ADMIN_RECEIVER_COMPONENT));
+            assertFalse(mDevicePolicyManager.isDeviceOwnerApp(BaseDeviceAdminTest.PACKAGE_NAME));
         }
 
         super.tearDown();

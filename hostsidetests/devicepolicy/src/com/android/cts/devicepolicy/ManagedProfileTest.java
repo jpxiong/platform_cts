@@ -34,6 +34,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String DEVICE_OWNER_APK = "CtsDeviceOwnerApp.apk";
     private static final String DEVICE_OWNER_ADMIN =
             DEVICE_OWNER_PKG + ".BaseDeviceOwnerTest$BasicAdminReceiver";
+    private static final String DEVICE_OWNER_CLEAR = DEVICE_OWNER_PKG + ".ClearDeviceOwnerTest";
 
     private static final String INTENT_SENDER_PKG = "com.android.cts.intent.sender";
     private static final String INTENT_SENDER_APK = "CtsIntentSenderApp.apk";
@@ -552,17 +553,22 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS, mUserId));
 
         // verify that we can't set a different admin receiver as profile owner
+        installAppAsUser(DEVICE_OWNER_APK, mUserId);
+        assertFalse(setProfileOwner(DEVICE_OWNER_PKG + "/" + DEVICE_OWNER_ADMIN, mUserId));
+    }
+
+    public void testCannotSetDeviceOwnerWhenProfilePresent() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+
         try {
             installApp(DEVICE_OWNER_APK);
             assertFalse(setDeviceOwner(DEVICE_OWNER_PKG + "/" + DEVICE_OWNER_ADMIN));
         } finally {
+            // make sure we clean up in case we succeeded in setting the device owner
+            runDeviceTests(DEVICE_OWNER_PKG, DEVICE_OWNER_CLEAR);
             getDevice().uninstallPackage(DEVICE_OWNER_PKG);
-        }
-    }
-
-    public void testCannotSetDeviceOwnerWhenProfilePresent() throws Exception {
-        if (mHasFeature) {
-            assertFalse(setDeviceOwner(MANAGED_PROFILE_PKG + "/" + ADMIN_RECEIVER_TEST_CLASS));
         }
     }
 
