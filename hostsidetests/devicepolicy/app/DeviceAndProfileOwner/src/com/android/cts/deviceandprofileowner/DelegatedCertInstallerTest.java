@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.cts.managedprofile;
+package com.android.cts.deviceandprofileowner;
 
 import android.app.KeyguardManager;
 import android.app.admin.DevicePolicyManager;
@@ -40,14 +40,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
-import static com.android.cts.managedprofile.BaseManagedProfileTest.ADMIN_RECEIVER_COMPONENT;
-
 /**
  * Exercise delegated cert installer APIs in {@link DevicePolicyManager} by setting the test app
  * (CtsCertInstallerApp) as a delegated cert installer and then asking it to invoke various
  * cert-related APIs. The expected certificate changes are validated both remotely and locally.
  */
-public class DelegatedCertInstallerTest extends AndroidTestCase {
+public class DelegatedCertInstallerTest extends BaseDeviceAdminTest {
 
     private static final String CERT_INSTALLER_PACKAGE = "com.android.cts.certinstaller";
 
@@ -163,12 +161,12 @@ public class DelegatedCertInstallerTest extends AndroidTestCase {
         mReceivedException = null;
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_CERT_OPERATION_DONE);
-        getContext().registerReceiver(receiver, filter);
+        mContext.registerReceiver(receiver, filter);
     }
 
     @Override
     public void tearDown() throws Exception {
-        getContext().unregisterReceiver(receiver);
+        mContext.unregisterReceiver(receiver);
         mDpm.uninstallCaCert(ADMIN_RECEIVER_COMPONENT, TEST_CA.getBytes());
         // Installed private key pair will be removed once the lockscreen password is cleared,
         // which is done in the hostside test.
@@ -246,7 +244,7 @@ public class DelegatedCertInstallerTest extends AndroidTestCase {
         intent.setAction(ACTION_INSTALL_CERT);
         intent.putExtra(EXTRA_CERT_DATA, cert);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        mContext.startActivity(intent);
     }
 
     private void removeCaCert(byte[] cert) {
@@ -254,7 +252,7 @@ public class DelegatedCertInstallerTest extends AndroidTestCase {
         intent.setAction(ACTION_REMOVE_CERT);
         intent.putExtra(EXTRA_CERT_DATA, cert);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        mContext.startActivity(intent);
     }
 
     private void verifyCaCert(byte[] cert) {
@@ -262,7 +260,7 @@ public class DelegatedCertInstallerTest extends AndroidTestCase {
         intent.setAction(ACTION_VERIFY_CERT);
         intent.putExtra(EXTRA_CERT_DATA, cert);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        mContext.startActivity(intent);
     }
 
     private void assertResult(String testName, Boolean expectSuccess) throws InterruptedException {
@@ -288,6 +286,6 @@ public class DelegatedCertInstallerTest extends AndroidTestCase {
         intent.putExtra(EXTRA_KEY_DATA, key);
         intent.putExtra(EXTRA_KEY_ALIAS, alias);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        getContext().startActivity(intent);
+        mContext.startActivity(intent);
     }
 }

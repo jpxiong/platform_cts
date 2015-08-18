@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.cts.managedprofile;
+package com.android.cts.deviceandprofileowner;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
@@ -21,7 +21,8 @@ import android.content.Context;
 import android.test.AndroidTestCase;
 
 /**
- * This test executes helper tasks as active device admin in the primary user.
+ * This test executes helper tasks as active device admin in the primary user. Current tasks are
+ * setting and clearing lockscreen password used by the host side delegated cert installer test.
  */
 public class PrimaryUserAdminHelper extends AndroidTestCase {
 
@@ -47,5 +48,24 @@ public class PrimaryUserAdminHelper extends AndroidTestCase {
             }
         }
         assertFalse(mDpm.isAdminActive(cn));
+    }
+
+    /**
+     * Set lockscreen password.
+     */
+    public void testSetPassword() {
+        // Enable credential storage by setting a nonempty password.
+        assertTrue(mDpm.resetPassword("test", 0));
+    }
+
+    /**
+     * Clear lockscreen password.
+     */
+    public void testClearPassword() {
+        mDpm.setPasswordQuality(PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT,
+                DevicePolicyManager.PASSWORD_QUALITY_UNSPECIFIED);
+        mDpm.setPasswordMinimumLength(
+                PrimaryUserDeviceAdmin.ADMIN_RECEIVER_COMPONENT, 0);
+        assertTrue(mDpm.resetPassword("", 0));
     }
 }

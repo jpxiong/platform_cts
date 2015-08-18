@@ -34,6 +34,9 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
     private static final String SIMPLE_PRE_M_APP_PKG = "com.android.cts.launcherapps.simplepremapp";
     private static final String SIMPLE_PRE_M_APP_APK = "CtsSimplePreMApp.apk";
 
+    private static final String CERT_INSTALLER_PKG = "com.android.cts.certinstaller";
+    private static final String CERT_INSTALLER_APK = "CtsCertInstallerApp.apk";
+
     protected static final int USER_OWNER = 0;
 
     // ID of the user all tests are run as. For device owner this will be 0, for profile owner it
@@ -46,6 +49,7 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
             getDevice().uninstallPackage(DEVICE_ADMIN_PKG);
             getDevice().uninstallPackage(PERMISSIONS_APP_PKG);
             getDevice().uninstallPackage(SIMPLE_PRE_M_APP_PKG);
+            getDevice().uninstallPackage(CERT_INSTALLER_PKG);
         }
         super.tearDown();
     }
@@ -166,6 +170,31 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         }
 
         executeDeviceTestClass(".AccountManagementTest");
+    }
+
+    public void testDelegatedCertInstaller() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+        installAppAsUser(CERT_INSTALLER_APK, mUserId);
+        installAppAsUser(DEVICE_ADMIN_APK, USER_OWNER);
+        setDeviceAdmin(DEVICE_ADMIN_PKG + "/.PrimaryUserDeviceAdmin");
+
+        final String adminHelperClass = ".PrimaryUserAdminHelper";
+        try {
+            // Set a non-empty device lockscreen password, which is a precondition for installing
+            // private key pairs.
+            assertTrue("Set lockscreen password failed", runDeviceTestsAsUser(DEVICE_ADMIN_PKG,
+                    adminHelperClass, "testSetPassword", 0 /* user 0 */));
+            assertTrue("DelegatedCertInstaller failed", runDeviceTestsAsUser(DEVICE_ADMIN_PKG,
+                    ".DelegatedCertInstallerTest", mUserId));
+        } finally {
+            // Reset lockscreen password and remove device admin.
+            assertTrue("Clear lockscreen password failed", runDeviceTestsAsUser(DEVICE_ADMIN_PKG,
+                    adminHelperClass, "testClearPassword", 0 /* user 0 */));
+            assertTrue("Clear device admin failed", runDeviceTestsAsUser(DEVICE_ADMIN_PKG,
+                    adminHelperClass, "testClearDeviceAdmin", 0 /* user 0 */));
+        }
     }
 
     protected void executeDeviceTestClass(String className) throws Exception {

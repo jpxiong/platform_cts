@@ -42,9 +42,6 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String INTENT_RECEIVER_PKG = "com.android.cts.intent.receiver";
     private static final String INTENT_RECEIVER_APK = "CtsIntentReceiverApp.apk";
 
-    private static final String CERT_INSTALLER_PKG = "com.android.cts.certinstaller";
-    private static final String CERT_INSTALLER_APK = "CtsCertInstallerApp.apk";
-
     private static final String WIFI_CONFIG_CREATOR_PKG = "com.android.cts.wificonfigcreator";
     private static final String WIFI_CONFIG_CREATOR_APK = "CtsWifiConfigCreator.apk";
 
@@ -94,7 +91,6 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
             getDevice().uninstallPackage(MANAGED_PROFILE_PKG);
             getDevice().uninstallPackage(INTENT_SENDER_PKG);
             getDevice().uninstallPackage(INTENT_RECEIVER_PKG);
-            getDevice().uninstallPackage(CERT_INSTALLER_PKG);
         }
         super.tearDown();
     }
@@ -523,28 +519,6 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         }
         assertTrue(runDeviceTestsAsUser(MANAGED_PROFILE_PKG, ".ContactsTest",
                 "testSetBluetoothContactSharingDisabled_setterAndGetter", mUserId));
-    }
-
-    public void testDelegatedCertInstaller() throws Exception {
-        if (!mHasFeature) {
-            return;
-        }
-        installApp(CERT_INSTALLER_APK);
-        setDeviceAdmin(MANAGED_PROFILE_PKG + "/.PrimaryUserDeviceAdmin");
-
-        final String adminHelperClass = ".PrimaryUserAdminHelper";
-        try {
-            assertTrue("Set lockscreen password failed", runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-                    adminHelperClass, "testSetPassword", 0 /* user 0 */));
-            assertTrue("DelegatedCertInstaller failed", runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-                    ".DelegatedCertInstallerTest", mUserId));
-        } finally {
-            // Reset lockscreen password and remove device admin.
-            assertTrue("Clear lockscreen password failed", runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-                    adminHelperClass, "testClearPassword", 0 /* user 0 */));
-            assertTrue("Clear device admin failed", runDeviceTestsAsUser(MANAGED_PROFILE_PKG,
-                    adminHelperClass, "testClearDeviceAdmin", 0 /* user 0 */));
-        }
     }
 
     public void testCannotSetProfileOwnerAgain() throws Exception {

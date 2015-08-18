@@ -14,6 +14,7 @@
 -->
 <device-admin xmlns:android="http://schemas.android.com/apk/res/android" android:visible="false">
     <uses-policies>
-         <disable-camera />
+         <reset-password />
+         <limit-password />
     </uses-policies>
 </device-admin>
