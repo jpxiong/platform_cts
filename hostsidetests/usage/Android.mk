@@ -18,8 +18,6 @@ include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
-LOCAL_MODULE_TAGS := optional
-
 # Must match the package name in CtsTestCaseList.mk
 LOCAL_MODULE := CtsUsageHostTestCases
 
@@ -29,4 +27,4 @@ LOCAL_CTS_TEST_PACKAGE := android.host.app.usage
 
 include $(BUILD_CTS_HOST_JAVA_LIBRARY)
 
-include $(call all-subdir-makefiles)
+include $(call all-makefiles-under,$(LOCAL_PATH))
