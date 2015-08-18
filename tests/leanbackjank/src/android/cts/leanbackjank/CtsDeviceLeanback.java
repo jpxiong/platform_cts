@@ -16,6 +16,7 @@ package android.cts.leanbackjank;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.cts.jank.leanback.IntentKeys;
 import android.os.SystemClock;
 import android.support.test.jank.GfxMonitor;
@@ -40,9 +41,30 @@ public class CtsDeviceLeanback extends CtsJankTestBase {
     private final static String JAVA_PACKAGE = "android.cts.jank.leanback.ui";
     private final static String CLASS = JAVA_PACKAGE + ".MainActivity";
 
+    private boolean shouldSkip() {
+	PackageManager packageManager =
+                getInstrumentation().getTargetContext().getPackageManager();
+        if (!packageManager.hasSystemFeature(
+                PackageManager.FEATURE_LEANBACK)) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    protected void runTest() throws Throwable {
+        if (shouldSkip()) {
+            return;
+        }
+        super.runTest();
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        if (shouldSkip()) {
+            return;
+        }
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.setComponent(new ComponentName(APP_PACKAGE, CLASS));
 
