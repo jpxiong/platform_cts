@@ -27,6 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.UserManager;
+import android.os.SystemProperties;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -80,6 +81,9 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
 
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
         addResult(VERSION_SDK, Build.VERSION.SDK);
+        addResult(VERSION_BASE_OS, SystemProperties.get("ro.build.version.base_os", ""));
+        addResult(VERSION_SECURITY_PATCH,
+            SystemProperties.get("ro.build.version.security_patch", ""));
 
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(
