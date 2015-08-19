@@ -24,7 +24,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class DelayedAssistantActivity extends Activity {
-    static final String TAG = "DelatyedAssistantActivity";
+    static final String TAG = "DelayedAssistantActivity";
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

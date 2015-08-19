@@ -22,9 +22,6 @@ import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.Log;
 
-/**
- * TODO(awlee): Change context on/off settings and test
- */
 public class DisableContextActivity extends Activity {
     static final String TAG = "DisableContextActivity";
 
@@ -38,8 +35,8 @@ public class DisableContextActivity extends Activity {
         super.onStart();
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(this, MainInteractionService.class));
+        Log.i(TAG, "Starting service.");
         finish();
-        ComponentName serviceName = startService(intent);
-        Log.i(TAG, "Started service: " + serviceName);
+        startService(intent);
     }
 }

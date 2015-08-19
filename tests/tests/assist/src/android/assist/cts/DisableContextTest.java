@@ -16,7 +16,6 @@
 
 package android.assist.cts;
 
-import android.assist.TestStartActivity;
 import android.assist.common.Utils;
 
 import android.app.Activity;
@@ -31,7 +30,6 @@ import android.cts.util.SystemUtil;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
-import android.util.Log;
 
 import java.lang.Override;
 import java.util.concurrent.CountDownLatch;

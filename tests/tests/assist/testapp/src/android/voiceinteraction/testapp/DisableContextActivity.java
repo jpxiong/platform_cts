@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package android.assist.service;
+package android.assist.testapp;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.Log;
 
-public class AssistStructureActivity extends Activity {
-    static final String TAG = "VoiceInteractionMain";
+public class DisableContextActivity extends Activity {
+    static final String TAG = "TestApp";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG, "TestApp created");
+        setContentView(R.layout.test_app);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Intent intent = new Intent();
-        intent.setComponent(new ComponentName(this, MainInteractionService.class));
-        Log.i(TAG, "Starting service.");
-        finish();
-        startService(intent);
+    public void onResume() {
+        super.onResume();
     }
 }

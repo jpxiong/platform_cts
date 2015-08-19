@@ -23,8 +23,9 @@
 
     <application>
       <uses-library android:name="android.test.runner" />
-      <activity android:name="android.assist.TestStartActivity"
-                android:label="Assist Target">
+      <activity android:name="android.assist.cts.TestStartActivity"
+                android:label="Assist Structure Test App"
+                android:theme="@android:style/Theme.Material.Light">
           <intent-filter>
               <action android:name="android.intent.action.TEST_START_ACTIVITY_ASSIST_STRUCTURE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_DISABLE_CONTEXT" />

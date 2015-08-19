@@ -22,7 +22,7 @@
         <uses-library android:name="android.test.runner" />
 
         <activity android:name="TestApp"
-                android:label="Assist Test App"
+                android:label="Assist Structure Test App"
                 android:theme="@android:style/Theme.Material.Light">
           <intent-filter>
               <action android:name="android.intent.action.TEST_APP_ASSIST_STRUCTURE" />
@@ -30,8 +30,16 @@
               <category android:name="android.intent.category.VOICE" />
           </intent-filter>
         </activity>
+        <activity android:name="DisableContextActivity"
+            android:label="Disable Context Test Activity"
+            android:theme="@android:style/Theme.Material.Light">
+            <intent-filter>
+                <action android:name="android.intent.action.TEST_APP_DISABLE_CONTEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name="SecureActivity"
-                  android:label="Secure Test App"
+                  android:label="Secure Test Activity"
                   android:theme="@android:style/Theme.Material.Light">
             <intent-filter>
                 <action android:name="android.intent.action.TEST_APP_FLAG_SECURE" />

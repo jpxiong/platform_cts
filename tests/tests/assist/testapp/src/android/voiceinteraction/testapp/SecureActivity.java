@@ -16,11 +16,16 @@
 
 package android.assist.testapp;
 
+import android.assist.common.Utils;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 
 public class SecureActivity extends Activity {
@@ -37,7 +42,15 @@ public class SecureActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "Activity has resumed");     
-        sendBroadcast(new Intent("android.intent.action.flag_secure_hasResumed"));
+        Log.i(TAG, "Activity has resumed");
+        final View layout = findViewById(android.R.id.content);
+        ViewTreeObserver vto = layout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                sendBroadcast(new Intent(Utils.FLAG_SECURE_HASRESUMED));
+            }
+        });
     }
 }

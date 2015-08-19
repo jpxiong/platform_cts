@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package android.assist;
+package android.assist.cts;
 
 import android.assist.common.Utils;
 
 import android.app.Activity;
+import android.app.assist.AssistStructure;
+import android.app.assist.AssistStructure.ViewNode;
 import android.content.Intent;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.TextView;
 
 public class TestStartActivity extends Activity {
     static final String TAG = "TestStartActivity";
@@ -31,6 +37,7 @@ public class TestStartActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, " in onCreate");
+        setContentView(R.layout.test_app);
     }
 
     @Override

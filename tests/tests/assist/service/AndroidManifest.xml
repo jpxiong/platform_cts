@@ -31,14 +31,7 @@
               <action android:name="android.service.voice.VoiceInteractionService" />
           </intent-filter>
       </service>
-      <activity android:name=".AssistStructureActivity" >
-          <intent-filter>
-              <action android:name="android.intent.action.START_TEST_ASSIST_STRUCTURE" />
-              <category android:name="android.intent.category.DEFAULT" />
-          </intent-filter>
-      </activity>
-      <activity android:name=".DisableContextActivity"
-                android:label="Disabled Context Activity">
+      <activity android:name=".DisableContextActivity" >
           <intent-filter>
               <action android:name="android.intent.action.START_TEST_DISABLE_CONTEXT" />
               <category android:name="android.intent.category.DEFAULT" />
@@ -47,6 +40,7 @@
       <activity android:name=".DelayedAssistantActivity"
                 android:label="Delay Assistant Start Activity">
           <intent-filter>
+              <action android:name="android.intent.action.START_TEST_ASSIST_STRUCTURE" />
               <action android:name="android.intent.action.START_TEST_LIFECYCLE" />
               <action android:name="android.intent.action.START_TEST_FLAG_SECURE" />
               <category android:name="android.intent.category.DEFAULT" />

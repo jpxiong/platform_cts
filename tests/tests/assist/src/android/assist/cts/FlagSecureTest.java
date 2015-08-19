@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
  * invoked on an app with FLAG_SECURE set.
  */
 public class FlagSecureTest extends AssistTestBase {
-
     static final String TAG = "FlagSecureTest";
 
     private static final String TEST_CASE_TYPE = Utils.FLAG_SECURE;
@@ -78,8 +77,13 @@ public class FlagSecureTest extends AssistTestBase {
     }
 
     public void testSecureActivity() throws Exception {
+        mTestActivity.startTest(TEST_CASE_TYPE);
+        waitForAssistantToBeReady();
+        mTestActivity.start3pApp(TEST_CASE_TYPE);
+        waitForOnResume();
+        startSession();
+        waitForContext();
         verifyAssistDataNullness(false, false, false, false);
-
         // verify that we have only the root window and not its children.
         verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE), true);
     }

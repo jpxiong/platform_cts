@@ -92,7 +92,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
         /*@Nullable*/ AssistContent content) {
         Log.i(TAG, "onHandleAssist");
         Log.i(TAG,
-            String.format("Bundle: %s, Structure: %s, Content: %s", data, structure, content));
+                String.format("Bundle: %s, Structure: %s, Content: %s", data, structure, content));
         super.onHandleAssist(data, structure, content);
 
         // send to test to verify that this is accurate.

@@ -51,7 +51,7 @@ public class MainInteractionService extends VoiceInteractionService {
     }
 
     private void maybeStart() {
-       if (mIntent == null || !mReady) {
+        if (mIntent == null || !mReady) {
             Log.wtf(TAG, "Can't start session because either intent is null or onReady() "
                     + "has not been called yet. mIntent = " + mIntent + ", mReady = " + mReady);
         } else {
@@ -60,18 +60,18 @@ public class MainInteractionService extends VoiceInteractionService {
                     Log.i(TAG, "Registering receiver to start session later");
                     if (mBroadcastReceiver == null) {
                         mBroadcastReceiver = new MainInteractionServiceBroadcastReceiver();
-                        registerReceiver(mBroadcastReceiver, 
+                        registerReceiver(mBroadcastReceiver,
                                 new IntentFilter(Utils.BROADCAST_INTENT_START_ASSIST));
                     }
                     sendBroadcast(new Intent(Utils.ASSIST_RECEIVER_REGISTERED));
-                } else {
-                    Log.i(TAG, "Yay! about to start session");
-                    showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
-                                VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
-                }
+              } else {
+                  Log.i(TAG, "Yay! about to start session");
+                  showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
+                          VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
+              }
             } else {
                 Log.wtf(TAG, "**** Not starting MainInteractionService because" +
-                    " it is not set as the current voice interaction service");
+                        " it is not set as the current voice interaction service");
             }
         }
     }
@@ -79,6 +79,7 @@ public class MainInteractionService extends VoiceInteractionService {
     private class MainInteractionServiceBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
+            Log.i(MainInteractionService.TAG, "Recieved broadcast to start session now.");
             if (intent.getAction().equals(Utils.BROADCAST_INTENT_START_ASSIST)) {
                 showSession(new Bundle(), SHOW_WITH_ASSIST | SHOW_WITH_SCREENSHOT);
             }

@@ -16,25 +16,41 @@
 
 package android.assist.testapp;
 
+import android.assist.common.Utils;
+
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+
+import java.lang.Override;
 
 public class TestApp extends Activity {
     static final String TAG = "TestApp";
 
-    Bundle mTestinfo = new Bundle();
-    Bundle mTotalInfo = new Bundle();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "TestApp created");
-        getLayoutInflater().inflate(R.layout.test_app, null);
+        setContentView(R.layout.test_app);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.i(TAG, "TestApp has resumed");
+        final View layout = findViewById(android.R.id.content);
+        ViewTreeObserver vto = layout.getViewTreeObserver();
+        vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                sendBroadcast(new Intent(Utils.ASSIST_STRUCTURE_HASRESUMED));
+            }
+        });
     }
 }

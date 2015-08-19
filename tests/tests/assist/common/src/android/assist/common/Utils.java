@@ -46,9 +46,11 @@ public class Utils {
 
     /** Flag Secure Test intent constants */
     public static final String FLAG_SECURE_HASRESUMED = ACTION_PREFIX + "flag_secure_hasResumed";
+    public static final String ASSIST_STRUCTURE_HASRESUMED = ACTION_PREFIX
+            + "assist_structure_hasResumed";
 
     /** Two second timeout for getting back assist context */
-    public static final int TIMEOUT_MS = 2 * 1000; // TODO(awlee): what is the timeout
+    public static final int TIMEOUT_MS = 2 * 1000;
     public static final int ACTIVITY_ONRESUME_TIMEOUT_MS = 4000;
     public static final String EXTRA_REGISTER_RECEIVER = "register_receiver";
 
@@ -66,10 +68,9 @@ public class Utils {
      */
     public static final String getTestActivity(String testCaseType) {
         switch (testCaseType) {
-            case ASSIST_STRUCTURE:
-                return "service.AssistStructureActivity";
             case DISABLE_CONTEXT:
                 return "service.DisableContextActivity";
+            case ASSIST_STRUCTURE:
             case FLAG_SECURE:
             case LIFECYCLE:
                 return "service.DelayedAssistantActivity";
@@ -84,9 +85,11 @@ public class Utils {
     public static final ComponentName getTestAppComponent(String testCaseType) {
         switch (testCaseType) {
             case ASSIST_STRUCTURE:
-            case DISABLE_CONTEXT:
                 return new ComponentName(
                         "android.assist.testapp", "android.assist.testapp.TestApp");
+            case DISABLE_CONTEXT:
+                return new ComponentName(
+                        "android.assist.testapp", "android.assist.testapp.DisableContextActivity");
             case FLAG_SECURE:
                 return new ComponentName(
                         "android.assist.testapp", "android.assist.testapp.SecureActivity");

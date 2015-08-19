@@ -16,7 +16,7 @@
 
 package android.assist.cts;
 
-import android.assist.TestStartActivity;
+import android.assist.cts.TestStartActivity;
 import android.assist.common.Utils;
 
 import android.app.Activity;
