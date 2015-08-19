@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.XmlResourceParser;
+import android.cts.util.SystemUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -58,10 +59,10 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected void setUp() throws Exception {
         super.setUp();
         mContext = getInstrumentation().getTargetContext();
-        assertEquals("1", Settings.Secure.getString(
-            mContext.getContentResolver(), "assist_structure_enabled"));
-        assertEquals("1", Settings.Secure.getString(
-            mContext.getContentResolver(), "assist_screenshot_enabled"));
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_structure_enabled 1");
+        SystemUtil.runShellCommand(getInstrumentation(),
+            "settings put secure assist_screenshot_enabled 1");
         logContextAndScreenshotSetting();
     }
 
