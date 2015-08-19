@@ -25,6 +25,7 @@ import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -37,10 +38,85 @@ import java.util.regex.Pattern;
  * Test to check that atrace is usable, to enable usage of systrace.
  */
 public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
-    private static final String TAG = "AtraceHostTest";
-
     private static final String TEST_APK = "CtsAtraceTestApp.apk";
     private static final String TEST_PKG = "com.android.cts.atracetestapp";
+
+    private interface FtraceEntryCallback {
+        void onTraceEntry(String threadName, int pid, int tid, String eventType, String args);
+        void onFinished();
+    }
+
+    /**
+     * Helper for parsing ftrace data.
+     * Regexs copied from (and should be kept in sync with) ftrace importer in catapult.
+     */
+    private static class FtraceParser {
+        // Matches the trace record in 3.2 and later with the print-tgid option:
+        //          <idle>-0    0 [001] d...  1.23: sched_switch
+        private static final Pattern sLineWithTgid = Pattern.compile(
+                "^\\s*(.+)-(\\d+)\\s+\\(\\s*(\\d+|-+)\\)\\s\\[(\\d+)\\]"
+                + "\\s+[dX.][N.][Hhs.][0-9a-f.]"
+                + "\\s+(\\d+\\.\\d+):\\s+(\\S+):\\s(.*)");
+
+        // Matches the default trace record in 3.2 and later (includes irq-info):
+        //          <idle>-0     [001] d...  1.23: sched_switch
+        private static final Pattern sLineWithIrqInfo = Pattern.compile(
+                "^\\s*(.+)-(\\d+)\\s+\\[(\\d+)\\]"
+                + "\\s+[dX.][N.][Hhs.][0-9a-f.]"
+                + "\\s+(\\d+\\.\\d+):\\s+(\\S+):\\s(.*)$");
+
+        // Matches the default trace record pre-3.2:
+        //          <idle>-0     [001]  1.23: sched_switch
+        private static final Pattern sLineLegacy = Pattern.compile(
+                "^\\s*(.+)-(\\d+)\\s+\\[(\\d+)\\]\\s*(\\d+\\.\\d+):\\s+(\\S+):\\s(.*)");
+        private static void parseLine(String line, FtraceEntryCallback callback) {
+            Matcher m = sLineWithTgid.matcher(line);
+            if (m.matches()) {
+                callback.onTraceEntry(
+                        /*threadname*/ m.group(1),
+                        /*pid*/ m.group(3).startsWith("-") ? -1 : Integer.parseInt(m.group(3)),
+                        /*tid*/ Integer.parseInt(m.group(2)),
+                        /*eventName*/ m.group(6),
+                        /*details*/ m.group(7));
+                return;
+            }
+
+            m = sLineWithIrqInfo.matcher(line);
+            if (m.matches()) {
+                callback.onTraceEntry(
+                        /*threadname*/ m.group(1),
+                        /*pid*/ -1,
+                        /*tid*/ Integer.parseInt(m.group(2)),
+                        /*eventName*/ m.group(5),
+                        /*details*/ m.group(6));
+                return;
+            }
+
+            m = sLineLegacy.matcher(line);
+            if (m.matches()) {
+                callback.onTraceEntry(
+                        /*threadname*/ m.group(1),
+                        /*pid*/ -1,
+                        /*tid*/ Integer.parseInt(m.group(2)),
+                        /*eventName*/ m.group(5),
+                        /*details*/ m.group(6));
+                return;
+            }
+            System.err.println("line doesn't match: " + line);
+        }
+
+        private static void parse(Reader reader, FtraceEntryCallback callback) throws Exception {
+            try {
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    FtraceParser.parseLine(line, callback);
+                }
+            } finally {
+                callback.onFinished();
+            }
+        }
+    }
 
     private CtsBuildHelper mCtsBuild;
 
@@ -109,15 +185,12 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
 
         if (!requiredCategories.isEmpty()) {
             for (String missingCategory : requiredCategories) {
-                Log.d(TAG, "missing category: " + missingCategory);
+                System.err.println("missing category: " + missingCategory);
             }
             fail("Expected categories missing from atrace");
         }
     }
 
-
-    private static final String TRACE_MARKER_REGEX =
-            "\\s*(\\S+)-(\\d+)\\s+\\(\\s*(\\d+)\\).*tracing_mark_write:\\s*(B|E)(.*)";
     /**
      * Tests that atrace captures app launch, including app level tracing
      */
@@ -131,20 +204,20 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
             File testAppFile = mCtsBuild.getTestApp(TEST_APK);
             String installResult = getDevice().installPackage(testAppFile, false);
             assertNull(
-                    String.format("failed to install simple app. Reason: %s", installResult),
+                    String.format("failed to install atrace test app. Reason: %s", installResult),
                     installResult);
 
             // capture a launch of the app with async tracing
             String atraceArgs = "-a " + TEST_PKG + " -c -b 16000 view"; // TODO: zipping
             getDevice().executeShellCommand("atrace --async_stop " + atraceArgs);
             getDevice().executeShellCommand("atrace --async_start " + atraceArgs);
-            String start = getDevice().executeShellCommand("am start " + TEST_PKG);
+            getDevice().executeShellCommand("am start " + TEST_PKG);
             getDevice().executeShellCommand("sleep 1");
-            atraceOutput = getDevice().executeShellCommand("atrace --async_dump " + atraceArgs);
+            atraceOutput = getDevice().executeShellCommand("atrace --async_stop " + atraceArgs);
         } finally {
+            assertNotNull("unable to capture atrace output", atraceOutput);
             getDevice().uninstallPackage(TEST_PKG);
         }
-        assertNotNull(atraceOutput);
 
 
         // now parse the trace data (see external/chromium-trace/systrace.py)
@@ -153,81 +226,64 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
         assertTrue(dataStart >= 0);
         String traceData = atraceOutput.substring(dataStart + MARKER.length());
 
-        /**
-         * Pattern that matches standard begin/end userspace tracing.
-         *
-         * Groups are:
-         * 1 - truncated thread name
-         * 2 - tid
-         * 3 - pid
-         * 4 - B/E
-         * 5 - ignored, for grouping
-         * 6 - if B, section title, else null
-         */
-        final Pattern beginEndPattern = Pattern.compile(
-                "\\s*(\\S+)-(\\d+)\\s+\\(\\s*(\\d+)\\).*tracing_mark_write:\\s*(B|E)(\\|\\d+\\|(.+))?");
+        FtraceEntryCallback callback = new FtraceEntryCallback() {
+            private int matches = 0;
+            private int nextSectionIndex = 0;
+            private int appPid = -1;
 
-        int appPid = -1;
-        String line;
+            // list of tags expected to be seen on app launch, in order.
+            private final String[] requiredSectionList = {
+                    "traceable-app-test-section",
+                    "inflate",
+                    "Choreographer#doFrame",
+                    "traversal",
+                    "measure",
+                    "layout",
+                    "draw",
+                    "Record View#draw()"
+            };
 
-        // list of tags expected to be seen on app launch, in order.
-        String[] requiredSectionList = {
-                "traceable-app-test-section",
-                "inflate",
-                "performTraversals",
-                "measure",
-                "layout",
-                "draw",
-                "Record View#draw()"
-        };
-        int nextSectionIndex = 0;
-        int matches = 0;
-        try (BufferedReader reader = new BufferedReader(new StringReader(traceData))) {
-            while ((line = reader.readLine()) != null) {
-                Matcher matcher = beginEndPattern.matcher(line);
-                if (matcher.find()) {
+            @Override
+            public void onTraceEntry(String truncatedThreadName, int pid, int tid,
+                    String eventName, String details) {
+                if (!"tracing_mark_write".equals(eventName)) {
+                    // not userspace trace, ignore
+                    return;
+                }
+
+                matches++;
+                assertNotNull(truncatedThreadName);
+                assertTrue(tid > 0);
+                if (TEST_PKG.endsWith(truncatedThreadName)) {
                     matches++;
 
-                    String truncatedThreadName = matcher.group(1);
-                    assertNotNull(truncatedThreadName);
-
-                    int tid = assertInt(matcher.group(2));
-                    assertTrue(tid > 0);
-                    int pid = assertInt(matcher.group(3));
-                    assertTrue(pid > 0);
-
-                    if (TEST_PKG.endsWith(truncatedThreadName)) {
-                        // should be something like "s.aptracetestapp" since beginning may be truncated
+                    if (pid >= 0) {
+                        // verify pid, if present
                         if (appPid == -1) {
                             appPid = pid;
                         } else {
                             assertEquals(appPid, pid);
                         }
+                    }
 
-                        if ("B".equals(matcher.group(4))) {
-                            String sectionTitle = matcher.group(6);
-                            if (nextSectionIndex < requiredSectionList.length
-                                    && requiredSectionList[nextSectionIndex].equals(sectionTitle)) {
-                                nextSectionIndex++;
-                            }
-                        }
+                    if (nextSectionIndex < requiredSectionList.length
+                            && details != null
+                            && details.startsWith("B|")
+                            && details.endsWith("|" + requiredSectionList[nextSectionIndex])) {
+                        nextSectionIndex++;
                     }
                 }
             }
-        }
-        assertTrue("Unable to parse any userspace sections from atrace output",
-                matches != 0);
-        assertEquals("Didn't see required list of traced sections, in order",
-                requiredSectionList.length, nextSectionIndex);
-    }
 
-    private static int assertInt(String input) {
-        try {
-            return Integer.parseInt(input);
-        } catch (NumberFormatException e) {
-            fail("Expected an integer but found \"" + input + "\"");
-            // Won't be hit, above throws AssertException
-            return -1;
-        }
+            @Override
+            public void onFinished() {
+                assertTrue("Unable to parse any userspace sections from atrace output",
+                        matches != 0);
+                assertEquals("Didn't see required list of traced sections, in order",
+                        requiredSectionList.length, nextSectionIndex);
+            }
+        };
+
+        FtraceParser.parse(new StringReader(traceData), callback);
     }
 }
