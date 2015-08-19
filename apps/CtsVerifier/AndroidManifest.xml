@@ -363,6 +363,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_security" />
             <meta-data android:name="test_excluded_features"
                        android:value="android.hardware.type.television:android.software.leanback:android.hardware.type.watch" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.fingerprint" />
         </activity>
         <activity android:name=".security.ScreenLockBoundKeysTest"
                 android:label="@string/sec_lock_bound_key_test"
