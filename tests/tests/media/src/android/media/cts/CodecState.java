@@ -330,6 +330,7 @@ public class CodecState {
             buffer.clear();
             ByteBuffer audioBuffer = ByteBuffer.allocate(buffer.remaining());
             audioBuffer.put(buffer);
+            audioBuffer.clear();
 
             mAudioTrack.write(audioBuffer, info.size, info.presentationTimeUs*1000);
 
