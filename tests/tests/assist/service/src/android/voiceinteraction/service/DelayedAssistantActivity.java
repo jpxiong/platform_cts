@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 The Android Open Source Project
+ * Copyright (C) 2014 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package android.assist.testapp;
+package android.assist.service;
 
 import android.app.Activity;
+import android.assist.common.Utils;
 import android.content.Intent;
+import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.Log;
 
-import android.view.WindowManager;
+public class DelayedAssistantActivity extends Activity {
+    static final String TAG = "DelatyedAssistantActivity";
 
-public class SecureActivity extends Activity {
-    static final String TAG = "SecureActivity";
-    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "SecureActivity created");
-        setContentView(R.layout.secure_app);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i(TAG, "Activity has resumed");     
-        sendBroadcast(new Intent("android.intent.action.flag_secure_hasResumed"));
+        Intent intent = new Intent();
+        intent.setComponent(new ComponentName(this, MainInteractionService.class));
+        intent.putExtra(Utils.EXTRA_REGISTER_RECEIVER, true);
+        finish();
+        ComponentName serviceName = startService(intent);
+        Log.i(TAG, "Started service: " + serviceName);
     }
 }

@@ -48,7 +48,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected BroadcastReceiver mReceiver;
     protected Bundle mAssistBundle;
     protected Context mContext;
-    protected CountDownLatch mLatch;
+    protected CountDownLatch mLatch, mAssistantReadyLatch;
     private String mTestName;
 
     public AssistTestBase() {
@@ -58,6 +58,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+        mAssistantReadyLatch = new CountDownLatch(1);
         mContext = getInstrumentation().getTargetContext();
         SystemUtil.runShellCommand(getInstrumentation(),
             "settings put secure assist_structure_enabled 1");
@@ -71,6 +72,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         mContext.unregisterReceiver(mReceiver);
         mTestActivity.finish();
         super.tearDown();
+        mContext.sendBroadcast(new Intent(Utils.HIDE_SESSION));
     }
 
     protected void startTestActivity(String testName) {
@@ -84,9 +86,32 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     }
 
     /**
+     * Called when waiting for Assistant's Broadcast Receiver to be setup
+     */
+    public void waitForAssistantToBeReady() throws Exception {
+        Log.i(TAG, "waiting for assistant to be ready before continuing");
+        if (!mAssistantReadyLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+            fail("Assistant was not ready before timeout of: " + Utils.TIMEOUT_MS + "msec");
+        }
+    }
+
+    /**
+     * Send broadcast to MainInteractionService to start a session
+     */
+    protected void startSession() {
+        mContext.sendBroadcast(new Intent(Utils.BROADCAST_INTENT_START_ASSIST));
+    }
+
+    /**
      * Called after startTestActivity
      */
     protected boolean waitForBroadcast() throws Exception {
+        mTestActivity.start3pApp(mTestName);
+        mTestActivity.startTest(mTestName);
+        return waitForContext();
+    }
+
+    protected boolean waitForContext() throws Exception {
         mLatch = new CountDownLatch(1);
         if (mReceiver != null) {
             mContext.unregisterReceiver(mReceiver);
@@ -95,8 +120,6 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         mContext.registerReceiver(mReceiver,
             new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
 
-        mTestActivity.start3pApp(mTestName);
-        mTestActivity.startTest(mTestName);
         if (!mLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             fail("Failed to receive broadcast in " + Utils.TIMEOUT_MS + "msec");
             return false;
