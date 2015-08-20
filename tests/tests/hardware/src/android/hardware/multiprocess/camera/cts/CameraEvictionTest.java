@@ -16,6 +16,7 @@
 
 package android.hardware.multiprocess.camera.cts;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
@@ -112,7 +113,8 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
         super.setUp();
 
         mCompleted = false;
-        mContext = getActivity();
+        getActivity();
+        mContext = getInstrumentation().getTargetContext();
         System.setProperty("dexmaker.dexcache", mContext.getCacheDir().toString());
         mActivityManager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
         mErrorServiceConnection = new ErrorLoggingService.ErrorServiceConnection(mContext);
@@ -232,6 +234,7 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
         assertTrue("Remote camera service exited early", timeoutExceptionHit);
         android.os.Process.killProcess(mProcessPid);
         mProcessPid = -1;
+        forceCtsActivityToTop();
     }
 
     /**
@@ -337,6 +340,19 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
         assertTrue("Remote camera service exited early", timeoutExceptionHit);
         android.os.Process.killProcess(mProcessPid);
         mProcessPid = -1;
+        forceCtsActivityToTop();
+    }
+
+    /**
+     * Ensure the CTS activity becomes foreground again instead of launcher.
+     */
+    private void forceCtsActivityToTop() throws InterruptedException {
+        Thread.sleep(WAIT_TIME);
+        Activity a = getActivity();
+        Intent activityIntent = new Intent(a, CameraCtsActivity.class);
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        a.startActivity(activityIntent);
+        Thread.sleep(WAIT_TIME);
     }
 
     /**
@@ -389,15 +405,15 @@ public class CameraEvictionTest extends ActivityInstrumentationTestCase2<CameraC
     public void startRemoteProcess(java.lang.Class<?> klass, String processName)
             throws InterruptedException {
         // Ensure no running activity process with same name
-        String cameraActivityName = mContext.getPackageName() + ":" + processName;
+        Activity a = getActivity();
+        String cameraActivityName = a.getPackageName() + ":" + processName;
         List<ActivityManager.RunningAppProcessInfo> list =
                 mActivityManager.getRunningAppProcesses();
         assertEquals(-1, getPid(cameraActivityName, list));
 
         // Start activity in a new top foreground process
-        Intent activityIntent = new Intent(mContext, klass);
-        activityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(activityIntent);
+        Intent activityIntent = new Intent(a, klass);
+        a.startActivity(activityIntent);
         Thread.sleep(WAIT_TIME);
 
         // Fail if activity isn't running
