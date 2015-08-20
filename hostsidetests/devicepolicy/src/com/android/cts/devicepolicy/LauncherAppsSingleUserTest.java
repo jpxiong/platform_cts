@@ -24,8 +24,10 @@ import com.android.tradefed.log.LogUtil.CLog;
  * Set of tests for LauncherApps with managed profiles.
  */
 public class LauncherAppsSingleUserTest extends BaseLauncherAppsTest {
+    private static final String FEATURE_LIVE_TV = "android.software.live_tv";
 
     private boolean mHasLauncherApps;
+    private boolean mHasLiveTvFeature;
 
     @Override
     protected void setUp() throws Exception {
@@ -35,6 +37,8 @@ public class LauncherAppsSingleUserTest extends BaseLauncherAppsTest {
         if (mHasLauncherApps) {
             installTestApps();
         }
+
+        mHasLiveTvFeature = hasDeviceFeature(FEATURE_LIVE_TV);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class LauncherAppsSingleUserTest extends BaseLauncherAppsTest {
     }
 
     public void testLauncherCallbackPackageChangedMainUser() throws Exception {
-        if (!mHasLauncherApps) {
+        if (!mHasLauncherApps || mHasLiveTvFeature) {
             return;
         }
         installApp(SIMPLE_APP_APK);
@@ -114,7 +118,7 @@ public class LauncherAppsSingleUserTest extends BaseLauncherAppsTest {
     }
 
     public void testLauncherNonExportedAppFails() throws Exception {
-        if (!mHasLauncherApps) {
+        if (!mHasLauncherApps || mHasLiveTvFeature) {
             return;
         }
         installApp(SIMPLE_APP_APK);
