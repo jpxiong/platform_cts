@@ -371,11 +371,11 @@ public class FileSystemPermissionTest extends AndroidTestCase {
         if (!arch.contains("arm") ||
             Integer.parseInt(osVersion[0]) < 2 ||
             (Integer.parseInt(osVersion[0]) == 3 &&
-             Integer.parseInt(osVersion[1]) < 10) ||
-             flavor.contains("sprout") || flavor.contains("sprout_b"))
+             Integer.parseInt(osVersion[1]) < 10))
             return;
         final File f = new File("/proc/device-tree/cpus");
-        assertTrue(f.exists());
+        if (!f.exists())
+            return;
         String[] dir = f.list(new FilenameFilter() {
             @Override
             public boolean accept(File pathname, String name) {
