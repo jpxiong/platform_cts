@@ -25,8 +25,8 @@
 
     <android.view.cts.MockView
         android:id="@+id/mock_view"
-        android:layout_width="100dp"
-        android:layout_height="200dp"/>
+        android:layout_width="100px"
+        android:layout_height="200px"/>
 
     <android.view.cts.MockView
         android:id="@+id/scroll_view"
