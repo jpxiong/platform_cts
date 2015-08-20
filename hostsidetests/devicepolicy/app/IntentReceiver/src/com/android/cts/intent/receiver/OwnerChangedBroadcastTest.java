@@ -61,7 +61,8 @@ public class OwnerChangedBroadcastTest extends InstrumentationTestCase {
             // Otherwise, we'll wait until we receive it.
             return;
         }
-        assertTrue(mPreferenceChanged.tryAcquire(40, TimeUnit.SECONDS));
+        // We're relying on background broadcast intents, which can take a long time.
+        assertTrue(mPreferenceChanged.tryAcquire(2, TimeUnit.MINUTES));
         assertTrue(mPreferences.getBoolean(
                 BroadcastIntentReceiver.OWNER_CHANGED_BROADCAST_RECEIVED_KEY, false));
     }
