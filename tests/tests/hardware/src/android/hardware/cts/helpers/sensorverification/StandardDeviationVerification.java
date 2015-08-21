@@ -66,23 +66,31 @@ public class StandardDeviationVerification extends AbstractSensorVerification {
      */
     public static StandardDeviationVerification getDefault(TestSensorEnvironment environment) {
         int sensorType = environment.getSensor().getType();
+        float mGraceFactorAccelGyro = 2.0f;
+        float mGraceFactorMagPressure = 4.0f;
+        float mMaxBandWidth = (float) environment.getFrequencyHz();
+        float mAccelNoise = (float)(mGraceFactorAccelGyro * Math.sqrt(mMaxBandWidth) * (9.81 * 0.0004));
+        float mGyroNoise = (float)(mGraceFactorAccelGyro * Math.sqrt(mMaxBandWidth) * (Math.PI/180.0 * 0.014));
+        float mMagNoise = (float)((mGraceFactorMagPressure) * 0.5); // Allow extra grace for mag
+        float mPressureNoise = (float)(mGraceFactorMagPressure * 0.02 * (float)Math.sqrt(mMaxBandWidth)); // Allow extra grace for pressure
+
         if (!DEFAULTS.containsKey(sensorType)) {
             return null;
         }
+
         boolean hasHifiSensors = environment.getContext().getPackageManager().hasSystemFeature(
                 PackageManager.FEATURE_HIFI_SENSORS);
 
         if (hasHifiSensors) {
-            // Max accelerometer deviation: 400uG/√Hz
-            DEFAULTS.put(Sensor.TYPE_ACCELEROMETER, new float[]{0.004f, 0.004f, 0.004f});
+
+            DEFAULTS.put(Sensor.TYPE_ACCELEROMETER, new float[]{mAccelNoise, mAccelNoise, mAccelNoise});
             // Max gyro deviation: 0.014°/s/√Hz
-            float deviationInRadians = (float) (0.014f * (Math.PI / 180));
             DEFAULTS.put(Sensor.TYPE_GYROSCOPE,
-                    new float[]{deviationInRadians,deviationInRadians, deviationInRadians});
+                    new float[]{mGyroNoise, mGyroNoise, mGyroNoise});
             // Max magnetometer deviation: 0.1uT/√Hz
-            DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD, new float[]{0.1f, 0.1f, 0.1f});
+            DEFAULTS.put(Sensor.TYPE_MAGNETIC_FIELD, new float[]{mMagNoise, mMagNoise, mMagNoise});
             // Max pressure deviation: 2Pa/√Hz
-            DEFAULTS.put(Sensor.TYPE_PRESSURE, new float[]{2.0f, 2.0f, 2.0f});
+            DEFAULTS.put(Sensor.TYPE_PRESSURE, new float[]{mPressureNoise,mPressureNoise,mPressureNoise});
         }
         return new StandardDeviationVerification(DEFAULTS.get(sensorType));
     }
