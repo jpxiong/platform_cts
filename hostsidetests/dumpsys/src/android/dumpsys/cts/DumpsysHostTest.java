@@ -349,7 +349,12 @@ public class DumpsysHostTest extends DeviceTestCase {
                     continue;
                 }
 
-                String[] parts = line.split(",");
+
+                // With a default limit of 0, empty strings at the end are discarded.
+                // We still consider the empty string as a valid value in some cases.
+                // Using any negative number for the limit will preserve a trailing empty string.
+                // @see String#split(String, int)
+                String[] parts = line.split(",", -1);
                 assertInteger(parts[0]); // old version
                 assertInteger(parts[1]); // UID
                 switch (parts[2]) { // aggregation type
