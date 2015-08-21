@@ -1529,6 +1529,10 @@ You should be prompted to select credentials; choose the ones you just installed
         - Both Personal and Work categories exist.\n
         - \"Remove work profile\" exists under the Work category.\n
         \n
+        Furthermore, hit the action overflow button (3 dots) and verify that:\n
+        - There are two auto-sync options present, one for personal and one for work data.\n
+        - De-selecting either option prompts a warning dialog.\n
+        \n
         Use the Back button to return to this page.
     </string>
     <string name="provisioning_byod_admin_visible_instruction">
