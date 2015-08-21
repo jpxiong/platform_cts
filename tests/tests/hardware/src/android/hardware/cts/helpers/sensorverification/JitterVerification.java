@@ -44,7 +44,8 @@ public class JitterVerification extends AbstractSensorVerification {
     // sensorType: threshold (% of expected period)
     private static final SparseIntArray DEFAULTS = new SparseIntArray(12);
     // Max allowed jitter (in percentage).
-    private static final int THRESHOLD_PERCENT_FOR_HIFI_SENSORS = 1;
+    private static final int GRACE_FACTOR = 2;
+    private static final int THRESHOLD_PERCENT_FOR_HIFI_SENSORS = 1 * GRACE_FACTOR;
     static {
         // Use a method so that the @deprecation warning can be set for that method only
         setDefaults();
