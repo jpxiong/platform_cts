@@ -619,8 +619,8 @@ public class Camera2SurfaceViewTestCase extends
                 mPreviewSize.getHeight());
         assertTrue("wait for surface change to " + mPreviewSize.toString() + " timed out", res);
         mPreviewSurface = holder.getSurface();
-        assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
         assertNotNull("Preview surface is null", mPreviewSurface);
+        assertTrue("Preview surface is invalid", mPreviewSurface.isValid());
     }
 
     /**
