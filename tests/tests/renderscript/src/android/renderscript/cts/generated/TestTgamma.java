@@ -40,7 +40,7 @@ public class TestTgamma extends RSBaseCompute {
     }
 
     private void checkTgammaFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5c02c6a0eda55486l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xeda55486l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testTgammaFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestTgamma extends RSBaseCompute {
     }
 
     private void checkTgammaFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8fe7559b3399bcbal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3399bcbal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testTgammaFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestTgamma extends RSBaseCompute {
     }
 
     private void checkTgammaFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8fe91eb629b4dd98l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x29b4dd98l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testTgammaFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestTgamma extends RSBaseCompute {
     }
 
     private void checkTgammaFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8feae7d11fcffe76l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1fcffe76l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testTgammaFloat4Float4(inV, out);

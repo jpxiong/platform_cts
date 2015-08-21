@@ -42,9 +42,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloatFloatFloatFloat() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7e886d7cc83c447dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdcebf6f230234027l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdcebf6e6c180322dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc83c447dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x30234027l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc180322dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -118,9 +118,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat2Float2Float2Float2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xa0d28bf142b07a5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb4e5c5f6ea8fc01fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb4e5c5eb7becb225l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x142b07a5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xea8fc01fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7becb225l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -194,9 +194,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat3Float3Float3Float3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd3716a4730ad7481l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc0d239a53946aa73l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc0d23999caa39c79l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x30ad7481l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3946aa73l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xcaa39c79l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -270,9 +270,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat4Float4Float4Float4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9cd5abcf4d2fe15dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xccbead5387fd94c7l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xccbead48195a86cdl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4d2fe15dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x87fd94c7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x195a86cdl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -346,9 +346,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat2FloatFloatFloat2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x71623fb3f1fca1a1l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x148e792e1a6253d3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x148e7922abbf45d9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf1fca1a1l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1a6253d3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xabbf45d9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -422,9 +422,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat3FloatFloatFloat3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc06893ff6ab8cf27l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1f4444b84d90bbc5l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x1f4444acdeedadcbl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6ab8cf27l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4d90bbc5l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdeedadcbl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -498,9 +498,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampFloat4FloatFloatFloat4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf6ee84ae374fcadl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x29fa104280bf23b7l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x29fa1037121c15bdl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe374fcadl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x80bf23b7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x121c15bdl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
@@ -581,9 +581,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampCharCharCharChar() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xaec8640bb673cf75l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x6379f7c3c505c8fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x6379f70cdad4e95l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xb673cf75l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x3c505c8fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xcdad4e95l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
@@ -656,9 +656,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar2Char2Char2Char2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xa209cfe6c3feb45dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xed63d0ab3442bdc7l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xed63d09fc59fafcdl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xc3feb45dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x3442bdc7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xc59fafcdl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
@@ -731,9 +731,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar3Char3Char3Char3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xfab6edb7b9d3b0a5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x7ae6f958470ecb1fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x7ae6f94cd86bbd25l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xb9d3b0a5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x470ecb1fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xd86bbd25l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
@@ -806,9 +806,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar4Char4Char4Char4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x53640b88afa8acedl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x86a220559dad877l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x86a21f9eb37ca7dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xafa8acedl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x59dad877l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xeb37ca7dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
@@ -888,9 +888,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUcharUcharUcharUchar() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x680c818a4447655l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xae40bae375336f2fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xae40bad806906135l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xa4447655l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x75336f2fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x6906135l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
@@ -963,9 +963,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar2Uchar2Uchar2Uchar2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xd69df43245dae301l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x82681747662c1df3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x8268173bf7890ff9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x45dae301l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x662c1df3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xf7890ff9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
@@ -1038,9 +1038,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar3Uchar3Uchar3Uchar3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xa00235ba625d4fddl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x8e548af5b4e30847l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x8e548aea463ffa4dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x625d4fddl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xb4e30847l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x463ffa4dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
@@ -1113,9 +1113,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar4Uchar4Uchar4Uchar4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x696677427edfbcb9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x9a40fea40399f29bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x9a40fe9894f6e4a1l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x7edfbcb9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x399f29bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x94f6e4a1l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
@@ -1195,9 +1195,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShortShortShortShort() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x8035c0627fc993ddl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xb5d4bd1fb4661447l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xb5d4bd1445c3064dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x7fc993ddl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xb4661447l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x45c3064dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
@@ -1270,9 +1270,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort2Short2Short2Short2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x7eab8e9b984e0915l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x7b334b992e67336fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x7b334b8dbfc42575l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x984e0915l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x2e67336fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xbfc42575l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
@@ -1345,9 +1345,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort3Short3Short3Short3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x480fd023b4d075f1l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x871fbf477d1e1dc3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x871fbf3c0e7b0fc9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xb4d075f1l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x7d1e1dc3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xe7b0fc9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
@@ -1420,9 +1420,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort4Short4Short4Short4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x117411abd152e2cdl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x930c32f5cbd50817l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x930c32ea5d31fa1dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xd152e2cdl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xcbd50817l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0x5d31fa1dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
@@ -1502,9 +1502,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshortUshortUshortUshort() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xf5881eeff74c4341l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xd2a0571394d3e2b3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xd2a057082630d4b9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xf74c4341l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x94d3e2b3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x2630d4b9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
@@ -1577,9 +1577,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort2Ushort2Ushort2Ushort2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x6441dbe2fc36b705l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x52161e934fa3b43fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x52161e87e100a645l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xfc36b705l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x4fa3b43fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xe100a645l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
@@ -1652,9 +1652,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort3Ushort3Ushort3Ushort3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x6b244d61fc64ee3dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x7b8d14b8610b3967l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x7b8d14acf2682b6dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xfc64ee3dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x610b3967l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xf2682b6dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
@@ -1727,9 +1727,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort4Ushort4Ushort4Ushort4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x7206bee0fc932575l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa5040add7272be8fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa5040ad203cfb095l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xfc932575l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x7272be8fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x3cfb095l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
@@ -1809,9 +1809,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampIntIntIntInt() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xfeb3aa11be6164c5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xd11c228c7c8bf97fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xd11c22810de8eb85l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xbe6164c5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x7c8bf97fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xde8eb85l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
@@ -1884,9 +1884,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt2Int2Int2Int2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x56252903bd307c01l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x770112109398f8f3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7701120524f5eaf9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xbd307c01l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x9398f8f3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x24f5eaf9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
@@ -1959,9 +1959,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt3Int3Int3Int3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x966882045600d2edl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xeb73e6749c7caa77l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xeb73e6692dd99c7dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x5600d2edl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x9c7caa77l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x2dd99c7dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
@@ -2034,9 +2034,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt4Int4Int4Int4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xd6abdb04eed129d9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x5fe6bad8a5605bfbl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x5fe6bacd36bd4e01l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xeed129d9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xa5605bfbl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x36bd4e01l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
@@ -2116,9 +2116,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUintUintUintUint() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xd8df32b2efc89475l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xcf8ec8eece8b7b8fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xcf8ec8e35fe86d95l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xefc89475l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xce8b7b8fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x5fe86d95l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
@@ -2191,9 +2191,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint2Uint2Uint2Uint2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xaf28d478873ae5dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x5bbd21aa2a4bc7l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x5bbd163b873dcdl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x8873ae5dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xaa2a4bc7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x3b873dcdl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
@@ -2266,9 +2266,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint3Uint3Uint3Uint3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x639fab187e48aaa5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x8ddee5cebcf6591fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x8ddee5c34e534b25l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x7e48aaa5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xbcf6591fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x4e534b25l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
@@ -2341,9 +2341,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint4Uint4Uint4Uint4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xbc4cc8e9741da6edl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x1b620e7bcfc26677l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x1b620e70611f587dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x741da6edl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0xcfc26677l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x611f587dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
@@ -2423,9 +2423,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLongLongLongLong() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x63fd360531c9c41dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x9d04d1824ef4907l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x9d04d0cb64c3b0dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x31c9c41dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x24ef4907l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xb64c3b0dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 1), INPUTSIZE);
@@ -2498,9 +2498,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong2Long2Long2Long2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xccbae869c2b0f12dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xe4c3844f4a3f8937l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xe4c38443db9c7b3dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xc2b0f12dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x4a3f8937l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0xdb9c7b3dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
@@ -2573,9 +2573,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong3Long3Long3Long3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x2568063ab885ed75l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7246acfc5d0b968fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x7246acf0ee688895l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xb885ed75l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x5d0b968fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0xee688895l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
@@ -2648,9 +2648,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong4Long4Long4Long4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x7e15240bae5ae9bdl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xffc9d5a96fd7a3e7l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xffc9d59e013495edl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0xae5ae9bdl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x6fd7a3e7l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x13495edl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
@@ -2730,9 +2730,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlongUlongUlongUlong() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x2b378139749bf4c5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x75ac5050a8ca97fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x75ac4f99be99b85l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x749bf4c5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xa8ca97fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x9be99b85l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 1), INPUTSIZE);
@@ -2805,9 +2805,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong2Ulong2Ulong2Ulong2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xa8c7fb17a09bb299l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x14e3c8dffe45623bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x14e3c8d48fa25441l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xa09bb299l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xfe45623bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0x8fa25441l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
@@ -2880,9 +2880,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong3Ulong3Ulong3Ulong3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x722c3c9fbd1e1f75l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x20d03c8e4cfc4c8fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x20d03c82de593e95l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xbd1e1f75l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x4cfc4c8fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0xde593e95l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
@@ -2955,9 +2955,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong4Ulong4Ulong4Ulong4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x3b907e27d9a08c51l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x2cbcb03c9bb336e3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x2cbcb0312d1028e9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0xd9a08c51l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9bb336e3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x2d1028e9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);
@@ -3030,9 +3030,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar2CharCharChar2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xd6884bbb7c57a5d1l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x3bf8830cc3b7db63l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x3bf883015514cd69l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0x7c57a5d1l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xc3b7db63l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x5514cd69l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
@@ -3105,9 +3105,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar3CharCharChar3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x4aa68c1b65a26ee5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x8b4b9ea0492789dfl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x8b4b9e94da847be5l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x65a26ee5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x492789dfl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xda847be5l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
@@ -3180,9 +3180,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampChar4CharCharChar4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xbec4cc7b4eed37f9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xda9eba33ce97385bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xda9eba285ff42a61l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x4eed37f9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xce97385bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x5ff42a61l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
@@ -3255,9 +3255,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar2UcharUcharUchar2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xafd4a680f02e0d63l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x78bbbcb3e9402039l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x78bbbca87a9d123fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xf02e0d63l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xe9402039l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x7a9d123fl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
@@ -3330,9 +3330,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar3UcharUcharUchar3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0xfedafacc68ea3ae9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x8371883e1c6e882bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x83718832adcb7a31l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x68ea3ae9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x1c6e882bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xadcb7a31l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
@@ -3405,9 +3405,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUchar4UcharUcharUchar4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x4de14f17e1a6686fl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x8e2753c84f9cf01dl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x8e2753bce0f9e223l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xe1a6686fl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x4f9cf01dl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xe0f9e223l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
@@ -3480,9 +3480,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort2ShortShortShort2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x89e3627eae2d6a9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x886d6d2ccaca776bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x886d6d215c276971l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0xeae2d6a9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xcaca776bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x5c276971l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
@@ -3555,9 +3555,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort3ShortShortShort3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x57a48a73639f042fl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x932338b6fdf8df5dl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x932338ab8f55d163l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x639f042fl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xfdf8df5dl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x8f55d163l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
@@ -3630,9 +3630,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampShort4ShortShortShort4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xa6aadebedc5b31b5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x9dd904413127474fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x9dd90435c2843955l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xdc5b31b5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x3127474fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xc2843955l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
@@ -3705,9 +3705,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort2UshortUshortUshort2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x2ece6d045621ef07l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xd88bd79cc7874965l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xd88bd79158e43b6bl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x5621ef07l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xc7874965l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x58e43b6bl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
@@ -3780,9 +3780,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort3UshortUshortUshort3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x393771467c9cd603l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xfe016431b3cf1419l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xfe016426452c061fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0x7c9cd603l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xb3cf1419l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x452c061fl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
@@ -3855,9 +3855,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUshort4UshortUshortUshort4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x43a07588a317bcffl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x2376f0c6a016decdl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x2376f0bb3173d0d3l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0xa317bcffl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0xa016decdl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x3173d0d3l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
@@ -3930,9 +3930,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt2IntIntInt2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xbb55c0997906d1dbl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x69776e80fba24121l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x69776e758cff3327l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x7906d1dbl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xfba24121l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x8cff3327l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
@@ -4005,9 +4005,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt3IntIntInt3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x3af8924ab5370be9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xdde27628f1a08b2bl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xdde2761d82fd7d31l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xb5370be9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xf1a08b2bl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x82fd7d31l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
@@ -4080,9 +4080,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampInt4IntIntInt4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xba9b63fbf16745f7l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x524d7dd0e79ed535l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x524d7dc578fbc73bl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xf16745f7l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xe79ed535l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x78fbc73bl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
@@ -4155,9 +4155,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint2UintUintUint2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x4fd098dd770d5a51l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x6de3f327c2a180e3l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x6de3f31c53fe72e9l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x770d5a51l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xc2a180e3l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x53fe72e9l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
@@ -4230,9 +4230,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint3UintUintUint3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0xc3eed93d60582365l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xbd370ebb48112f5fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xbd370eafd96e2165l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x60582365l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x48112f5fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xd96e2165l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
@@ -4305,9 +4305,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUint4UintUintUint4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x380d199d49a2ec79l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xc8a2a4ecd80dddbl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xc8a2a435eddcfe1l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x49a2ec79l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xcd80dddbl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x5eddcfe1l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
@@ -4380,9 +4380,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong2LongLongLong2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x19353a9f7c535bb5l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xee8dc7f38f83654fl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xee8dc7e820e05755l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 2, 0x7c535bb5l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x8f83654fl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x20e05755l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 2), INPUTSIZE);
@@ -4455,9 +4455,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong3LongLongLong3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x8d537aff659e24c9l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x3de0e38714f313cbl, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x3de0e37ba65005d1l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 3, 0x659e24c9l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x14f313cbl, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0xa65005d1l, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 3), INPUTSIZE);
@@ -4530,9 +4530,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampLong4LongLongLong4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x171bb5f4ee8edddl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x8d33ff1a9a62c247l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x8d33ff0f2bbfb44dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 4, 0x4ee8edddl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x9a62c247l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.SIGNED_64, 1, 0x2bbfb44dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_64, 4), INPUTSIZE);
@@ -4605,9 +4605,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong2UlongUlongUlong2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xf275dabaa7fa1bf7l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xf08a9e698d13b735l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xf08a9e5e1e70a93bl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 2, 0xa7fa1bf7l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x8d13b735l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x1e70a93bl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 2), INPUTSIZE);
@@ -4680,9 +4680,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong3UlongUlongUlong3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x417c2f0620b6497dl, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xfb4069f3c0421f27l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xfb4069e8519f112dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 3, 0x20b6497dl, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xc0421f27l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x519f112dl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 3), INPUTSIZE);
@@ -4755,9 +4755,9 @@ public class TestClamp extends RSBaseCompute {
     }
 
     private void checkClampUlong4UlongUlongUlong4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x9082835199727703l, false);
-        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x5f6357df3708719l, false);
-        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x5f6357284cd791fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 4, 0x99727703l, false);
+        Allocation inMinValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0xf3708719l, false);
+        Allocation inMaxValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_64, 1, 0x84cd791fl, false);
         enforceOrdering(inMinValue, inMaxValue);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_64, 4), INPUTSIZE);

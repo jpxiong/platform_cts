@@ -41,8 +41,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloatFloatFloat() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x598900c49184fbfel, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9aefccaa832f44e9l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9184fbfel, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x832f44e9l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -107,8 +107,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat2Float2Float2() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x6efefa297df69504l, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x12eb000b8567f58bl, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7df69504l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8567f58bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -173,8 +173,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat3Float3Float3() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9e548cd666a7a77l, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x674fde2b8745f72cl, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x666a7a77l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8745f72cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -239,8 +239,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat4Float4Float4() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa4cb97714ede5feal, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xbbb4bc4b8923f8cdl, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4ede5feal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8923f8cdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -305,8 +305,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat2FloatFloat2() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb0ac06c45b3d8b26l, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xfa7d66f2b6d48a21l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5b3d8b26l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb6d48a21l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -371,8 +371,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat3FloatFloat3() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x304ed837c68f43fal, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4fcd1a0aa53f7e7dl, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc68f43fal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa53f7e7dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -437,8 +437,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloat4FloatFloat4() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xaff1a9ab31e0fccel, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa51ccd2293aa72d9l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x31e0fccel, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x93aa72d9l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -503,8 +503,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloatFloat2Float2() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x70a0554e664b1852l, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdd7f0d444e2f7c5l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x664b1852l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x44e2f7c5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -569,8 +569,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloatFloat3Float3() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9b2d75ce91abcbccl, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdd9b9ef3afe18a3l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x91abcbccl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3afe18a3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInV(inV);
@@ -635,8 +635,8 @@ public class TestStep extends RSBaseCompute {
     }
 
     private void checkStepFloatFloat4Float4() {
-        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc5ba964ebd0c7f46l, false);
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xddb830a31193981l, false);
+        Allocation inEdge = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbd0c7f46l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x31193981l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInV(inV);

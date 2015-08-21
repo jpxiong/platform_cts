@@ -40,7 +40,7 @@ public class TestAsinh extends RSBaseCompute {
     }
 
     private void checkAsinhFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2cdf6bfa7c4a48f4l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7c4a48f4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testAsinhFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestAsinh extends RSBaseCompute {
     }
 
     private void checkAsinhFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x198d997279032b38l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x79032b38l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testAsinhFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestAsinh extends RSBaseCompute {
     }
 
     private void checkAsinhFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x198f628d6f1e4c16l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f1e4c16l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testAsinhFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestAsinh extends RSBaseCompute {
     }
 
     private void checkAsinhFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x19912ba865396cf4l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x65396cf4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testAsinhFloat4Float4(inV, out);

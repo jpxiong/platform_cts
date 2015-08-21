@@ -40,7 +40,7 @@ public class TestNativeAsinh extends RSBaseCompute {
     }
 
     private void checkNativeAsinhFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbd2e22f24b5b925bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4b5b925bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeAsinhFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeAsinh extends RSBaseCompute {
     }
 
     private void checkNativeAsinhFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x62151d490cde5427l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xcde5427l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeAsinhFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeAsinh extends RSBaseCompute {
     }
 
     private void checkNativeAsinhFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6216e66402f97505l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2f97505l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeAsinhFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeAsinh extends RSBaseCompute {
     }
 
     private void checkNativeAsinhFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x6218af7ef91495e3l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf91495e3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeAsinhFloat4Float4(inV, out);

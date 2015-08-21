@@ -40,7 +40,7 @@ public class TestRsqrt extends RSBaseCompute {
     }
 
     private void checkRsqrtFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x637c4873aa3f3b8fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaa3f3b8fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testRsqrtFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestRsqrt extends RSBaseCompute {
     }
 
     private void checkRsqrtFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8c8200af672f6cbbl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x672f6cbbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testRsqrtFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestRsqrt extends RSBaseCompute {
     }
 
     private void checkRsqrtFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8c83c9ca5d4a8d99l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5d4a8d99l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testRsqrtFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestRsqrt extends RSBaseCompute {
     }
 
     private void checkRsqrtFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8c8592e55365ae77l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x5365ae77l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testRsqrtFloat4Float4(inV, out);

@@ -40,7 +40,7 @@ public class TestNativeCosh extends RSBaseCompute {
     }
 
     private void checkNativeCoshFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7bb5784aa43ffcf5l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa43ffcf5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeCoshFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeCosh extends RSBaseCompute {
     }
 
     private void checkNativeCoshFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x818c886316a44671l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x16a44671l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeCoshFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeCosh extends RSBaseCompute {
     }
 
     private void checkNativeCoshFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x818e517e0cbf674fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xcbf674fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeCoshFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeCosh extends RSBaseCompute {
     }
 
     private void checkNativeCoshFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x81901a9902da882dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2da882dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeCoshFloat4Float4(inV, out);

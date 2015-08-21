@@ -40,7 +40,7 @@ public class TestRadians extends RSBaseCompute {
     }
 
     private void checkRadiansFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6e5054c0042adfabl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x42adfabl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testRadiansFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestRadians extends RSBaseCompute {
     }
 
     private void checkRadiansFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xc20ed424de23baf7l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xde23baf7l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testRadiansFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestRadians extends RSBaseCompute {
     }
 
     private void checkRadiansFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xc2109d3fd43edbd5l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd43edbd5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testRadiansFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestRadians extends RSBaseCompute {
     }
 
     private void checkRadiansFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xc212665aca59fcb3l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xca59fcb3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testRadiansFloat4Float4(inV, out);

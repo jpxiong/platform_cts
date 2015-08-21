@@ -40,7 +40,7 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x46ba02a2e7004d04l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe7004d04l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeAtanhFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd557bfdd35a682c8l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x35a682c8l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeAtanhFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd55988f82bc1a3a6l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2bc1a3a6l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeAtanhFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeAtanh extends RSBaseCompute {
     }
 
     private void checkNativeAtanhFloat4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd55b521321dcc484l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x21dcc484l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeAtanhFloat4Float4(inV, out);
