@@ -358,6 +358,204 @@ public class TestMin extends RSBaseCompute {
                 (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), errorFound);
     }
 
+    private void checkMinFloat2FloatFloat2() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x503b89a6l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x503b89a7l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMinFloat2FloatFloat2(inA, out);
+            verifyResultsMinFloat2FloatFloat2(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat2FloatFloat2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMinFloat2FloatFloat2(inA, out);
+            verifyResultsMinFloat2FloatFloat2(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat2FloatFloat2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinFloat2FloatFloat2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 2];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 2 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMin(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinFloat2FloatFloat2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinFloat3FloatFloat3() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3ea67e02l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3ea67e03l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMinFloat3FloatFloat3(inA, out);
+            verifyResultsMinFloat3FloatFloat3(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat3FloatFloat3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMinFloat3FloatFloat3(inA, out);
+            verifyResultsMinFloat3FloatFloat3(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat3FloatFloat3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinFloat3FloatFloat3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMin(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinFloat3FloatFloat3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMinFloat4FloatFloat4() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2d11725el, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2d11725fl, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMinFloat4FloatFloat4(inA, out);
+            verifyResultsMinFloat4FloatFloat4(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat4FloatFloat4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMinFloat4FloatFloat4(inA, out);
+            verifyResultsMinFloat4FloatFloat4(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMinFloat4FloatFloat4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMinFloat4FloatFloat4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMin(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMinFloat4FloatFloat4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsCharCharChar {
         public byte inA;
         public byte inB;
@@ -2907,6 +3105,9 @@ public class TestMin extends RSBaseCompute {
         checkMinFloat2Float2Float2();
         checkMinFloat3Float3Float3();
         checkMinFloat4Float4Float4();
+        checkMinFloat2FloatFloat2();
+        checkMinFloat3FloatFloat3();
+        checkMinFloat4FloatFloat4();
         checkMinCharCharChar();
         checkMinChar2Char2Char2();
         checkMinChar3Char3Char3();
