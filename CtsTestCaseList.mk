@@ -111,6 +111,7 @@ cts_support_packages := \
     CtsVoiceInteractionService \
     CtsVoiceInteractionApp \
     CtsVoiceSettingsService \
+    CtsWidgetProviderApp \
     $(cts_account_support_packages) \
     $(cts_security_apps_list) \
     $(cts_security_keysets_list)
