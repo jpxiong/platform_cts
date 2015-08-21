@@ -373,7 +373,7 @@ public class MediaStore_FilesTest extends AndroidTestCase {
         values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/mp3");
         Uri fileUri = mResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
         // give media provider some time to realize there's no album art
-        //SystemClock.sleep(1000);
+        SystemClock.sleep(1000);
         // get its album id
         Cursor c = mResolver.query(fileUri, new String[] { MediaStore.Audio.Media.ALBUM_ID},
                 null, null, null);
