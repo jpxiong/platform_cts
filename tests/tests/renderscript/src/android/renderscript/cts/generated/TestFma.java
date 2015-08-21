@@ -42,9 +42,9 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloatFloatFloatFloat() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x716293a685c419bel, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x716293a685c419bfl, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4a235a109d441b0el, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x85c419bel, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x85c419bfl, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9d441b0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -117,9 +117,9 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat2Float2Float2Float2() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1bb42af9dda15056l, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1bb42af9dda15057l, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x667fbd778aeda396l, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdda15056l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdda15057l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8aeda396l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -192,9 +192,9 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat3Float3Float3Float3() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x19169f2d349697b2l, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x19169f2d349697b3l, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3a56bf5454d5ec8al, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x349697b2l, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x349697b3l, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x54d5ec8al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);
@@ -267,9 +267,9 @@ public class TestFma extends RSBaseCompute {
     }
 
     private void checkFmaFloat4Float4Float4Float4() {
-        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x167913608b8bdf0el, false);
-        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x167913608b8bdf0fl, false);
-        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe2dc1311ebe357el, false);
+        Allocation inMultiplicand1 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8b8bdf0el, false);
+        Allocation inMultiplicand2 = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8b8bdf0fl, false);
+        Allocation inOffset = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1ebe357el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInMultiplicand2(inMultiplicand2);

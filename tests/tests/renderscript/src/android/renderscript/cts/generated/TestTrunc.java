@@ -40,7 +40,7 @@ public class TestTrunc extends RSBaseCompute {
     }
 
     private void checkTruncFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb16f216b11eebe01l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x11eebe01l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testTruncFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestTrunc extends RSBaseCompute {
     }
 
     private void checkTruncFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8b83139b49d4961dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x49d4961dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testTruncFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestTrunc extends RSBaseCompute {
     }
 
     private void checkTruncFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8b84dcb63fefb6fbl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3fefb6fbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testTruncFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestTrunc extends RSBaseCompute {
     }
 
     private void checkTruncFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8b86a5d1360ad7d9l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x360ad7d9l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testTruncFloat4Float4(inV, out);

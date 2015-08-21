@@ -40,7 +40,7 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x21721d33845561d4l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x845561d4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testCbrtFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x910f9e5d9129d518l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x9129d518l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testCbrtFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x911167788744f5f6l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8744f5f6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testCbrtFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestCbrt extends RSBaseCompute {
     }
 
     private void checkCbrtFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x911330937d6016d4l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7d6016d4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testCbrtFloat4Float4(inV, out);

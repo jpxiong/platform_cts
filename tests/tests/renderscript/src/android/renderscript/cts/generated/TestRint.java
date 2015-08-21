@@ -40,7 +40,7 @@ public class TestRint extends RSBaseCompute {
     }
 
     private void checkRintFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb88cd9adbf02db54l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbf02db54l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testRintFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestRint extends RSBaseCompute {
     }
 
     private void checkRintFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf12aed2f601c6298l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x601c6298l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testRintFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestRint extends RSBaseCompute {
     }
 
     private void checkRintFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf12cb64a56378376l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x56378376l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testRintFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestRint extends RSBaseCompute {
     }
 
     private void checkRintFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf12e7f654c52a454l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4c52a454l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testRintFloat4Float4(inV, out);

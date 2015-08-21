@@ -40,7 +40,7 @@ public class TestErf extends RSBaseCompute {
     }
 
     private void checkErfFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xccfbfd30a3951fb8l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa3951fb8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testErfFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestErf extends RSBaseCompute {
     }
 
     private void checkErfFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x87e26994448c58dcl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x448c58dcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testErfFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestErf extends RSBaseCompute {
     }
 
     private void checkErfFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x87e432af3aa779bal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3aa779bal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testErfFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestErf extends RSBaseCompute {
     }
 
     private void checkErfFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x87e5fbca30c29a98l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x30c29a98l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testErfFloat4Float4(inV, out);

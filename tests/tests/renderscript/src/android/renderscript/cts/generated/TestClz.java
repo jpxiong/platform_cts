@@ -40,7 +40,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzCharChar() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0xf6f3a15e2f7765afl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 1, 0x2f7765afl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 1), INPUTSIZE);
             script.forEach_testClzCharChar(inValue, out);
@@ -96,7 +96,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzChar2Char2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xf718b99dcaca5e93l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 2, 0xcaca5e93l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 2), INPUTSIZE);
             script.forEach_testClzChar2Char2(inValue, out);
@@ -152,7 +152,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzChar3Char3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0x21a5da5bc7099347l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 3, 0xc7099347l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 3), INPUTSIZE);
             script.forEach_testClzChar3Char3(inValue, out);
@@ -208,7 +208,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzChar4Char4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0x4c32fb19c348c7fbl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_8, 4, 0xc348c7fbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_8, 4), INPUTSIZE);
             script.forEach_testClzChar4Char4(inValue, out);
@@ -269,7 +269,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUcharUchar() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0xd2e451b48b84f57fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 1, 0x8b84f57fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 1), INPUTSIZE);
             script.forEach_testClzUcharUchar(inValue, out);
@@ -325,7 +325,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUchar2Uchar2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0x792e2970f47ebc85l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 2, 0xf47ebc85l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 2), INPUTSIZE);
             script.forEach_testClzUchar2Uchar2(inValue, out);
@@ -381,7 +381,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUchar3Uchar3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x9ee29ef83dbce203l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 3, 0x3dbce203l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 3), INPUTSIZE);
             script.forEach_testClzUchar3Uchar3(inValue, out);
@@ -437,7 +437,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUchar4Uchar4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0xc497147f86fb0781l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_8, 4, 0x86fb0781l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_8, 4), INPUTSIZE);
             script.forEach_testClzUchar4Uchar4(inValue, out);
@@ -498,7 +498,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzShortShort() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0x3290aea900d8ad53l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 1, 0xd8ad53l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 1), INPUTSIZE);
             script.forEach_testClzShortShort(inValue, out);
@@ -554,7 +554,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzShort2Short2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x81f69d4442dd6ebfl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 2, 0x42dd6ebfl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 2), INPUTSIZE);
             script.forEach_testClzShort2Short2(inValue, out);
@@ -610,7 +610,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzShort3Short3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0xa7ab12cb8c1b943dl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 3, 0x8c1b943dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 3), INPUTSIZE);
             script.forEach_testClzShort3Short3(inValue, out);
@@ -666,7 +666,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzShort4Short4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xcd5f8852d559b9bbl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_16, 4, 0xd559b9bbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_16, 4), INPUTSIZE);
             script.forEach_testClzShort4Short4(inValue, out);
@@ -727,7 +727,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUshortUshort() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x97bdeee92c0103a5l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 1, 0x2c0103a5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 1), INPUTSIZE);
             script.forEach_testClzUshortUshort(inValue, out);
@@ -783,7 +783,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUshort2Ushort2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0x5ea7a024b2913837l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 2, 0xb2913837l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 2), INPUTSIZE);
             script.forEach_testClzUshort2Ushort2(inValue, out);
@@ -839,7 +839,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUshort3Ushort3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xb3f7537beaa1cfa3l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 3, 0xeaa1cfa3l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 3), INPUTSIZE);
             script.forEach_testClzUshort3Ushort3(inValue, out);
@@ -895,7 +895,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUshort4Ushort4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x94706d322b2670fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_16, 4, 0x22b2670fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_16, 4), INPUTSIZE);
             script.forEach_testClzUshort4Ushort4(inValue, out);
@@ -956,7 +956,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzIntInt() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0xb13809da3142eb97l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x3142eb97l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.forEach_testClzIntInt(inValue, out);
@@ -1012,7 +1012,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzInt2Int2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0xc9fd2c1a27fe3ad5l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x27fe3ad5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testClzInt2Int2(inValue, out);
@@ -1068,7 +1068,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzInt3Int3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xd6e2b014f2d24c2bl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0xf2d24c2bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testClzInt3Int3(inValue, out);
@@ -1124,7 +1124,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzInt4Int4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xe3c8340fbda65d81l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0xbda65d81l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testClzInt4Int4(inValue, out);
@@ -1185,7 +1185,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUintUint() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x64a0b78a75ac502fl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x75ac502fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 1), INPUTSIZE);
             script.forEach_testClzUintUint(inValue, out);
@@ -1241,7 +1241,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUint2Uint2() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0xf809b50329344f93l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 2, 0x29344f93l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 2), INPUTSIZE);
             script.forEach_testClzUint2Uint2(inValue, out);
@@ -1297,7 +1297,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUint3Uint3() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x2296d5c125738447l, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 3, 0x25738447l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 3), INPUTSIZE);
             script.forEach_testClzUint3Uint3(inValue, out);
@@ -1353,7 +1353,7 @@ public class TestClz extends RSBaseCompute {
     }
 
     private void checkClzUint4Uint4() {
-        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x4d23f67f21b2b8fbl, false);
+        Allocation inValue = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 4, 0x21b2b8fbl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.UNSIGNED_32, 4), INPUTSIZE);
             script.forEach_testClzUint4Uint4(inValue, out);

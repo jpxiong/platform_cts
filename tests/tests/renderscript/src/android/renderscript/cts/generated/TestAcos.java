@@ -40,7 +40,7 @@ public class TestAcos extends RSBaseCompute {
     }
 
     private void checkAcosFloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf6e893f6d1cc3bdfl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd1cc3bdfl, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testAcosFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestAcos extends RSBaseCompute {
     }
 
     private void checkAcosFloat2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x55af66f81096ae8bl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1096ae8bl, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testAcosFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestAcos extends RSBaseCompute {
     }
 
     private void checkAcosFloat3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x55b1301306b1cf69l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6b1cf69l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testAcosFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestAcos extends RSBaseCompute {
     }
 
     private void checkAcosFloat4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x55b2f92dfcccf047l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfcccf047l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testAcosFloat4Float4(inV, out);

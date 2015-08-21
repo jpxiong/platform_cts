@@ -40,7 +40,7 @@ public class TestNativeLog10 extends RSBaseCompute {
     }
 
     private void checkNativeLog10FloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4a5d84f60083219dl, 10e-10, 10e10);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x83219dl, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeLog10FloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeLog10 extends RSBaseCompute {
     }
 
     private void checkNativeLog10Float2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1d500a10779807d9l, 10e-10, 10e10);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x779807d9l, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeLog10Float2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeLog10 extends RSBaseCompute {
     }
 
     private void checkNativeLog10Float3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1d51d32b6db328b7l, 10e-10, 10e10);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6db328b7l, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeLog10Float3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeLog10 extends RSBaseCompute {
     }
 
     private void checkNativeLog10Float4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1d539c4663ce4995l, 10e-10, 10e10);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x63ce4995l, 10e-10, 10e10);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeLog10Float4Float4(inV, out);

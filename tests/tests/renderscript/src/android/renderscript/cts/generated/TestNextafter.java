@@ -41,8 +41,8 @@ public class TestNextafter extends RSBaseCompute {
     }
 
     private void checkNextafterFloatFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa3b02393ad412956l, false);
-        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xde8acce6afd7c03dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xad412956l, false);
+        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xafd7c03dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInTarget(inTarget);
@@ -107,8 +107,8 @@ public class TestNextafter extends RSBaseCompute {
     }
 
     private void checkNextafterFloat2Float2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x29b40e0584a1e22l, false);
-        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x68f3a41af7e4d541l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x584a1e22l, false);
+        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf7e4d541l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInTarget(inTarget);
@@ -173,8 +173,8 @@ public class TestNextafter extends RSBaseCompute {
     }
 
     private void checkNextafterFloat3Float3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x57001f005a281fc3l, false);
-        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3261a1f4e4f910dcl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5a281fc3l, false);
+        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe4f910dcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInTarget(inTarget);
@@ -239,8 +239,8 @@ public class TestNextafter extends RSBaseCompute {
     }
 
     private void checkNextafterFloat4Float4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xab64fd205c062164l, false);
-        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfbcf9fced20d4c77l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x5c062164l, false);
+        Allocation inTarget = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd20d4c77l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInTarget(inTarget);

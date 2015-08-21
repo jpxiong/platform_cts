@@ -40,7 +40,7 @@ public class TestNativeAcospi extends RSBaseCompute {
     }
 
     private void checkNativeAcospiFloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xdcf67f5599c7d8ffl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x99c7d8ffl, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeAcospiFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeAcospi extends RSBaseCompute {
     }
 
     private void checkNativeAcospiFloat2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf038668a78e88aabl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x78e88aabl, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeAcospiFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeAcospi extends RSBaseCompute {
     }
 
     private void checkNativeAcospiFloat3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf03a2fa56f03ab89l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x6f03ab89l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeAcospiFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeAcospi extends RSBaseCompute {
     }
 
     private void checkNativeAcospiFloat4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf03bf8c0651ecc67l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x651ecc67l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeAcospiFloat4Float4(inV, out);

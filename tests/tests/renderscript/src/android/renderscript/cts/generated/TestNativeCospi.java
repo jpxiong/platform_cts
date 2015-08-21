@@ -40,7 +40,7 @@ public class TestNativeCospi extends RSBaseCompute {
     }
 
     private void checkNativeCospiFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2614541c9b86df38l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x9b86df38l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeCospiFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeCospi extends RSBaseCompute {
     }
 
     private void checkNativeCospiFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8ae37e6159c7c5cl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x159c7c5cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeCospiFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeCospi extends RSBaseCompute {
     }
 
     private void checkNativeCospiFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x8b001010bb79d3al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xbb79d3al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeCospiFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeCospi extends RSBaseCompute {
     }
 
     private void checkNativeCospiFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8b1ca1c01d2be18l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1d2be18l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeCospiFloat4Float4(inV, out);

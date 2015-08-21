@@ -40,7 +40,7 @@ public class TestLog extends RSBaseCompute {
     }
 
     private void checkLogFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x4176ec542a43578dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x2a43578dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testLogFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestLog extends RSBaseCompute {
     }
 
     private void checkLogFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd3cba12c04dd9a49l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4dd9a49l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testLogFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestLog extends RSBaseCompute {
     }
 
     private void checkLogFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd3cd6a46faf8bb27l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xfaf8bb27l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testLogFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestLog extends RSBaseCompute {
     }
 
     private void checkLogFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd3cf3361f113dc05l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf113dc05l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testLogFloat4Float4(inV, out);

@@ -40,7 +40,7 @@ public class TestCos extends RSBaseCompute {
     }
 
     private void checkCosFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe70ae86bb80fef6l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xbb80fef6l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testCosFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestCos extends RSBaseCompute {
     }
 
     private void checkCosFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4bb740670b2bbfaal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb2bbfaal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testCosFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestCos extends RSBaseCompute {
     }
 
     private void checkCosFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4bb909820146e088l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x146e088l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testCosFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestCos extends RSBaseCompute {
     }
 
     private void checkCosFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4bbad29cf7620166l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xf7620166l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testCosFloat4Float4(inV, out);

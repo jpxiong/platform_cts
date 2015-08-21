@@ -41,7 +41,7 @@ public class TestNativeSincos extends RSBaseCompute {
     }
 
     private void checkNativeSincosFloatFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe15df2366436cc13l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6436cc13l, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
@@ -116,7 +116,7 @@ public class TestNativeSincos extends RSBaseCompute {
     }
 
     private void checkNativeSincosFloat2Float2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe5a1f1dcda676ea9l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xda676ea9l, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
@@ -191,7 +191,7 @@ public class TestNativeSincos extends RSBaseCompute {
     }
 
     private void checkNativeSincosFloat3Float3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3a06cffcdc45704al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdc45704al, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
@@ -266,7 +266,7 @@ public class TestNativeSincos extends RSBaseCompute {
     }
 
     private void checkNativeSincosFloat4Float4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x8e6bae1cde2371ebl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xde2371ebl, false);
         try {
             Allocation outCos = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);

@@ -41,8 +41,8 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloatFloatFloat() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x73477387751754efl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5ed4412e19040daal, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x751754efl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x19040daal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -107,8 +107,8 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat2Float2Float2() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x752d5a1207785d6dl, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb071fa74af507ad4l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7785d6dl, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xaf507ad4l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -173,8 +173,8 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat3Float3Float3() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5623c6c05fb90198l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x79d63bbd822c0e0dl, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5fb90198l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x822c0e0dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);
@@ -239,8 +239,8 @@ public class TestNativeDivide extends RSBaseCompute {
     }
 
     private void checkNativeDivideFloat4Float4Float4() {
-        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x371a336eb7f9a5c3l, false);
-        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x433a7d065507a146l, false);
+        Allocation inLeftVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb7f9a5c3l, false);
+        Allocation inRightVector = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x5507a146l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInRightVector(inRightVector);

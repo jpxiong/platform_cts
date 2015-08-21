@@ -40,7 +40,7 @@ public class TestNativeExpm1 extends RSBaseCompute {
     }
 
     private void checkNativeExpm1FloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7a90bd8a7094f34bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x7094f34bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeExpm1FloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeExpm1 extends RSBaseCompute {
     }
 
     private void checkNativeExpm1Float2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x3f43b22de84b7997l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe84b7997l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeExpm1Float2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeExpm1 extends RSBaseCompute {
     }
 
     private void checkNativeExpm1Float3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x3f457b48de669a75l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xde669a75l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeExpm1Float3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeExpm1 extends RSBaseCompute {
     }
 
     private void checkNativeExpm1Float4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3f474463d481bb53l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd481bb53l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeExpm1Float4Float4(inV, out);

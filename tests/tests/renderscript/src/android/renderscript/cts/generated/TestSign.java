@@ -40,7 +40,7 @@ public class TestSign extends RSBaseCompute {
     }
 
     private void checkSignFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xadc8bc2f364ea474l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x364ea474l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testSignFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestSign extends RSBaseCompute {
     }
 
     private void checkSignFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x2eb1e646027c0ab8l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x27c0ab8l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testSignFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestSign extends RSBaseCompute {
     }
 
     private void checkSignFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x2eb3af60f8972b96l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf8972b96l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testSignFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestSign extends RSBaseCompute {
     }
 
     private void checkSignFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2eb5787beeb24c74l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xeeb24c74l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testSignFloat4Float4(inV, out);

@@ -40,7 +40,7 @@ public class TestCeil extends RSBaseCompute {
     }
 
     private void checkCeilFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf12a662b492bf934l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x492bf934l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testCeilFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestCeil extends RSBaseCompute {
     }
 
     private void checkCeilFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xdb16a3ea43152978l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x43152978l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testCeilFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestCeil extends RSBaseCompute {
     }
 
     private void checkCeilFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdb186d0539304a56l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x39304a56l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testCeilFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestCeil extends RSBaseCompute {
     }
 
     private void checkCeilFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xdb1a36202f4b6b34l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2f4b6b34l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testCeilFloat4Float4(inV, out);
