@@ -120,6 +120,7 @@ public class ClonedSecureRandomTest extends AndroidTestCase {
          */
         int firstPid = -1;
         int previousPid = -1;
+        int lastPid = -1;
         for (int i = 0; i < MAX_PID; i++) {
             byte[] output = new byte[RANDOM_BYTES_PER_PID];
             int pid;
@@ -202,7 +203,9 @@ public class ClonedSecureRandomTest extends AndroidTestCase {
                 firstPid = pid;
             }
 
-            if (i > PRIMING_ITERATIONS) {
+            if (i <= PRIMING_ITERATIONS) {
+                lastPid = pid;
+            } else if (pid > lastPid && (lastPid > firstPid || pid < firstPid)) {
                 wastePids(firstPid, previousPid);
             }
         }
