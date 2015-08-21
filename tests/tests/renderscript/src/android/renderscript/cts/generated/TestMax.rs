@@ -41,6 +41,21 @@ float4 __attribute__((kernel)) testMaxFloat4Float4Float4(float4 inA, unsigned in
     return max(inA, inB);
 }
 
+float2 __attribute__((kernel)) testMaxFloat2FloatFloat2(float2 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return max(inA, inB);
+}
+
+float3 __attribute__((kernel)) testMaxFloat3FloatFloat3(float3 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return max(inA, inB);
+}
+
+float4 __attribute__((kernel)) testMaxFloat4FloatFloat4(float4 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return max(inA, inB);
+}
+
 char __attribute__((kernel)) testMaxCharCharChar(char inA, unsigned int x) {
     char inB = rsGetElementAt_char(gAllocInB, x);
     return max(inA, inB);

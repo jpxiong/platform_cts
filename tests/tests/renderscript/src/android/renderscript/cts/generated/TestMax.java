@@ -304,6 +304,204 @@ public class TestMax extends RSBaseCompute {
         }
     }
 
+    private void checkMaxFloat2FloatFloat2() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x8592438l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x8592439l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMaxFloat2FloatFloat2(inA, out);
+            verifyResultsMaxFloat2FloatFloat2(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat2FloatFloat2: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMaxFloat2FloatFloat2(inA, out);
+            verifyResultsMaxFloat2FloatFloat2(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat2FloatFloat2: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxFloat2FloatFloat2(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 2];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 2];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 2 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 2 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMax(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 2 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 2 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxFloat2FloatFloat2" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxFloat3FloatFloat3() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xf6c41894l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xf6c41895l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMaxFloat3FloatFloat3(inA, out);
+            verifyResultsMaxFloat3FloatFloat3(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat3FloatFloat3: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMaxFloat3FloatFloat3(inA, out);
+            verifyResultsMaxFloat3FloatFloat3(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat3FloatFloat3: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxFloat3FloatFloat3(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 3 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMax(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxFloat3FloatFloat3" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
+    private void checkMaxFloat4FloatFloat4() {
+        Allocation inA = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe52f0cf0l, false);
+        Allocation inB = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xe52f0cf1l, false);
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            script.set_gAllocInB(inB);
+            script.forEach_testMaxFloat4FloatFloat4(inA, out);
+            verifyResultsMaxFloat4FloatFloat4(inA, inB, out, false);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat4FloatFloat4: " + e.toString());
+        }
+        try {
+            Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
+            scriptRelaxed.set_gAllocInB(inB);
+            scriptRelaxed.forEach_testMaxFloat4FloatFloat4(inA, out);
+            verifyResultsMaxFloat4FloatFloat4(inA, inB, out, true);
+        } catch (Exception e) {
+            throw new RSRuntimeException("RenderScript. Can't invoke forEach_testMaxFloat4FloatFloat4: " + e.toString());
+        }
+    }
+
+    private void verifyResultsMaxFloat4FloatFloat4(Allocation inA, Allocation inB, Allocation out, boolean relaxed) {
+        float[] arrayInA = new float[INPUTSIZE * 4];
+        inA.copyTo(arrayInA);
+        float[] arrayInB = new float[INPUTSIZE * 1];
+        inB.copyTo(arrayInB);
+        float[] arrayOut = new float[INPUTSIZE * 4];
+        out.copyTo(arrayOut);
+        for (int i = 0; i < INPUTSIZE; i++) {
+            for (int j = 0; j < 4 ; j++) {
+                // Extract the inputs.
+                ArgumentsFloatFloatFloat args = new ArgumentsFloatFloatFloat();
+                args.inA = arrayInA[i * 4 + j];
+                args.inB = arrayInB[i];
+                // Figure out what the outputs should have been.
+                Target target = new Target(relaxed);
+                CoreMathVerifier.computeMax(args, target);
+                // Validate the outputs.
+                boolean valid = true;
+                if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                    valid = false;
+                }
+                if (!valid) {
+                    StringBuilder message = new StringBuilder();
+                    message.append("Input inA: ");
+                    appendVariableToMessage(message, args.inA);
+                    message.append("\n");
+                    message.append("Input inB: ");
+                    appendVariableToMessage(message, args.inB);
+                    message.append("\n");
+                    message.append("Expected output out: ");
+                    appendVariableToMessage(message, args.out);
+                    message.append("\n");
+                    message.append("Actual   output out: ");
+                    appendVariableToMessage(message, arrayOut[i * 4 + j]);
+                    if (!args.out.couldBe(arrayOut[i * 4 + j])) {
+                        message.append(" FAIL");
+                    }
+                    message.append("\n");
+                    assertTrue("Incorrect output for checkMaxFloat4FloatFloat4" +
+                            (relaxed ? "_relaxed" : "") + ":\n" + message.toString(), valid);
+                }
+            }
+        }
+    }
+
     public class ArgumentsCharCharChar {
         public byte inA;
         public byte inB;
@@ -2437,6 +2635,9 @@ public class TestMax extends RSBaseCompute {
         checkMaxFloat2Float2Float2();
         checkMaxFloat3Float3Float3();
         checkMaxFloat4Float4Float4();
+        checkMaxFloat2FloatFloat2();
+        checkMaxFloat3FloatFloat3();
+        checkMaxFloat4FloatFloat4();
         checkMaxCharCharChar();
         checkMaxChar2Char2Char2();
         checkMaxChar3Char3Char3();
