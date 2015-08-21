@@ -41,6 +41,21 @@ float4 __attribute__((kernel)) testMinFloat4Float4Float4(float4 inA, unsigned in
     return min(inA, inB);
 }
 
+float2 __attribute__((kernel)) testMinFloat2FloatFloat2(float2 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return min(inA, inB);
+}
+
+float3 __attribute__((kernel)) testMinFloat3FloatFloat3(float3 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return min(inA, inB);
+}
+
+float4 __attribute__((kernel)) testMinFloat4FloatFloat4(float4 inA, unsigned int x) {
+    float inB = rsGetElementAt_float(gAllocInB, x);
+    return min(inA, inB);
+}
+
 char __attribute__((kernel)) testMinCharCharChar(char inA, unsigned int x) {
     char inB = rsGetElementAt_char(gAllocInB, x);
     return min(inA, inB);
