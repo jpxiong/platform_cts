@@ -32,10 +32,21 @@ LOCAL_SRC_FILES := \
 		android_security_cts_SELinuxTest.cpp \
 		android_security_cts_MMapExecutableTest.cpp \
 		android_security_cts_NetlinkSocket.cpp \
-		android_security_cts_AudioPolicyBinderTest.cpp
+		android_security_cts_AudioPolicyBinderTest.cpp \
+		android_security_cts_StagefrightTest.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
 LOCAL_SHARED_LIBRARIES := libnativehelper liblog libbinder libutils libmedia libselinux libdl
 
+include $(BUILD_SHARED_LIBRARY)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := libctsstagefright
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := StagefrightTest.cpp
+LOCAL_C_INCLUDES := frameworks/av/media/libstagefright/include \
+		frameworks/native/include/media/openmax
+LOCAL_SHARED_LIBRARIES := liblog libstagefright
 include $(BUILD_SHARED_LIBRARY)
