@@ -40,7 +40,7 @@ public class TestNativeAtanpi extends RSBaseCompute {
     }
 
     private void checkNativeAtanpiFloatFloat() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x3fd790efd1d451bdl, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xd1d451bdl, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeAtanpiFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeAtanpi extends RSBaseCompute {
     }
 
     private void checkNativeAtanpiFloat2Float2() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x1bd089694afc9ef9l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4afc9ef9l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeAtanpiFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeAtanpi extends RSBaseCompute {
     }
 
     private void checkNativeAtanpiFloat3Float3() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x1bd252844117bfd7l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4117bfd7l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeAtanpiFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeAtanpi extends RSBaseCompute {
     }
 
     private void checkNativeAtanpiFloat4Float4() {
-        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x1bd41b9f3732e0b5l, -1, 1);
+        Allocation inV = createRandomFloatAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3732e0b5l, -1, 1);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeAtanpiFloat4Float4(inV, out);

@@ -40,7 +40,7 @@ public class TestNativeSinpi extends RSBaseCompute {
     }
 
     private void checkNativeSinpiFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6e76d30caee7fd93l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaee7fd93l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNativeSinpiFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestNativeSinpi extends RSBaseCompute {
     }
 
     private void checkNativeSinpiFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xd8150be20e10bb9fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe10bb9fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testNativeSinpiFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestNativeSinpi extends RSBaseCompute {
     }
 
     private void checkNativeSinpiFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xd816d4fd042bdc7dl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x42bdc7dl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testNativeSinpiFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestNativeSinpi extends RSBaseCompute {
     }
 
     private void checkNativeSinpiFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd8189e17fa46fd5bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xfa46fd5bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testNativeSinpiFloat4Float4(inV, out);

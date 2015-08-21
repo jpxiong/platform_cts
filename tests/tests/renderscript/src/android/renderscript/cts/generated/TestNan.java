@@ -40,7 +40,7 @@ public class TestNan extends RSBaseCompute {
     }
 
     private void checkNanUintFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0xbc42cb366a8a10d2l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.UNSIGNED_32, 1, 0x6a8a10d2l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testNanUintFloat(inV, out);

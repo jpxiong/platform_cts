@@ -40,7 +40,7 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2FloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x58195894b8b72a10l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xb8b72a10l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testExp2FloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4eeb7f70e7690e74l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe7690e74l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testExp2Float2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x4eed488bdd842f52l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xdd842f52l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testExp2Float3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestExp2 extends RSBaseCompute {
     }
 
     private void checkExp2Float4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4eef11a6d39f5030l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd39f5030l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testExp2Float4Float4(inV, out);

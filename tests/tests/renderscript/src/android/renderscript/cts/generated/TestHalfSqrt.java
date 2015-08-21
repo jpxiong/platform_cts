@@ -40,7 +40,7 @@ public class TestHalfSqrt extends RSBaseCompute {
     }
 
     private void checkHalfSqrtFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x8be766c7a15db5fal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa15db5fal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testHalfSqrtFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestHalfSqrt extends RSBaseCompute {
     }
 
     private void checkHalfSqrtFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x7a300d2342519b8el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x42519b8el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testHalfSqrtFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestHalfSqrt extends RSBaseCompute {
     }
 
     private void checkHalfSqrtFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x7a31d63e386cbc6cl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x386cbc6cl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testHalfSqrtFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestHalfSqrt extends RSBaseCompute {
     }
 
     private void checkHalfSqrtFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x7a339f592e87dd4al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x2e87dd4al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testHalfSqrtFloat4Float4(inV, out);

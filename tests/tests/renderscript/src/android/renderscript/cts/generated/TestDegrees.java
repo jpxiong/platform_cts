@@ -40,7 +40,7 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x606ed077c5dde30al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xc5dde30al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testDegreesFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x803a665ae417141el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe417141el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testDegreesFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x803c2f75da3234fcl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xda3234fcl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testDegreesFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestDegrees extends RSBaseCompute {
     }
 
     private void checkDegreesFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x803df890d04d55dal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xd04d55dal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testDegreesFloat4Float4(inV, out);

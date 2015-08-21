@@ -40,7 +40,7 @@ public class TestIlogb extends RSBaseCompute {
     }
 
     private void checkIlogbFloatInt() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6103ca4b5664967bl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x5664967bl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 1), INPUTSIZE);
             script.forEach_testIlogbFloatInt(inV, out);
@@ -89,7 +89,7 @@ public class TestIlogb extends RSBaseCompute {
     }
 
     private void checkIlogbFloat2Int2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb460143cb6f32a61l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb6f32a61l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 2), INPUTSIZE);
             script.forEach_testIlogbFloat2Int2(inV, out);
@@ -138,7 +138,7 @@ public class TestIlogb extends RSBaseCompute {
     }
 
     private void checkIlogbFloat3Int3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xb460147c009b3a97l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x9b3a97l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 3), INPUTSIZE);
             script.forEach_testIlogbFloat3Int3(inV, out);
@@ -187,7 +187,7 @@ public class TestIlogb extends RSBaseCompute {
     }
 
     private void checkIlogbFloat4Int4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb46014bb4a434acdl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x4a434acdl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.SIGNED_32, 4), INPUTSIZE);
             script.forEach_testIlogbFloat4Int4(inV, out);

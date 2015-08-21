@@ -40,7 +40,7 @@ public class TestTanh extends RSBaseCompute {
     }
 
     private void checkTanhFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xaa47c1d7594bc87al, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x594bc87al, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testTanhFloatFloat(inV, out);
@@ -97,7 +97,7 @@ public class TestTanh extends RSBaseCompute {
     }
 
     private void checkTanhFloat2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xe021c1aab8d53a0el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xb8d53a0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.forEach_testTanhFloat2Float2(inV, out);
@@ -154,7 +154,7 @@ public class TestTanh extends RSBaseCompute {
     }
 
     private void checkTanhFloat3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xe0238ac5aef05aecl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0xaef05aecl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.forEach_testTanhFloat3Float3(inV, out);
@@ -211,7 +211,7 @@ public class TestTanh extends RSBaseCompute {
     }
 
     private void checkTanhFloat4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xe02553e0a50b7bcal, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xa50b7bcal, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.forEach_testTanhFloat4Float4(inV, out);

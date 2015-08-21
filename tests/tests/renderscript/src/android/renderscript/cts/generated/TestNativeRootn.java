@@ -41,8 +41,8 @@ public class TestNativeRootn extends RSBaseCompute {
     }
 
     private void checkNativeRootnFloatIntFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x6693fe5c237ac0f1l, false);
-        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x6693fe5c237ac0e9l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0x237ac0f1l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 1, 0x237ac0e9l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.set_gAllocInN(inN);
@@ -107,8 +107,8 @@ public class TestNativeRootn extends RSBaseCompute {
     }
 
     private void checkNativeRootnFloat2Int2Float2() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x5363e8c04afd5bcdl, false);
-        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x5363e8c04afd5bc5l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x4afd5bcdl, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 2, 0x4afd5bc5l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 2), INPUTSIZE);
             script.set_gAllocInN(inN);
@@ -173,8 +173,8 @@ public class TestNativeRootn extends RSBaseCompute {
     }
 
     private void checkNativeRootnFloat3Int3Float3() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x791a272340afc886l, false);
-        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x791a272340afc87el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x40afc886l, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 3, 0x40afc87el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 3), INPUTSIZE);
             script.set_gAllocInN(inN);
@@ -239,8 +239,8 @@ public class TestNativeRootn extends RSBaseCompute {
     }
 
     private void checkNativeRootnFloat4Int4Float4() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x9ed065863662353fl, false);
-        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x9ed0658636623537l, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x3662353fl, false);
+        Allocation inN = createRandomAllocation(mRS, Element.DataType.SIGNED_32, 4, 0x36623537l, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 4), INPUTSIZE);
             script.set_gAllocInN(inN);

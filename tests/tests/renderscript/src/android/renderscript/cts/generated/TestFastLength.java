@@ -40,7 +40,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloatFloat() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xebac65aea2660e8fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 1, 0xa2660e8fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloatFloat(inV, out);
@@ -101,7 +101,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloat2Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0x95f43650f85e6cadl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 2, 0xf85e6cadl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat2Float(inV, out);
@@ -162,7 +162,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloat3Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x95f440f25764fb0el, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 3, 0x5764fb0el, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat3Float(inV, out);
@@ -223,7 +223,7 @@ public class TestFastLength extends RSBaseCompute {
     }
 
     private void checkFastLengthFloat4Float() {
-        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0x95f44b93b66b896fl, false);
+        Allocation inV = createRandomAllocation(mRS, Element.DataType.FLOAT_32, 4, 0xb66b896fl, false);
         try {
             Allocation out = Allocation.createSized(mRS, getElement(mRS, Element.DataType.FLOAT_32, 1), INPUTSIZE);
             script.forEach_testFastLengthFloat4Float(inV, out);
