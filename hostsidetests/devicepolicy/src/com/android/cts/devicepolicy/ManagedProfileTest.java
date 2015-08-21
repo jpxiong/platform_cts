@@ -48,6 +48,9 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
     private static final String WIFI_CONFIG_CREATOR_PKG = "com.android.cts.wificonfigcreator";
     private static final String WIFI_CONFIG_CREATOR_APK = "CtsWifiConfigCreator.apk";
 
+    private static final String WIDGET_PROVIDER_APK = "CtsWidgetProviderApp.apk";
+    private static final String WIDGET_PROVIDER_PKG = "com.android.cts.widgetprovider";
+
     private static final String ADMIN_RECEIVER_TEST_CLASS =
             MANAGED_PROFILE_PKG + ".BaseManagedProfileTest$BasicAdminReceiver";
 
@@ -596,6 +599,47 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 "testNfcShareEnabled", 0));
     }
 
+    public void testCrossProfileWidgets() throws Exception {
+        if (!mHasFeature) {
+            return;
+        }
+
+        try {
+            installApp(WIDGET_PROVIDER_APK);
+            getDevice().executeShellCommand("appwidget grantbind --user 0 --package "
+                    + WIDGET_PROVIDER_PKG);
+            startWidgetHostService();
+
+            String commandOutput = changeCrossProfileWidgetForUser(WIDGET_PROVIDER_PKG,
+                    "add-cross-profile-widget", mUserId);
+            assertTrue("Command was expected to succeed " + commandOutput,
+                    commandOutput.contains("Status: ok"));
+
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetTest",
+                    "testCrossProfileWidgetProviderAdded", mUserId));
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetPrimaryUserTest",
+                    "testHasCrossProfileWidgetProvider_true", 0));
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetPrimaryUserTest",
+                    "testHostReceivesWidgetUpdates_true", 0));
+
+            commandOutput = changeCrossProfileWidgetForUser(WIDGET_PROVIDER_PKG,
+                    "remove-cross-profile-widget", mUserId);
+            assertTrue("Command was expected to succeed " + commandOutput,
+                    commandOutput.contains("Status: ok"));
+
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetTest",
+                    "testCrossProfileWidgetProviderRemoved", mUserId));
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetPrimaryUserTest",
+                    "testHasCrossProfileWidgetProvider_false", 0));
+            assertTrue(runDeviceTests(MANAGED_PROFILE_PKG, ".CrossProfileWidgetPrimaryUserTest",
+                    "testHostReceivesWidgetUpdates_false", 0));
+        } finally {
+            changeCrossProfileWidgetForUser(WIDGET_PROVIDER_PKG, "remove-cross-profile-widget",
+                    mUserId);
+            getDevice().uninstallPackage(WIDGET_PROVIDER_PKG);
+        }
+    }
+
     private void disableActivityForUser(String activityName, int userId)
             throws DeviceNotAvailableException {
         String command = "am start -W --user " + userId
@@ -612,7 +656,20 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
                 + " -c android.intent.category.DEFAULT "
                 + " --es extra-command " + command
                 + " --es extra-restriction-key " + key
-                + " " + MANAGED_PROFILE_PKG + "/.UserRestrictionActivity";
+                + " " + MANAGED_PROFILE_PKG + "/.SetPolicyActivity";
+        String commandOutput = getDevice().executeShellCommand(adbCommand);
+        CLog.logAndDisplay(LogLevel.INFO,
+                "Output for command " + adbCommand + ": " + commandOutput);
+        return commandOutput;
+    }
+
+    private String changeCrossProfileWidgetForUser(String packageName, String command, int userId)
+            throws DeviceNotAvailableException {
+        String adbCommand = "am start -W --user " + userId
+                + " -c android.intent.category.DEFAULT "
+                + " --es extra-command " + command
+                + " --es extra-package-name " + packageName
+                + " " + MANAGED_PROFILE_PKG + "/.SetPolicyActivity";
         String commandOutput = getDevice().executeShellCommand(adbCommand);
         CLog.logAndDisplay(LogLevel.INFO,
                 "Output for command " + adbCommand + ": " + commandOutput);
@@ -625,6 +682,15 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         String command = "pm set-app-link --user " + userId + " " + packageName + " " + status;
         CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
                 + getDevice().executeShellCommand(command));
+    }
+
+    protected void startWidgetHostService() throws Exception {
+        String command = "am startservice --user 0 "
+                + "-a " + WIDGET_PROVIDER_PKG + ".REGISTER_CALLBACK "
+                + "--ei user-extra " + getUserSerialNumber(mUserId)
+                + " " + WIDGET_PROVIDER_PKG + "/.SimpleAppWidgetHostService";
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+              + getDevice().executeShellCommand(command));
     }
 
     private void assertAppLinkResult(String methodName) throws DeviceNotAvailableException {
