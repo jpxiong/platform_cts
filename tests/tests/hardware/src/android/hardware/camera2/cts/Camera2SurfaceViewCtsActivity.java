@@ -32,6 +32,7 @@ public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHo
     private SurfaceView mSurfaceView;
     private int currentWidth = 0;
     private int currentHeight = 0;
+    private final Object sizeLock = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +54,12 @@ public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHo
                             "timeout(%d), expectWidth(%d), and expectHeight(%d) " +
                             "should all be positive numbers",
                             timeOutMs, expectWidth, expectHeight));
+        }
+
+        synchronized(sizeLock) {
+            if (expectWidth == currentWidth && expectHeight == currentHeight) {
+                return true;
+            }
         }
 
         int waitTimeMs = timeOutMs;
@@ -87,8 +94,10 @@ public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHo
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.i(TAG, "Surface Changed to: " + width + "x" + height);
-        currentWidth = width;
-        currentHeight = height;
+        synchronized (sizeLock) {
+            currentWidth = width;
+            currentHeight = height;
+        }
         surfaceChangedDone.open();
     }
 
