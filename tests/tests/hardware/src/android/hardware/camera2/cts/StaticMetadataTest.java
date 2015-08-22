@@ -397,6 +397,9 @@ public class StaticMetadataTest extends Camera2AndroidTestCase {
             case REQUEST_AVAILABLE_CAPABILITIES_PRIVATE_REPROCESSING:
                 // Tested in ExtendedCameraCharacteristicsTest
                 return;
+            case REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT:
+                // Tested in ExtendedCameracharacteristicsTest
+                return;
             default:
                 capabilityName = "Unknown";
                 assertTrue(String.format("Unknown capability set: %d", capability),
