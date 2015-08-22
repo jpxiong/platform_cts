@@ -738,6 +738,157 @@ public class ExtendedCameraCharacteristicsTest extends AndroidTestCase {
     }
 
     /**
+     * Check depth output capability
+     */
+    public void testDepthOutputCharacteristics() {
+        int counter = 0;
+
+        for (CameraCharacteristics c : mCharacteristics) {
+            Log.i(TAG, "testDepthOutputCharacteristics: Testing camera ID " + mIds[counter]);
+
+            int[] capabilities = c.get(CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+            assertNotNull("android.request.availableCapabilities must never be null",
+                    capabilities);
+            boolean supportDepth = arrayContains(capabilities,
+                    CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES_DEPTH_OUTPUT);
+            StreamConfigurationMap configs =
+                    c.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
+            int[] outputFormats = configs.getOutputFormats();
+            boolean hasDepth16 = arrayContains(outputFormats, ImageFormat.DEPTH16);
+
+            Boolean depthIsExclusive = c.get(CameraCharacteristics.DEPTH_DEPTH_IS_EXCLUSIVE);
+
+            float[] poseRotation = c.get(CameraCharacteristics.LENS_POSE_ROTATION);
+            float[] poseTranslation = c.get(CameraCharacteristics.LENS_POSE_TRANSLATION);
+            float[] cameraIntrinsics = c.get(CameraCharacteristics.LENS_INTRINSIC_CALIBRATION);
+            float[] radialDistortion = c.get(CameraCharacteristics.LENS_RADIAL_DISTORTION);
+
+            if (supportDepth) {
+                mCollector.expectTrue("Supports DEPTH_OUTPUT but does not support DEPTH16",
+                        hasDepth16);
+                if (hasDepth16) {
+                    Size[] depthSizes = configs.getOutputSizes(ImageFormat.DEPTH16);
+                    mCollector.expectTrue("Supports DEPTH_OUTPUT but no sizes for DEPTH16 supported!",
+                            depthSizes != null && depthSizes.length > 0);
+                    if (depthSizes != null) {
+                        for (Size depthSize : depthSizes) {
+                            mCollector.expectTrue("All depth16 sizes must be positive",
+                                    depthSize.getWidth() > 0 && depthSize.getHeight() > 0);
+                            long minFrameDuration = configs.getOutputMinFrameDuration(
+                                    ImageFormat.DEPTH16, depthSize);
+                            mCollector.expectTrue("Non-negative min frame duration for depth size "
+                                    + depthSize + " expected, got " + minFrameDuration,
+                                    minFrameDuration >= 0);
+                            long stallDuration = configs.getOutputStallDuration(
+                                    ImageFormat.DEPTH16, depthSize);
+                            mCollector.expectTrue("Non-negative stall duration for depth size "
+                                    + depthSize + " expected, got " + stallDuration,
+                                    stallDuration >= 0);
+                        }
+                    }
+                }
+                if (arrayContains(outputFormats, ImageFormat.DEPTH_POINT_CLOUD)) {
+                    Size[] depthCloudSizes = configs.getOutputSizes(ImageFormat.DEPTH_POINT_CLOUD);
+                    mCollector.expectTrue("Supports DEPTH_POINT_CLOUD " +
+                            "but no sizes for DEPTH_POINT_CLOUD supported!",
+                            depthCloudSizes != null && depthCloudSizes.length > 0);
+                    if (depthCloudSizes != null) {
+                        for (Size depthCloudSize : depthCloudSizes) {
+                            mCollector.expectTrue("All depth point cloud sizes must be nonzero",
+                                    depthCloudSize.getWidth() > 0);
+                            mCollector.expectTrue("All depth point cloud sizes must be N x 1",
+                                    depthCloudSize.getHeight() == 1);
+                            long minFrameDuration = configs.getOutputMinFrameDuration(
+                                    ImageFormat.DEPTH_POINT_CLOUD, depthCloudSize);
+                            mCollector.expectTrue("Non-negative min frame duration for depth size "
+                                    + depthCloudSize + " expected, got " + minFrameDuration,
+                                    minFrameDuration >= 0);
+                            long stallDuration = configs.getOutputStallDuration(
+                                    ImageFormat.DEPTH_POINT_CLOUD, depthCloudSize);
+                            mCollector.expectTrue("Non-negative stall duration for depth size "
+                                    + depthCloudSize + " expected, got " + stallDuration,
+                                    stallDuration >= 0);
+                        }
+                    }
+                }
+
+                mCollector.expectTrue("Supports DEPTH_OUTPUT but DEPTH_IS_EXCLUSIVE is not defined",
+                        depthIsExclusive != null);
+
+                mCollector.expectTrue(
+                        "Supports DEPTH_OUTPUT but LENS_POSE_ROTATION not right size",
+                        poseRotation != null && poseRotation.length == 4);
+                mCollector.expectTrue(
+                        "Supports DEPTH_OUTPUT but LENS_POSE_TRANSLATION not right size",
+                        poseTranslation != null && poseTranslation.length == 3);
+                mCollector.expectTrue(
+                        "Supports DEPTH_OUTPUT but LENS_INTRINSIC_CALIBRATION not right size",
+                        cameraIntrinsics != null && cameraIntrinsics.length == 5);
+                mCollector.expectTrue(
+                        "Supports DEPTH_OUTPUT but LENS_RADIAL_DISTORTION not right size",
+                        radialDistortion != null && radialDistortion.length == 6);
+
+                if (poseRotation != null && poseRotation.length == 4) {
+                    float normSq =
+                        poseRotation[0] * poseRotation[0] +
+                        poseRotation[1] * poseRotation[1] +
+                        poseRotation[2] * poseRotation[2] +
+                        poseRotation[3] * poseRotation[3];
+                    mCollector.expectTrue(
+                            "LENS_POSE_ROTATION quarternion must be unit-length",
+                            0.9999f < normSq && normSq < 1.0001f);
+
+                    // TODO: Cross-validate orientation/facing and poseRotation
+                    Integer orientation = c.get(CameraCharacteristics.SENSOR_ORIENTATION);
+                    Integer facing = c.get(CameraCharacteristics.LENS_FACING);
+                }
+
+                if (poseTranslation != null && poseTranslation.length == 3) {
+                    float normSq =
+                        poseTranslation[0] * poseTranslation[0] +
+                        poseTranslation[1] * poseTranslation[1] +
+                        poseTranslation[2] * poseTranslation[2];
+                    mCollector.expectTrue("Pose translation is larger than 1 m",
+                            normSq < 1.f);
+                }
+
+                Rect precorrectionArray =
+                    c.get(CameraCharacteristics.SENSOR_INFO_PRE_CORRECTION_ACTIVE_ARRAY_SIZE);
+                mCollector.expectTrue("Supports DEPTH_OUTPUT but does not have " +
+                        "precorrection active array defined", precorrectionArray != null);
+
+                if (cameraIntrinsics != null && precorrectionArray != null) {
+                    float fx = cameraIntrinsics[0];
+                    float fy = cameraIntrinsics[1];
+                    float cx = cameraIntrinsics[2];
+                    float cy = cameraIntrinsics[3];
+                    float s = cameraIntrinsics[4];
+                    mCollector.expectTrue("Optical center expected to be within precorrection array",
+                            0 <= cx && cx < precorrectionArray.width() &&
+                            0 <= cy && cy < precorrectionArray.height());
+
+                    // TODO: Verify focal lengths and skew are reasonable
+                }
+
+                if (radialDistortion != null) {
+                    // TODO: Verify radial distortion
+                }
+
+            } else {
+                boolean hasFields =
+                    hasDepth16 && (poseTranslation != null) &&
+                    (poseRotation != null) && (cameraIntrinsics != null) &&
+                    (radialDistortion != null) && (depthIsExclusive != null);
+
+                mCollector.expectTrue(
+                        "All necessary depth fields defined, but DEPTH_OUTPUT capability is not listed",
+                        !hasFields);
+            }
+        }
+    }
+
+    /**
      * Cross-check StreamConfigurationMap output
      */
     public void testStreamConfigurationMap() throws Exception {
