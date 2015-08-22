@@ -21,28 +21,33 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanRecord;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.ParcelUuid;
 import android.os.SystemClock;
 import android.test.AndroidTestCase;
 import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Test cases for Bluetooth LE scans.
  * <p>
- * To run the test, the device must be placed in an environment that has at least 5 BLE beacons
- * broadcasting no slower than 1 HZ. The BLE beacons should be a combination of iBeacon devices and
- * non-iBeacon devices.
+ * To run the test, the device must be placed in an environment that has at least 3 beacons, all
+ * placed less than 5 meters away from the DUT.
  * <p>
  * Run 'run cts --class android.bluetooth.cts.BluetoothLeScanTest' in cts-tradefed to run the test
  * cases.
@@ -51,25 +56,26 @@ public class BluetoothLeScanTest extends AndroidTestCase {
 
     private static final String TAG = "BluetoothLeScanTest";
 
-    private static final ScanFilter MANUFACTURER_DATA_FILTER =
-            new ScanFilter.Builder().setManufacturerData(0x004C, new byte[0], new byte[0]).build();
     private static final int SCAN_DURATION_MILLIS = 5000;
-    private static final int BATCH_SCAN_REPORT_DELAY_MILLIS = 10000;
+    private static final int BATCH_SCAN_REPORT_DELAY_MILLIS = 20000;
 
+    private BluetoothAdapter mBluetoothAdapter;
     private BluetoothLeScanner mScanner;
 
     @Override
     public void setUp() {
+        if (!isBleSupported())
+            return;
         BluetoothManager manager = (BluetoothManager) mContext.getSystemService(
                 Context.BLUETOOTH_SERVICE);
-        BluetoothAdapter adapter = manager.getAdapter();
-        if (!adapter.isEnabled()) {
-            adapter.enable();
+        mBluetoothAdapter = manager.getAdapter();
+        if (!mBluetoothAdapter.isEnabled()) {
             // Note it's not reliable to listen for Adapter.ACTION_STATE_CHANGED broadcast and check
             // bluetooth state.
-            sleep(2000);
+            mBluetoothAdapter.enable();
+            sleep(3000);
         }
-        mScanner = adapter.getBluetoothLeScanner();
+        mScanner = mBluetoothAdapter.getBluetoothLeScanner();
     }
 
     /**
@@ -77,13 +83,11 @@ public class BluetoothLeScanTest extends AndroidTestCase {
      */
     @MediumTest
     public void testBasicBleScan() {
-        BleScanCallback regularLeScanCallback = new BleScanCallback();
+        if (!isBleSupported())
+            return;
         long scanStartMillis = SystemClock.elapsedRealtime();
-        mScanner.startScan(regularLeScanCallback);
-        sleep(SCAN_DURATION_MILLIS);
-        mScanner.stopScan(regularLeScanCallback);
+        Collection<ScanResult> scanResults = scan();
         long scanEndMillis = SystemClock.elapsedRealtime();
-        Collection<ScanResult> scanResults = regularLeScanCallback.getScanResults();
         assertTrue("Scan results shouldn't be empty", !scanResults.isEmpty());
         verifyTimestamp(scanResults, scanStartMillis, scanEndMillis);
     }
@@ -94,8 +98,16 @@ public class BluetoothLeScanTest extends AndroidTestCase {
      */
     @MediumTest
     public void testScanFilter() {
+        if (!isBleSupported())
+            return;
+
         List<ScanFilter> filters = new ArrayList<ScanFilter>();
-        filters.add(MANUFACTURER_DATA_FILTER);
+        ScanFilter filter = createScanFilter();
+        if (filter == null) {
+            Log.d(TAG, "no appropriate filter can be set");
+            return;
+        }
+        filters.add(filter);
 
         BleScanCallback filterLeScanCallback = new BleScanCallback();
         ScanSettings settings = new ScanSettings.Builder().setScanMode(
@@ -103,11 +115,42 @@ public class BluetoothLeScanTest extends AndroidTestCase {
         mScanner.startScan(filters, settings, filterLeScanCallback);
         sleep(SCAN_DURATION_MILLIS);
         mScanner.stopScan(filterLeScanCallback);
+        sleep(1000);
         Collection<ScanResult> scanResults = filterLeScanCallback.getScanResults();
-        assertTrue("No scan results", !scanResults.isEmpty());
         for (ScanResult result : scanResults) {
-            assertTrue(MANUFACTURER_DATA_FILTER.matches(result));
+            assertTrue(filter.matches(result));
         }
+    }
+
+    // Create a scan filter based on the nearby beacon with highest signal strength.
+    private ScanFilter createScanFilter() {
+        // Get a list of nearby beacons.
+        List<ScanResult> scanResults = new ArrayList<ScanResult>(scan());
+        assertTrue("Scan results shouldn't be empty", !scanResults.isEmpty());
+        // Find the beacon with strongest signal strength, which is the target device for filter
+        // scan.
+        Collections.sort(scanResults, new RssiComparator());
+        ScanResult result = scanResults.get(0);
+        ScanRecord record = result.getScanRecord();
+        if (record == null) {
+            return null;
+        }
+        Map<ParcelUuid, byte[]> serviceData = record.getServiceData();
+        if (serviceData != null && !serviceData.isEmpty()) {
+            ParcelUuid uuid = serviceData.keySet().iterator().next();
+            return new ScanFilter.Builder().setServiceData(uuid, new byte[] { 0 },
+                    new byte[] { 0 }).build();
+        }
+        SparseArray<byte[]> manufacturerSpecificData = record.getManufacturerSpecificData();
+        if (manufacturerSpecificData != null && manufacturerSpecificData.size() > 0) {
+            return new ScanFilter.Builder().setManufacturerData(manufacturerSpecificData.keyAt(0),
+                    new byte[] { 0 }, new byte[] { 0 }).build();
+        }
+        List<ParcelUuid> serviceUuids = record.getServiceUuids();
+        if (serviceUuids != null && !serviceUuids.isEmpty()) {
+            return new ScanFilter.Builder().setServiceUuid(serviceUuids.get(0)).build();
+        }
+        return null;
     }
 
     /**
@@ -115,10 +158,11 @@ public class BluetoothLeScanTest extends AndroidTestCase {
      */
     @MediumTest
     public void testOpportunisticScan() {
-        ScanSettings opportunisticScanSettings =
-                new ScanSettings.Builder()
-                        .setScanMode(-1) // TODO: use constants in ScanSettings once it's unhiden.
-                        .build();
+        if (!isBleSupported())
+            return;
+        ScanSettings opportunisticScanSettings = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_OPPORTUNISTIC)
+                .build();
         BleScanCallback emptyScanCallback = new BleScanCallback();
 
         // No scans are really started with opportunistic scans only.
@@ -128,18 +172,20 @@ public class BluetoothLeScanTest extends AndroidTestCase {
         assertTrue(emptyScanCallback.getScanResults().isEmpty());
 
         BleScanCallback regularScanCallback = new BleScanCallback();
-        ScanSettings regularScanSettings =
-                new ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
+        ScanSettings regularScanSettings = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).build();
         List<ScanFilter> filters = new ArrayList<>();
-        filters.add(MANUFACTURER_DATA_FILTER);
+        ScanFilter filter = createScanFilter();
+        if (filter != null) {
+            filters.add(filter);
+        } else {
+            Log.d(TAG, "no appropriate filter can be set");
+        }
         mScanner.startScan(filters, regularScanSettings, regularScanCallback);
         sleep(SCAN_DURATION_MILLIS);
         // With normal BLE scan client, opportunistic scan client will get scan results.
         assertTrue("opportunistic scan results shouldn't be empty",
                 !emptyScanCallback.getScanResults().isEmpty());
-        assertTrue("opportunistic scan should see more results",
-                emptyScanCallback.getScanResults().size() >
-                regularScanCallback.getScanResults().size());
 
         // No more scan results for opportunistic scan clients once the normal BLE scan clients
         // stops.
@@ -157,20 +203,24 @@ public class BluetoothLeScanTest extends AndroidTestCase {
      */
     @MediumTest
     public void testBatchScan() {
+        if (!isBleSupported() || !isBleBatchScanSupported()) {
+            Log.d(TAG, "BLE or BLE batching not suppported");
+            return;
+        }
         ScanSettings batchScanSettings = new ScanSettings.Builder()
                 .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                 .setReportDelay(BATCH_SCAN_REPORT_DELAY_MILLIS).build();
         BleScanCallback batchScanCallback = new BleScanCallback();
-        long scanStartMillis = SystemClock.elapsedRealtime();
         mScanner.startScan(Collections.<ScanFilter> emptyList(), batchScanSettings,
                 batchScanCallback);
         sleep(SCAN_DURATION_MILLIS);
         mScanner.flushPendingScanResults(batchScanCallback);
         sleep(1000);
-        long scanEndMillis = SystemClock.elapsedRealtime();
         List<ScanResult> results = batchScanCallback.getBatchScanResults();
         assertTrue(!results.isEmpty());
-        verifyTimestamp(results, scanStartMillis, scanEndMillis);
+        long scanEndMillis = SystemClock.elapsedRealtime();
+        mScanner.stopScan(batchScanCallback);
+        verifyTimestamp(results, 0, scanEndMillis);
     }
 
     // Verify timestamp of all scan results are within [scanStartMillis, scanEndMillis].
@@ -178,8 +228,10 @@ public class BluetoothLeScanTest extends AndroidTestCase {
             long scanEndMillis) {
         for (ScanResult result : results) {
             long timestampMillis = TimeUnit.NANOSECONDS.toMillis(result.getTimestampNanos());
-            assertTrue("Invalid timestamp", timestampMillis >= scanStartMillis);
-            assertTrue("Invalid timestamp", timestampMillis <= scanEndMillis);
+            assertTrue("Invalid timestamp: " + timestampMillis + " should be >= " + scanStartMillis,
+                    timestampMillis >= scanStartMillis);
+            assertTrue("Invalid timestamp: " + timestampMillis + " should be <= " + scanEndMillis,
+                    timestampMillis <= scanEndMillis);
         }
     }
 
@@ -207,14 +259,33 @@ public class BluetoothLeScanTest extends AndroidTestCase {
         }
 
         // Return regular BLE scan results accumulated so far.
-        synchronized Collection<ScanResult> getScanResults() {
-            return Collections.unmodifiableCollection(mResults);
+        synchronized Set<ScanResult> getScanResults() {
+            return Collections.unmodifiableSet(mResults);
         }
 
         // Return batch scan results.
         synchronized List<ScanResult> getBatchScanResults() {
             return Collections.unmodifiableList(mBatchScanResults);
         }
+    }
+
+    private class RssiComparator implements Comparator<ScanResult> {
+
+        @Override
+        public int compare(ScanResult lhs, ScanResult rhs) {
+            return rhs.getRssi() - lhs.getRssi();
+        }
+
+    }
+
+    // Perform a BLE scan to get results of nearby BLE devices.
+    private Set<ScanResult> scan() {
+        BleScanCallback regularLeScanCallback = new BleScanCallback();
+        mScanner.startScan(regularLeScanCallback);
+        sleep(SCAN_DURATION_MILLIS);
+        mScanner.stopScan(regularLeScanCallback);
+        sleep(1000);
+        return regularLeScanCallback.getScanResults();
     }
 
     // Put the current thread to sleep.
@@ -224,6 +295,17 @@ public class BluetoothLeScanTest extends AndroidTestCase {
         } catch (InterruptedException e) {
             Log.e(TAG, "interrupted", e);
         }
+    }
+
+    // Check if Bluetooth LE feature is supported on DUT.
+    private boolean isBleSupported() {
+        return getContext().getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE);
+    }
+
+    // Returns whether offloaded scan batching is supported.
+    private boolean isBleBatchScanSupported() {
+        return mBluetoothAdapter.isOffloadedScanBatchingSupported();
     }
 
 }
