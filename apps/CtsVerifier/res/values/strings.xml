@@ -44,6 +44,7 @@
     <string name="test_results_cleared">Test results cleared.</string>
     <string name="view">View</string>
     <string name="test_results_error">Couldn\'t create test results report.</string>
+    <string name="runtime_permissions_error">Cannot continue. Please grant runtime permissions</string>
     <string name="export">Export</string>
     <string name="no_storage">Cannot save report to external storage, see log for details.</string>
     <string name="report_saved">Report saved to: %s</string>
@@ -2029,7 +2030,7 @@ You should be prompted to select credentials; choose the ones you just installed
    <!-- Audio Frequency Line Test -->
     <string name="audio_frequency_line_test">Audio Frequency Line Test</string>
     <string name="audio_frequency_line_info">
-        The system will measure the frequency response of the left and right line outputs, 
+        The system will measure the frequency response of the left and right line outputs,
         by feeding them back thru the microphone conection with the loopback jack.
         This test requires the Loopback Plug. Please connect a Loopback Plug on the headset
         connector, and proceed with the instructions on the screen.
