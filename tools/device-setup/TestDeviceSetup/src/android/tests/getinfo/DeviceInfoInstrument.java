@@ -80,6 +80,8 @@ public class DeviceInfoInstrument extends Instrumentation implements DeviceInfoC
 
         addResult(VERSION_RELEASE, Build.VERSION.RELEASE);
         addResult(VERSION_SDK, Build.VERSION.SDK);
+        addResult(VERSION_BASE_OS, Build.VERSION.BASE_OS);
+        addResult(VERSION_SECURITY_PATCH, Build.VERSION.SECURITY_PATCH);
 
         DisplayMetrics metrics = new DisplayMetrics();
         WindowManager wm = (WindowManager) getContext().getSystemService(
