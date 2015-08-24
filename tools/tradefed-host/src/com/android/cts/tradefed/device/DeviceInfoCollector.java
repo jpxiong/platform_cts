@@ -48,7 +48,8 @@ public class DeviceInfoCollector {
             "com.android.compatibility.common.deviceinfo";
     private static final String EXTENDED_INSTRUMENTATION_NAME =
             "com.android.compatibility.common.deviceinfo.DeviceInfoInstrument";
-    private static final String DEVICE_RESULT_DIR = "/sdcard/device-info-files";
+    private static final String DEVICE_INFO_FILES = "device-info-files";
+    private static final String DEVICE_RESULT_DIR = "/sdcard/" + DEVICE_INFO_FILES;
 
     public static final Set<String> IDS = new HashSet<String>();
     public static final Set<String> EXTENDED_IDS = new HashSet<String>();
@@ -126,6 +127,10 @@ public class DeviceInfoCollector {
             Log.e(LOG_TAG, "Local result directory is null or is not a directory");
             return;
         }
+
+        localResultDir = new File(localResultDir, DEVICE_INFO_FILES);
+        localResultDir.mkdirs();
+
         // Pull files from device result directory to local result directory
         String command = String.format("adb -s %s pull %s %s", device.getSerialNumber(),
                 DEVICE_RESULT_DIR, localResultDir.getAbsolutePath());
