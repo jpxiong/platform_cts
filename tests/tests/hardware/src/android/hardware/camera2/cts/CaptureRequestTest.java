@@ -1993,12 +1993,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private long[] getExposureTimeTestValues() {
         long[] testValues = new long[DEFAULT_NUM_EXPOSURE_TIME_STEPS + 1];
         long maxExpTime = mStaticInfo.getExposureMaximumOrDefault(DEFAULT_EXP_TIME_NS);
-        long minxExpTime = mStaticInfo.getExposureMinimumOrDefault(DEFAULT_EXP_TIME_NS);
+        long minExpTime = mStaticInfo.getExposureMinimumOrDefault(DEFAULT_EXP_TIME_NS);
 
-        long range = maxExpTime - minxExpTime;
+        long range = maxExpTime - minExpTime;
         double stepSize = range / (double)DEFAULT_NUM_EXPOSURE_TIME_STEPS;
         for (int i = 0; i < testValues.length; i++) {
-            testValues[i] = minxExpTime + (long)(stepSize * i);
+            testValues[i] = maxExpTime - (long)(stepSize * i);
             testValues[i] = mStaticInfo.getExposureClampToRange(testValues[i]);
         }
 
@@ -2047,7 +2047,7 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         }
         int[] testValues = new int[numSteps + 1];
         for (int i = 0; i < testValues.length; i++) {
-            testValues[i] = minSensitivity + stepSize * i;
+            testValues[i] = maxSensitivity - stepSize * i;
             testValues[i] = mStaticInfo.getSensitivityClampToRange(testValues[i]);
         }
 
