@@ -1454,11 +1454,15 @@ You should be prompted to select credentials; choose the ones you just installed
         This test exercises Keyguard Disabled Features. Follow instructions above.
     </string>
     <string name="provisioning_byod_keyguard_disabled_features_instruction">
-        Please press the \"Prepare test\" button to disable trust agents.\n
+        Please go to Settings &gt; Security &gt; Device administrators and set
+        \"CTS Verifier - AfW Admin\" as active admin.\n
+        After that please press the \"Prepare test\" button to disable trust agents.\n
         Then please press through the following verification steps.\n
-        Note: Device password will be set to \"testpassword\". After leaving the screen device password be cleared.
+        Note: Device password will be set to \"testpassword\". After leaving the screen device
+        password and active admin status will be cleared.
     </string>
     <string name="provisioning_byod_keyguard_disabled_features_prepare_button">Prepare test</string>
+    <string name="provisioning_byod_keyguard_disabled_features_not_admin">CtsVerifier is not active admin. Please follow instructions.</string>
     <string name="provisioning_byod_disable_trust_agents">Disable trust agents</string>
     <string name="provisioning_byod_disable_trust_agents_instruction">
         Please press the Go button to go to Settings > Security. Then go to Trusted agents and\n

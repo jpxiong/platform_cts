@@ -18,6 +18,7 @@ package com.android.cts.verifier.managedprovisioning;
 
 import android.app.admin.DevicePolicyManager;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
@@ -25,12 +26,15 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import com.android.cts.verifier.ArrayTestListAdapter;
 import com.android.cts.verifier.DialogTestListActivity;
 import com.android.cts.verifier.R;
 
 public class KeyguardDisabledFeaturesActivity extends DialogTestListActivity {
+
+    private DevicePolicyManager mDpm;
 
     public KeyguardDisabledFeaturesActivity() {
         super(R.layout.provisioning_byod,
@@ -43,12 +47,20 @@ public class KeyguardDisabledFeaturesActivity extends DialogTestListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mDpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+
         mPrepareTestButton.setText(
                 R.string.provisioning_byod_keyguard_disabled_features_prepare_button);
         mPrepareTestButton.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    resetPassword("testpassword");
+                    if (!mDpm.isAdminActive(DeviceAdminTestReceiver.getReceiverComponentName())) {
+                        Toast.makeText(KeyguardDisabledFeaturesActivity.this,
+                                R.string.provisioning_byod_keyguard_disabled_features_not_admin,
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    mDpm.resetPassword("testpassword", 0);
                     setKeyguardDisabledFeatures(DevicePolicyManager.KEYGUARD_DISABLE_TRUST_AGENTS |
                             DevicePolicyManager.KEYGUARD_DISABLE_FINGERPRINT |
                             DevicePolicyManager.KEYGUARD_DISABLE_UNREDACTED_NOTIFICATIONS);
@@ -60,7 +72,11 @@ public class KeyguardDisabledFeaturesActivity extends DialogTestListActivity {
     public void finish() {
         // Pass and fail buttons are known to call finish() when clicked, and this is when we want to
         // clear the password.
-        resetPassword(null);
+        final ComponentName adminComponent = DeviceAdminTestReceiver.getReceiverComponentName();
+        if (mDpm.isAdminActive(adminComponent)) {
+            mDpm.resetPassword(null, 0);
+            mDpm.removeActiveAdmin(adminComponent);
+        }
         super.finish();
     }
 
@@ -69,16 +85,6 @@ public class KeyguardDisabledFeaturesActivity extends DialogTestListActivity {
                 new Intent(ByodHelperActivity.ACTION_KEYGUARD_DISABLED_FEATURES)
                 .putExtra(ByodHelperActivity.EXTRA_PARAMETER_1, flags);
         startActivity(setKeyguardDisabledFeaturesIntent);
-    }
-
-    /**
-     * Reset device password
-     * @param password password to reset to (may be null)
-     */
-    private void resetPassword(String password) {
-        DevicePolicyManager dpm = (DevicePolicyManager)
-                getSystemService(Context.DEVICE_POLICY_SERVICE);
-        dpm.resetPassword(password, 0);
     }
 
     @Override
