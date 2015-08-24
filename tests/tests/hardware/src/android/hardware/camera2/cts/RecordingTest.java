@@ -821,13 +821,21 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     getAvailableMinFrameDurationsForFormatChecked(ImageFormat.JPEG);
             for (int i = mOrderedStillSizes.size() - 2; i >= 0; i--) {
                 Size candidateSize = mOrderedStillSizes.get(i);
-                Long jpegFrameDuration = minFrameDurationMap.get(candidateSize);
-                assertTrue("Cannot find minimum frame duration for jpeg size " + candidateSize,
-                        jpegFrameDuration != null);
-                if (candidateSize.getWidth() <= videoSz.getWidth() &&
-                        candidateSize.getHeight() <= videoSz.getHeight() &&
-                        jpegFrameDuration <= videoFrameDuration) {
-                    videoSnapshotSz = candidateSize;
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    // Legacy level doesn't report min frame duration
+                    if (candidateSize.getWidth() <= videoSz.getWidth() &&
+                            candidateSize.getHeight() <= videoSz.getHeight()) {
+                        videoSnapshotSz = candidateSize;
+                    }
+                } else {
+                    Long jpegFrameDuration = minFrameDurationMap.get(candidateSize);
+                    assertTrue("Cannot find minimum frame duration for jpeg size " + candidateSize,
+                            jpegFrameDuration != null);
+                    if (candidateSize.getWidth() <= videoSz.getWidth() &&
+                            candidateSize.getHeight() <= videoSz.getHeight() &&
+                            jpegFrameDuration <= videoFrameDuration) {
+                        videoSnapshotSz = candidateSize;
+                    }
                 }
             }
 
