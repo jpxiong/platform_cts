@@ -16,6 +16,10 @@
 
 package com.android.cts.devicepolicy;
 
+import com.android.ddmlib.Log.LogLevel;
+import com.android.tradefed.device.DeviceNotAvailableException;
+import com.android.tradefed.log.LogUtil.CLog;
+
 /**
  * Set of tests for usecases that apply to profile and device owner.
  * This class is the base class of MixedProfileOwnerTest and MixedDeviceOwnerTest and is abstract
@@ -170,6 +174,11 @@ public abstract class DeviceAndProfileOwnerTest extends BaseDevicePolicyTest {
         }
 
         executeDeviceTestClass(".AccountManagementTest");
+
+        // Send a home intent to dismiss an error dialog.
+        String command = "am start -a android.intent.action.MAIN -c android.intent.category.HOME";
+        CLog.logAndDisplay(LogLevel.INFO, "Output for command " + command + ": "
+                + getDevice().executeShellCommand(command));
     }
 
     public void testDelegatedCertInstaller() throws Exception {
