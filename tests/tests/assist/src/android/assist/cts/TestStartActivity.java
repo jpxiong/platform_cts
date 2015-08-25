@@ -37,7 +37,15 @@ public class TestStartActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, " in onCreate");
-        setContentView(R.layout.test_app);
+
+        // Set the respective view we want compared with the test activity
+        String testCaseName = getIntent().getStringExtra(Utils.TESTCASE_TYPE);
+        switch (testCaseName) {
+            case Utils.ASSIST_STRUCTURE:
+                setContentView(R.layout.test_app);
+                setTitle(R.string.testAppTitle);
+                return;
+        }
     }
 
     @Override
@@ -59,6 +67,14 @@ public class TestStartActivity extends Activity {
     public void start3pApp(String testCaseName) {
         Intent intent = new Intent();
         intent.setAction("android.intent.action.TEST_APP_" + testCaseName);
+        intent.setComponent(Utils.getTestAppComponent(testCaseName));
+        startActivity(intent);
+    }
+
+    public void start3pAppWithColor(String testCaseName, int color) {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.TEST_APP_" + testCaseName);
+        intent.putExtra(Utils.SCREENSHOT_COLOR_KEY, color);
         intent.setComponent(Utils.getTestAppComponent(testCaseName));
         startActivity(intent);
     }

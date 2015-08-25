@@ -95,9 +95,13 @@ public class AssistStructureTest extends AssistTestBase {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (action.equals(Utils.ASSIST_STRUCTURE_HASRESUMED)) {
-                mHasResumedLatch.countDown();
+                if (mHasResumedLatch != null) {
+                    mHasResumedLatch.countDown();
+                }
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
-                mAssistantReadyLatch.countDown();
+                if (mAssistantReadyLatch != null) {
+                    mAssistantReadyLatch.countDown();
+                }
             }
         }
     }

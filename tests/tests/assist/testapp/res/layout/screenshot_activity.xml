@@ -13,8 +13,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources>
-    <string name="welcome">Hello there!</string>
-     <string name="testAppTitle">Assist Structure Test Activity</string>
-     <string name="screenshotActivityTitle">Screenshot Test Activity</string>
-</resources>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/screenshot_activity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+</RelativeLayout>

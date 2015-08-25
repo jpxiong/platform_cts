@@ -22,7 +22,7 @@
         <uses-library android:name="android.test.runner" />
 
         <activity android:name="TestApp"
-                android:label="Assist Structure Test App"
+                android:label="Assist Structure Test Activity"
                 android:theme="@android:style/Theme.Material.Light">
           <intent-filter>
               <action android:name="android.intent.action.TEST_APP_ASSIST_STRUCTURE" />
@@ -53,6 +53,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.TEST_APP_LIFECYCLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity>
+        <activity android:name="ScreenshotActivity"
+                  android:label="Screenshot Test Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.TEST_APP_SCREENSHOT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
             </intent-filter>
         </activity>
     </application>

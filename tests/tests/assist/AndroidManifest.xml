@@ -20,17 +20,18 @@
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.BIND_VOICE_INTERACTION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application>
       <uses-library android:name="android.test.runner" />
       <activity android:name="android.assist.cts.TestStartActivity"
-                android:label="Assist Structure Test App"
-                android:theme="@android:style/Theme.Material.Light">
+                android:label="Assist Test Start Activity">
           <intent-filter>
               <action android:name="android.intent.action.TEST_START_ACTIVITY_ASSIST_STRUCTURE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_DISABLE_CONTEXT" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_FLAG_SECURE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_LIFECYCLE" />
+              <action android:name="android.intent.action.TEST_START_ACTIVITY_SCREENSHOT" />
               <category android:name="android.intent.category.LAUNCHER" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>

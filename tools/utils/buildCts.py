@@ -470,6 +470,9 @@ def BuildCtsTemporarilyKnownFailureList():
           'android.alarmclock.cts.SetAlarmTest#testAll',
           'android.alarmclock.cts.SnoozeAlarmTest#testAll',
       ],
+      'android.assist' : [
+          'android.assist.cts.ScreenshotTest',
+      ],
       'android.calllog' : [
           'android.calllog.cts.CallLogBackupTest#testSingleCallBackup',
       ],

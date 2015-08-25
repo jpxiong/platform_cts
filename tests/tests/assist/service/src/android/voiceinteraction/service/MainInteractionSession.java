@@ -24,15 +24,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 
 import android.assist.common.Utils;
+import android.view.WindowManager;
 
 public class MainInteractionSession extends VoiceInteractionSession {
     static final String TAG = "MainInteractionSession";
@@ -43,7 +49,12 @@ public class MainInteractionSession extends VoiceInteractionSession {
 
     private boolean hasReceivedAssistData = false;
     private boolean hasReceivedScreenshot = false;
+    private int mCurColor;
+    private int mDisplayHeight;
+    private int mDisplayWidth;
+    private Bitmap mScreenshot;
     private BroadcastReceiver mReceiver;
+    private String mTestName;
 
     MainInteractionSession(Context context) {
         super(context);
@@ -78,12 +89,13 @@ public class MainInteractionSession extends VoiceInteractionSession {
 
     @Override
     public void onShow(Bundle args, int showFlags) {
-        // set some content view.
-        // TODO: check that the view takes up the whole screen.
-        // check that interactor mode is for assist
         if ((showFlags & SHOW_WITH_ASSIST) == 0) {
             return;
         }
+        mTestName = args.getString(Utils.TESTCASE_TYPE, "");
+        mCurColor = args.getInt(Utils.SCREENSHOT_COLOR_KEY);
+        mDisplayHeight = args.getInt(Utils.DISPLAY_HEIGHT_KEY);
+        mDisplayWidth = args.getInt(Utils.DISPLAY_WIDTH_KEY);
         super.onShow(args, showFlags);
     }
 
@@ -107,15 +119,50 @@ public class MainInteractionSession extends VoiceInteractionSession {
     public void onHandleScreenshot(/*@Nullable*/ Bitmap screenshot) {
         Log.i(TAG, String.format("onHandleScreenshot - Screenshot: %s", screenshot));
         super.onHandleScreenshot(screenshot);
-        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+
         if (screenshot != null) {
-            screenshot.compress(Bitmap.CompressFormat.PNG, 50, bs);
-            mAssistData.putByteArray(Utils.ASSIST_SCREENSHOT_KEY, bs.toByteArray());
+            mAssistData.putBoolean(Utils.ASSIST_SCREENSHOT_KEY, true);
+
+            if (mTestName.equals(Utils.SCREENSHOT)) {
+                boolean screenshotMatches = compareScreenshot(screenshot, mCurColor);
+                Log.i(TAG, "this is a screenshot test. Matches? " + screenshotMatches);
+                mAssistData.putBoolean(
+                    Utils.COMPARE_SCREENSHOT_KEY, screenshotMatches);
+            }
         } else {
-            mAssistData.putByteArray(Utils.ASSIST_SCREENSHOT_KEY, null);
+            mAssistData.putBoolean(Utils.ASSIST_SCREENSHOT_KEY, false);
         }
         hasReceivedScreenshot = true;
         maybeBroadcastResults();
+    }
+
+    private boolean compareScreenshot(Bitmap screenshot, int color) {
+        Point size = new Point(mDisplayWidth, mDisplayHeight);
+
+        if (screenshot.getWidth() != size.x || screenshot.getHeight() != size.y) {
+            Log.i(TAG, "width  or height didn't match: " + size + " vs " + screenshot.getWidth()
+                    + "," + screenshot.getHeight());
+            return false;
+        }
+        int[] pixels = new int[size.x * size.y];
+        screenshot.getPixels(pixels, 0, size.x, 0, 0, size.x, size.y);
+
+        int expectedColor = 0;
+        int wrongColor = 0;
+        for (int pixel : pixels) {
+            if (pixel == color) {
+                expectedColor += 1;
+            } else {
+                wrongColor += 1;
+            }
+        }
+
+        double colorRatio = (double) expectedColor / (expectedColor + wrongColor);
+        Log.i(TAG, "the ratio is " + colorRatio);
+        if (colorRatio < 0.6) {
+            return false;
+        }
+        return true;
     }
 
     private void maybeBroadcastResults() {
@@ -142,12 +189,5 @@ public class MainInteractionSession extends VoiceInteractionSession {
             Log.wtf(TAG, "layout inflater was null");
         }
         return f.inflate(R.layout.assist_layer,null);
-    }
-
-    class DoneReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Done_broadcast " + intent.getAction());
-        }
     }
 }

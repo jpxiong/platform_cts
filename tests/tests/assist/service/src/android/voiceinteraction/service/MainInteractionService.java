@@ -30,11 +30,17 @@ import android.service.voice.VoiceInteractionService;
 import android.service.voice.VoiceInteractionSession;
 import android.util.Log;
 
+import java.lang.Exception;
+import java.lang.Override;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
 public class MainInteractionService extends VoiceInteractionService {
     static final String TAG = "MainInteractionService";
     private Intent mIntent;
     private boolean mReady = false;
-    private BroadcastReceiver mBroadcastReceiver;
+    private BroadcastReceiver mBroadcastReceiver, mResumeReceiver;
+    private CountDownLatch mResumeLatch;
 
     @Override
     public void onReady() {
@@ -57,17 +63,27 @@ public class MainInteractionService extends VoiceInteractionService {
         } else {
             if (isActiveService(this, new ComponentName(this, getClass()))) {
                 if (mIntent.getBooleanExtra(Utils.EXTRA_REGISTER_RECEIVER, false)) {
-                    Log.i(TAG, "Registering receiver to start session later");
+                    mResumeLatch = new CountDownLatch(1);
                     if (mBroadcastReceiver == null) {
                         mBroadcastReceiver = new MainInteractionServiceBroadcastReceiver();
-                        registerReceiver(mBroadcastReceiver,
-                                new IntentFilter(Utils.BROADCAST_INTENT_START_ASSIST));
+                        IntentFilter filter = new IntentFilter();
+                        filter.addAction(Utils.BROADCAST_INTENT_START_ASSIST);
+                        registerReceiver(mBroadcastReceiver, filter);
+                        Log.i(TAG, "Registered receiver to start session later");
+
+                        IntentFilter resumeFilter = new IntentFilter(Utils.SCREENSHOT_HASRESUMED);
+                        mResumeReceiver = new MainServiceAppResumeReceiver();
+                        registerReceiver(mResumeReceiver, resumeFilter);
+                        Log.i(TAG, "Registered receiver for resuming activity");
                     }
                     sendBroadcast(new Intent(Utils.ASSIST_RECEIVER_REGISTERED));
               } else {
                   Log.i(TAG, "Yay! about to start session");
-                  showSession(new Bundle(), VoiceInteractionSession.SHOW_WITH_ASSIST |
-                          VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
+                  Bundle bundle = new Bundle();
+                  bundle.putString(Utils.TESTCASE_TYPE,
+                          mIntent.getStringExtra(Utils.TESTCASE_TYPE));
+                  showSession(bundle, VoiceInteractionSession.SHOW_WITH_ASSIST |
+                      VoiceInteractionSession.SHOW_WITH_SCREENSHOT);
               }
             } else {
                 Log.wtf(TAG, "**** Not starting MainInteractionService because" +
@@ -81,7 +97,49 @@ public class MainInteractionService extends VoiceInteractionService {
         public void onReceive(Context context, Intent intent) {
             Log.i(MainInteractionService.TAG, "Recieved broadcast to start session now.");
             if (intent.getAction().equals(Utils.BROADCAST_INTENT_START_ASSIST)) {
-                showSession(new Bundle(), SHOW_WITH_ASSIST | SHOW_WITH_SCREENSHOT);
+                String testCaseName = intent.getStringExtra(Utils.TESTCASE_TYPE);
+                Log.i(MainInteractionService.TAG, "trying to start 3p activity: " + testCaseName);
+                Bundle extras = intent.getExtras();
+                if (extras == null) {
+                    extras = new Bundle();
+                }
+                if (testCaseName.equals(Utils.SCREENSHOT)) {
+                    try {
+                        // extra info to pass along to 3p activity.
+
+                        Intent intent3p = new Intent();
+                        Log.i(TAG, "starting the 3p app again");
+                        intent3p.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent3p.setAction("android.intent.action.TEST_APP_" + testCaseName);
+                        intent3p.setComponent(Utils.getTestAppComponent(testCaseName));
+                        intent3p.putExtras(extras);
+                        startActivity(intent3p);
+                        if (!MainInteractionService.this.mResumeLatch
+                                .await(Utils.ACTIVITY_ONRESUME_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                            Log.i(TAG, "waited for 3p activity to resume");
+                        }
+                    } catch (Exception e) {
+                        Log.i(TAG, "failed so reload 3p app: " + e.toString());
+                    }
+                }
+                extras.putString(Utils.TESTCASE_TYPE, mIntent.getStringExtra(Utils.TESTCASE_TYPE));
+                MainInteractionService.this.showSession(
+                        extras, SHOW_WITH_ASSIST | SHOW_WITH_SCREENSHOT);
+            }
+        }
+    }
+
+    private class MainServiceAppResumeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Utils.SCREENSHOT_HASRESUMED)) {
+                Log.i(MainInteractionService.TAG,
+                    "screenshot activity has resumed in this new receiver");
+                if (MainInteractionService.this.mResumeLatch != null) {
+                    MainInteractionService.this.mResumeLatch.countDown();
+                } else {
+                    Log.i(TAG, "mResumeLatch was null");
+                }
             }
         }
     }

@@ -20,6 +20,16 @@ import android.assist.common.Utils;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+
+import java.io.ByteArrayOutputStream;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,7 +40,6 @@ import java.lang.Override;
 
 public class TestApp extends Activity {
     static final String TAG = "TestApp";
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

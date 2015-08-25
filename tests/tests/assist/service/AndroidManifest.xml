@@ -18,6 +18,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="android.assist.service">
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
     <application>
       <uses-library android:name="android.test.runner" />
       <service android:name=".MainInteractionService"
@@ -43,6 +45,7 @@
               <action android:name="android.intent.action.START_TEST_ASSIST_STRUCTURE" />
               <action android:name="android.intent.action.START_TEST_LIFECYCLE" />
               <action android:name="android.intent.action.START_TEST_FLAG_SECURE" />
+              <action android:name="android.intent.action.START_TEST_SCREENSHOT" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>
       </activity>

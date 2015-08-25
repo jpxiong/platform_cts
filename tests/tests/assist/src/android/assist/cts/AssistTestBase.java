@@ -33,10 +33,13 @@ import android.content.res.XmlResourceParser;
 import android.cts.util.SystemUtil;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,12 +55,14 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected TestStartActivity mTestActivity;
     protected AssistContent mAssistContent;
     protected AssistStructure mAssistStructure;
-    protected Bitmap mScreenshot;
+    protected boolean mScreenshot;
+    protected Bitmap mAppScreenshot;
     protected BroadcastReceiver mReceiver;
     protected Bundle mAssistBundle;
     protected Context mContext;
-    protected CountDownLatch mLatch, mAssistantReadyLatch;
-
+    protected CountDownLatch mLatch, mAssistantReadyLatch, mScreenshotLatch, mHasResumedLatch;
+    protected boolean mScreenshotMatches;
+    private Point mDisplaySize;
     private String mTestName;
     private View mView;
 
@@ -75,22 +80,35 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         SystemUtil.runShellCommand(getInstrumentation(),
                 "settings put secure assist_screenshot_enabled 1");
         logContextAndScreenshotSetting();
+        // reset old values
+        mScreenshotMatches = false;
+        mScreenshot = false;
+        mAssistStructure = null;
+        mAssistContent = null;
+        mAssistBundle = null;
     }
 
     @Override
     protected void tearDown() throws Exception {
-        mContext.unregisterReceiver(mReceiver);
         mTestActivity.finish();
-        super.tearDown();
         mContext.sendBroadcast(new Intent(Utils.HIDE_SESSION));
+        if (mReceiver != null) {
+            mContext.unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+        super.tearDown();
     }
 
+    /**
+     * Starts the shim service activity
+     */
     protected void startTestActivity(String testName) {
         Intent intent = new Intent();
         mTestName = testName;
         intent.setAction("android.intent.action.TEST_START_ACTIVITY_" + testName);
         intent.setComponent(new ComponentName(getInstrumentation().getContext(),
                 TestStartActivity.class));
+        intent.putExtra(Utils.TESTCASE_TYPE, testName);
         setActivityIntent(intent);
         mTestActivity = getActivity();
     }
@@ -109,11 +127,33 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
      * Send broadcast to MainInteractionService to start a session
      */
     protected void startSession() {
-        mContext.sendBroadcast(new Intent(Utils.BROADCAST_INTENT_START_ASSIST));
+        startSession(mTestName, new Bundle());
+    }
+
+    protected void startSession(String testName, Bundle extras) {
+        Intent intent = new Intent(Utils.BROADCAST_INTENT_START_ASSIST);
+        Log.i(TAG, "passed in class test name is: " + testName);
+        intent.putExtra(Utils.TESTCASE_TYPE, testName);
+        addDimensionsToIntent(intent);
+        intent.putExtras(extras);
+        mContext.sendBroadcast(intent);
     }
 
     /**
-     * Called after startTestActivity
+     * Calculate display dimensions (including navbar) to pass along in the given intent.
+     */
+    private void addDimensionsToIntent(Intent intent) {
+        if (mDisplaySize == null) {
+            Display display = mTestActivity.getWindowManager().getDefaultDisplay();
+            mDisplaySize = new Point();
+            display.getRealSize(mDisplaySize);
+        }
+        intent.putExtra(Utils.DISPLAY_WIDTH_KEY, mDisplaySize.x);
+        intent.putExtra(Utils.DISPLAY_HEIGHT_KEY, mDisplaySize.y);
+    }
+
+    /**
+     * Called after startTestActivity. Includes check for receiving context.
      */
     protected boolean waitForBroadcast() throws Exception {
         mTestActivity.start3pApp(mTestName);
@@ -123,15 +163,16 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
 
     protected boolean waitForContext() throws Exception {
         mLatch = new CountDownLatch(1);
+
         if (mReceiver != null) {
             mContext.unregisterReceiver(mReceiver);
         }
         mReceiver = new TestResultsReceiver();
-        mContext.registerReceiver(mReceiver,
-            new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
-
-        if (!mLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-            fail("Failed to receive broadcast in " + Utils.TIMEOUT_MS + "msec");
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Utils.BROADCAST_ASSIST_DATA_INTENT);
+        mContext.registerReceiver(mReceiver, filter);
+        if (!mLatch.await(Utils.getAssistDataTimeout(mTestName), TimeUnit.MILLISECONDS)) {
+            fail("Fail to receive broadcast in " + Utils.getAssistDataTimeout(mTestName) + "msec");
         }
         Log.i(TAG, "Received broadcast with all information.");
         return true;
@@ -163,7 +204,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
                     isBundleNull? "":"not", mAssistBundle));
         }
 
-        if ((mScreenshot == null) != isScreenshotNull) {
+        if (mScreenshot == isScreenshotNull) {
             fail(String.format("Should %s have been null - Screenshot: %s",
                     isScreenshotNull? "":"not", mScreenshot));
         }
@@ -187,7 +228,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
 
     protected void logContextAndScreenshotSetting() {
         Log.i(TAG, "Context is: " + Settings.Secure.getString(
-            mContext.getContentResolver(), "assist_structure_enabled"));
+                mContext.getContentResolver(), "assist_structure_enabled"));
         Log.i(TAG, "Screenshot is: " + Settings.Secure.getString(
                 mContext.getContentResolver(), "assist_screenshot_enabled"));
     }
@@ -260,7 +301,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
         }
         numNodeChildren = parentNode.getChildCount();
 
-        if  (isSecureWindow) {
+        if (isSecureWindow) {
             assertEquals("Secure window should only traverse root node.", 0, numNodeChildren);
             isSecureWindow = false;
             return;
@@ -304,6 +345,11 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
             assertNull("View Node should not have an ID.", parentNode.getIdEntry());
         }
 
+        Log.i(TAG, "parent text: " + parentNode.getText());
+        if (parentView instanceof TextView) {
+            Log.i(TAG, "view text: " + ((TextView) parentView).getText());
+        }
+
         assertEquals("Scroll X does not match.",
                 parentView.getScrollX(), parentNode.getScrollX());
 
@@ -336,16 +382,19 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
                 AssistTestBase.this.mAssistContent = assistData.getParcelable(
                         Utils.ASSIST_CONTENT_KEY);
 
-                byte[] bitmapArray = assistData.getByteArray(Utils.ASSIST_SCREENSHOT_KEY);
-                if (bitmapArray != null) {
-                    AssistTestBase.this.mScreenshot = BitmapFactory.decodeByteArray(
-                            bitmapArray, 0, bitmapArray.length);
-                } else {
-                    AssistTestBase.this.mScreenshot = null;
-                }
+                AssistTestBase.this.mScreenshot =
+                        assistData.getBoolean(Utils.ASSIST_SCREENSHOT_KEY, false);
+
+                AssistTestBase.this.mScreenshotMatches = assistData.getBoolean(
+                        Utils.COMPARE_SCREENSHOT_KEY, false);
 
                 if (mLatch != null) {
+                    Log.i(AssistTestBase.TAG, "counting down latch. received assist data.");
                     mLatch.countDown();
+                }
+            } else if (intent.getAction().equals(Utils.SCREENSHOT_HASRESUMED)) {
+                if (mHasResumedLatch != null) {
+                    mHasResumedLatch.countDown();
                 }
             }
         }

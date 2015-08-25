@@ -295,5 +295,12 @@
     "com.android.cts.app.os.OsHostTests#testNonExportedActivities"
   ],
   bug: 23779168
+},
+{
+  description: "New assist tests that do not yet have a track record.",
+  names: [
+    "android.assist.cts.ScreenshotTest"
+  ],
+  bug: 21668302
 }
 ]

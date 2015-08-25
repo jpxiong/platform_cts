@@ -108,16 +108,18 @@ public class LifecycleTest extends AssistTestBase {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(action_hasResumed)) {
-                mHasResumedLatch.countDown();
-            } else if (action.equals(action_onPause)) {
+            if (action.equals(action_hasResumed) && mHasResumedLatch != null) {
+                    mHasResumedLatch.countDown();
+            } else if (action.equals(action_onPause) && mActivityLifecycleLatch != null) {
                 mActivityLifecycleLatch.countDown();
-            } else if (action.equals(action_onStop)) {
+            } else if (action.equals(action_onStop) && mActivityLifecycleLatch != null) {
                 mActivityLifecycleLatch.countDown();
-            } else if (action.equals(action_onDestroy)) {
+            } else if (action.equals(action_onDestroy) && mActivityLifecycleLatch != null) {
                 mActivityLifecycleLatch.countDown();
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
-                mAssistantReadyLatch.countDown();
+                if (mAssistantReadyLatch != null) {
+                    mAssistantReadyLatch.countDown();
+                }
             }
         }
     }

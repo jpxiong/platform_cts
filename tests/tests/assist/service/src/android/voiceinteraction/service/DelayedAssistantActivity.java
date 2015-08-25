@@ -26,11 +26,17 @@ import android.util.Log;
 public class DelayedAssistantActivity extends Activity {
     static final String TAG = "DelayedAssistantActivity";
 
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(this, MainInteractionService.class));
         intent.putExtra(Utils.EXTRA_REGISTER_RECEIVER, true);
+        intent.putExtra(Utils.TESTCASE_TYPE, getIntent().getStringExtra(Utils.TESTCASE_TYPE));
+        intent.putExtra(Utils.DISPLAY_WIDTH_KEY,
+                getIntent().getIntExtra(Utils.DISPLAY_WIDTH_KEY, 0));
+        intent.putExtra(Utils.DISPLAY_HEIGHT_KEY,
+                getIntent().getIntExtra(Utils.DISPLAY_HEIGHT_KEY, 0));
         finish();
         ComponentName serviceName = startService(intent);
         Log.i(TAG, "Started service: " + serviceName);
