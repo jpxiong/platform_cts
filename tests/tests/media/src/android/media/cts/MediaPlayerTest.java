@@ -89,6 +89,37 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testFlacHeapOverflow() throws Exception {
+        testIfMediaServerDied(R.raw.heap_oob_flac);
+    }
+
+    private void testIfMediaServerDied(int res) throws Exception {
+        mMediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                assertTrue(mp == mMediaPlayer);
+                assertTrue("mediaserver process died", what != MediaPlayer.MEDIA_ERROR_SERVER_DIED);
+                return false;
+            }
+        });
+
+        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                assertTrue(mp == mMediaPlayer);
+                mOnCompletionCalled.signal();
+            }
+        });
+
+        AssetFileDescriptor afd = mResources.openRawResourceFd(res);
+        mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+        afd.close();
+        mMediaPlayer.prepare();
+        mMediaPlayer.start();
+        mOnCompletionCalled.waitForSignal();
+        mMediaPlayer.release();
+    }
+
     // Bug 13652927
     public void testVorbisCrash() throws Exception {
         MediaPlayer mp = mMediaPlayer;
