@@ -177,6 +177,7 @@ cts_host_libraries := \
     CtsDumpsysHostTestCases \
     CtsHostJank \
     CtsHostUi \
+    CtsJdwpSecurityHostTestCases \
     CtsMonkeyTestCases \
     CtsThemeHostTestCases \
     CtsSecurityHostTestCases \
@@ -199,6 +200,7 @@ cts_ui_tests := \
 
 cts_device_jars := \
     CtsDeviceJank \
+    CtsJdwpApp \
     CtsPrintInstrument
 
 cts_device_executables := \
