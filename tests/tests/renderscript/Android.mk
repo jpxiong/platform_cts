@@ -28,7 +28,7 @@ LOCAL_MULTILIB := both
 # When built, explicitly put it in the data partition.
 LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
 
-LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner
+LOCAL_STATIC_JAVA_LIBRARIES := ctstestrunner xmp_toolkit
 LOCAL_JNI_SHARED_LIBRARIES := libcoremathtestcpp_jni libbnnmdata_jni
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-renderscript-files-under, src)
