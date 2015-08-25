@@ -30,10 +30,14 @@ LOCAL_SRC_FILES := \
 		android_security_cts_NativeCodeTest.cpp \
 		android_security_cts_SELinuxTest.cpp \
 		android_security_cts_MMapExecutableTest.cpp \
-		android_security_cts_AudioPolicyBinderTest.cpp
+		android_security_cts_AudioPolicyBinderTest.cpp \
+		android_security_cts_EncryptionTest.cpp
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
-LOCAL_SHARED_LIBRARIES := libnativehelper liblog libbinder libutils libmedia libselinux libdl
+LOCAL_SHARED_LIBRARIES := libnativehelper liblog libbinder libutils libmedia libselinux libdl libcutils libcrypto
+
+LOCAL_C_INCLUDES += ndk/sources/cpufeatures
+LOCAL_STATIC_LIBRARIES := cpufeatures
 
 include $(BUILD_SHARED_LIBRARY)
