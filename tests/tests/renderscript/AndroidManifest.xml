@@ -22,6 +22,8 @@
     package="com.android.cts.renderscript">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
