@@ -101,6 +101,11 @@ public class PermissionsHostTest extends DeviceTestCase implements IAbiReceiver,
         runDeviceTests(PKG, ".UsePermissionTest", "testInteractiveGrant");
     }
 
+    public void testRuntimeGroupGrantSpecificity() throws Exception {
+        assertNull(getDevice().installPackage(mCtsBuild.getTestApp(APK), false, false));
+        runDeviceTests(PKG, ".UsePermissionTest", "testRuntimeGroupGrantSpecificity");
+    }
+
     public void testCompatDefault() throws Exception {
         assertNull(getDevice().installPackage(mCtsBuild.getTestApp(APK_COMPAT), false, false));
         runDeviceTests(PKG, ".UsePermissionCompatTest", "testCompatDefault");
