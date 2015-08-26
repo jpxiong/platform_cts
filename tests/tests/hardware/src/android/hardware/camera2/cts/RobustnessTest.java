@@ -306,9 +306,6 @@ public class RobustnessTest extends Camera2AndroidTestCase {
             {YUV , MAXIMUM, PRIV, PREVIEW, YUV , RECORD},
             {PRIV, MAXIMUM, PRIV, PREVIEW, YUV , MAXIMUM},
             {PRIV, MAXIMUM, YUV , PREVIEW, YUV , MAXIMUM},
-            {PRIV, MAXIMUM, PRIV, PREVIEW, YUV , RECORD , JPEG, RECORD},
-            {YUV , MAXIMUM, PRIV, PREVIEW, YUV , RECORD , JPEG, RECORD},
-            {PRIV, MAXIMUM, YUV , PREVIEW, PRIV, PREVIEW, YUV , MAXIMUM},
             {PRIV, MAXIMUM, PRIV, PREVIEW, YUV , PREVIEW, JPEG, MAXIMUM},
             {YUV , MAXIMUM, PRIV, PREVIEW, YUV , PREVIEW, JPEG, MAXIMUM},
         };
@@ -1218,7 +1215,7 @@ public class RobustnessTest extends Camera2AndroidTestCase {
                 MaxStreamSizes.reprocessConfigToString(reprocessConfig)));
 
         final int TIMEOUT_FOR_RESULT_MS = 3000;
-        final int NUM_REPROCESS_CAPTURES = 3;
+        final int NUM_REPROCESS_CAPTURES_PER_CONFIG = 3;
 
         List<SurfaceTexture> privTargets = new ArrayList<>();
         List<ImageReader> jpegTargets = new ArrayList<>();
@@ -1243,64 +1240,75 @@ public class RobustnessTest extends Camera2AndroidTestCase {
         }
 
         try {
-            // reprocessConfig[0:1] is input
-            InputConfiguration inputConfig = getInputConfig(
-                    Arrays.copyOfRange(reprocessConfig, 0, 2), maxSizes);
-
-
-            inputReader = ImageReader.newInstance(inputConfig.getWidth(), inputConfig.getHeight(),
-                    inputConfig.getFormat(), NUM_REPROCESS_CAPTURES);
-            inputReader.setOnImageAvailableListener(inputReaderListener, mHandler);
-            outputSurfaces.add(inputReader.getSurface());
-
             // reprocessConfig[2..] are additional outputs
             setupConfigurationTargets(
                     Arrays.copyOfRange(reprocessConfig, 2, reprocessConfig.length),
                     maxSizes, privTargets, jpegTargets, yuvTargets, rawTargets, outputSurfaces,
-                    NUM_REPROCESS_CAPTURES);
+                    NUM_REPROCESS_CAPTURES_PER_CONFIG);
+
+            // reprocessConfig[0:1] is input
+            InputConfiguration inputConfig = getInputConfig(
+                    Arrays.copyOfRange(reprocessConfig, 0, 2), maxSizes);
+
+            // For each config, YUV and JPEG outputs will be tested. (For YUV reprocessing,
+            // the YUV ImageReader for input is also used for output.)
+            final int totalNumReprocessCaptures =  NUM_REPROCESS_CAPTURES_PER_CONFIG * (
+                    (inputConfig.getFormat() == ImageFormat.YUV_420_888 ? 1 : 0) +
+                    jpegTargets.size() + yuvTargets.size());
+
+            // It needs 1 input buffer for each reprocess capture + the number of buffers
+            // that will be used as outputs.
+            inputReader = ImageReader.newInstance(inputConfig.getWidth(), inputConfig.getHeight(),
+                    inputConfig.getFormat(),
+                    totalNumReprocessCaptures + NUM_REPROCESS_CAPTURES_PER_CONFIG);
+            inputReader.setOnImageAvailableListener(inputReaderListener, mHandler);
+            outputSurfaces.add(inputReader.getSurface());
 
             // Verify we can create a reprocessable session with the input and all outputs.
             BlockingSessionCallback sessionListener = new BlockingSessionCallback();
             CameraCaptureSession session = configureReprocessableCameraSession(mCamera,
                     inputConfig, outputSurfaces, sessionListener, mHandler);
             inputWriter = ImageWriter.newInstance(session.getInputSurface(),
-                    NUM_REPROCESS_CAPTURES);
+                    totalNumReprocessCaptures);
 
             // Prepare a request for reprocess input
             CaptureRequest.Builder builder = mCamera.createCaptureRequest(
                     CameraDevice.TEMPLATE_ZERO_SHUTTER_LAG);
             builder.addTarget(inputReader.getSurface());
 
-            for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
+            for (int i = 0; i < totalNumReprocessCaptures; i++) {
                 session.capture(builder.build(), inputCaptureListener, mHandler);
             }
 
             List<CaptureRequest> reprocessRequests = new ArrayList<>();
-            int numReprocessOutputs = 0;
+            List<Surface> reprocessOutputs = new ArrayList<>();
+            if (inputConfig.getFormat() == ImageFormat.YUV_420_888) {
+                reprocessOutputs.add(inputReader.getSurface());
+            }
 
-            for (int i = 0; i < NUM_REPROCESS_CAPTURES; i++) {
-                TotalCaptureResult result = inputCaptureListener.getTotalCaptureResult(
-                        TIMEOUT_FOR_RESULT_MS);
-                builder =  mCamera.createReprocessCaptureRequest(result);
-                inputWriter.queueInputImage(inputReaderListener.getImage(TIMEOUT_FOR_RESULT_MS));
+            for (ImageReader reader : jpegTargets) {
+                reprocessOutputs.add(reader.getSurface());
+            }
 
-                // Test mandatory YUV and JPEG reprocess outputs.
-                for (ImageReader reader : jpegTargets) {
-                    builder.addTarget(reader.getSurface());
-                    numReprocessOutputs++;
+            for (ImageReader reader : yuvTargets) {
+                reprocessOutputs.add(reader.getSurface());
+            }
+
+            for (int i = 0; i < NUM_REPROCESS_CAPTURES_PER_CONFIG; i++) {
+                for (Surface output : reprocessOutputs) {
+                    TotalCaptureResult result = inputCaptureListener.getTotalCaptureResult(
+                            TIMEOUT_FOR_RESULT_MS);
+                    builder =  mCamera.createReprocessCaptureRequest(result);
+                    inputWriter.queueInputImage(
+                            inputReaderListener.getImage(TIMEOUT_FOR_RESULT_MS));
+                    builder.addTarget(output);
+                    reprocessRequests.add(builder.build());
                 }
-
-                for (ImageReader reader : yuvTargets) {
-                    builder.addTarget(reader.getSurface());
-                    numReprocessOutputs++;
-                }
-
-                reprocessRequests.add(builder.build());
             }
 
             session.captureBurst(reprocessRequests, reprocessOutputCaptureListener, mHandler);
 
-            for (int i = 0; i < numReprocessOutputs; i++) {
+            for (int i = 0; i < reprocessOutputs.size() * NUM_REPROCESS_CAPTURES_PER_CONFIG; i++) {
                 TotalCaptureResult result = reprocessOutputCaptureListener.getTotalCaptureResult(
                         TIMEOUT_FOR_RESULT_MS);
             }

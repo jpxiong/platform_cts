@@ -192,8 +192,8 @@ def main():
 
             # Verify reprocessing HQ(2) is similar to regular HQ(2) relative to
             # OFF(0)
-            assert(numpy.isclose(sharpness_reprocess[reprocess_format][2] /
-                                    sharpness_reprocess[reprocess_format][0],
+            assert(numpy.isclose(sharpnesses_reprocess[reprocess_format][2] /
+                                    sharpnesses_reprocess[reprocess_format][0],
                                  sharpness_regular[2] / sharpness_regular[0],
                                  THRESHOLD_RELATIVE_SHARPNESS_DIFF))
 
