@@ -133,6 +133,13 @@ public class IntentFiltersTestHelper {
                 Intent.CATEGORY_OPENABLE),
         new Intent(Intent.ACTION_OPEN_DOCUMENT).setType("*/*").addCategory(
                 Intent.CATEGORY_OPENABLE),
+        new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS),
+        new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS),
+        new Intent(Settings.ACTION_APPLICATION_SETTINGS),
+        new Intent("android.settings.ACTION_OTHER_SOUND_SETTINGS"),
+        new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION),
+        new Intent(Settings.ACTION_WIFI_IP_SETTINGS),
+        new Intent(Settings.ACTION_WIFI_SETTINGS),
         new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
     };
 
@@ -155,7 +162,6 @@ public class IntentFiltersTestHelper {
         new Intent(Intent.ACTION_VIEW).setData(
                 Uri.parse("http://www.example.com/horse.mp3")).setType("audio/*"),
         new Intent(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH),
-        new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION),
         new Intent(Intent.ACTION_VIEW).setData(
                 Uri.parse("market://details?id=com.android.chrome")).addCategory(
                 Intent.CATEGORY_BROWSABLE),
@@ -163,14 +169,8 @@ public class IntentFiltersTestHelper {
         new Intent(Settings.ACTION_SEARCH_SETTINGS),
         new Intent(Settings.ACTION_PRINT_SETTINGS),
         new Intent(Intent.ACTION_MANAGE_NETWORK_USAGE),
-        new Intent(Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS),
-        new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS),
-        new Intent(Settings.ACTION_APPLICATION_SETTINGS),
         new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).setData(
                 Uri.parse("package:com.android.chrome")),
-        new Intent("android.settings.ACTION_OTHER_SOUND_SETTINGS"),
-        new Intent(Settings.ACTION_WIFI_IP_SETTINGS),
-        new Intent(Settings.ACTION_WIFI_SETTINGS),
         new Intent("android.settings.SHOW_INPUT_METHOD_PICKER"),
         new Intent(Intent.ACTION_INSERT).setData(Events.CONTENT_URI),
         new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)

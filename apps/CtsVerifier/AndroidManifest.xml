@@ -1452,6 +1452,9 @@
         <activity android:name=".managedprovisioning.CrossProfileTestActivity">
             <intent-filter>
                 <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE" />
+                <!-- We need to have at least one activity listening to this intent in the parent
+                     to test if it is forwarded from the managed profile to the parent -->
+                <action android:name="android.provider.MediaStore.RECORD_SOUND" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
