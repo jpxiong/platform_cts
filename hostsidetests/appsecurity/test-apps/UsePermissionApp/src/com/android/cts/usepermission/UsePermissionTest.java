@@ -156,4 +156,41 @@ public class UsePermissionTest extends InstrumentationTestCase {
         mActivity.finish();
     }
 
+    public void testRuntimeGroupGrantExpansion() throws Exception {
+        // Start out without permission
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.RECEIVE_SMS));
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.SEND_SMS));
+
+        // Go through normal grant flow
+        mDevice = UiDevice.getInstance(getInstrumentation());
+        mActivity = launchActivity(getInstrumentation().getTargetContext().getPackageName(),
+                MyActivity.class, null);
+        mDevice.waitForIdle();
+
+        // request only one permission from the 'SMS' permission group at runtime,
+        // but two from this group are <uses-permission> in the manifest
+        mActivity.requestPermissions(new String[] {
+                android.Manifest.permission.RECEIVE_SMS }, 44);
+        mDevice.waitForIdle();
+
+        new UiObject(new UiSelector()
+                .resourceId("com.android.packageinstaller:id/permission_allow_button")).click();
+        mDevice.waitForIdle();
+
+        MyActivity.Result result = mActivity.getResult();
+        assertEquals(44, result.requestCode);
+        assertEquals(android.Manifest.permission.RECEIVE_SMS, result.permissions[0]);
+        assertEquals(PackageManager.PERMISSION_GRANTED, result.grantResults[0]);
+
+        // We should now have been granted both of the permissions from this group
+        // that are mentioned in our manifest
+        assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.RECEIVE_SMS));
+        assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.SEND_SMS));
+
+        mActivity.finish();
+    }
 }

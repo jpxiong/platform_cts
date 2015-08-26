@@ -31,4 +31,8 @@
     <!-- Deliberately request WRITE_CONTACTS but *not* READ_CONTACTS -->
     <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
+    <!-- Request two different permissions within the same group -->
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+
 </manifest>
