@@ -317,13 +317,8 @@ public class AdapterViewTest extends ActivityInstrumentationTestCase2<AdapterVie
             //expected
         }
 
-        try {
-            assertEquals(AdapterView.INVALID_POSITION,
-                    mAdapterView.getPositionForView(new ImageView(mActivity)));
-            fail("Should throw NullPointerException");
-        } catch (NullPointerException e) {
-            //expected
-        }
+        assertEquals(AdapterView.INVALID_POSITION,
+                mAdapterView.getPositionForView(new ImageView(mActivity)));
     }
 
     public void testChangeFocusable() {
