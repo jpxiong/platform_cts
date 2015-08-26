@@ -119,4 +119,41 @@ public class UsePermissionTest extends InstrumentationTestCase {
 
         mActivity.finish();
     }
+
+    public void testRuntimeGroupGrantSpecificity() throws Exception {
+        // Start out without permission
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.WRITE_CONTACTS));
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_CONTACTS));
+
+        // Go through normal grant flow
+        mDevice = UiDevice.getInstance(getInstrumentation());
+        mActivity = launchActivity(getInstrumentation().getTargetContext().getPackageName(),
+                MyActivity.class, null);
+        mDevice.waitForIdle();
+
+        // request only one permission from the 'contacts' permission group
+        mActivity.requestPermissions(new String[] {
+                android.Manifest.permission.WRITE_CONTACTS }, 43);
+        mDevice.waitForIdle();
+
+        new UiObject(new UiSelector()
+                .resourceId("com.android.packageinstaller:id/permission_allow_button")).click();
+        mDevice.waitForIdle();
+
+        MyActivity.Result result = mActivity.getResult();
+        assertEquals(43, result.requestCode);
+        assertEquals(android.Manifest.permission.WRITE_CONTACTS, result.permissions[0]);
+        assertEquals(PackageManager.PERMISSION_GRANTED, result.grantResults[0]);
+
+        // We should have only the explicitly requested permission from this group
+        assertEquals(PackageManager.PERMISSION_GRANTED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.WRITE_CONTACTS));
+        assertEquals(PackageManager.PERMISSION_DENIED, getInstrumentation().getContext()
+                .checkSelfPermission(android.Manifest.permission.READ_CONTACTS));
+
+        mActivity.finish();
+    }
+
 }

@@ -23,5 +23,12 @@
     <instrumentation
         android:name="android.support.test.runner.AndroidJUnitRunner"
         android:targetPackage="com.android.cts.usepermission" />
+
+    <!-- Note that WRITE_EXTERNAL_STORAGE implies READ_EXTERNAL_STORAGE;
+         this is a special case. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <!-- Deliberately request WRITE_CONTACTS but *not* READ_CONTACTS -->
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+
 </manifest>
