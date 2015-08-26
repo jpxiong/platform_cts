@@ -25,7 +25,8 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 /**
- * An activity to display information about the device, including density bucket and dimensions.
+ * An activity to display information about the device, including density
+ * bucket and dimensions.
  */
 public class DisplayInfoActivity extends Activity {
 

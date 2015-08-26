@@ -26,6 +26,8 @@ LOCAL_DEX_PREOPT := false
 
 LOCAL_PROGUARD_ENABLED := disabled
 
+LOCAL_STATIC_JAVA_LIBRARIES := android-support-test
+
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 
 #Flags to tell the Android Asset Packaging Tool not to strip for some densities
