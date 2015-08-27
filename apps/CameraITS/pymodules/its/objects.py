@@ -195,12 +195,20 @@ def turn_slow_filters_off(props, req):
     set_filter_off_or_fast_if_possible(props, req,
         "android.colorCorrection.availableAberrationModes",
         "android.colorCorrection.aberrationMode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.hotPixel.availableHotPixelModes",
-        "android.hotPixel.mode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.edge.availableEdgeModes",
-        "android.edge.mode")
+    if props.has_key("android.request.availableCharacteristicsKeys"):
+        hot_pixel_modes = 393217 in props["android.request.availableCharacteristicsKeys"]
+        edge_modes = 196610 in props["android.request.availableCharacteristicsKeys"]
+    if props.has_key("android.request.availableRequestKeys"):
+        hot_pixel_mode = 393216 in props["android.request.availableRequestKeys"]
+        edge_mode = 196608 in props["android.request.availableRequestKeys"]
+    if hot_pixel_modes and hot_pixel_mode:
+        set_filter_off_or_fast_if_possible(props, req,
+            "android.hotPixel.availableHotPixelModes",
+            "android.hotPixel.mode")
+    if edge_modes and edge_mode:
+        set_filter_off_or_fast_if_possible(props, req,
+            "android.edge.availableEdgeModes",
+            "android.edge.mode")
 
 def get_fastest_manual_capture_settings(props):
     """Return a capture request and format spec for the fastest capture.
