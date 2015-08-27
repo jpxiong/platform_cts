@@ -160,6 +160,8 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
                             IntentFiltersTestHelper.FLAG_INTENTS_FROM_MANAGED);
             setResult(intentFiltersSetForManagedIntents? RESULT_OK : RESULT_FAILED, null);
         } else if (action.equals(ACTION_CAPTURE_AND_CHECK_IMAGE)) {
+            // We need the camera permission to send the image capture intent.
+            grantCameraPermissionToSelf();
             Intent captureImageIntent = getCaptureImageIntent();
             mImageUri = getTempUri("image.jpg");
             captureImageIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
@@ -172,6 +174,8 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
             }
             return;
         } else if (action.equals(ACTION_CAPTURE_AND_CHECK_VIDEO)) {
+            // We need the camera permission to send the video capture intent.
+            grantCameraPermissionToSelf();
             Intent captureVideoIntent = getCaptureVideoIntent();
             mVideoUri = getTempUri("video.mp4");
             captureVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mVideoUri);
@@ -334,6 +338,12 @@ public class ByodHelperActivity extends Activity implements DialogCallback {
     private void showToast(int messageId) {
         String message = getString(messageId);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void grantCameraPermissionToSelf() {
+        mDevicePolicyManager.setPermissionGrantState(mAdminReceiverComponent, getPackageName(),
+                android.Manifest.permission.CAMERA,
+                DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED);
     }
 
     @Override
