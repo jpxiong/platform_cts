@@ -137,7 +137,9 @@ public class ServicePermissionsTest extends AndroidTestCase {
 
             if (lines.size() == 1) {
                 String message = lines.get(0);
-                if (!message.contains("Permission Denial") &&
+                if ("backup".equals(service) && "Inactive".equals(message)) {
+                    Log.i(TAG, "Exempt inactive backup service.");
+                } else if (!message.contains("Permission Denial") &&
                         !message.contains("android.permission.DUMP")) {
                     fail("dump() for " + service + " produced a single line which didn't "
                             + "reference a permission; it may be leaking sensitive data.");
