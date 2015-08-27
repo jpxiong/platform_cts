@@ -1484,13 +1484,32 @@ public class ItsService extends Service implements SensorEventListener {
 
                 StringBuilder logMsg = new StringBuilder();
                 logMsg.append(String.format(
-                        "Capt result: AE=%d, AF=%d, AWB=%d, sens=%d, exp=%.1fms, dur=%.1fms, ",
+                        "Capt result: AE=%d, AF=%d, AWB=%d, ",
                         result.get(CaptureResult.CONTROL_AE_STATE),
                         result.get(CaptureResult.CONTROL_AF_STATE),
-                        result.get(CaptureResult.CONTROL_AWB_STATE),
-                        result.get(CaptureResult.SENSOR_SENSITIVITY),
-                        result.get(CaptureResult.SENSOR_EXPOSURE_TIME).intValue() / 1000000.0f,
-                        result.get(CaptureResult.SENSOR_FRAME_DURATION).intValue() / 1000000.0f));
+                        result.get(CaptureResult.CONTROL_AWB_STATE)));
+                int[] capabilities = mCameraCharacteristics.get(
+                        CameraCharacteristics.REQUEST_AVAILABLE_CAPABILITIES);
+                if (capabilities == null) {
+                    throw new ItsException("Failed to get capabilities");
+                }
+                boolean readSensorSettings = false;
+                for (int capability : capabilities) {
+                    if (capability ==
+                            CameraCharacteristics.
+                                    REQUEST_AVAILABLE_CAPABILITIES_READ_SENSOR_SETTINGS) {
+                        readSensorSettings = true;
+                        break;
+                    }
+                }
+                if (readSensorSettings) {
+                    logMsg.append(String.format(
+                            "sens=%d, exp=%.1fms, dur=%.1fms, ",
+                            result.get(CaptureResult.SENSOR_SENSITIVITY),
+                            result.get(CaptureResult.SENSOR_EXPOSURE_TIME).intValue() / 1000000.0f,
+                            result.get(CaptureResult.SENSOR_FRAME_DURATION).intValue() /
+                                        1000000.0f));
+                }
                 if (result.get(CaptureResult.COLOR_CORRECTION_GAINS) != null) {
                     logMsg.append(String.format(
                             "gains=[%.1f, %.1f, %.1f, %.1f], ",
