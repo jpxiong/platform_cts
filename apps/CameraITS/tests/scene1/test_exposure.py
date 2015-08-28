@@ -36,11 +36,13 @@ def main():
     THRESHOLD_MIN_LEVEL = 0.1
     THRESHOLD_MAX_LEVEL = 0.9
     THRESHOLD_MAX_LEVEL_DIFF = 0.025
+    THRESHOLD_MAX_LEVEL_DIFF_WIDE_RANGE = 0.05
 
     mults = []
     r_means = []
     g_means = []
     b_means = []
+    threshold_max_level_diff = THRESHOLD_MAX_LEVEL_DIFF
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
@@ -57,13 +59,18 @@ def main():
             req = its.objects.manual_capture_request(s*m, e/m)
             cap = cam.do_capture(req)
             img = its.image.convert_capture_to_rgb_image(cap)
-            its.image.write_image(img, "%s_mult=%02d.jpg" % (NAME, m))
+            its.image.write_image(img, "%s_mult=%3.2f.jpg" % (NAME, m))
             tile = its.image.get_image_patch(img, 0.45, 0.45, 0.1, 0.1)
             rgb_means = its.image.compute_image_means(tile)
             r_means.append(rgb_means[0])
             g_means.append(rgb_means[1])
             b_means.append(rgb_means[2])
-            m = m + 4
+            # Test 3 steps per 2x gain
+            m = m * pow(2, 1.0 / 3)
+
+        # Allow more threshold for devices with wider exposure range
+        if m >= 64.0:
+            threshold_max_level_diff = THRESHOLD_MAX_LEVEL_DIFF_WIDE_RANGE
 
     # Draw a plot.
     pylab.plot(mults, r_means, 'r')
@@ -83,7 +90,7 @@ def main():
         max_diff = max_val - min_val
         print "Channel %d line fit (y = mx+b): m = %f, b = %f" % (chan, m, b)
         print "Channel max %f min %f diff %f" % (max_val, min_val, max_diff)
-        assert(max_diff < THRESHOLD_MAX_LEVEL_DIFF)
+        assert(max_diff < threshold_max_level_diff)
         assert(b > THRESHOLD_MIN_LEVEL and b < THRESHOLD_MAX_LEVEL)
         for v in values:
             assert(v > THRESHOLD_MIN_LEVEL and v < THRESHOLD_MAX_LEVEL)
