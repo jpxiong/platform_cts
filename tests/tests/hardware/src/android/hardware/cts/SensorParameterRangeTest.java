@@ -35,21 +35,21 @@ import java.util.concurrent.TimeUnit;
  */
 public class SensorParameterRangeTest extends SensorTestCase {
 
-    private static final double ACCELEROMETER_MAX_RANGE = 8 * 9.81; // 8G
-    private static final int ACCELEROMETER_MIN_FREQUENCY = 5;
+    private static final double ACCELEROMETER_MAX_RANGE = 8 * 9.80; // 8G minus a slop
+    private static final double ACCELEROMETER_MIN_FREQUENCY = 12.50;
     private static final int ACCELEROMETER_MAX_FREQUENCY = 200;
 
-    private static final double GYRO_MAX_RANGE = 1000/57.295; // 1000 degrees per sec.
-    private static final int GYRO_MIN_FREQUENCY = 5;
-    private static final int GYRO_MAX_FREQUENCY = 200;
+    private static final double GYRO_MAX_RANGE = 1000/57.295 - 1.0; // 1000 degrees per sec minus a slop
+    private static final double GYRO_MIN_FREQUENCY = 12.50;
+    private static final double GYRO_MAX_FREQUENCY = 200.0;
 
     private static final int MAGNETOMETER_MAX_RANGE = 900;   // micro telsa
-    private static final int MAGNETOMETER_MIN_FREQUENCY = 5;
-    private static final int MAGNETOMETER_MAX_FREQUENCY = 50;
+    private static final double MAGNETOMETER_MIN_FREQUENCY = 5.0;
+    private static final double MAGNETOMETER_MAX_FREQUENCY = 50.0;
 
-    private static final int PRESSURE_MAX_RANGE = 1100;     // hecto-pascal
-    private static final int PRESSURE_MIN_FREQUENCY = 1;
-    private static final int PRESSURE_MAX_FREQUENCY = 10;
+    private static final double PRESSURE_MAX_RANGE = 1100.0;     // hecto-pascal
+    private static final double PRESSURE_MIN_FREQUENCY = 1.0;
+    private static final double PRESSURE_MAX_FREQUENCY = 10.0;
 
     private boolean mHasHifiSensors;
     private SensorManager mSensorManager;
@@ -94,7 +94,7 @@ public class SensorParameterRangeTest extends SensorTestCase {
     }
 
     private void checkSensorRangeAndFrequency(
-          Sensor sensor, double maxRange, int minFrequency, int maxFrequency) {
+          Sensor sensor, double maxRange, double minFrequency, double maxFrequency) {
         if (!mHasHifiSensors) return;
         assertTrue(String.format("%s Range actual=%.2f expected=%.2f %s",
                     sensor.getName(), sensor.getMaximumRange(), maxRange,
@@ -104,12 +104,12 @@ public class SensorParameterRangeTest extends SensorTestCase {
                 TimeUnit.MICROSECONDS);
         assertTrue(String.format("%s Min Frequency actual=%.2f expected=%dHz",
                     sensor.getName(), actualMinFrequency, minFrequency), actualMinFrequency <=
-                minFrequency);
+                minFrequency + 0.1);
 
         double actualMaxFrequency = SensorCtsHelper.getFrequency(sensor.getMinDelay(),
                 TimeUnit.MICROSECONDS);
         assertTrue(String.format("%s Max Frequency actual=%.2f expected=%dHz",
                     sensor.getName(), actualMaxFrequency, maxFrequency), actualMaxFrequency >=
-                maxFrequency);
+                maxFrequency - 0.1);
     }
 }
