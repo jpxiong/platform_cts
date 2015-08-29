@@ -107,6 +107,12 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
     private final int INDEX_ALGORITHM_AWB = 1;
     private final int INDEX_ALGORITHM_AF = 2;
 
+    private enum TorchSeqState {
+        RAMPING_UP,
+        FIRED,
+        RAMPING_DOWN
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -963,16 +969,39 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
         waitForNumResults(listener, flashModeTorchRequests - NUM_FLASH_REQUESTS_TESTED);
 
         // Verify the results
+        TorchSeqState state = TorchSeqState.RAMPING_UP;
         for (int i = 0; i < NUM_FLASH_REQUESTS_TESTED; i++) {
             result = listener.getCaptureResultForRequest(torchRequest,
                     NUM_RESULTS_WAIT_TIMEOUT);
-
-            // Result mode must be TORCH, state must be FIRED
-            mCollector.expectEquals("Flash mode result must be TORCH",
+            int flashMode = result.get(CaptureResult.FLASH_MODE);
+            int flashState = result.get(CaptureResult.FLASH_STATE);
+            // Result mode must be TORCH
+            mCollector.expectEquals("Flash mode result " + i + " must be TORCH",
                     CaptureResult.FLASH_MODE_TORCH, result.get(CaptureResult.FLASH_MODE));
-            mCollector.expectEquals("Flash state result must be FIRED",
-                    CaptureResult.FLASH_STATE_FIRED, result.get(CaptureResult.FLASH_STATE));
+            if (state == TorchSeqState.RAMPING_UP &&
+                    flashState == CaptureResult.FLASH_STATE_FIRED) {
+                state = TorchSeqState.FIRED;
+            } else if (state == TorchSeqState.FIRED &&
+                    flashState == CaptureResult.FLASH_STATE_PARTIAL) {
+                state = TorchSeqState.RAMPING_DOWN;
+            }
+
+            if (i == 0 && mStaticInfo.isPerFrameControlSupported()) {
+                mCollector.expectTrue(
+                        "Per frame control device must enter FIRED state on first torch request",
+                        state == TorchSeqState.FIRED);
+            }
+
+            if (state == TorchSeqState.FIRED) {
+                mCollector.expectEquals("Flash state result " + i + " must be FIRED",
+                        CaptureResult.FLASH_STATE_FIRED, result.get(CaptureResult.FLASH_STATE));
+            } else {
+                mCollector.expectEquals("Flash state result " + i + " must be PARTIAL",
+                        CaptureResult.FLASH_STATE_PARTIAL, result.get(CaptureResult.FLASH_STATE));
+            }
         }
+        mCollector.expectTrue("Torch state FIRED never seen",
+                state == TorchSeqState.FIRED || state == TorchSeqState.RAMPING_DOWN);
 
         // Test flash OFF mode control
         requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_OFF);
