@@ -30,7 +30,7 @@ def main():
     """
     NAME = os.path.basename(__file__).split(".")[0]
 
-    BURST_LEN = 10
+    BURST_LEN = 8
     SPREAD_THRESH = 0.005
     FPS_MAX_DIFF = 2.0
 
@@ -38,7 +38,7 @@ def main():
         props = cam.get_camera_properties()
 
         # Converge 3A prior to capture.
-        cam.do_3a(do_af=False, lock_ae=True, lock_awb=True)
+        cam.do_3a(do_af=True, lock_ae=True, lock_awb=True)
 
         # After 3A has converged, lock AE+AWB for the duration of the test.
         req = its.objects.auto_capture_request()
@@ -63,7 +63,8 @@ def main():
         # Pass/fail based on center patch similarity.
         for means in [r_means, g_means, b_means]:
             spread = max(means) - min(means)
-            print "Patch mean spread", spread
+            print "Patch mean spread", spread, \
+                   " (min/max: ",  min(means), "/", max(means), ")"
             assert(spread < SPREAD_THRESH)
 
         # Also ensure that the burst was at full frame rate.
@@ -80,9 +81,11 @@ def main():
         tstamps = [c['metadata']['android.sensor.timestamp'] for c in caps]
         deltas = [tstamps[i]-tstamps[i-1] for i in range(1,len(tstamps))]
         actual_fps = 1.0 / (max(deltas) / 1000000000.0)
+        actual_fps_max = 1.0 / (min(deltas) / 1000000000.0)
         max_fps = 1.0 / (min_duration / 1000000000.0)
+        print "Measure FPS min/max", actual_fps, "/", actual_fps_max
         print "FPS measured %.1f, max advertized %.1f" %(actual_fps, max_fps)
-        assert(max_fps - FPS_MAX_DIFF <= actual_fps <= max_fps)
+        assert(max_fps - FPS_MAX_DIFF <= actual_fps <= max_fps + FPS_MAX_DIFF)
 
 if __name__ == '__main__':
     main()

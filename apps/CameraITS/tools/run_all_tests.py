@@ -27,6 +27,27 @@ def main():
     Script should be run from the top-level CameraITS directory.
     """
 
+    # Not yet mandated tests
+    NOT_YET_MANDATED = {
+        "scene0":[
+            "test_jitter"
+        ],
+        "scene1":[
+            "test_ae_precapture_trigger",
+            "test_black_white",
+            "test_burst_sameness_manual",
+            "test_crop_region_raw",
+            "test_crop_regions",
+            "test_exposure",
+            "test_locked_burst",
+            "test_param_exposure_time",
+            "test_param_flash_mode",
+            "test_yuv_plus_jpeg",
+            "test_yuv_plus_raw",
+            "test_yuv_plus_raw10"
+        ]
+    }
+
     # Get all the scene0 and scene1 tests, which can be run using the same
     # physical setup.
     scenes = ["scene0", "scene1"]
@@ -45,6 +66,7 @@ def main():
 
     # Run each test, capturing stdout and stderr.
     numpass = 0
+    numnotmandatedfail = 0
     for (scene,testname,testpath) in tests:
         cmd = ['python', os.path.join(os.getcwd(),testpath)] + sys.argv[1:]
         outdir = os.path.join(topdir,scene)
@@ -54,14 +76,22 @@ def main():
         with open(outpath,"w") as fout, open(errpath,"w") as ferr:
             retcode = subprocess.call(cmd,stderr=ferr,stdout=fout,cwd=outdir)
         t1 = time.time()
-        print "%s %s/%s [%.1fs]" % (
-                "PASS" if retcode==0 else "FAIL", scene, testname, t1-t0)
-        if retcode == 0:
+        retstr = "PASS "
+        if retcode != 0:
+            retstr = "FAIL*" if testname in NOT_YET_MANDATED[scene] else "FAIL "
+
+        if retstr == "FAIL*":
+            numnotmandatedfail += 1
+
+        print "%s %s/%s [%.1fs]" % (retstr, scene, testname, t1-t0)
+        if retcode == 0 or testname in NOT_YET_MANDATED[scene]:
             numpass += 1
-    its.device.ItsSession.report_result(numpass == len(tests))
 
     print "\n%d / %d tests passed (%.1f%%)" % (
             numpass, len(tests), 100.0*float(numpass)/len(tests))
+    if numnotmandatedfail > 0:
+        print "(*) tests are not yet mandated"
+    its.device.ItsSession.report_result(numpass == len(tests))
 
 if __name__ == '__main__':
     main()
