@@ -27,7 +27,8 @@ LOCAL_PROGUARD_ENABLED := disabled
 
 LOCAL_JAVA_LIBRARIES := android.test.runner
 
-LOCAL_SDK_VERSION := current
+# uncomment when b/13282254 is fixed
+#LOCAL_SDK_VERSION := current
 
 LOCAL_PACKAGE_NAME := TestDeviceSetup
 
