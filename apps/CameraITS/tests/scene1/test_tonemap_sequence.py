@@ -32,7 +32,8 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.manual_sensor(props) and
-            its.caps.manual_post_proc(props))
+                             its.caps.manual_post_proc(props) and
+                             its.caps.per_frame_control(props))
 
         sens, exp_time, _,_,_ = cam.do_3a(do_af=False,get_results=True)
 

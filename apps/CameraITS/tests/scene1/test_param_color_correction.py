@@ -37,7 +37,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        its.caps.skip_unless(its.caps.compute_target_exposure(props))
+        its.caps.skip_unless(its.caps.compute_target_exposure(props) and
+                             its.caps.per_frame_control(props))
 
         # Baseline request
         e, s = its.target.get_target_exposure_combos(cam)["midSensitivity"]
@@ -89,7 +90,7 @@ def main():
         matplotlib.pyplot.savefig("%s_plot_means.png" % (NAME))
 
         # Expect G0 == G1 == G2, R0 == 0.5*R1 == R2, B0 == B1 == 0.5*B2
-        # Also need to ensure that the imasge is not clamped to white/black.
+        # Also need to ensure that the image is not clamped to white/black.
         assert(all(g_means[i] > 0.2 and g_means[i] < 0.8 for i in xrange(3)))
         assert(abs(g_means[1] - g_means[0]) < THRESHOLD_MAX_DIFF)
         assert(abs(g_means[2] - g_means[1]) < THRESHOLD_MAX_DIFF)

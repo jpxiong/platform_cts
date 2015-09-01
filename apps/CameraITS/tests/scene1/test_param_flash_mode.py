@@ -27,7 +27,8 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.compute_target_exposure(props) and
-                             its.caps.flash(props))
+                             its.caps.flash(props) and
+                             its.caps.per_frame_control(props))
 
         flash_modes_reported = []
         flash_states_reported = []

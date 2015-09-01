@@ -35,7 +35,8 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.manual_sensor(props) and
-            its.caps.manual_post_proc(props))
+                             its.caps.manual_post_proc(props) and
+                             its.caps.per_frame_control(props))
 
         manual_tonemap = [0,0, 1,1] # Linear
         manual_transform = its.objects.int_to_rational([1,2,3, 4,5,6, 7,8,9])

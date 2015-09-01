@@ -36,7 +36,8 @@ def main():
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
         its.caps.skip_unless(its.caps.compute_target_exposure(props) and
-            its.caps.freeform_crop(props))
+                             its.caps.freeform_crop(props) and
+                             its.caps.per_frame_control(props))
 
         a = props['android.sensor.info.activeArraySize']
         ax, ay = a["left"], a["top"]
