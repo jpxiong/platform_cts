@@ -218,7 +218,7 @@ to this command line will be passed to each script as it is executed.
 
 The tests/inprog directory contains a mix of unfinished, in-progress, and
 incomplete tests. These may or may not be useful in testing a HAL impl.,
-and as these tests are copmleted they will be moved into the scene<N> folders.
+and as these tests are completed they will be moved into the scene<N> folders.
 
 When running individual tests from the command line (as in the examples here),
 each test run will ensure that the ITS service is running on the device and is

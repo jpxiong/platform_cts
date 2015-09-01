@@ -154,7 +154,7 @@ def main():
 
         # Apply a 3x3 matrix to the image, and save the new version. The matrix
         # is a numpy array, in row major order, and the pixel values are right-
-        # multipled to it (when considered as column vectors). The example
+        # multiplied to it (when considered as column vectors). The example
         # matrix here just boosts the blue channel by 10%.
         mat = numpy.array([[1, 0, 0  ],
                            [0, 1, 0  ],
@@ -162,7 +162,7 @@ def main():
         rgbimg_mat = its.image.apply_matrix_to_image(rgbimg, mat)
         its.image.write_image(rgbimg_mat, "%s_rgb_2_mat.jpg" % (NAME))
 
-        # Compute a histogram of the luma image, in 256 buckeits.
+        # Compute a histogram of the luma image, in 256 buckets.
         yimg,_,_ = its.image.convert_capture_to_planes(cap)
         hist,_ = numpy.histogram(yimg*255, 256, (0,256))
 

@@ -111,7 +111,7 @@ def main():
             # Some sanity checks:
             # * Noise levels should increase with brightness.
             # * Extrapolating to a black image, the noise should be positive.
-            # Basically, the "b" value should correspnd to the read noise,
+            # Basically, the "b" value should correspond to the read noise,
             # which is the noise level if the sensor was operating in zero
             # light.
             #assert(m > 0)

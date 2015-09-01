@@ -135,7 +135,7 @@ def raw10(props):
 
 def sensor_fusion(props):
     """Returns whether the camera and motion sensor timestamps for the device
-    are in the same time domain and can be compared direcctly.
+    are in the same time domain and can be compared directly.
 
     Args:
         props: Camera properties object.

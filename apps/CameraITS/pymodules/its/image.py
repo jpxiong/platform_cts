@@ -83,7 +83,7 @@ def unpack_raw10_capture(cap, props):
 
     Args:
         cap: A raw-10 capture object.
-        props: Camera propertis object.
+        props: Camera properties object.
 
     Returns:
         New capture object with raw-16 data.
@@ -574,7 +574,7 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
     Args:
         img: Input image, as a numpy array with pixels in [0,1].
         debug_fname_prefix: If not None, the (string) name of a file prefix to
-            use to save a number of debug images for visulaizing the output of
+            use to save a number of debug images for visualizing the output of
             this function; can be used to see if the patches are being found
             successfully.
 
@@ -655,7 +655,7 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
     # Return the coords of the origin (top-left when the chart is in the normal
     # upright orientation) patch's center, and the vector displacement to the
     # center of the second patch on the first row of the chart (when in the
-    # normal upright orienation).
+    # normal upright orientation).
     origin_index = (white_patch_index+1)%4
     prev_index = (origin_index-1+4)%4
     next_index = (origin_index+1)%4
