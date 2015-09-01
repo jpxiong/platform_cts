@@ -186,6 +186,18 @@ def freeform_crop(props):
     return props.has_key("android.scaler.croppingType") and \
            props["android.scaler.croppingType"] == 1
 
+def flash(props):
+    """Returns whether a device supports flash control.
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key("android.flash.info.available") and \
+           props["android.flash.info.available"] == 1
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
