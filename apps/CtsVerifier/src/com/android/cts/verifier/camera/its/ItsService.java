@@ -95,7 +95,7 @@ public class ItsService extends Service implements SensorEventListener {
     // Timeout to wait for a capture result after the capture buffer has arrived, in ms.
     private static final long TIMEOUT_CAP_RES = 2000;
 
-    private static final int MAX_CONCURRENT_READER_BUFFERS = 8;
+    private static final int MAX_CONCURRENT_READER_BUFFERS = 10;
 
     // Supports at most RAW+YUV+JPEG, one surface each.
     private static final int MAX_NUM_OUTPUT_SURFACES = 3;
