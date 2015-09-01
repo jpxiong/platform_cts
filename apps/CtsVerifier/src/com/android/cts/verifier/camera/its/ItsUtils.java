@@ -142,7 +142,13 @@ public class ItsUtils {
                 || format == ImageFormat.RAW10) {
             int offset = 0;
             data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
-            byte[] rowData = new byte[planes[0].getRowStride()];
+            int maxRowSize = planes[0].getRowStride();
+            for (int i = 0; i < planes.length; i++) {
+                if (maxRowSize < planes[i].getRowStride()) {
+                    maxRowSize = planes[i].getRowStride();
+                }
+            }
+            byte[] rowData = new byte[maxRowSize];
             for (int i = 0; i < planes.length; i++) {
                 ByteBuffer buffer = planes[i].getBuffer();
                 int rowStride = planes[i].getRowStride();
