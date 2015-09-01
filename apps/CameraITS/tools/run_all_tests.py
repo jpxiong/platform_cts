@@ -42,9 +42,7 @@ def main():
             "test_locked_burst",
             "test_param_exposure_time",
             "test_param_flash_mode",
-            "test_yuv_plus_jpeg",
-            "test_yuv_plus_raw",
-            "test_yuv_plus_raw10"
+            "test_yuv_plus_jpeg"
         ]
     }
 
