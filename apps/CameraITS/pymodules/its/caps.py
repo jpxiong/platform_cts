@@ -152,6 +152,18 @@ def compute_target_exposure(props):
     """
     return manual_sensor(props) and manual_post_proc(props)
 
+def freeform_crop(props):
+    """Returns whether a device supports freefrom cropping.
+
+    Args:
+        props: Camera properties object.
+
+    Return:
+        Boolean.
+    """
+    return props.has_key("android.scaler.croppingType") and \
+           props["android.scaler.croppingType"] == 1
+
 class __UnitTest(unittest.TestCase):
     """Run a suite of unit tests on this module.
     """
