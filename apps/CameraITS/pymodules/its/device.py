@@ -506,12 +506,20 @@ class ItsSession(object):
             rets.append(objs if ncap>1 else objs[0])
         return rets if len(rets)>1 else rets[0]
 
-    @staticmethod
-    def report_result(camera_id, success):
-        resultstr = "%s=%s" % (camera_id, 'True' if success else 'False')
-        _run(('%s shell am broadcast '
-              '-a %s --es %s %s') % (ItsSession.ADB, ItsSession.ACTION_ITS_RESULT, \
-              ItsSession.EXTRA_SUCCESS, resultstr))
+def report_result(camera_id, success):
+    """Send a pass/fail result to the device, via an intent.
+
+    Args:
+        camera_id: The ID string of the camera for which to report pass/fail.
+        success: Boolean, indicating if the result was pass or fail.
+
+    Returns:
+        Nothing.
+    """
+    resultstr = "%s=%s" % (camera_id, 'True' if success else 'False')
+    _run(('%s shell am broadcast '
+          '-a %s --es %s %s') % (ItsSession.ADB, ItsSession.ACTION_ITS_RESULT,
+          ItsSession.EXTRA_SUCCESS, resultstr))
 
 
 def _run(cmd):
