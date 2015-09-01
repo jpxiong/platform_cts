@@ -507,10 +507,11 @@ class ItsSession(object):
         return rets if len(rets)>1 else rets[0]
 
     @staticmethod
-    def report_result(success):
+    def report_result(camera_id, success):
+        resultstr = "%s=%s" % (camera_id, 'True' if success else 'False')
         _run(('%s shell am broadcast '
-              '-a %s --ez %s %s') % (ItsSession.ADB, ItsSession.ACTION_ITS_RESULT, \
-              ItsSession.EXTRA_SUCCESS, 'True' if success else 'False' ))
+              '-a %s --es %s %s') % (ItsSession.ADB, ItsSession.ACTION_ITS_RESULT, \
+              ItsSession.EXTRA_SUCCESS, resultstr))
 
 
 def _run(cmd):

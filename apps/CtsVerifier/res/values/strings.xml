@@ -778,7 +778,8 @@
         (cd CameraITS; source build/envsetup.sh;).
         \n\n3. Setup the test scene described in the CameraITS README file, and aim the camera
         at it.
-        \n\n4. Run the full ITS test suite (cd CameraITS; python tools/run_all_tests.py;).  Once all
+        \n\n4. Run the full ITS test suite on all possible camera Ids.
+        (cd CameraITS; python tools/run_all_tests.py camera=[cameraId]).  Once all
         of the tests have been run, the \'PASS\' button will be enabled if all of the tests have
         succeeded.  Please note that these tests can take 20+ minutes to run.
     </string>
