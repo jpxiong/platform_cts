@@ -769,6 +769,29 @@
     <string name="usb_test_passed">Received all expected messages. Pass button enabled!</string>
     <string name="usb_file_descriptor_error">Could not open file descriptor for USB accessory... try reconnecting and restarting the accessory?</string>
 
+    <!-- Strings for the Camera ITS test activity -->
+    <string name="camera_its_test">Camera ITS Test</string>
+    <string name="camera_its_test_info">
+        1. Connect your Android device to a computer with adb installed via a USB cable.
+        \n\n2. Setup the CameraITS test environment by following the setup instructions in the
+        README file found in the CameraITS directory included in the CTS Verifier bundle
+        (cd CameraITS; source build/envsetup.sh;).
+        \n\n3. Setup the test scene described in the CameraITS README file, and aim the camera
+        at it.
+        \n\n4. Run the full ITS test suite (cd CameraITS; python tools/run_all_tests.py;).  Once all
+        of the tests have been run, the \'PASS\' button will be enabled if all of the tests have
+        succeeded.  Please note that these tests can take 20+ minutes to run.
+    </string>
+    <string name="no_camera_manager">
+        No camera manager exists!  This test device is in a bad state.
+    </string>
+    <string name="all_legacy_devices">
+        All cameras on this device are LEGACY mode only - ITS tests will only be applied to LIMITED
+        or better devices.  \'PASS\' button enabled.
+    </string>
+    <string name="its_test_passed">All Camera ITS tests passed.  Pass button enabled!</string>
+    <string name="its_test_failed">Some Camera ITS tests failed.</string>
+
     <!-- Strings for StreamingVideoActivity -->
     <string name="streaming_video">Streaming Video Quality Verifier</string>
     <string name="streaming_video_info">This is a test for assessing the quality of streaming videos.  Play each stream and verify that the video is smooth and in sync with the audio, and that there are no quality problems.</string>

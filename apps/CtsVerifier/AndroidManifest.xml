@@ -23,6 +23,7 @@
     <uses-sdk android:minSdkVersion="19" android:targetSdkVersion="21"/>
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -34,6 +35,11 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-feature android:name="android.hardware.camera" android:required="false"/>
+    <uses-feature android:name="android.hardware.camera.flash" android:required="false"/>
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.compass" android:required="false" />
+    <uses-feature android:name="android.hardware.sensor.gyroscope" android:required="false" />
     <uses-feature android:name="android.hardware.camera.front"
                   android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus"
@@ -717,6 +723,15 @@
             <meta-data android:name="android.nfc.cardemulation.host_apdu_service" android:resource="@xml/access_prefix_aid_list"/>
         </service>
 
+        <!-- Service used for Camera ITS tests -->
+        <service android:name=".camera.its.ItsService" >
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.camera.its.START"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </service>
+
         <!--
             A DeviceAdmin receiver for sensor tests, it allows sensor tests to turn off the screen.
         -->
@@ -1006,6 +1021,17 @@
             <meta-data android:name="test_category" android:value="@string/test_category_camera" />
             <meta-data android:name="test_required_features"
                     android:value="android.hardware.camera.any"/>
+        </activity>
+
+        <activity android:name=".camera.its.ItsTestActivity"
+                  android:label="@string/camera_its_test"
+                  android:configChanges="keyboardHidden|orientation|screenSize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.cts.intent.category.MANUAL_TEST" />
+            </intent-filter>
+            <meta-data android:name="test_category" android:value="@string/test_category_camera" />
+            <meta-data android:name="test_required_features" android:value="android.hardware.camera.any" />
         </activity>
 
         <activity android:name=".usb.UsbAccessoryTestActivity"
