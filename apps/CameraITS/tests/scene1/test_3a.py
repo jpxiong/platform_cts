@@ -23,9 +23,7 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.read_3a(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.read_3a(props))
 
         sens, exp, gains, xform, focus = cam.do_3a(get_results=True)
         print "AE: sensitivity %d, exposure %dms" % (sens, exp/1000000)

@@ -44,9 +44,7 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.compute_target_exposure(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.compute_target_exposure(props))
 
         # NR mode 0 with low gain
         e, s = its.target.get_target_exposure_combos(cam)["minSensitivity"]

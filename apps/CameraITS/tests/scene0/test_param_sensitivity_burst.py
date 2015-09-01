@@ -27,9 +27,7 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.manual_sensor(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props))
 
         sens_range = props['android.sensor.info.sensitivityRange']
         sens_step = (sens_range[1] - sens_range[0]) / NUM_STEPS

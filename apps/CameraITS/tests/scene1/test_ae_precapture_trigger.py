@@ -30,9 +30,7 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.compute_target_exposure(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.compute_target_exposure(props))
 
         _,fmt = its.objects.get_fastest_manual_capture_settings(props)
 

@@ -32,9 +32,7 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if not its.caps.manual_sensor(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props))
 
         expt_range = props['android.sensor.info.exposureTimeRange']
         sens_range = props['android.sensor.info.sensitivityRange']

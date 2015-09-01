@@ -14,6 +14,28 @@
 
 import unittest
 import its.objects
+import sys
+
+
+def skip_unless(cond):
+    """Skips the test if the condition is false.
+
+    If a test is skipped, then it is exited and returns the special code
+    of 101 to the calling shell, which can be used by an external test
+    harness to differentiate a skip from a pass or fail.
+
+    Args:
+        cond: Boolean, which must be true for the test to not skip.
+
+    Returns:
+        Nothing.
+    """
+    SKIP_RET_CODE = 101
+
+    if not cond:
+        print "Test skipped"
+        sys.exit(SKIP_RET_CODE)
+
 
 def full(props):
     """Returns whether a device is a FULL capability camera2 device.

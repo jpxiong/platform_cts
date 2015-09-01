@@ -27,9 +27,7 @@ def main():
         # Arbitrary capture request exposure values; image content is not
         # important for this test, only the metadata.
         props = cam.get_camera_properties()
-        if not its.caps.manual_sensor(props):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.manual_sensor(props))
 
         req,fmt = its.objects.get_fastest_manual_capture_settings(props)
         cap = cam.do_capture(req, fmt)

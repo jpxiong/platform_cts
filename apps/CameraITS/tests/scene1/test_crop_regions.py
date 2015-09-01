@@ -35,10 +35,8 @@ def main():
 
     with its.device.ItsSession() as cam:
         props = cam.get_camera_properties()
-        if (not its.caps.compute_target_exposure(props) or
-            not its.caps.freeform_crop(props)):
-            print "Test skipped"
-            return
+        its.caps.skip_unless(its.caps.compute_target_exposure(props) and
+            its.caps.freeform_crop(props))
 
         a = props['android.sensor.info.activeArraySize']
         ax, ay = a["left"], a["top"]
