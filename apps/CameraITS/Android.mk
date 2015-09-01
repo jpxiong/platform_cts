@@ -21,6 +21,8 @@ camera-its: $(its-build-stamp)
 
 .PHONY: camera-its
 
+$(its-dir): $(its-build-stamp)
+
 $(its-build-stamp): $(ACP)
 	echo $(its_dir)
 	mkdir -p $(its-dir)
