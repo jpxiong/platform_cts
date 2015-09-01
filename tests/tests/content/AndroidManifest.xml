@@ -117,6 +117,14 @@
             </intent-filter>
         </receiver>
 
+        <!-- Receiver that will be explicitly disabled at runtime -->
+        <receiver android:name="android.content.cts.MockReceiverDisableable"
+                android:enabled="true">
+            <intent-filter android:priority="1">
+                <action android:name="android.content.cts.BroadcastReceiverTest.BROADCAST_DISABLED" />
+            </intent-filter>
+        </receiver>
+
         <activity android:name="android.content.cts.AvailableIntentsActivity"
             android:label="AvailableIntentsActivity">
             <intent-filter>
