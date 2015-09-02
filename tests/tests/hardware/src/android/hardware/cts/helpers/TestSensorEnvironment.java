@@ -223,7 +223,7 @@ public class TestSensorEnvironment {
         if (mSamplingPeriodUs == SensorManager.SENSOR_DELAY_FASTEST) {
             return "fastest";
         }
-        return String.format("%.0fhz", getFrequencyHz());
+        return String.format("%.2fhz", getFrequencyHz());
     }
 
     /**
