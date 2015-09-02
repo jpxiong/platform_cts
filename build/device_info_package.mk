@@ -19,7 +19,7 @@
 DEVICE_INFO_PACKAGE := com.android.compatibility.common.deviceinfo
 DEVICE_INFO_INSTRUMENT := com.android.compatibility.common.deviceinfo.DeviceInfoInstrument
 DEVICE_INFO_PERMISSIONS += android.permission.WRITE_EXTERNAL_STORAGE
-DEVICE_INFO_ACTIVITIES += $(DEVICE_INFO_PACKAGE).GenericDeviceInfo
+DEVICE_INFO_ACTIVITIES += $(DEVICE_INFO_PACKAGE).GenericDeviceInfo $(DEVICE_INFO_PACKAGE).PackageDeviceInfo
 
 # Add the base device info
 LOCAL_STATIC_JAVA_LIBRARIES += compatibility-device-info
