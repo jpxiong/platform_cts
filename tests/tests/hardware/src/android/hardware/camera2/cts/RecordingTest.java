@@ -375,7 +375,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     prepareRecording(size, videoFramerate, captureRate);
 
                     // prepare preview surface by using video size.
-                    updatePreviewSurfaceWithVideoSize(size);
+                    updatePreviewSurfaceWithVideo(size, captureRate);
 
                     // Start recording
                     SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
@@ -440,7 +440,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         prepareRecording(size, VIDEO_FRAME_RATE, captureRate);
 
                         // prepare preview surface by using video size.
-                        updatePreviewSurfaceWithVideoSize(size);
+                        updatePreviewSurfaceWithVideo(size, captureRate);
 
                         // Start recording
                         SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
@@ -631,7 +631,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             prepareRecordingWithProfile(profile);
 
             // prepare preview surface by using video size.
-            updatePreviewSurfaceWithVideoSize(videoSz);
+            updatePreviewSurfaceWithVideo(videoSz, profile.videoFrameRate);
 
             // Start recording
             SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
@@ -681,7 +681,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
             prepareRecording(sz, VIDEO_FRAME_RATE, VIDEO_FRAME_RATE);
 
             // prepare preview surface by using video size.
-            updatePreviewSurfaceWithVideoSize(sz);
+            updatePreviewSurfaceWithVideo(sz, VIDEO_FRAME_RATE);
 
             // Start recording
             SimpleCaptureCallback resultListener = new SimpleCaptureCallback();
@@ -901,7 +901,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                                 CameraDevice.TEMPLATE_VIDEO_SNAPSHOT);
 
                 // prepare preview surface by using video size.
-                updatePreviewSurfaceWithVideoSize(videoSz);
+                updatePreviewSurfaceWithVideo(videoSz, profile.videoFrameRate);
 
                 prepareVideoSnapshot(videoSnapshotRequestBuilder, imageListener);
                 CaptureRequest request = videoSnapshotRequestBuilder.build();
@@ -1001,20 +1001,44 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * <p>Preview size will be capped with max preview size.</p>
      *
      * @param videoSize The video size used for preview.
+     * @param videoFrameRate The video frame rate
+     *
      */
-    private void updatePreviewSurfaceWithVideoSize(Size videoSize) {
+    private void updatePreviewSurfaceWithVideo(Size videoSize, int videoFrameRate) {
         if (mOrderedPreviewSizes == null) {
             throw new IllegalStateException("supported preview size list is not initialized yet");
         }
+        final float FRAME_DURATION_TOLERANCE = 0.01f;
+        long videoFrameDuration = (long) (1e9 / videoFrameRate *
+                (1.0 + FRAME_DURATION_TOLERANCE));
+        HashMap<Size, Long> minFrameDurationMap = mStaticInfo.
+                getAvailableMinFrameDurationsForFormatChecked(ImageFormat.PRIVATE);
         Size maxPreviewSize = mOrderedPreviewSizes.get(0);
-        Size previewSize = videoSize;
+        Size previewSize = null;
         if (videoSize.getWidth() > maxPreviewSize.getWidth() ||
                 videoSize.getHeight() > maxPreviewSize.getHeight()) {
-            Log.w(TAG, "Overwrite preview size from " + videoSize.toString() +
-                    " to " + maxPreviewSize.toString());
-            previewSize = maxPreviewSize;
+            for (Size s : mOrderedPreviewSizes) {
+                Long frameDuration = minFrameDurationMap.get(s);
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    // Legacy doesn't report min frame duration
+                    frameDuration = new Long(0);
+                }
+                assertTrue("Cannot find minimum frame duration for private size" + s,
+                        frameDuration != null);
+                if (frameDuration <= videoFrameDuration &&
+                        s.getWidth() <= videoSize.getWidth() &&
+                        s.getHeight() <= videoSize.getHeight()) {
+                    Log.w(TAG, "Overwrite preview size from " + videoSize.toString() +
+                            " to " + s.toString());
+                    previewSize = s;
+                    break;
+                    // If all preview size doesn't work then we fallback to video size
+                }
+            }
         }
-
+        if (previewSize == null) {
+            previewSize = videoSize;
+        }
         updatePreviewSurface(previewSize);
     }
 
