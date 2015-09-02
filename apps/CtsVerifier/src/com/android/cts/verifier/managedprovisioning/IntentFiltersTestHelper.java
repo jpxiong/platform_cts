@@ -18,6 +18,7 @@ package com.android.cts.verifier.managedprovisioning;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
+import android.app.DownloadManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -173,7 +174,8 @@ public class IntentFiltersTestHelper {
                 Uri.parse("package:com.android.chrome")),
         new Intent("android.settings.SHOW_INPUT_METHOD_PICKER"),
         new Intent(Intent.ACTION_INSERT).setData(Events.CONTENT_URI),
-        new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
+        new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL),
+        new Intent(DownloadManager.ACTION_VIEW_DOWNLOADS)
     };
 
     // This flag specifies we are dealing with intents fired from the primary profile.
