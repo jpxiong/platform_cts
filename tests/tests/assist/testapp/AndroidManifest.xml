@@ -64,5 +64,13 @@
                 <category android:name="android.intent.category.VOICE" />
             </intent-filter>
         </activity>
+        <activity android:name="ExtraAssistDataActivity"
+            android:label="Extra Assist Test Activity">
+            <intent-filter>
+                <action android:name="android.intent.action.TEST_APP_EXTRA_ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.VOICE" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

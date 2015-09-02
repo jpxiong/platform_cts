@@ -13,39 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package android.assist.cts;
 
 import android.assist.common.Utils;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.provider.Settings;
+import android.os.Bundle;
 import android.util.Log;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-
-/**
- *  Test that the AssistStructure returned is properly formatted.
- */
-
-public class AssistStructureTest extends AssistTestBase {
-    private static final String TAG = "AssistStructureTest";
-    private static final String TEST_CASE_TYPE = Utils.ASSIST_STRUCTURE;
+public class ExtraAssistDataTest extends AssistTestBase {
+    private static final String TAG = "ExtraAssistDataTest";
+    private static final String TEST_CASE_TYPE = Utils.EXTRA_ASSIST;
 
     private BroadcastReceiver mReceiver;
     private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
 
-    public AssistStructureTest() {
+    public ExtraAssistDataTest() {
         super();
     }
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         setUpAndRegisterReceiver();
         startTestActivity(TEST_CASE_TYPE);
@@ -64,11 +57,36 @@ public class AssistStructureTest extends AssistTestBase {
         if (mReceiver != null) {
             mContext.unregisterReceiver(mReceiver);
         }
-        mReceiver = new AssistStructureTestBroadcastReceiver();
+        mReceiver = new ExtraAssistDataReceiver();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Utils.ASSIST_STRUCTURE_HASRESUMED);
+        filter.addAction(Utils.APP_3P_HASRESUMED);
         filter.addAction(Utils.ASSIST_RECEIVER_REGISTERED);
         mContext.registerReceiver(mReceiver, filter);
+    }
+
+    public void testAssistContentAndAssistData() throws Exception {
+        mTestActivity.startTest(TEST_CASE_TYPE);
+        waitForAssistantToBeReady();
+        mTestActivity.start3pApp(TEST_CASE_TYPE);
+        waitForOnResume();
+        startSession();
+        waitForContext();
+        verifyAssistDataNullness(false, false, false, false);
+
+        Log.i(TAG, "assist bundle is: " + Utils.toBundleString(mAssistBundle));
+
+        // tests that the assist content's structured data is the expected
+        assertEquals("AssistContent structured data did not match data in onProvideAssistContent",
+                Utils.getStructuredJSON(), mAssistContent.getStructuredData());
+        // tests the assist data. EXTRA_ASSIST_CONTEXT is what's expected.
+        Bundle extraExpectedBundle = Utils.getExtraAssistBundle();
+        Bundle extraAssistBundle = mAssistBundle.getBundle(Intent.EXTRA_ASSIST_CONTEXT);
+        for (String key : extraExpectedBundle.keySet()) {
+            assertTrue("Assist bundle does not contain expected extra context key: " + key,
+                    extraAssistBundle.containsKey(key));
+            assertEquals("Extra assist context bundle values do not match for key: " + key,
+                    extraExpectedBundle.get(key), extraAssistBundle.get(key));
+        }
     }
 
     private void waitForOnResume() throws Exception {
@@ -78,24 +96,11 @@ public class AssistStructureTest extends AssistTestBase {
         }
     }
 
-    public void testAssistStructure() throws Exception {
-        mTestActivity.start3pApp(TEST_CASE_TYPE);
-        mTestActivity.startTest(TEST_CASE_TYPE);
-        waitForAssistantToBeReady();
-        waitForOnResume();
-        startSession();
-        waitForContext();
-        verifyAssistDataNullness(false, false, false, false);
-
-        verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE),
-                false /*FLAG_SECURE set*/);
-    }
-
-    private class AssistStructureTestBroadcastReceiver extends BroadcastReceiver {
+    private class ExtraAssistDataReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Utils.ASSIST_STRUCTURE_HASRESUMED)) {
+            if (action.equals(Utils.APP_3P_HASRESUMED)) {
                 if (mHasResumedLatch != null) {
                     mHasResumedLatch.countDown();
                 }

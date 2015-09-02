@@ -49,7 +49,7 @@ public class ScreenshotActivity extends Activity {
         view.requestLayout();
 
         // Tell service activity is in foreground.
-        Intent intent = new Intent(Utils.SCREENSHOT_HASRESUMED);
+        Intent intent = new Intent(Utils.APP_3P_HASRESUMED);
         sendBroadcast(intent);
         Log.i(TAG, "Resumed broadcast sent.");
     }

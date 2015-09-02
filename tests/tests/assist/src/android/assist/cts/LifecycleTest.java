@@ -46,6 +46,8 @@ public class LifecycleTest extends AssistTestBase {
     private static final String action_onStop = Utils.LIFECYCLE_ONSTOP;
     private static final String action_onDestroy = Utils.LIFECYCLE_ONDESTROY;
 
+    private static final String TEST_CASE_TYPE = Utils.LIFECYCLE;
+
     private BroadcastReceiver mLifecycleTestBroadcastReceiver;
     private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
     private CountDownLatch mActivityLifecycleLatch = new CountDownLatch(1);
@@ -54,7 +56,7 @@ public class LifecycleTest extends AssistTestBase {
     public void setUp() throws Exception {
         super.setUp();
         setUpAndRegisterReceiver();
-        startTestActivity(Utils.LIFECYCLE);
+        startTestActivity(TEST_CASE_TYPE);
     }
 
     @Override

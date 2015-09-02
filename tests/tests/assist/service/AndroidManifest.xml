@@ -46,6 +46,7 @@
               <action android:name="android.intent.action.START_TEST_LIFECYCLE" />
               <action android:name="android.intent.action.START_TEST_FLAG_SECURE" />
               <action android:name="android.intent.action.START_TEST_SCREENSHOT" />
+              <action android:name="android.intent.action.START_TEST_EXTRA_ASSIST" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>
       </activity>

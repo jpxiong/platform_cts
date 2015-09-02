@@ -471,6 +471,7 @@ def BuildCtsTemporarilyKnownFailureList():
           'android.alarmclock.cts.SnoozeAlarmTest#testAll',
       ],
       'android.assist' : [
+          'android.assist.cts.ExtraAssistDataTest',
           'android.assist.cts.ScreenshotTest',
       ],
       'android.calllog' : [

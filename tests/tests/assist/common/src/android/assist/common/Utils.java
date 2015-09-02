@@ -19,6 +19,9 @@ import android.R;
 import android.content.ComponentName;
 import android.os.Bundle;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class Utils {
@@ -50,7 +53,7 @@ public class Utils {
 
     /** Flag Secure Test intent constants */
     public static final String FLAG_SECURE_HASRESUMED = ACTION_PREFIX + "flag_secure_hasResumed";
-    public static final String SCREENSHOT_HASRESUMED = ACTION_PREFIX + "screenshot_hasResumed";
+    public static final String APP_3P_HASRESUMED = ACTION_PREFIX + "screenshot_hasResumed";
     public static final String ASSIST_STRUCTURE_HASRESUMED = ACTION_PREFIX
             + "assist_structure_hasResumed";
 
@@ -67,9 +70,48 @@ public class Utils {
     public static final String FLAG_SECURE = "FLAG_SECURE";
     public static final String LIFECYCLE = "LIFECYCLE";
     public static final String SCREENSHOT = "SCREENSHOT";
+    public static final String EXTRA_ASSIST = "EXTRA_ASSIST";
 
     /** Session intent constants */
     public static final String HIDE_SESSION = "android.intent.action.hide_session";
+
+    /** Extra data to add to assist data and assist content */
+    private static Bundle EXTRA_ASSIST_BUNDLE;
+    private static String STRUCTURED_JSON;
+
+    public static final String getStructuredJSON() throws Exception {
+        if (STRUCTURED_JSON == null) {
+            STRUCTURED_JSON = new JSONObject()
+                    .put("@type", "MusicRecording")
+                    .put("@id", "https://example/music/recording")
+                    .put("url", "android-app://com.example/https/music/album")
+                    .put("name", "Album Title")
+                    .put("hello", "hi there")
+                    .put("knownNull", null)
+                    .put("unicode value", "\ud800\udc35")
+                    .put("empty string", "")
+                    .put("LongString",
+                        "lkasdjfalsdkfjalsdjfalskj9i9234jl1w23j4o123j412l3j421l3kj412l3kj1l3k4j32")
+                    .put("\ud800\udc35", "any-value")
+                    .put("key with spaces", "any-value")
+                    .toString();
+        }
+        return STRUCTURED_JSON;
+    }
+
+    public static final Bundle getExtraAssistBundle() {
+        if (EXTRA_ASSIST_BUNDLE == null) {
+            EXTRA_ASSIST_BUNDLE = new Bundle();
+            addExtraAssistDataToBundle(EXTRA_ASSIST_BUNDLE);
+        }
+        return EXTRA_ASSIST_BUNDLE;
+    }
+
+    public static void addExtraAssistDataToBundle(Bundle data) {
+        data.putString("hello", "there");
+        data.putBoolean("isthis_true_or_false", true);
+        data.putInt("number", 123);
+    }
 
     /** The shim activity that starts the service associated with each test. */
     public static final String getTestActivity(String testCaseType) {
@@ -82,6 +124,7 @@ public class Utils {
             case FLAG_SECURE:
             case LIFECYCLE:
             case SCREENSHOT:
+            case EXTRA_ASSIST:
                 return "service.DelayedAssistantActivity";
             default:
                 return "";
@@ -106,6 +149,9 @@ public class Utils {
             case SCREENSHOT:
                 return new ComponentName(
                         "android.assist.testapp", "android.assist.testapp.ScreenshotActivity");
+            case EXTRA_ASSIST:
+                return new ComponentName(
+                        "android.assist.testapp", "android.assist.testapp.ExtraAssistDataActivity");
             default:
                 return new ComponentName("","");
         }
@@ -116,16 +162,11 @@ public class Utils {
      */
     public static final int getAssistDataTimeout(String testCaseType) {
         switch (testCaseType) {
-            case ASSIST_STRUCTURE:
-            case FLAG_SECURE:
-            case DISABLE_CONTEXT:
-            case LIFECYCLE:
-                return TIMEOUT_MS;
             case SCREENSHOT:
                 // needs to wait for 3p activity to resume before receiving assist data.
                 return TIMEOUT_MS + ACTIVITY_ONRESUME_TIMEOUT_MS;
             default:
-                return 0;
+                return TIMEOUT_MS;
         }
     }
 

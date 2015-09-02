@@ -54,7 +54,7 @@ public class ScreenshotTest extends AssistTestBase {
         mScreenshotActivityReceiver = new ScreenshotTestReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(Utils.ASSIST_RECEIVER_REGISTERED);
-        filter.addAction(Utils.SCREENSHOT_HASRESUMED);
+        filter.addAction(Utils.APP_3P_HASRESUMED);
         mContext.registerReceiver(mScreenshotActivityReceiver, filter);
 
         // start test start activity
@@ -122,7 +122,7 @@ public class ScreenshotTest extends AssistTestBase {
             if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
                 Log.i(ScreenshotTest.TAG, "Received assist receiver is registered.");
                 mAssistantReadyLatch.countDown();
-            } else if (action.equals(Utils.SCREENSHOT_HASRESUMED)) {
+            } else if (action.equals(Utils.APP_3P_HASRESUMED)) {
                 if (mHasResumedLatch != null) {
                     mHasResumedLatch.countDown();
                 }

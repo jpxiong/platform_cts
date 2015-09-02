@@ -50,7 +50,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartActivity> {
-    static final String TAG = "AssistTestBase";
+    private static final String TAG = "AssistTestBase";
 
     protected TestStartActivity mTestActivity;
     protected AssistContent mAssistContent;
@@ -392,7 +392,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
                     Log.i(AssistTestBase.TAG, "counting down latch. received assist data.");
                     mLatch.countDown();
                 }
-            } else if (intent.getAction().equals(Utils.SCREENSHOT_HASRESUMED)) {
+            } else if (intent.getAction().equals(Utils.APP_3P_HASRESUMED)) {
                 if (mHasResumedLatch != null) {
                     mHasResumedLatch.countDown();
                 }

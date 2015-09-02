@@ -71,7 +71,7 @@ public class MainInteractionService extends VoiceInteractionService {
                         registerReceiver(mBroadcastReceiver, filter);
                         Log.i(TAG, "Registered receiver to start session later");
 
-                        IntentFilter resumeFilter = new IntentFilter(Utils.SCREENSHOT_HASRESUMED);
+                        IntentFilter resumeFilter = new IntentFilter(Utils.APP_3P_HASRESUMED);
                         mResumeReceiver = new MainServiceAppResumeReceiver();
                         registerReceiver(mResumeReceiver, resumeFilter);
                         Log.i(TAG, "Registered receiver for resuming activity");
@@ -132,9 +132,9 @@ public class MainInteractionService extends VoiceInteractionService {
     private class MainServiceAppResumeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(Utils.SCREENSHOT_HASRESUMED)) {
+            if (intent.getAction().equals(Utils.APP_3P_HASRESUMED)) {
                 Log.i(MainInteractionService.TAG,
-                    "screenshot activity has resumed in this new receiver");
+                    "3p activity has resumed in this new receiver");
                 if (MainInteractionService.this.mResumeLatch != null) {
                     MainInteractionService.this.mResumeLatch.countDown();
                 } else {

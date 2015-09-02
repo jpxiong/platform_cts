@@ -32,6 +32,7 @@
               <action android:name="android.intent.action.TEST_START_ACTIVITY_FLAG_SECURE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_LIFECYCLE" />
               <action android:name="android.intent.action.TEST_START_ACTIVITY_SCREENSHOT" />
+              <action android:name="android.intent.action.TEST_START_ACTIVITY_EXTRA_ASSIST" />
               <category android:name="android.intent.category.LAUNCHER" />
               <category android:name="android.intent.category.DEFAULT" />
           </intent-filter>
