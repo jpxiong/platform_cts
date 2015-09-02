@@ -51,7 +51,9 @@ public class BaseRemoteTelecomTest extends BaseTelecomTestWithMockServices {
 
     @Override
     protected void tearDown() throws Exception {
-        tearDownConnectionServices(TEST_PHONE_ACCOUNT_HANDLE, TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+        if (mShouldTestTelecom) {
+            tearDownConnectionServices(TEST_PHONE_ACCOUNT_HANDLE, TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+        }
         super.tearDown();
     }
 

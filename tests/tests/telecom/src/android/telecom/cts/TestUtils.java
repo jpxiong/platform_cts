@@ -63,7 +63,8 @@ public class TestUtils {
             return false;
         }
         final PackageManager pm = context.getPackageManager();
-        return pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+        return pm.hasSystemFeature(PackageManager.FEATURE_TELEPHONY) &&
+                pm.hasSystemFeature(PackageManager.FEATURE_CONNECTION_SERVICE);
     }
 
     public static String setDefaultDialer(Instrumentation instrumentation, String packageName)
