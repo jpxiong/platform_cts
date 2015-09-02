@@ -25,19 +25,37 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * An instrumentation that runs all activities that extends DeviceInfoActivity.
  */
 public class DeviceInfoInstrument extends Instrumentation {
 
     private static final String LOG_TAG = "ExtendedDeviceInfo";
-    private static final int DEVICE_INFO_ACTIVITY_REQUEST = 1;
+    private static final String COLLECTOR = "collector";
 
+    // List of collectors to run. If null or empty, all collectors will run.
+    private Set<String> mCollectorSet = new HashSet<String>();
+
+    // Results sent to the caller when this istrumentation completes.
     private Bundle mBundle = new Bundle();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            String collectorList = savedInstanceState.getString(COLLECTOR);
+            if (!TextUtils.isEmpty(collectorList)) {
+                for (String collector : TextUtils.split(collectorList, ",")) {
+                  if (!TextUtils.isEmpty(collector)) {
+                    mCollectorSet.add(collector);
+                  }
+                }
+            }
+        }
         start();
     }
 
@@ -47,13 +65,8 @@ public class DeviceInfoInstrument extends Instrumentation {
             Context context = getContext();
             ActivityInfo[] activities = context.getPackageManager().getPackageInfo(
                     context.getPackageName(), PackageManager.GET_ACTIVITIES).activities;
-
             for (ActivityInfo activityInfo : activities) {
-                Class cls = Class.forName(activityInfo.name);
-                if (cls != DeviceInfoActivity.class &&
-                        DeviceInfoActivity.class.isAssignableFrom(cls)) {
-                    runActivity(activityInfo.name);
-                }
+                runActivity(activityInfo.name);
             }
         } catch (Exception e) {
             Log.e(LOG_TAG, "Exception occurred while running activities.", e);
@@ -65,9 +78,40 @@ public class DeviceInfoInstrument extends Instrumentation {
     }
 
     /**
+     * Returns true if the activity meets the criteria to run; otherwise, false.
+     */
+    private boolean isActivityRunnable(Class activityClass) {
+        // Don't run the base DeviceInfoActivity class.
+        if (DeviceInfoActivity.class == activityClass) {
+            return false;
+        }
+        // Don't run anything that doesn't extends DeviceInfoActivity.
+        if (!DeviceInfoActivity.class.isAssignableFrom(activityClass)) {
+            return false;
+        }
+        // Only run activity if mCollectorSet is empty or contains it.
+        if (mCollectorSet != null && mCollectorSet.size() > 0) {
+            return mCollectorSet.contains(activityClass.getName());
+        }
+        // Run anything that makes it here.
+        return true;
+    }
+
+    /**
      * Runs a device info activity and return the file path where the results are written to.
      */
     private void runActivity(String activityName) throws Exception {
+        Class activityClass = null;
+        try {
+            activityClass = Class.forName(activityName);
+        } catch (ClassNotFoundException e) {
+            return;
+        }
+
+        if (activityClass == null || !isActivityRunnable(activityClass)) {
+            return;
+        }
+
         Intent intent = new Intent();
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setClassName(this.getContext(), activityName);
@@ -76,7 +120,7 @@ public class DeviceInfoInstrument extends Instrumentation {
         waitForIdleSync();
         activity.waitForActivityToFinish();
 
-        String className = Class.forName(activityName).getSimpleName();
+        String className = activityClass.getSimpleName();
         String errorMessage = activity.getErrorMessage();
         if (TextUtils.isEmpty(errorMessage)) {
             mBundle.putString(className, activity.getResultFilePath());
