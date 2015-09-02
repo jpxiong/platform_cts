@@ -1,5 +1,14 @@
 [
 {
+  description: "some AlarmClockTests are not robust across different device types",
+  names: [
+    "android.alarmclock.cts.DismissAlarmTest#testAll",
+    "android.alarmclock.cts.SetAlarmTest#testAll",
+    "android.alarmclock.cts.SnoozeAlarmTest#testAll"
+  ],
+  bug: 23776083
+},
+{
   description: "the UsageStats is not yet stable enough",
   names: [
     "android.app.usage.cts.UsageStatsTest"
@@ -13,6 +22,21 @@
     "android.accessibilityservice.cts.AccessibilityTextTraversalTest#testActionNextAndPreviousAtGranularityPageOverTextExtend"
   ],
   bug: 17595050
+},
+{
+  description: "test fails on devices with no telephony",
+  names: [
+    "android.calllog.cts.CallLogBackupTest#testSingleCallBackup"
+  ],
+  bug: 23776099
+},
+{
+  description: "test fails on some devices",
+  names: [
+    "android.dumpsys.cts.DumpsysHostTest#testBatterystatsOutput",
+    "android.dumpsys.cts.DumpsysHostTest#testGfxinfoFramestats"
+  ],
+  bug: 23776893
 },
 {
   description: "the SSLCertificateSocketFactoryTest often fails because of lack of live internet or short timeout, it should be refactored to do a local server testing",
@@ -37,6 +61,21 @@
     "android.security.cts.AudioPolicyBinderTest"
   ],
   bug: 18461670
+},
+{
+  description: "test not robust",
+  names: [
+    "android.telecom.cts.ExtendedInCallServiceTest#testAddNewOutgoingCallAndThenDisconnect",
+    "android.telecom.cts.RemoteConferenceTest#testRemoteConferenceCallbacks_ConferenceableConnections"
+  ],
+  bug: 23604254
+},
+{
+  description: "tests too flaky",
+  names: [
+    "android.transition.cts.ChangeScrollTest#testChangeScroll"
+  ],
+  bug: 23779020
 },
 {
   description: "Not all jdwp features are currently supported. These tests will fail",
@@ -117,6 +156,13 @@
     "android.admin.cts.DevicePolicyManagerTest#testUninstallAllUserCaCerts_failIfNotProfileOwner"
   ],
   bug: 17508787
+},
+{
+  description: "Test is not yet properly implemented",
+  names: [
+    "android.voicesettings.cts.ZenModeTest#testAll"
+  ],
+  bug: 23238984
 },
 {
   description: "These tests fail on some devices.",
@@ -234,5 +280,12 @@
     "android.hardware.cts.SingleSensorTests#testOrientation_5hz"
   ],
   bug: 22922206
+},
+{
+  description: "tests are not yet ready",
+  names: [
+    "com.android.cts.app.os.OsHostTests#testNonExportedActivities"
+  ],
+  bug: 23779168
 }
 ]

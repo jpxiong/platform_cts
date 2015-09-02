@@ -191,8 +191,6 @@ class CtsBuilder(object):
     for package, test_list in small_tests.iteritems():
       plan.Include(package+'$')
     plan.Exclude(r'com\.android\.cts\.browserbench')
-    for package, test_list in temporarily_known_failure_tests.iteritems():
-      plan.ExcludeTests(package, test_list)
     for package, test_list in flaky_tests.iteritems():
       plan.ExcludeTests(package, test_list)
     for package, test_list in releasekey_tests.iteritems():
@@ -273,9 +271,6 @@ class CtsBuilder(object):
       plan.Exclude(package+'$')
     for package, tests_list in new_test_packages.iteritems():
       plan.Exclude(package+'$')
-    for package, test_list in temporarily_known_failure_tests.iteritems():
-      plan.Include(package+'$')
-      plan.IncludeTests(package, test_list)
     plan.Exclude(r'com\.drawelements\.')
     plan.Exclude(r'android\.hardware$')
     plan.Exclude(r'android\.media$')
@@ -286,6 +281,15 @@ class CtsBuilder(object):
       plan.ExcludeTests(package, test_list)
     for package, test_list in releasekey_tests.iteritems():
       plan.ExcludeTests(package, test_list)
+    self.__WritePlan(plan, 'CTS-m-tests')
+
+
+    # CTS - sub plan for new test packages added for staging
+    plan = tools.TestPlan(packages)
+    plan.Exclude('.*')
+    for package, test_list in temporarily_known_failure_tests.iteritems():
+      plan.Include(package+'$')
+      plan.IncludeTests(package, test_list)
     self.__WritePlan(plan, 'CTS-staging')
 
     plan = tools.TestPlan(packages)
@@ -461,11 +465,31 @@ def BuildCtsTemporarilyKnownFailureList():
   """ Construct a defaultdict that maps package name to a list of tests
       that are known failures during dev cycle but expected to be fixed before launch """
   return {
-      'android.bluetooth' : [
-          'android.bluetooth.cts.BluetoothLeScanTest#testBasicBleScan',
-          'android.bluetooth.cts.BluetoothLeScanTest#testBatchScan',
-          'android.bluetooth.cts.BluetoothLeScanTest#testOpportunisticScan',
-          'android.bluetooth.cts.BluetoothLeScanTest#testScanFilter',],
+      'android.alarmclock' : [
+          'android.alarmclock.cts.DismissAlarmTest#testAll',
+          'android.alarmclock.cts.SetAlarmTest#testAll',
+          'android.alarmclock.cts.SnoozeAlarmTest#testAll',
+      ],
+      'android.calllog' : [
+          'android.calllog.cts.CallLogBackupTest#testSingleCallBackup',
+      ],
+      'android.dumpsys' : [
+          'android.dumpsys.cts.DumpsysHostTest#testBatterystatsOutput',
+          'android.dumpsys.cts.DumpsysHostTest#testGfxinfoFramestats',
+      ],
+      'android.telecom' : [
+          'android.telecom.cts.ExtendedInCallServiceTest#testAddNewOutgoingCallAndThenDisconnect',
+          'android.telecom.cts.RemoteConferenceTest#testRemoteConferenceCallbacks_ConferenceableConnections',
+      ],
+      'android.transition' : [
+          'android.transition.cts.ChangeScrollTest#testChangeScroll',
+      ],
+      'android.voicesettings' : [
+          'android.voicesettings.cts.ZenModeTest#testAll',
+      ],
+      'com.android.cts.app.os' : [
+          'com.android.cts.app.os.OsHostTests#testNonExportedActivities',
+      ],
       '' : []}
 
 def LogGenerateDescription(name):
