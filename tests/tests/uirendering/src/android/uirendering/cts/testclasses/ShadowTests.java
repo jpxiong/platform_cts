@@ -32,6 +32,7 @@ public class ShadowTests extends ActivityTestBase {
         if (getActivity().getOnTv()) {
             shadowColorValue = 0xB7;
         }
+        // Use a higher threshold (30) than default value (20);
         SamplePointVerifier verifier = new SamplePointVerifier(
                 new Point[] {
                         // view area
@@ -46,7 +47,8 @@ public class ShadowTests extends ActivityTestBase {
                         Color.WHITE,
                         Color.rgb(shadowColorValue, shadowColorValue, shadowColorValue),
                         Color.rgb(shadowColorValue, shadowColorValue, shadowColorValue),
-                });
+                },
+                30);
         createTest()
                 .addLayout(R.layout.simple_shadow_layout, null, true/* HW only */)
                 .runWithVerifier(verifier);
