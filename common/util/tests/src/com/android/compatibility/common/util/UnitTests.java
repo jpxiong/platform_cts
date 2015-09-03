@@ -11,15 +11,21 @@
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
- * limitations under the License.
+ * limitations under the License
  */
 
 package com.android.compatibility.common.util;
 
-import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-public class CommonUtilTest extends TestCase {
+/**
+ * A {@link TestSuite} for the common.util package.
+ */
+public class UnitTests extends TestSuite {
 
-    // TODO(stuartscott): Add tests when there is something to test.
+    public UnitTests() {
+        super();
 
+        addTestSuite(MetricsXmlSerializerTest.class);
+    }
 }

@@ -25,7 +25,10 @@ LOCAL_MULTILIB := both
 
 LOCAL_SRC_FILES := $(call all-java-files-under, src) $(call all-Iaidl-files-under, src)
 
-LOCAL_STATIC_JAVA_LIBRARIES := cts-sensors-tests ctstestrunner android-ex-camera2
+LOCAL_STATIC_JAVA_LIBRARIES := android-ex-camera2 \
+                               compatibility-common-util-devicesidelib_v2 \
+                               cts-sensors-tests \
+                               ctstestrunner \
 
 LOCAL_PACKAGE_NAME := CtsVerifier
 
