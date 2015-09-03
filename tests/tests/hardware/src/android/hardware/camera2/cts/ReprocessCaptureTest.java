@@ -1211,6 +1211,9 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
             throw new IllegalArgumentException("isReprocessCaptures must have at least 1 capture.");
         }
 
+        boolean hasReprocessRequest = false;
+        boolean hasRegularRequest = false;
+
         TotalCaptureResult[] results = new TotalCaptureResult[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
             // submit a capture and get the result if this entry is a reprocess capture.
@@ -1219,6 +1222,9 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
                         /*inputResult*/null);
                 mImageWriter.queueInputImage(
                         mFirstImageReaderListener.getImage(CAPTURE_TIMEOUT_MS));
+                hasReprocessRequest = true;
+            } else {
+                hasRegularRequest = true;
             }
         }
 
@@ -1232,7 +1238,24 @@ public class ReprocessCaptureTest extends Camera2SurfaceViewTestCase  {
         ImageResultHolder[] holders = new ImageResultHolder[isReprocessCaptures.length];
         for (int i = 0; i < isReprocessCaptures.length; i++) {
             Image image = getReprocessOutputImageReaderListener().getImage(CAPTURE_TIMEOUT_MS);
-            holders[i] = new ImageResultHolder(image, finalResults[i]);
+            if (hasReprocessRequest && hasRegularRequest) {
+                // If there are mixed requests, images and results may not be in the same order.
+                for (int j = 0; j < finalResults.length; j++) {
+                    if (finalResults[j] != null &&
+                            finalResults[j].get(CaptureResult.SENSOR_TIMESTAMP) ==
+                            image.getTimestamp()) {
+                        holders[i] = new ImageResultHolder(image, finalResults[j]);
+                        finalResults[j] = null;
+                        break;
+                    }
+                }
+
+                assertNotNull("Cannot find a result matching output image's timestamp: " +
+                        image.getTimestamp(), holders[i]);
+            } else {
+                // If no mixed requests, images and results should be in the same order.
+                holders[i] = new ImageResultHolder(image, finalResults[i]);
+            }
         }
 
         return holders;
