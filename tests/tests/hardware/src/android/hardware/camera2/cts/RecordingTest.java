@@ -30,6 +30,7 @@ import android.media.MediaCodecInfo.CodecProfileLevel;
 import android.media.Image;
 import android.media.ImageReader;
 import android.media.MediaCodecList;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -1031,133 +1032,10 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * by AVC specification for certain level.
      */
     private static boolean isSupportedByAVCEncoder(Size sz, int frameRate) {
-        String mimeType = "video/avc";
-        MediaCodecInfo codecInfo = getEncoderInfo(mimeType);
-        if (codecInfo == null) {
-            return false;
-        }
-        CodecCapabilities cap = codecInfo.getCapabilitiesForType(mimeType);
-        if (cap == null) {
-            return false;
-        }
-
-        int highestLevel = 0;
-        for (CodecProfileLevel lvl : cap.profileLevels) {
-            if (lvl.level > highestLevel) {
-                highestLevel = lvl.level;
-            }
-        }
-        // Don't support anything meaningful for level 1 or 2.
-        if (highestLevel <= CodecProfileLevel.AVCLevel2) {
-            return false;
-        }
-
-        if(VERBOSE) {
-            Log.v(TAG, "The highest level supported by encoder is: " + highestLevel);
-        }
-
-        // Put bitRate here for future use.
-        int maxW, maxH, bitRate;
-        // Max encoding speed.
-        int maxMacroblocksPerSecond = 0;
-        switch(highestLevel) {
-            case CodecProfileLevel.AVCLevel21:
-                maxW = 352;
-                maxH = 576;
-                bitRate = 4000000;
-                maxMacroblocksPerSecond = 19800;
-                break;
-            case CodecProfileLevel.AVCLevel22:
-                maxW = 720;
-                maxH = 480;
-                bitRate = 4000000;
-                maxMacroblocksPerSecond = 20250;
-                break;
-            case CodecProfileLevel.AVCLevel3:
-                maxW = 720;
-                maxH = 480;
-                bitRate = 10000000;
-                maxMacroblocksPerSecond = 40500;
-                break;
-            case CodecProfileLevel.AVCLevel31:
-                maxW = 1280;
-                maxH = 720;
-                bitRate = 14000000;
-                maxMacroblocksPerSecond = 108000;
-                break;
-            case CodecProfileLevel.AVCLevel32:
-                maxW = 1280;
-                maxH = 720;
-                bitRate = 20000000;
-                maxMacroblocksPerSecond = 216000;
-                break;
-            case CodecProfileLevel.AVCLevel4:
-                maxW = 1920;
-                maxH = 1088; // It should be 1088 in terms of AVC capability.
-                bitRate = 20000000;
-                maxMacroblocksPerSecond = 245760;
-                break;
-            case CodecProfileLevel.AVCLevel41:
-                maxW = 1920;
-                maxH = 1088; // It should be 1088 in terms of AVC capability.
-                bitRate = 50000000;
-                maxMacroblocksPerSecond = 245760;
-                break;
-            case CodecProfileLevel.AVCLevel42:
-                maxW = 2048;
-                maxH = 1088; // It should be 1088 in terms of AVC capability.
-                bitRate = 50000000;
-                maxMacroblocksPerSecond = 522240;
-                break;
-            case CodecProfileLevel.AVCLevel5:
-                maxW = 3672;
-                maxH = 1536;
-                bitRate = 135000000;
-                maxMacroblocksPerSecond = 589824;
-                break;
-            case CodecProfileLevel.AVCLevel51:
-            default:
-                maxW = 4096;
-                maxH = 2304;
-                bitRate = 240000000;
-                maxMacroblocksPerSecond = 983040;
-                break;
-        }
-
-        // Check size limit.
-        if (sz.getWidth() > maxW || sz.getHeight() > maxH) {
-            Log.i(TAG, "Requested resolution " + sz.toString() + " exceeds (" +
-                    maxW + "," + maxH + ")");
-            return false;
-        }
-
-        // Check frame rate limit.
-        Size sizeInMb = new Size((sz.getWidth() + 15) / 16, (sz.getHeight() + 15) / 16);
-        int maxFps = maxMacroblocksPerSecond / (sizeInMb.getWidth() * sizeInMb.getHeight());
-        if (frameRate > maxFps) {
-            Log.i(TAG, "Requested frame rate " + frameRate + " exceeds " + maxFps);
-            return false;
-        }
-
-        return true;
-    }
-
-    private static MediaCodecInfo getEncoderInfo(String mimeType) {
-        int numCodecs = MediaCodecList.getCodecCount();
-        for (int i = 0; i < numCodecs; i++) {
-            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
-
-            if (!codecInfo.isEncoder()) {
-                continue;
-            }
-
-            String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-                if (types[j].equalsIgnoreCase(mimeType)) {
-                    return codecInfo;
-                }
-            }
-        }
-        return null;
+        MediaFormat format = MediaFormat.createVideoFormat(
+                MediaFormat.MIMETYPE_VIDEO_AVC, sz.getWidth(), sz.getHeight());
+        format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
+        MediaCodecList mcl = new MediaCodecList(MediaCodecList.REGULAR_CODECS);
+        return mcl.findEncoderForFormat(format) != null;
     }
 }
