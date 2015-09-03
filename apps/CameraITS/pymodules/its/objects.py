@@ -88,6 +88,7 @@ def manual_capture_request(sensitivity, exp_time, linear_tonemap=False):
         its.device.do_capture function.
     """
     req = {
+        "android.control.captureIntent": 6,
         "android.control.mode": 0,
         "android.control.aeMode": 0,
         "android.control.awbMode": 0,
@@ -101,6 +102,7 @@ def manual_capture_request(sensitivity, exp_time, linear_tonemap=False):
                 int_to_rational([1,0,0, 0,1,0, 0,0,1]),
         "android.colorCorrection.gains": [1,1,1,1],
         "android.tonemap.mode": 1,
+        "android.shading.mode": 1
         }
     if linear_tonemap:
         req["android.tonemap.mode"] = 0
@@ -140,6 +142,24 @@ def get_available_output_sizes(fmt, props):
     out_sizes.sort(reverse=True)
     return out_sizes
 
+def set_filter_off_or_fast_if_possible(props, req, available_modes, filter):
+    """ Check and set controlKey to off or fast in req
+
+    Args:
+        props: the object returned from its.device.get_camera_properties().
+        req: the input request.
+        available_modes: the key to check available modes.
+        filter: the filter key
+
+    Returns:
+        None. control_key will be set to OFF or FAST if possible.
+    """
+    if props.has_key(available_modes):
+        if 0 in props[available_modes]:
+            req[filter] = 0
+        elif 1 in props[available_modes]:
+            req[filter] = 1
+
 def get_fastest_manual_capture_settings(props):
     """Return a capture request and format spec for the fastest capture.
 
@@ -157,6 +177,20 @@ def get_fastest_manual_capture_settings(props):
     s = min(props['android.sensor.info.sensitivityRange'])
     e = min(props['android.sensor.info.exposureTimeRange'])
     req = manual_capture_request(s,e)
+
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.noiseReduction.availableNoiseReductionModes",
+        "android.noiseReduction.mode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.colorCorrection.availableAberrationModes",
+        "android.colorCorrection.aberrationMode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.hotPixel.availableHotPixelModes",
+        "android.hotPixel.mode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.edge.availableEdgeModes",
+        "android.edge.mode")
+
     return req, out_spec
 
 def get_max_digital_zoom(props):
