@@ -16,6 +16,7 @@
 
 package android.media.cts;
 
+import android.content.pm.PackageManager;
 import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -1541,7 +1542,16 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         }
     }
 
+    private boolean hasAudioOutput() {
+        return getContext().getPackageManager()
+            .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
+    }
+
     public void testGetTimestamp() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
+        
         // constants for test
         final String TEST_NAME = "testGetTimestamp";
         final int TEST_SR = 22050;
