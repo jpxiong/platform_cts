@@ -79,11 +79,17 @@ public class MediaCodecTest extends AndroidTestCase {
      * methods when called in incorrect operational states.
      */
     public void testException() throws Exception {
+        String mimeType = "audio/amr-wb";
+        if (!supportsCodec(mimeType, false)) {
+            Log.i(TAG, "No decoder found for mimeType= " + mimeType);
+            return;
+        }
+
         MediaFormat[] formatList = new MediaFormat[2];
 
         // use audio format
         formatList[0] = new MediaFormat();
-        formatList[0].setString(MediaFormat.KEY_MIME, "audio/amr-wb");
+        formatList[0].setString(MediaFormat.KEY_MIME, mimeType);
         formatList[0].setInteger(MediaFormat.KEY_SAMPLE_RATE, 16000);
         formatList[0].setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
         formatList[0].setInteger(MediaFormat.KEY_BIT_RATE, 19850);
@@ -272,6 +278,11 @@ public class MediaCodecTest extends AndroidTestCase {
      * <br> calling createInputSurface() with a non-Surface color format throws exception
      */
     public void testCreateInputSurfaceErrors() {
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         MediaFormat format = createMediaFormat();
         MediaCodec encoder = null;
         Surface surface = null;
@@ -326,6 +337,11 @@ public class MediaCodecTest extends AndroidTestCase {
      * <br> submitting a frame after EOS throws exception [TODO]
      */
     public void testSignalSurfaceEOS() {
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         MediaFormat format = createMediaFormat();
         MediaCodec encoder = null;
         InputSurface inputSurface = null;
@@ -378,6 +394,11 @@ public class MediaCodecTest extends AndroidTestCase {
      * <br> stopping with buffers in flight doesn't crash or hang
      */
     public void testAbruptStop() {
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         // There appears to be a race, so run it several times with a short delay between runs
         // to allow any previous activity to shut down.
         for (int i = 0; i < 50; i++) {
@@ -432,6 +453,11 @@ public class MediaCodecTest extends AndroidTestCase {
      * <br> dequeueInputBuffer() fails when encoder configured with an input Surface
      */
     public void testDequeueSurface() {
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         MediaFormat format = createMediaFormat();
         MediaCodec encoder = null;
         Surface surface = null;
@@ -470,6 +496,11 @@ public class MediaCodecTest extends AndroidTestCase {
      * <br> sending EOS with signalEndOfInputStream on non-Surface encoder fails
      */
     public void testReconfigureWithoutSurface() {
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         MediaFormat format = createMediaFormat();
         MediaCodec encoder = null;
         Surface surface = null;
@@ -553,8 +584,13 @@ public class MediaCodecTest extends AndroidTestCase {
             mediaExtractor = getMediaExtractorForMimeType(inputResourceId, "video/");
             MediaFormat mediaFormat =
                     mediaExtractor.getTrackFormat(mediaExtractor.getSampleTrackIndex());
+            String mimeType = mediaFormat.getString(MediaFormat.KEY_MIME);
+            if (!supportsCodec(mimeType, false)) {
+                Log.i(TAG, "No decoder found for mimeType= " + MIME_TYPE);
+                return true;
+            }
             mediaCodec =
-                    MediaCodec.createDecoderByType(mediaFormat.getString(MediaFormat.KEY_MIME));
+                    MediaCodec.createDecoderByType(mimeType);
             mediaCodec.configure(mediaFormat, outputSurface.getSurface(), null, 0);
             mediaCodec.start();
             boolean eos = false;
@@ -669,6 +705,16 @@ public class MediaCodecTest extends AndroidTestCase {
      * Tests creating an encoder and decoder for {@link #MIME_TYPE_AUDIO} at the same time.
      */
     public void testCreateAudioDecoderAndEncoder() {
+        if (!supportsCodec(MIME_TYPE_AUDIO, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE_AUDIO);
+            return;
+        }
+
+        if (!supportsCodec(MIME_TYPE_AUDIO, false)) {
+            Log.i(TAG, "No decoder found for mimeType= " + MIME_TYPE_AUDIO);
+            return;
+        }
+
         final MediaFormat encoderFormat = MediaFormat.createAudioFormat(
                 MIME_TYPE_AUDIO, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL_COUNT);
         encoderFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, AUDIO_AAC_PROFILE);
@@ -716,6 +762,16 @@ public class MediaCodecTest extends AndroidTestCase {
     }
 
     public void testConcurrentAudioVideoEncodings() throws InterruptedException {
+        if (!supportsCodec(MIME_TYPE_AUDIO, true)) {
+            Log.i(TAG, "No encoder found for mimeType= " + MIME_TYPE_AUDIO);
+            return;
+        }
+
+        if (!supportsCodec(MIME_TYPE, true)) {
+            Log.i(TAG, "No decoder found for mimeType= " + MIME_TYPE);
+            return;
+        }
+
         final int VIDEO_NUM_SWAPS = 100;
         // audio only checks this and stop
         mVideoEncodingOngoing = true;
@@ -1005,5 +1061,24 @@ public class MediaCodecTest extends AndroidTestCase {
         }
 
         return mediaExtractor;
+    }
+
+    private static boolean supportsCodec(String mimeType, boolean encoder) {
+        MediaCodecList list = new MediaCodecList(MediaCodecList.ALL_CODECS);
+        for (MediaCodecInfo info : list.getCodecInfos()) {
+            if (encoder && !info.isEncoder()) {
+                continue;
+            }
+            if (!encoder && info.isEncoder()) {
+                continue;
+            }
+            
+            for (String type : info.getSupportedTypes()) {
+                if (type.equalsIgnoreCase(mimeType)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
