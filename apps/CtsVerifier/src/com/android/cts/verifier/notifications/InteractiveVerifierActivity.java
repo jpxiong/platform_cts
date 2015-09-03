@@ -16,9 +16,7 @@
 
 package com.android.cts.verifier.notifications;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -38,19 +36,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.android.cts.verifier.PassFailButtons;
 import com.android.cts.verifier.R;
-import com.android.cts.verifier.nfc.TagVerifierActivity;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
-
-import static com.android.cts.verifier.notifications.MockListener.*;
 
 public abstract class InteractiveVerifierActivity extends PassFailButtons.Activity
         implements Runnable {
@@ -223,17 +213,18 @@ public abstract class InteractiveVerifierActivity extends PassFailButtons.Activi
     }
 
     protected View createNlsSettingsItem(ViewGroup parent, int messageId) {
-        return createUserItem(parent, messageId, R.string.nls_start_settings);
+        return createUserItem(parent, R.string.nls_start_settings, messageId);
     }
 
-    protected View createRetryItem(ViewGroup parent, int messageId) {
-        return createUserItem(parent, messageId, R.string.attention_ready);
+    protected View createRetryItem(ViewGroup parent, int messageId, Object... messageFormatArgs) {
+        return createUserItem(parent, R.string.attention_ready, messageId, messageFormatArgs);
     }
 
-    protected View createUserItem(ViewGroup parent, int messageId, int actionId) {
+    protected View createUserItem(ViewGroup parent, int actionId, int messageId,
+            Object... messageFormatArgs) {
         View item = mInflater.inflate(R.layout.nls_item, parent, false);
         TextView instructions = (TextView) item.findViewById(R.id.nls_instructions);
-        instructions.setText(messageId);
+        instructions.setText(getString(messageId, messageFormatArgs));
         Button button = (Button) item.findViewById(R.id.nls_action_button);
         button.setText(actionId);
         button.setTag(actionId);

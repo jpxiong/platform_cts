@@ -968,6 +968,14 @@
         itself according to the current rotation of the device.</string>
 
     <string name="test_category_notifications">Notifications</string>
+    <string name="package_priority_test">Notification Package Priority Test</string>
+    <string name="package_priority_info">This test checks that the NotificationManagerService respects
+        user preferences about relative package priorities.
+    </string>
+    <string name="package_priority_high">Find \"%s\" under \"App notifications\" in the \"Sound &amp; notifications\" settings panel, and mark it as having notification priority.</string>
+    <string name="package_priority_default">Find \"%s\" under \"App notifications\" in the \"Sound &amp; notifications\" settings panel, and make sure it has default priority.</string>
+    <string name="package_priority_user_order">Check that ranker respects user priorities.</string>
+
     <string name="attention_test">Notification Attention Management Test</string>
     <string name="attention_info">This test checks that the NotificationManagerService is
         respecting user preferences about notification ranking and filtering.
