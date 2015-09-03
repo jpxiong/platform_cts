@@ -561,22 +561,19 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
     * Standard color checker chart with standard-sized black borders.
 
     The values returned are in the coordinate system of the chart; that is,
-    the "origin" patch is the brown patch that is in the chart's top-left
-    corner when it is in the normal upright/horizontal orientation. (The chart
-    may be any of the four main orientations in the image.)
-
-    The chart is 6x4 patches in the normal upright orientation. The return
-    values of this function are the center coordinate of the top-left patch,
-    and the displacement vectors to the next patches to the right and below
-    the top-left patch. From these pieces of data, the center coordinates of
-    any of the patches can be computed.
+    patch (0,0) is the brown patch that is in the chart's top-left corner when
+    it is in the normal upright/horizontal orientation. (The chart may be any
+    of the four main orientations in the image.)
 
     Args:
         img: Input image, as a numpy array with pixels in [0,1].
         debug_fname_prefix: If not None, the (string) name of a file prefix to
             use to save a number of debug images for visualizing the output of
             this function; can be used to see if the patches are being found
-            successfully.
+            successfully. If this argument is provided, then some of the sanity
+            check assertions will be disabled to allow the function to provide
+            useful debugging information, meaning that garbage data may be
+            returned.
 
     Returns:
         6x4 list of lists of integer (x,y) coords of the center of each patch,
