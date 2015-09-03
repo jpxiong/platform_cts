@@ -2046,8 +2046,14 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
 
         assertEquals(SingleLineTransformationMethod.getInstance(),
                 textView.getTransformationMethod());
-        int singleLineWidth = textView.getLayout().getWidth();
-        int singleLineHeight = textView.getLayout().getHeight();
+
+        int singleLineWidth = 0;
+        int singleLineHeight = 0;
+
+        if (textView.getLayout() != null) {
+            singleLineWidth = textView.getLayout().getWidth();
+            singleLineHeight = textView.getLayout().getHeight();
+        }
 
         mActivity.runOnUiThread(new Runnable() {
             public void run() {
@@ -2056,8 +2062,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         });
         mInstrumentation.waitForIdleSync();
         assertEquals(null, textView.getTransformationMethod());
-        assertTrue(textView.getLayout().getHeight() > singleLineHeight);
-        assertTrue(textView.getLayout().getWidth() < singleLineWidth);
+
+        if (textView.getLayout() != null) {
+            assertTrue(textView.getLayout().getHeight() > singleLineHeight);
+            assertTrue(textView.getLayout().getWidth() < singleLineWidth);
+        }
 
         // same behaviours as setSingLine(true)
         mActivity.runOnUiThread(new Runnable() {
@@ -2068,8 +2077,11 @@ public class TextViewTest extends ActivityInstrumentationTestCase2<TextViewCtsAc
         mInstrumentation.waitForIdleSync();
         assertEquals(SingleLineTransformationMethod.getInstance(),
                 textView.getTransformationMethod());
-        assertEquals(singleLineHeight, textView.getLayout().getHeight());
-        assertEquals(singleLineWidth, textView.getLayout().getWidth());
+
+        if (textView.getLayout() != null) {
+            assertEquals(singleLineHeight, textView.getLayout().getHeight());
+            assertEquals(singleLineWidth, textView.getLayout().getWidth());
+        }
     }
 
     @UiThreadTest
