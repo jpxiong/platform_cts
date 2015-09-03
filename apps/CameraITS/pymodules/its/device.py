@@ -260,7 +260,8 @@ class ItsSession(object):
                     regions_af=[[0,0,1,1,1]],
                     do_ae=True, do_awb=True, do_af=True,
                     lock_ae=False, lock_awb=False,
-                    get_results=False):
+                    get_results=False,
+                    ev_comp=0):
         """Perform a 3A operation on the device.
 
         Triggers some or all of AE, AWB, and AF, and returns once they have
@@ -278,6 +279,7 @@ class ItsSession(object):
             lock_ae: Request AE lock after convergence, and wait for it.
             lock_awb: Request AWB lock after convergence, and wait for it.
             get_results: Return the 3A results from this function.
+            ev_comp: An EV compensation value to use when running AE.
 
         Region format in args:
             Arguments are lists of weighted regions; each weighted region is a
@@ -307,6 +309,8 @@ class ItsSession(object):
             cmd["aeLock"] = True
         if lock_awb:
             cmd["awbLock"] = True
+        if ev_comp != 0:
+            cmd["evComp"] = ev_comp
         self.sock.send(json.dumps(cmd) + "\n")
 
         # Wait for each specified 3A to converge.
