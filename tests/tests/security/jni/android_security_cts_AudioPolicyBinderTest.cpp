@@ -18,6 +18,7 @@
 
 #include <jni.h>
 #include <binder/IServiceManager.h>
+#include <binder/Parcel.h>
 #include <media/IAudioPolicyService.h>
 #include <media/AudioSystem.h>
 #include <system/audio.h>
@@ -153,6 +154,32 @@ jboolean android_security_cts_AudioPolicy_test_isStreamActive(JNIEnv* env __unus
     return true;
 }
 
+jint android_security_cts_AudioPolicy_test_getStreamVolumeLeak(JNIEnv* env __unused,
+                                                           jobject thiz __unused)
+{
+    sp<IAudioPolicyService> aps;
+
+    if (!init(aps, NULL, NULL)) {
+        return -1;
+    }
+
+    // Keep synchronized with IAudioPolicyService.cpp!
+    enum {
+        GET_STREAM_VOLUME = 17,
+    };
+
+    Parcel data, reply;
+    status_t err;
+    data.writeInterfaceToken(aps->getInterfaceDescriptor());
+    data.writeInt32(-1); // stream type
+    data.writeInt32(-1); // device
+    aps->asBinder()->transact(GET_STREAM_VOLUME, data, &reply);
+    int index = reply.readInt32();
+    err = reply.readInt32();
+
+    return index;
+}
+
 static JNINativeMethod gMethods[] = {
     {  "native_test_startOutput", "()Z",
             (void *) android_security_cts_AudioPolicy_test_startOutput },
@@ -160,6 +187,8 @@ static JNINativeMethod gMethods[] = {
                 (void *) android_security_cts_AudioPolicy_test_stopOutput },
     {  "native_test_isStreamActive", "()Z",
                 (void *) android_security_cts_AudioPolicy_test_isStreamActive },
+    {  "native_test_getStreamVolumeLeak", "()I",
+                (void *) android_security_cts_AudioPolicy_test_getStreamVolumeLeak },
 };
 
 int register_android_security_cts_AudioPolicyBinderTest(JNIEnv* env)
