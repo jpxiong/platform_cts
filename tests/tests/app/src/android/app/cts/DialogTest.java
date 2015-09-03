@@ -393,25 +393,28 @@ public class DialogTest extends ActivityInstrumentationTestCase2<DialogStubActiv
         d.isOnTouchEventCalled = false;
         assertTrue(d.isShowing());
 
-        // Send a touch event outside the activity.  This time the dialog will be dismissed
-        // because closeOnTouchOutside is true.
-        d.setCanceledOnTouchOutside(true);
+        // Watch activities cover the entire screen, so there is no way to touch outside.
+        if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_WATCH)) {
+            // Send a touch event outside the activity.  This time the dialog will be dismissed
+            // because closeOnTouchOutside is true.
+            d.setCanceledOnTouchOutside(true);
 
-        touchMotionEvent = MotionEvent.obtain(now, now + 1, MotionEvent.ACTION_DOWN,
-                1, 100, 0);
-        mInstrumentation.sendPointerSync(touchMotionEvent);
+            touchMotionEvent = MotionEvent.obtain(now, now + 1, MotionEvent.ACTION_DOWN,
+                    1, 100, 0);
+            mInstrumentation.sendPointerSync(touchMotionEvent);
 
-        new PollingCheck(TEST_TIMEOUT) {
-            protected boolean check() {
-                return d.dispatchTouchEventResult;
-            }
-        }.run();
+            new PollingCheck(TEST_TIMEOUT) {
+                protected boolean check() {
+                    return d.dispatchTouchEventResult;
+                }
+            }.run();
 
-        assertMotionEventEquals(touchMotionEvent, d.touchEvent);
+            assertMotionEventEquals(touchMotionEvent, d.touchEvent);
 
-        assertTrue(d.isOnTouchEventCalled);
-        assertMotionEventEquals(touchMotionEvent, d.onTouchEvent);
-        assertFalse(d.isShowing());
+            assertTrue(d.isOnTouchEventCalled);
+            assertMotionEventEquals(touchMotionEvent, d.onTouchEvent);
+            assertFalse(d.isShowing());
+        }
     }
 
     public void testTrackballEvent() {
