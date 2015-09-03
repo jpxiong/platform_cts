@@ -16,6 +16,7 @@
 package android.media.cts;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
@@ -402,10 +403,19 @@ public class ClearKeySystemTest extends MediaPlayerTestBase {
         }
     }
 
+    private boolean hasAudioOutput() {
+        return getInstrumentation().getTargetContext().getPackageManager()
+            .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
+    }
+
     /**
      * Tests clear key system playback.
      */
     public void testClearKeyPlayback() throws Exception {
+        if (!hasAudioOutput()) {
+            return;
+        }
+        
         MediaDrm drm = startDrm();
         if (null == drm) {
             throw new Error("Failed to create drm.");
