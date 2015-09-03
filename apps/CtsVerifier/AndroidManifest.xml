@@ -1407,6 +1407,9 @@
         <service android:name=".jobscheduler.MockJobService"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
 
+        <!-- Used by the SensorTestScreenManipulator to reset the screen timeout after turn off. -->
+        <activity android:name=".os.TimeoutResetActivity"/>
+
     </application>
 
 </manifest>
