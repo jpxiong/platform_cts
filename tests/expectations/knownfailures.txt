@@ -22,6 +22,23 @@
   bug: 17595050
 },
 {
+  description: "the SSLCertificateSocketFactoryTest often fails because of lack of live internet or short timeout, it should be refactored to do a local server testing",
+  names: [
+    "android.net.cts.SSLCertificateSocketFactoryTest#testCreateSocket",
+    "android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_bind",
+    "android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_simple",
+    "android.net.cts.SSLCertificateSocketFactoryTest#test_createSocket_wrapping"
+  ],
+  bug: 18682315
+},
+{
+  description: "the test result are too much dependent on live-internet connection, which for some devices might not exist",
+  names: [
+    "android.net.wifi.cts.NsdManagerTest#testAndroidTestCaseSetupProperly"
+  ],
+  bug: 18680089
+},
+{
   description: "AudioPolicyBinder tests are not yet robust enough",
   names: [
     "android.security.cts.AudioPolicyBinderTest"
