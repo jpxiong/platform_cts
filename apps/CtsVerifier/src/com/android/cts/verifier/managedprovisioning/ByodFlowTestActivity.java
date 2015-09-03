@@ -69,7 +69,6 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     protected DevicePolicyManager mDevicePolicyManager;
 
     private TestItem mProfileOwnerInstalled;
-    private TestItem mDiskEncryptionTest;
     private TestItem mProfileVisibleTest;
     private TestItem mDeviceAdminVisibleTest;
     private TestItem mWorkAppVisibleTest;
@@ -155,13 +154,6 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
             }
         };
 
-        mDiskEncryptionTest = new TestItem(this, R.string.provisioning_byod_diskencryption) {
-            @Override
-            public TestResult getPassFailState() {
-                return isDeviceEncrypted() ? TestResult.Passed : TestResult.Failed;
-            }
-        };
-
         mProfileVisibleTest = new TestItem(this, R.string.provisioning_byod_profile_visible,
                 R.string.provisioning_byod_profile_visible_instruction,
                 new Intent(Settings.ACTION_SETTINGS));
@@ -181,7 +173,6 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 R.string.provisioning_byod_cross_profile_instruction,
                 chooser);
 
-        mTests.add(mDiskEncryptionTest);
         mTests.add(mProfileOwnerInstalled);
         mTests.add(mProfileVisibleTest);
         mTests.add(mDeviceAdminVisibleTest);
@@ -282,11 +273,6 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 this, ByodHelperActivity.class),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-    }
-
-    private boolean isDeviceEncrypted() {
-        return mDevicePolicyManager.getStorageEncryptionStatus()
-                == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE;
     }
 
     private void showToast(int messageId) {
