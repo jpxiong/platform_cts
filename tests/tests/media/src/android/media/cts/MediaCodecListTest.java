@@ -50,9 +50,10 @@ public class MediaCodecListTest extends AndroidTestCase {
             mAllCodecs.getCodecInfos();
 
     class CodecType {
-        CodecType(String type, boolean isEncoder) {
+        CodecType(String type, boolean isEncoder, MediaFormat sampleFormat) {
             mMimeTypeName = type;
             mIsEncoder = isEncoder;
+            mSampleFormat = sampleFormat;
         }
 
         boolean equals(CodecType codecType) {
@@ -60,9 +61,34 @@ public class MediaCodecListTest extends AndroidTestCase {
                     mIsEncoder == codecType.mIsEncoder;
         }
 
-        String mMimeTypeName;
-        boolean mIsEncoder;
+        boolean canBeFound() {
+            return codecCanBeFound(mIsEncoder, mSampleFormat);
+        }
+
+        @Override
+        public String toString() {
+            return mMimeTypeName + (mIsEncoder ? " encoder" : " decoder") + " for " + mSampleFormat;
+        }
+
+        private String mMimeTypeName;
+        private boolean mIsEncoder;
+        private MediaFormat mSampleFormat;
     };
+
+    class AudioCodec extends CodecType {
+        AudioCodec(String mime, boolean isEncoder, int sampleRate) {
+            super(mime, isEncoder, MediaFormat.createAudioFormat(
+                    mime, sampleRate, 1 /* channelCount */));
+        }
+    }
+
+    class VideoCodec extends CodecType {
+        VideoCodec(String mime, boolean isEncoder) {
+            // implicit assumption that QVGA video is always valid
+            super(mime, isEncoder, MediaFormat.createVideoFormat(
+                    mime, 176 /* width */, 144 /* height */));
+        }
+    }
 
     public static void testMediaCodecXmlFileExist() {
         File file = new File(MEDIA_CODEC_XML_FILE);
@@ -241,6 +267,9 @@ public class MediaCodecListTest extends AndroidTestCase {
         List<CodecType> requiredList = getRequiredCodecTypes();
         List<CodecType> supportedList = getSupportedCodecTypes();
         assertTrue(areRequiredCodecTypesSupported(requiredList, supportedList));
+        for (CodecType type : requiredList) {
+            assertTrue("cannot find " + type, type.canBeFound());
+        }
     }
 
     private boolean hasCamera() {
@@ -268,80 +297,8 @@ public class MediaCodecListTest extends AndroidTestCase {
                 && !pm.hasSystemFeature(pm.FEATURE_TELEVISION);
     }
 
-    // H263 baseline profile must be supported
-    public void testIsH263BaselineProfileSupported() {
-        if (!hasCamera()) {
-            Log.d(TAG, "not required without camera");
-            return;
-        }
-
-        int profile = CodecProfileLevel.H263ProfileBaseline;
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_H263, false, profile));
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_H263, true, profile));
-    }
-
-    // AVC baseline profile must be supported
-    public void testIsAVCBaselineProfileSupported() {
-        int profile = CodecProfileLevel.AVCProfileBaseline;
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_AVC, false, profile));
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_AVC, true, profile));
-    }
-
-    // HEVC main profile must be supported
-    public void testIsHEVCMainProfileSupported() {
-        int profile = CodecProfileLevel.HEVCProfileMain;
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_HEVC, false, profile));
-    }
-
-    // MPEG4 simple profile must be supported
-    public void testIsM4VSimpleProfileSupported() {
-        if (!hasCamera()) {
-            Log.d(TAG, "not required without camera");
-            return;
-        }
-
-        int profile = CodecProfileLevel.MPEG4ProfileSimple;
-        assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_MPEG4, false, profile));
-
-        // FIXME: no support for M4v simple profile video encoder
-        // assertTrue(checkProfileSupported(MediaFormat.MIMETYPE_VIDEO_MPEG4, true, profile));
-    }
-
-    /*
-     * Find whether the given codec is supported
-     */
-    private boolean checkProfileSupported(
-            String mime, boolean isEncoder, int profile) {
-        return profileIsListed(mime, isEncoder, profile) &&
-                codecCanBeFound(mime, isEncoder);
-    }
-
-    private boolean profileIsListed(
-        String mime, boolean isEncoder, int profile) {
-
-        for (MediaCodecInfo info : mRegularInfos) {
-            if (isEncoder != info.isEncoder()) {
-                continue;
-            }
-
-            for (String type : info.getSupportedTypes()) {
-                if (type.equalsIgnoreCase(mime)) {
-                    CodecCapabilities cap = info.getCapabilitiesForType(type);
-                    for (CodecProfileLevel pl : cap.profileLevels) {
-                        if (pl.profile == profile) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     // Find whether the given codec can be found using MediaCodecList.find methods.
-    private boolean codecCanBeFound(String mime, boolean isEncoder) {
-        // implicit assumption that QVGA video is always valid.
-        MediaFormat format = MediaFormat.createVideoFormat(mime, 176, 144);
+    private boolean codecCanBeFound(boolean isEncoder, MediaFormat format) {
         String codecName = isEncoder
                 ? mRegularCodecs.findEncoderForFormat(format)
                 : mRegularCodecs.findDecoderForFormat(format);
@@ -380,7 +337,7 @@ public class MediaCodecListTest extends AndroidTestCase {
             assertTrue("Unexpected number of supported types", types.length > 0);
             boolean isEncoder = info.isEncoder();
             for (int j = 0; j < types.length; ++j) {
-                supportedList.add(new CodecType(types[j], isEncoder));
+                supportedList.add(new CodecType(types[j], isEncoder, null /* sampleFormat */));
             }
         }
         return supportedList;
@@ -393,39 +350,51 @@ public class MediaCodecListTest extends AndroidTestCase {
     private List<CodecType> getRequiredCodecTypes() {
         List<CodecType> list = new ArrayList<CodecType>(16);
 
-        // Mandatory audio codecs
+        // Mandatory audio decoders
 
         // flac decoder is not omx-based yet
-        // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, false));  // flac decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_MPEG, false));     // mp3 decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_VORBIS, false));   // vorbis decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, false));      // aac decoder
-        list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_RAW, false));      // raw/pcm decoder
+        // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, false, 8000));
+        // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, false, 48000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_MPEG, false, 8000));  // mp3
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_MPEG, false, 48000)); // mp3
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_VORBIS, false, 8000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_VORBIS, false, 48000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, false, 8000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, false, 48000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_RAW, false, 8000));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_RAW, false, 44100));
+        list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_OPUS, false, 48000));
+
+        // Mandatory audio encoders (for non-watch devices with camera)
+
         if (hasMicrophone() && !isWatch()) {
-            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AAC, true));       // aac encoder
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, true, 16000));
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AAC, true, 48000));
             // flac encoder is not required
-            // list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_FLAC, true));   // flac encoder
-        }
-        if (isHandheld()) {
-            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false));   // amrnb decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true));    // amrnb encoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false));   // amrwb decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true));    // amrwb encoder
+            // list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_FLAC, true));  // encoder
         }
 
-        // Mandatory video codecs
+        // Mandatory audio encoders for handheld devices
+        if (isHandheld()) {
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AMR_NB, false, 8000));  // decoder
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AMR_NB, true,  8000));  // encoder
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AMR_WB, false, 16000)); // decoder
+            list.add(new AudioCodec(MediaFormat.MIMETYPE_AUDIO_AMR_WB, true,  16000)); // encoder
+        }
+
+        // Mandatory video codecs (for non-watch devices)
 
         if (!isWatch()) {
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, false));    // avc decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_AVC, true));     // avc encoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, false));    // vp8 decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP8, true));     // vp8 encoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_VP9, false));    // vp9 decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_HEVC, false));   // hevc decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_MPEG4, false));  // m4v decoder
-            list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, false));   // h263 decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_AVC, false));   // avc decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_AVC, true));    // avc encoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_VP8, false));   // vp8 decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_VP8, true));    // vp8 encoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_VP9, false));   // vp9 decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_HEVC, false));  // hevc decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_MPEG4, false)); // m4v decoder
+            list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_H263, false));  // h263 decoder
             if (hasCamera()) {
-                list.add(new CodecType(MediaFormat.MIMETYPE_VIDEO_H263, true));    // h263 encoder
+                list.add(new VideoCodec(MediaFormat.MIMETYPE_VIDEO_H263, true)); // h263 encoder
             }
         }
 

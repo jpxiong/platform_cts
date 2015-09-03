@@ -109,6 +109,7 @@ public class MediaPlayerFlakyNetworkTest extends MediaPlayerTestBase {
         String[] supported = getSupportedVideos();
         if (supported.length == 0) {
             MediaUtils.skipTest("no codec found");
+            return;
         }
 
         Random random = new Random(seed);
