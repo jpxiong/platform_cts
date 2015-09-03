@@ -1436,16 +1436,36 @@ You should be prompted to select credentials; choose the ones you just installed
     <string name="provisioning_byod_profile_visible">Profile-aware accounts settings</string>
     <string name="provisioning_byod_admin_visible">Profile-aware device administrator settings</string>
     <string name="provisioning_byod_workapps_visible">Badged work apps visible in Launcher</string>
-    <string name="provisioning_byod_cross_profile">Open app cross profiles</string>
-    <string name="provisioning_byod_cross_profile_app_personal">
-        You selected the CTS Verifier option.
-    </string>
+    <string name="provisioning_byod_cross_profile_from_personal">Open app cross profiles from the personal side</string>
+    <string name="provisioning_byod_cross_profile_from_work">Open app cross profiles from the work side</string>
+    <string name="provisioning_app_linking">App links from the work side</string>
+    <string name="provisioning_byod_cross_profile_app_personal">You selected the personal option.</string>
     <string name="provisioning_byod_cross_profile_app_work">You selected the Work option.</string>
-    <string name="provisioning_byod_cross_profile_instruction">
+    <string name="provisioning_byod_cross_profile_app_ctsverifier"> You selected the ctsverifier option </string>
+    <string name="provisioning_byod_cross_profile_from_personal_instruction">
         Please press the Go button to start an action.\n
         \n
         You should be asked to choose either \"CTS Verifier\" or \"Work\" to complete the action.
         Pressing either should bring up a page stating your choice.\n
+        \n
+        Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
+    </string>
+    <string name="provisioning_byod_cross_profile_from_work_instruction">
+        Please press the Go button to start an action.\n
+        \n
+        You should be asked to choose either \"CTS Verifier\" or \"Personal\" to complete the action.
+        Pressing either should bring up a page stating your choice.\n
+        \n
+        Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
+    </string>
+    <string name="provisioning_byod_app_linking_instruction">
+        Please press the Go button to start an action.\n
+        \n
+        You should be asked to choose either \"CTS Verifier\" or \"Personal\" to complete the action.\n
+        - If you choose \"CTS Verifier\", you should see a page stating your chose \"CTS Verifier\".\n
+        - If you choose \"Personal\", you should be presented with another dialog between \"CTS Verifier\"
+        and some other apps. In this case, you should choose \"CTS verifier\".\n
+        You should then see a page stating you chose \"Personal\".\n
         \n
         Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
     </string>

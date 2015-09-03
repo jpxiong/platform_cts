@@ -59,7 +59,9 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
     private DialogTestListItem mProfileAccountVisibleTest;
     private DialogTestListItem mDeviceAdminVisibleTest;
     private DialogTestListItem mWorkAppVisibleTest;
-    private DialogTestListItem mCrossProfileIntentFiltersTest;
+    private DialogTestListItem mCrossProfileIntentFiltersTestFromPersonal;
+    private DialogTestListItem mCrossProfileIntentFiltersTestFromWork;
+    private DialogTestListItem mAppLinkingTest;
     private DialogTestListItem mDisableNonMarketTest;
     private DialogTestListItem mEnableNonMarketTest;
     private DialogTestListItem mWorkNotificationBadgedTest;
@@ -264,14 +266,27 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
                 R.string.provisioning_byod_print_settings_instruction,
                 new Intent(Settings.ACTION_PRINT_SETTINGS));
 
-        Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
+        Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE_TO_WORK);
+        intent.putExtra(CrossProfileTestActivity.EXTRA_STARTED_FROM_WORK, false);
         Intent chooser = Intent.createChooser(intent,
                 getResources().getString(R.string.provisioning_cross_profile_chooser));
-        mCrossProfileIntentFiltersTest = new DialogTestListItem(this,
-                R.string.provisioning_byod_cross_profile,
-                "BYOD_CrossProfileIntentFiltersTest",
-                R.string.provisioning_byod_cross_profile_instruction,
+        mCrossProfileIntentFiltersTestFromPersonal = new DialogTestListItem(this,
+                R.string.provisioning_byod_cross_profile_from_personal,
+                "BYOD_CrossProfileIntentFiltersTestFromPersonal",
+                R.string.provisioning_byod_cross_profile_from_personal_instruction,
                 chooser);
+
+        mCrossProfileIntentFiltersTestFromWork = new DialogTestListItem(this,
+                R.string.provisioning_byod_cross_profile_from_work,
+                "BYOD_CrossProfileIntentFiltersTestFromWork",
+                R.string.provisioning_byod_cross_profile_from_work_instruction,
+                new Intent(ByodHelperActivity.ACTION_TEST_CROSS_PROFILE_INTENTS_DIALOG));
+
+        mAppLinkingTest = new DialogTestListItem(this,
+                R.string.provisioning_app_linking,
+                "BYOD_AppLinking",
+                R.string.provisioning_byod_app_linking_instruction,
+                new Intent(ByodHelperActivity.ACTION_TEST_APP_LINKING_DIALOG));
 
         mKeyguardDisabledFeaturesTest = TestListItem.newTest(this,
                 R.string.provisioning_byod_keyguard_disabled_features,
@@ -314,7 +329,9 @@ public class ByodFlowTestActivity extends DialogTestListActivity {
         adapter.add(mDataUsageSettingsVisibleTest);
         adapter.add(mPrintSettingsVisibleTest);
 
-        adapter.add(mCrossProfileIntentFiltersTest);
+        adapter.add(mCrossProfileIntentFiltersTestFromPersonal);
+        adapter.add(mCrossProfileIntentFiltersTestFromWork);
+        adapter.add(mAppLinkingTest);
         adapter.add(mDisableNonMarketTest);
         adapter.add(mEnableNonMarketTest);
         adapter.add(mIntentFiltersTest);

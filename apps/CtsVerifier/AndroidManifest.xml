@@ -1425,6 +1425,8 @@
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_KEYGUARD_DISABLED_FEATURES" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_LOCKNOW" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.TEST_NFC_BEAM" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.action.TEST_CROSS_PROFILE_INTENTS_DIALOG" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.action.TEST_APP_LINKING_DIALOG" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
@@ -1452,11 +1454,18 @@
 
         <activity android:name=".managedprovisioning.CrossProfileTestActivity">
             <intent-filter>
-                <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE" />
                 <!-- We need to have at least one activity listening to this intent in the parent
                      to test if it is forwarded from the managed profile to the parent -->
                 <action android:name="android.provider.MediaStore.RECORD_SOUND" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE_TO_PERSONAL" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE_TO_WORK" />
                 <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <data android:scheme="http" android:host="com.android.cts.verifier" />
             </intent-filter>
         </activity>
 
