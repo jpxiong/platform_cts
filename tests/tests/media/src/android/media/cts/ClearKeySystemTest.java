@@ -403,11 +403,6 @@ public class ClearKeySystemTest extends MediaPlayerTestBase {
         }
     }
 
-    private boolean hasAudioOutput() {
-        return getInstrumentation().getTargetContext().getPackageManager()
-            .hasSystemFeature(PackageManager.FEATURE_AUDIO_OUTPUT);
-    }
-
     /**
      * Tests clear key system playback.
      */
