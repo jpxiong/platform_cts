@@ -16,10 +16,14 @@
 
 package android.telecom.cts;
 
+import static org.junit.Assert.assertFalse;
+
+import android.content.Intent;
 import android.telecom.Call;
 import android.telecom.CallAudioState;
 import android.telecom.InCallService;
 import android.util.ArrayMap;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class MockInCallService extends InCallService {
+    private static String LOG_TAG = "MockInCallService";
     private ArrayList<Call> mCalls = new ArrayList<>();
     private ArrayList<Call> mConferenceCalls = new ArrayList<>();
     private static InCallServiceCallbacks sCallbacks;
@@ -34,6 +39,7 @@ public class MockInCallService extends InCallService {
             new ArrayMap<Call, MockVideoCallCallback>();
 
     private static final Object sLock = new Object();
+    private static boolean mIsServiceUnbound;
 
     public static abstract class InCallServiceCallbacks {
         private MockInCallService mService;
@@ -152,9 +158,11 @@ public class MockInCallService extends InCallService {
 
     @Override
     public android.os.IBinder onBind(android.content.Intent intent) {
+        Log.i(LOG_TAG, "Service bounded");
         if (getCallbacks() != null) {
             getCallbacks().setService(this);
         }
+        mIsServiceUnbound = false;
         return super.onBind(intent);
     }
 
@@ -311,5 +319,17 @@ public class MockInCallService extends InCallService {
      */
     public MockVideoCallCallback getVideoCallCallback(Call call) {
         return mVideoCallCallbacks.get(call);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(LOG_TAG, "Service unbounded");
+        assertFalse(mIsServiceUnbound);
+        mIsServiceUnbound = true;
+        return super.onUnbind(intent);
+    }
+
+    public static boolean isServiceUnbound() {
+        return mIsServiceUnbound;
     }
 }

@@ -50,7 +50,6 @@ public class ConferenceTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContext = getInstrumentation().getContext();
         if (mShouldTestTelecom) {
             addOutgoingCalls();
             addConferenceCall(mCall1, mCall2);

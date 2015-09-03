@@ -48,20 +48,13 @@ public class ConnectionServiceTest extends BaseTelecomTestWithMockServices {
         placeAndVerifyCall();
         verifyConnectionForOutgoingCall();
 
+        // Add second connection (add existing connection)
         final MockConnection connection = new MockConnection();
         connection.setOnHold();
         CtsConnectionService.addExistingConnectionToTelecom(TEST_PHONE_ACCOUNT_HANDLE, connection);
-
-        try {
-            if (!mInCallCallbacks.lock.tryAcquire(3, TimeUnit.SECONDS)) {
-                fail("No call added to InCallService.");
-            }
-        } catch (InterruptedException e) {
-            Log.i(TAG, "Test interrupted!");
-        }
-
-        final MockInCallService inCallService = mInCallCallbacks.getService();
-        final Call call = inCallService.getLastCall();
+        assertNumCalls(mInCallCallbacks.getService(), 2);
+        mInCallCallbacks.lock.drainPermits();
+        final Call call = mInCallCallbacks.getService().getLastCall();
         assertCallState(call, Call.STATE_HOLDING);
     }
 
@@ -77,17 +70,22 @@ public class ConnectionServiceTest extends BaseTelecomTestWithMockServices {
         Collection<Connection> connections = CtsConnectionService.getAllConnectionsFromTelecom();
         assertEquals(1, connections.size());
         assertTrue(connections.contains(connection1));
+        // Need to move this to active since we reject the 3rd incoming call below if this is in
+        // dialing state (b/23428950).
+        connection1.setActive();
+        assertCallState(mInCallCallbacks.getService().getLastCall(), Call.STATE_ACTIVE);
 
         // Add second connection (add existing connection)
         final Connection connection2 = new MockConnection();
         CtsConnectionService.addExistingConnectionToTelecom(TEST_PHONE_ACCOUNT_HANDLE, connection2);
-
+        assertNumCalls(mInCallCallbacks.getService(), 2);
+        mInCallCallbacks.lock.drainPermits();
         connections = CtsConnectionService.getAllConnectionsFromTelecom();
         assertEquals(2, connections.size());
         assertTrue(connections.contains(connection2));
 
         // Add third connection (incoming call)
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final Connection connection3 = verifyConnectionForIncomingCall();
         connections = CtsConnectionService.getAllConnectionsFromTelecom();
         assertEquals(3, connections.size());

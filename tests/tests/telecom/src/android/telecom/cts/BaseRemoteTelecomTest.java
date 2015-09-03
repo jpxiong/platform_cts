@@ -52,17 +52,20 @@ public class BaseRemoteTelecomTest extends BaseTelecomTestWithMockServices {
     @Override
     protected void tearDown() throws Exception {
         if (mShouldTestTelecom) {
-            tearDownConnectionServices(TEST_PHONE_ACCOUNT_HANDLE, TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+            tearDownRemoteConnectionService(TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
         }
         super.tearDown();
     }
 
     protected void setupConnectionServices(MockConnectionService connectionService,
-            MockConnectionService remoteConnectionService, int flags)
-            throws Exception {
+            MockConnectionService remoteConnectionService, int flags) throws Exception {
         // Setup the primary connection service first
         setupConnectionService(connectionService, flags);
+        setupRemoteConnectionService(remoteConnectionService, flags);
+    }
 
+    protected void setupRemoteConnectionService(MockConnectionService remoteConnectionService,
+            int flags) throws Exception {
         if (remoteConnectionService != null) {
             this.remoteConnectionService = remoteConnectionService;
         } else {
@@ -78,19 +81,23 @@ public class BaseRemoteTelecomTest extends BaseTelecomTestWithMockServices {
                     TEST_REMOTE_PHONE_ACCOUNT_HANDLE,
                     REMOTE_ACCOUNT_LABEL,
                     TEST_REMOTE_PHONE_ACCOUNT_ADDRESS);
+            // Wait till the adb commands have executed and account is in Telecom database.
+            assertPhoneAccountRegistered(TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
         }
         if ((flags & FLAG_ENABLE) != 0) {
             TestUtils.enablePhoneAccount(getInstrumentation(), TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
+            // Wait till the adb commands have executed and account is enabled in Telecom database.
+            assertPhoneAccountEnabled(TEST_REMOTE_PHONE_ACCOUNT_HANDLE);
         }
     }
 
-    protected void tearDownConnectionServices(PhoneAccountHandle accountHandle,
-            PhoneAccountHandle remoteAccountHandle) throws Exception {
-        // Teardown the primary connection service first
-        tearDownConnectionService(accountHandle);
-
+    protected void tearDownRemoteConnectionService(PhoneAccountHandle remoteAccountHandle)
+            throws Exception {
+        assertNumConnections(this.remoteConnectionService, 0);
         mTelecomManager.unregisterPhoneAccount(remoteAccountHandle);
         CtsRemoteConnectionService.tearDown();
+        //Telecom doesn't unbind the remote connection service at the end of all calls today.
+        //assertCtsRemoteConnectionServiceUnbound();
         this.remoteConnectionService = null;
     }
 
@@ -208,6 +215,24 @@ public class BaseRemoteTelecomTest extends BaseTelecomTestWithMockServices {
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                 "Remote Conference should be in state " + state
+        );
+    }
+
+    void assertCtsRemoteConnectionServiceUnbound() {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected(){
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return CtsRemoteConnectionService.isServiceUnbound();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "CtsRemoteConnectionService not yet unbound!"
         );
     }
 }

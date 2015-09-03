@@ -188,7 +188,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
@@ -209,7 +209,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
@@ -232,7 +232,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
         final MockInCallService inCallService = mInCallCallbacks.getService();
@@ -390,7 +390,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         verifyConnectionForIncomingCall();
         final MockInCallService inCallService = mInCallCallbacks.getService();
 
@@ -428,7 +428,7 @@ public class ExtendedInCallServiceTest extends BaseTelecomTestWithMockServices {
         assertEquals("InCallService.getCalls() should return list with 1 call.", 1, calls.size());
         assertEquals(call1, calls.get(0));
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         verifyConnectionForIncomingCall();
 
         final Call call2 = inCallService.getLastCall();

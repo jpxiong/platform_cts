@@ -66,6 +66,7 @@ public class MockConnection extends Connection {
         if (mRemoteConnection != null) {
             mRemoteConnection.reject();
         }
+        destroy();
     }
 
     @Override
@@ -90,18 +91,20 @@ public class MockConnection extends Connection {
     public void onDisconnect() {
         super.onDisconnect();
         setDisconnected(new DisconnectCause(DisconnectCause.LOCAL));
-        destroy();
         if (mRemoteConnection != null) {
             mRemoteConnection.disconnect();
         }
+        destroy();
     }
 
     @Override
     public void onAbort() {
         super.onAbort();
+        setDisconnected(new DisconnectCause(DisconnectCause.UNKNOWN));
         if (mRemoteConnection != null) {
             mRemoteConnection.abort();
         }
+        destroy();
     }
 
     @Override

@@ -110,13 +110,13 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 TestUtils.setDefaultDialer(getInstrumentation(), mPreviousDefaultDialer);
             }
             tearDownConnectionService(TEST_PHONE_ACCOUNT_HANDLE);
+            assertMockInCallServiceUnbound();
         }
         super.tearDown();
     }
 
     protected PhoneAccount setupConnectionService(MockConnectionService connectionService,
-            int flags)
-            throws Exception {
+            int flags) throws Exception {
         if (connectionService != null) {
             this.connectionService = connectionService;
         } else {
@@ -130,14 +130,18 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
         }
         if ((flags & FLAG_ENABLE) != 0) {
             TestUtils.enablePhoneAccount(getInstrumentation(), TEST_PHONE_ACCOUNT_HANDLE);
+            // Wait till the adb commands have executed and account is enabled in Telecom database.
+            assertPhoneAccountEnabled(TEST_PHONE_ACCOUNT_HANDLE);
         }
 
         return TEST_PHONE_ACCOUNT;
     }
 
     protected void tearDownConnectionService(PhoneAccountHandle accountHandle) throws Exception {
+        assertNumConnections(this.connectionService, 0);
         mTelecomManager.unregisterPhoneAccount(accountHandle);
         CtsConnectionService.tearDown();
+        assertCtsConnectionServiceUnbound();
         this.connectionService = null;
     }
 
@@ -513,6 +517,22 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
     }
 
 
+    void assertNumConnections(final MockConnectionService connService, final int numConnections) {
+        waitUntilConditionIsTrueOrTimeout(new Condition() {
+                                              @Override
+                                              public Object expected() {
+                                                  return numConnections;
+                                              }
+                                              @Override
+                                              public Object actual() {
+                                                  return connService.getAllConnections().size();
+                                              }
+                                          },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "ConnectionService should contain " + numConnections + " connections."
+        );
+    }
+
     void assertMuteState(final InCallService incallService, final boolean isMuted) {
         waitUntilConditionIsTrueOrTimeout(
                 new Condition() {
@@ -621,7 +641,7 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                     }
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
-                "Call should be in state " + state
+                "Call: " + call + " should be in state " + state
         );
     }
 
@@ -728,6 +748,79 @@ public class BaseTelecomTestWithMockServices extends InstrumentationTestCase {
                 },
                 WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
                 "Conference should be in state " + state
+        );
+    }
+
+    void assertPhoneAccountRegistered(final PhoneAccountHandle handle) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return mTelecomManager.getPhoneAccount(handle) != null;
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Phone account registration failed for " + handle
+        );
+    }
+
+    void assertPhoneAccountEnabled(final PhoneAccountHandle handle) {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        PhoneAccount phoneAccount = mTelecomManager.getPhoneAccount(handle);
+                        return (phoneAccount != null && phoneAccount.isEnabled());
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "Phone account enable failed for " + handle
+        );
+    }
+
+    void assertCtsConnectionServiceUnbound() {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return CtsConnectionService.isServiceUnbound();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "CtsConnectionService not yet unbound!"
+        );
+    }
+
+    void assertMockInCallServiceUnbound() {
+        waitUntilConditionIsTrueOrTimeout(
+                new Condition() {
+                    @Override
+                    public Object expected() {
+                        return true;
+                    }
+
+                    @Override
+                    public Object actual() {
+                        return MockInCallService.isServiceUnbound();
+                    }
+                },
+                WAIT_FOR_STATE_CHANGE_TIMEOUT_MS,
+                "MockInCallService not yet unbound!"
         );
     }
 

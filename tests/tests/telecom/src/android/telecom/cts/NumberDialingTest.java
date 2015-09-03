@@ -62,7 +62,5 @@ public class NumberDialingTest extends BaseTelecomTestWithMockServices {
             res.wait(CS_WAIT_MILLIS);
         }
         assertEquals(address, res[0]);
-
-        tearDownConnectionService(account.getAccountHandle());
     }
 }

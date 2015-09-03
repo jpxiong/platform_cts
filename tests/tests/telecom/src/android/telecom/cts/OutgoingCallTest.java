@@ -35,15 +35,13 @@ public class OutgoingCallTest extends BaseTelecomTestWithMockServices {
         }
     }
 
-    // TODO: Need to send some commands to the UserManager via adb to do setup
+    /* TODO: Need to send some commands to the UserManager via adb to do setup
     public void testDisallowOutgoingCallsForSecondaryUser() {
+    } */
 
-    }
-
-    // TODO: Need to figure out a way to mock emergency calls without adb root
+    /* TODO: Need to figure out a way to mock emergency calls without adb root
     public void testOutgoingCallBroadcast_isSentForAllCalls() {
-
-    }
+    } */
 
     /**
      * Verifies that providing the EXTRA_START_CALL_WITH_SPEAKERPHONE extra starts the call with

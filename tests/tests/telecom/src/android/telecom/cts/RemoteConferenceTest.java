@@ -61,7 +61,6 @@ public class RemoteConferenceTest extends BaseRemoteTelecomTest {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mContext = getInstrumentation().getContext();
         if (mShouldTestTelecom) {
             addRemoteConferenceCall();
             verifyRemoteConferenceObject(mRemoteConferenceObject, mRemoteConference, mConference);

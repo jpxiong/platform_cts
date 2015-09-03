@@ -35,21 +35,12 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
         }
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        if (mInCallCallbacks != null && mInCallCallbacks.getService() != null) {
-            mInCallCallbacks.getService().disconnectLastCall();
-            assertNumCalls(mInCallCallbacks.getService(), 0);
-        }
-        super.tearDown();
-    }
-
     public void testIncomingCallShortPress_acceptsCall() throws Exception {
         if (!mShouldTestTelecom) {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
         final Call call = mInCallCallbacks.getService().getLastCall();
@@ -66,7 +57,7 @@ public class WiredHeadsetTest extends BaseTelecomTestWithMockServices {
             return;
         }
 
-        addAndVerifyNewIncomingCall(getTestNumber(), null);
+        addAndVerifyNewIncomingCall(createTestNumber(), null);
         final MockConnection connection = verifyConnectionForIncomingCall();
 
         final Call call = mInCallCallbacks.getService().getLastCall();

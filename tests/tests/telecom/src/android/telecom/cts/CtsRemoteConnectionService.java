@@ -16,11 +16,15 @@
 
 package android.telecom.cts;
 
+import static org.junit.Assert.assertFalse;
+
+import android.content.Intent;
 import android.telecom.Conference;
 import android.telecom.Connection;
 import android.telecom.ConnectionRequest;
 import android.telecom.ConnectionService;
 import android.telecom.PhoneAccountHandle;
+import android.util.Log;
 
 /**
  * This is the Remote ConnectionService for Telecom's CTS App. Since telecom requires that a
@@ -39,10 +43,12 @@ import android.telecom.PhoneAccountHandle;
  *
  */
 public class CtsRemoteConnectionService extends ConnectionService {
+    private static String LOG_TAG = "CtsConnectionService";
     // This is the connection service implemented by the test
     private static ConnectionService sConnectionService;
     // This is the connection service registered with Telecom
     private static ConnectionService sTelecomConnectionService;
+    private static boolean mIsServiceUnbound;
 
     public CtsRemoteConnectionService() throws Exception {
         super();
@@ -64,13 +70,14 @@ public class CtsRemoteConnectionService extends ConnectionService {
     private static Object sLock = new Object();
 
     public static void setUp(PhoneAccountHandle phoneAccountHandle,
-            ConnectionService connectionService)
-            throws Exception {
+            ConnectionService connectionService) throws Exception {
         synchronized(sLock) {
             if (sConnectionService != null) {
                 throw new Exception("Mock ConnectionService exists.  Failed to call tearDown().");
             }
             sConnectionService = connectionService;
+            // Cant override the onBind method for ConnectionService, so reset it here.
+            mIsServiceUnbound = false;
         }
     }
 
@@ -123,5 +130,17 @@ public class CtsRemoteConnectionService extends ConnectionService {
         synchronized(sLock) {
             sTelecomConnectionService.addConference(conference);
         }
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.i(LOG_TAG, "Service unbounded");
+        assertFalse(mIsServiceUnbound);
+        mIsServiceUnbound = true;
+        return super.onUnbind(intent);
+    }
+
+    public static boolean isServiceUnbound() {
+        return mIsServiceUnbound;
     }
 }
