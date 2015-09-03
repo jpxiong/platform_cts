@@ -89,8 +89,8 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 mContext,
                 MediaFormat.MIMETYPE_VIDEO_VP8,
                 "OMX.google.vp8.decoder",
-                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_44100hz);
+                R.raw.video_480x360_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_48000hz,
+                R.raw.video_1280x720_webm_vp8_333kbps_25fps_vorbis_stereo_128kbps_48000hz);
     }
 
     public Iterable<Codec> VP9(CodecFactory factory) {
@@ -98,8 +98,8 @@ public class AdaptivePlaybackTest extends MediaPlayerTestBase {
                 mContext,
                 MediaFormat.MIMETYPE_VIDEO_VP9,
                 "OMX.google.vp9.decoder",
-                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_44100hz,
-                R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_44100hz);
+                R.raw.video_480x360_webm_vp9_333kbps_25fps_vorbis_stereo_128kbps_48000hz,
+                R.raw.video_1280x720_webm_vp9_309kbps_25fps_vorbis_stereo_128kbps_48000hz);
     }
 
     CodecFactory ALL = new CodecFactory();
