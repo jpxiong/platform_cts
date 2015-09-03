@@ -1309,7 +1309,7 @@
 
     <string name="js_charging_test">Charging Constraints</string>
     <string name="js_charging_instructions">Verify the behaviour of the JobScheduler API for when the device is on power and unplugged from power. Simply follow the on-screen instructions.</string>
-    <string name="js_charging_description_1">Unplug the phone in order to begin.</string>
+    <string name="js_charging_description_1">Unplug the device in order to begin.</string>
     <string name="js_charging_off_test">Device not charging will not execute a job with a charging constraint.</string>
     <string name="js_charging_on_test">Device when charging will execute a job with a charging constraint.</string>
     <string name="js_charging_description_2">After the above test has passed, plug the device back in to continue. If the above failed, you can simply fail this test.</string>
