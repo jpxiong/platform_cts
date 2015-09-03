@@ -140,7 +140,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRendering800x480Locally");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRendering800x480Locally(): codec not supported");
+            return;
         }
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, false, false);
@@ -153,7 +154,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRenderingMaxResolutionLocally");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRenderingMaxResolutionLocally(): codec not supported");
+            return;
         }
         Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
         runTestRenderingInSeparateThread(maxRes.first, maxRes.second, false, false);
@@ -163,7 +165,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRendering800x480Remotely");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRendering800x480Remotely(): codec not supported");
+            return;
         }
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, true, false);
@@ -176,7 +179,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRenderingMaxResolutionRemotely");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRenderingMaxResolutionRemotely(): codec not supported");
+            return;
         }
         Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
         runTestRenderingInSeparateThread(maxRes.first, maxRes.second, true, false);
@@ -186,7 +190,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRendering800x480RemotelyWith3Windows");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRendering800x480RemotelyWith3Windows(): codec not supported");
+            return;
         }
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, true, true);
@@ -199,7 +204,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
         Log.i(TAG, "testRendering800x480LocallyWith3Windows");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
         if (maxRes == null) {
-            fail("codec not supported");
+            Log.i(TAG, "SKIPPING testRendering800x480LocallyWith3Windows(): codec not supported");
+            return;
         }
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, false, true);
