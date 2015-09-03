@@ -50,7 +50,7 @@ def main():
         s_e_prod *= 2
 
         # Capture raw frames across the full sensitivity range.
-        NUM_SENS_STEPS = 15
+        NUM_SENS_STEPS = 9
         sens_step = int((sens_max - sens_min - 1) / float(NUM_SENS_STEPS))
         reqs = []
         sens = []
@@ -75,7 +75,7 @@ def main():
         patches = [(2*x,2*y) for (x,y) in sum(patches,[])]
 
         lines = []
-        for (s,cap) in zip(sens,caps):
+        for iouter, (s,cap) in enumerate(zip(sens,caps)):
             # For each capture, compute the mean value in each patch, for each
             # Bayer plane; discard patches where pixels are close to clamped.
             # Also compute the variance.
@@ -117,10 +117,17 @@ def main():
             #assert(m > 0)
             #assert(b >= 0)
 
-            # Draw a plot.
-            pylab.plot(xs, ys, 'r')
-            pylab.plot([0,xs[-1]],[b,m*xs[-1]+b],'b')
-            matplotlib.pyplot.savefig("%s_plot_mean_vs_variance.png" % (NAME))
+            if iouter == 0:
+                pylab.plot(xs, ys, 'r', label="Measured")
+                pylab.plot([0,xs[-1]],[b,m*xs[-1]+b],'b', label="Fit")
+            else:
+                pylab.plot(xs, ys, 'r')
+                pylab.plot([0,xs[-1]],[b,m*xs[-1]+b],'b')
+
+        pylab.xlabel("Mean")
+        pylab.ylabel("Variance")
+        pylab.legend()
+        matplotlib.pyplot.savefig("%s_plot_mean_vs_variance.png" % (NAME))
 
         # Now fit a line across the (m,b) line parameters for each sensitivity.
         # The gradient (m) params are fit to the "S" line, and the offset (b)
@@ -132,11 +139,16 @@ def main():
         mO,bO = numpy.polyfit(gains, Os, 1)
 
         # Plot curve "O" as 10x, so it fits in the same scale as curve "S".
-        pylab.plot(gains, [10*o for o in Os], 'r')
+        fig = matplotlib.pyplot.figure()
+        pylab.plot(gains, [10*o for o in Os], 'r', label="Measured")
         pylab.plot([gains[0],gains[-1]],
-                [10*mO*gains[0]+10*bO, 10*mO*gains[-1]+10*bO], 'b')
-        pylab.plot(gains, Ss, 'r')
-        pylab.plot([gains[0],gains[-1]], [mS*gains[0]+bS, mS*gains[-1]+bS], 'b')
+                [10*mO*gains[0]+10*bO, 10*mO*gains[-1]+10*bO],'r--',label="Fit")
+        pylab.plot(gains, Ss, 'b', label="Measured")
+        pylab.plot([gains[0],gains[-1]], [mS*gains[0]+bS,mS*gains[-1]+bS],'b--',
+                label="Fit")
+        pylab.xlabel("Sensitivity")
+        pylab.ylabel("Model parameter: S (blue), O x10 (red)")
+        pylab.legend()
         matplotlib.pyplot.savefig("%s_plot_S_O.png" % (NAME))
 
         print """

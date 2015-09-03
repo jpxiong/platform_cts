@@ -540,9 +540,13 @@ def downscale_image(img, f):
     img = numpy.vstack(chs).T.reshape(h/f,w/f,chans)
     return img
 
-def __measure_color_checker_patch(img, xc,yc, patch_size):
+def __get_color_checker_patch(img, xc,yc, patch_size):
     r = patch_size/2
-    tile = img[yc-r:yc+r+1:, xc-r:xc+r+1:, ::]
+    tile = img[yc-r:yc+r:, xc-r:xc+r:, ::]
+    return tile
+
+def __measure_color_checker_patch(img, xc,yc, patch_size):
+    tile = __get_color_checker_patch(img, xc,yc, patch_size)
     means = tile.mean(1).mean(0)
     return means
 
@@ -570,10 +574,7 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
         debug_fname_prefix: If not None, the (string) name of a file prefix to
             use to save a number of debug images for visualizing the output of
             this function; can be used to see if the patches are being found
-            successfully. If this argument is provided, then some of the sanity
-            check assertions will be disabled to allow the function to provide
-            useful debugging information, meaning that garbage data may be
-            returned.
+            successfully.
 
     Returns:
         6x4 list of lists of integer (x,y) coords of the center of each patch,
@@ -674,6 +675,7 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
             patches[yi].append((xc,yc))
 
     # Sanity check: test that the R,G,B,black,white patches are correct.
+    sanity_failed = False
     patch_info = [(2,2,[0]), # Red
                   (2,1,[1]), # Green
                   (2,0,[2]), # Blue
@@ -686,16 +688,19 @@ def get_color_checker_chart_patches(img, debug_fname_prefix=None):
         means = __measure_color_checker_patch(img, xc,yc, 64)
         if (min([means[i] for i in high_chans]+[1]) < \
                 max([means[i] for i in low_chans]+[0])):
-            print "Color patch sanity check failed: patch", i
-            # If the debug info is requested, then don't assert that the patches
-            # are matched, to allow the caller to see the output.
-            if debug_fname_prefix is None:
-                assert(0)
+            sanity_failed = True
 
     if debug_fname_prefix is not None:
-        for (xc,yc) in sum(patches,[]):
-            img[yc,xc] = 1.0
-        write_image(img, debug_fname_prefix+"_2.jpg")
+        gridimg = numpy.zeros([4*(32+2), 6*(32+2), 3])
+        for yi in range(4):
+            for xi in range(6):
+                xc,yc = patches[yi][xi]
+                tile = __get_color_checker_patch(img, xc,yc, 32)
+                gridimg[yi*(32+2)+1:yi*(32+2)+1+32,
+                        xi*(32+2)+1:xi*(32+2)+1+32, :] = tile
+        write_image(gridimg, debug_fname_prefix+"_2.png")
+
+    assert(not sanity_failed)
 
     return patches
 
