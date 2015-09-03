@@ -21,6 +21,7 @@ import com.android.cts.media.R;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.Resources;
+import android.cts.util.MediaUtils;
 import android.graphics.ImageFormat;
 import android.media.Image;
 import android.media.Image.Plane;
@@ -28,7 +29,6 @@ import android.media.ImageReader;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecInfo.CodecCapabilities;
-import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Handler;
@@ -100,10 +100,6 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
      * to be supported by hw decoder.
      */
     public void testHwAVCDecode360pForFlexibleYuv() throws Exception {
-        if (!MediaPlayerTestBase.hasH264(false)) {
-            Log.i(TAG, "SKIPPING testSwAVCDecode360pForFlexibleYuv(): no codec found.");
-            return;
-        }
         try {
             int format = ImageFormat.YUV_420_888;
             videoDecodeToSurface(
@@ -119,10 +115,6 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
      * to be supported by sw decoder.
      */
     public void testSwAVCDecode360pForFlexibleYuv() throws Exception {
-        if (!MediaPlayerTestBase.hasH264(false)) {
-            Log.i(TAG, "SKIPPING testSwAVCDecode360pForFlexibleYuv(): no codec found.");
-            return;
-        }
         try {
             int format = ImageFormat.YUV_420_888;
             videoDecodeToSurface(
@@ -167,6 +159,10 @@ public class ImageReaderDecoderTest extends AndroidTestCase {
         int outputBufferIndex;
         ByteBuffer[] decoderInputBuffers;
         ByteBuffer[] decoderOutputBuffers;
+
+        if (!MediaUtils.checkCodecForResource(mContext, video, 0 /* track */)) {
+            return; // skip
+        }
 
         AssetFileDescriptor vidFD = mResources.openRawResourceFd(video);
 

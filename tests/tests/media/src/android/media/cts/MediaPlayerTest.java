@@ -20,10 +20,9 @@ import com.android.cts.media.R;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
+import android.cts.util.MediaUtils;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaPlayer;
@@ -745,11 +744,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             }
         });
 
-        try {
-            loadResource(R.raw.testvideo);
-        } catch (UnsupportedCodecException e) {
-            Log.i(LOG_TAG, "SKIPPING testVideoSurfaceResetting(). Could not find codec.");
-            return;
+        if (!checkLoadResource(R.raw.testvideo)) {
+            return; // skip;
         }
         playLoadedVideo(352, 288, -1);
 
@@ -1101,11 +1097,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testDeselectTrack() throws Throwable {
-        try {
-            loadResource(R.raw.testvideo_with_2_subtitles);
-        } catch (UnsupportedCodecException e) {
-            Log.i(LOG_TAG, "SKIPPING testDeselectTrack(). Could not find codec.");
-            return;
+        if (!checkLoadResource(R.raw.testvideo_with_2_subtitles)) {
+            return; // skip;
         }
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -1177,11 +1170,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testChangeSubtitleTrack() throws Throwable {
-        try {
-            loadResource(R.raw.testvideo_with_2_subtitles);
-        } catch (UnsupportedCodecException e) {
-            Log.i(LOG_TAG, "SKIPPING testChangeSubtitleTrack(). Could not find codec.");
-            return;
+        if (!checkLoadResource(R.raw.testvideo_with_2_subtitles)) {
+            return; // skip;
         }
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
@@ -1270,11 +1260,8 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testGetTrackInfo() throws Throwable {
-        try {
-            loadResource(R.raw.testvideo_with_2_subtitles);
-        } catch (UnsupportedCodecException e) {
-            Log.i(LOG_TAG, "SKIPPING testGetTrackInfo(). Could not find codec.");
-            return;
+        if (!checkLoadResource(R.raw.testvideo_with_2_subtitles)) {
+            return; // skip;
         }
         runTestOnUiThread(new Runnable() {
             public void run() {
@@ -1317,17 +1304,23 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
      *  The ones being used here are 10 seconds long.
      */
     public void testResumeAtEnd() throws Throwable {
-        testResumeAtEnd(R.raw.loudsoftmp3);
-        testResumeAtEnd(R.raw.loudsoftwav);
-        testResumeAtEnd(R.raw.loudsoftogg);
-        testResumeAtEnd(R.raw.loudsoftitunes);
-        testResumeAtEnd(R.raw.loudsoftfaac);
-        testResumeAtEnd(R.raw.loudsoftaac);
+        int testsRun =
+            testResumeAtEnd(R.raw.loudsoftmp3) +
+            testResumeAtEnd(R.raw.loudsoftwav) +
+            testResumeAtEnd(R.raw.loudsoftogg) +
+            testResumeAtEnd(R.raw.loudsoftitunes) +
+            testResumeAtEnd(R.raw.loudsoftfaac) +
+            testResumeAtEnd(R.raw.loudsoftaac);
+        if (testsRun == 0) {
+            MediaUtils.skipTest("no decoder found");
+        }
     }
 
-    private void testResumeAtEnd(int res) throws Throwable {
-
-        loadResource(res);
+    // returns 1 if test was run, 0 otherwise
+    private int testResumeAtEnd(int res) throws Throwable {
+        if (!loadResource(res)) {
+            return 0; // skip
+        }
         mMediaPlayer.prepare();
         mOnCompletionCalled.reset();
         mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -1345,16 +1338,14 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         assertTrue("MediaPlayer should still be playing", mMediaPlayer.isPlaying());
         mMediaPlayer.reset();
         assertEquals("wrong number of repetitions", 1, mOnCompletionCalled.getNumSignal());
+        return 1;
     }
 
     public void testCallback() throws Throwable {
         final int mp4Duration = 8484;
 
-        try {
-            loadResource(R.raw.testvideo);
-        } catch (UnsupportedCodecException e) {
-            Log.i(LOG_TAG, "SKIPPING testCallback(). Could not find codec.");
-            return;
+        if (!checkLoadResource(R.raw.testvideo)) {
+            return; // skip;
         }
 
         mMediaPlayer.setDisplay(getActivity().getSurfaceHolder());
@@ -1428,12 +1419,12 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
 
     public void testRecordAndPlay() throws Exception {
         if (!hasMicrophone()) {
-            Log.i(LOG_TAG, "SKIPPING testRecordAndPlay(). No microphone.");
+            MediaUtils.skipTest(LOG_TAG, "no microphone");
             return;
         }
-        if (!hasH263(false)) {
-            Log.i(LOG_TAG, "SKIPPING testRecordAndPlay(). Cound not find codec.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_AUDIO_AMR_NB)
+                || !MediaUtils.checkEncoder(MediaFormat.MIMETYPE_AUDIO_AMR_NB)) {
+            return; // skip
         }
         File outputFile = new File(Environment.getExternalStorageDirectory(),
                 "record_and_play.3gp");

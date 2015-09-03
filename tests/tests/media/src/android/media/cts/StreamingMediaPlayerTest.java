@@ -15,6 +15,8 @@
  */
 package android.media.cts;
 
+import android.cts.util.MediaUtils;
+import android.media.MediaFormat;
 import android.media.MediaPlayer;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -22,7 +24,6 @@ import android.util.Log;
 import android.webkit.cts.CtsTestServer;
 
 import java.io.IOException;
-
 
 /**
  * Tests of MediaPlayer streaming capabilities.
@@ -64,9 +65,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
 */
     // Streaming HTTP video from YouTube
     public void testHTTP_H263_AMR_Video1() throws Exception {
-        if (!hasH263(false)) {
-            Log.i(TAG, "Skipping testHTTP_H263_AMR_Video1(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_H263, MediaFormat.MIMETYPE_AUDIO_AMR_NB)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
@@ -77,9 +77,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&key=ik0&user=android-device-test", 176, 144);
     }
     public void testHTTP_H263_AMR_Video2() throws Exception {
-        if (!hasH263(false)) {
-            Log.i(TAG, "Skipping testHTTP_H263_AMR_Video2(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_H263, MediaFormat.MIMETYPE_AUDIO_AMR_NB)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
@@ -91,9 +90,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testHTTP_MPEG4SP_AAC_Video1() throws Exception {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testHTTP_MPEG4SP_AAC_Video1(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_MPEG4)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
@@ -104,9 +102,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&key=ik0&user=android-device-test", 176, 144);
     }
     public void testHTTP_MPEG4SP_AAC_Video2() throws Exception {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testHTTP_MPEG4SP_AAC_Video2(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_MPEG4)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
@@ -118,9 +115,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testHTTP_H264Base_AAC_Video1() throws Exception {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testHTTP_H264Base_AAC_Video1(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=271de9756065677e"
@@ -131,9 +127,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 + "&key=ik0&user=android-device-test", 640, 360);
     }
     public void testHTTP_H264Base_AAC_Video2() throws Exception {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testHTTP_H264Base_AAC_Video2(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
 
         playVideoTest("http://redirector.c.youtube.com/videoplayback?id=c80658495af60617"
@@ -146,9 +141,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
 
     // Streaming HLS video from YouTube
     public void testHLS() throws Exception {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testHLS(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
 
         // Play stream for 60 seconds
@@ -202,9 +196,8 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
                 stream_url = stream_url + "?" + CtsTestServer.NOLENGTH_POSTFIX;
             }
 
-            if (!supportsPlayback(stream_url)) {
-                Log.i(TAG, "Failed to find codec for: '" + stream_url + "'. Skipping test.");
-                return;
+            if (!MediaUtils.checkCodecsForPath(mContext, stream_url)) {
+                return; // skip
             }
 
             mMediaPlayer.setDataSource(stream_url);
@@ -294,25 +287,22 @@ public class StreamingMediaPlayerTest extends MediaPlayerTestBase {
     }
 
     public void testPlayHlsStream() throws Throwable {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testPlayHlsStream(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
         localHlsTest("hls.m3u8", false, false);
     }
 
     public void testPlayHlsStreamWithQueryString() throws Throwable {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testPlayHlsStreamWithQueryString(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
         localHlsTest("hls.m3u8", true, false);
     }
 
     public void testPlayHlsStreamWithRedirect() throws Throwable {
-        if (!hasH264(false)) {
-            Log.i(TAG, "Skipping testPlayHlsStreamWithRedirect(): No codec found.");
-            return;
+        if (!MediaUtils.checkDecoder(MediaFormat.MIMETYPE_VIDEO_AVC)) {
+            return; // skip
         }
         localHlsTest("hls.m3u8", false, true);
     }
