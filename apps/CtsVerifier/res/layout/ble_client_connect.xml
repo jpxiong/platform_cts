@@ -20,22 +20,19 @@
         android:padding="10dip"
         >
 
-    <LinearLayout android:orientation="horizontal"
+    <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             >
-        <EditText android:id="@+id/ble_address"
-                android:layout_weight="1"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:hint="@string/ble_address"
-                />
-        <Button android:id="@+id/ble_connect"
+        <Button android:id="@+id/ble_scan_start"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ble_connect"
-                />
+                android:text="@string/ble_scan_start"/>
+        <Button android:id="@+id/ble_scan_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ble_scan_stop"/>
     </LinearLayout>
 
     <include android:layout_width="match_parent"

@@ -217,6 +217,7 @@
     <string name="ble_waiting_notification">Waiting on notification</string>
     <string name="ble_read_rssi">Read RSSI</string>
     <string name="ble_disconnect">Disconnect</string>
+    <string name="ble_test_text">TEST</string>
 
     <!-- BLE server side strings -->
     <string name="ble_server_service_name">Bluetooth LE GATT Server Handler Service</string>
@@ -266,6 +267,8 @@
     <string name="ble_scanner_scan_filter_instruction">Scan filter is to scan data with service UUID = 0x6666 only. If you scan without scan filter, data with service UUID = 0x5555 and 0x6666 will show up on screen.\nFor monsoon test:\n\tClick scan with filter, lock the screen, connect to monsoon. It will not wake up when advertiser is advertising unscannable data packets, but will show a peak in power usage when advertiser is advertising scannable data.\nFor logcat test:\n\tClick scan with filter, logcat the scanner. No data will be received by GattService when advertiser is advertising unscannable data.</string>
     <string name="ble_scan_with_filter">Scan with filter</string>
     <string name="ble_scan_without_filter">Scan without filter</string>
+    <string name="ble_scan_start">Start scan</string>
+    <string name="ble_scan_stop">Stop scan</string>
 
     <!-- Strings for FeatureSummaryActivity -->
     <string name="feature_summary">Hardware/Software Feature Summary</string>

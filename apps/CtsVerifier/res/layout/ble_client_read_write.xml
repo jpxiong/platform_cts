@@ -32,6 +32,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
+                    android:text="@string/ble_test_text"
                     android:hint="@string/ble_write_hint"
                     android:padding="10dip"
                     />

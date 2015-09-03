@@ -16,6 +16,7 @@
 
 package com.android.cts.verifier.bluetooth;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.List;
 
@@ -29,10 +30,16 @@ import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.le.BluetoothLeScanner;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanResult;
+import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -53,6 +60,8 @@ public class BleClientService extends Service {
     public static final int COMMAND_BEGIN_WRITE = 9;
     public static final int COMMAND_EXECUTE_WRITE = 10;
     public static final int COMMAND_ABORT_RELIABLE = 11;
+    public static final int COMMAND_SCAN_START = 12;
+    public static final int COMMAND_SCAN_STOP = 13;
 
     public static final String BLE_BLUETOOTH_CONNECTED =
             "com.android.cts.verifier.bluetooth.BLE_BLUETOOTH_CONNECTED";
@@ -102,6 +111,8 @@ public class BleClientService extends Service {
     private BluetoothDevice mDevice;
     private BluetoothGatt mBluetoothGatt;
     private Handler mHandler;
+    private Context mContext;
+    private BluetoothLeScanner mScanner;
 
     @Override
     public void onCreate() {
@@ -110,6 +121,8 @@ public class BleClientService extends Service {
         mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = mBluetoothManager.getAdapter();
         mHandler = new Handler();
+        mContext = this;
+        mScanner = mBluetoothAdapter.getBluetoothLeScanner();
     }
 
     @Override
@@ -128,6 +141,7 @@ public class BleClientService extends Service {
         super.onDestroy();
         mBluetoothGatt.disconnect();
         mBluetoothGatt.close();
+        stopScan();
     }
 
     private void handleIntent(Intent intent) {
@@ -176,6 +190,12 @@ public class BleClientService extends Service {
                 break;
             case COMMAND_ABORT_RELIABLE:
                 if (mBluetoothGatt != null) mBluetoothGatt.abortReliableWrite(mDevice);
+                break;
+            case COMMAND_SCAN_START:
+                startScan();
+                break;
+            case COMMAND_SCAN_STOP:
+                stopScan();
                 break;
             default:
                 showMessage("Unrecognized command: " + command);
@@ -343,8 +363,8 @@ public class BleClientService extends Service {
         @Override
         public void onCharacteristicWrite(BluetoothGatt gatt,
                                           BluetoothGattCharacteristic characteristic, int status) {
-            if (DEBUG) Log.d(TAG, "onCharacteristicWrite: characteristic.val=" + characteristic.getStringValue(0)
-                                  + " status=" + status);
+            if (DEBUG) Log.d(TAG, "onCharacteristicWrite: characteristic.val="
+                    + characteristic.getStringValue(0) + " status=" + status);
             BluetoothGattCharacteristic mCharacteristic = getCharacteristic(CHARACTERISTIC_UUID);
             if ((status == BluetoothGatt.GATT_SUCCESS) &&
                 (characteristic.getStringValue(0).equals(mCharacteristic.getStringValue(0)))) {
@@ -387,4 +407,25 @@ public class BleClientService extends Service {
             if (status == BluetoothGatt.GATT_SUCCESS) notifyReadRemoteRssi(rssi);
         }
     };
+
+    private final ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, ScanResult result) {
+            mBluetoothGatt = result.getDevice().connectGatt(mContext, false, mGattCallbacks);
+        }
+    };
+
+    private void startScan() {
+        if (DEBUG) Log.d(TAG, "startScan");
+        List<ScanFilter> filter = Arrays.asList(new ScanFilter.Builder().setServiceUuid(
+                new ParcelUuid(BleServerService.ADV_SERVICE_UUID)).build());
+        ScanSettings setting = new ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_POWER).build();
+        mScanner.startScan(filter, setting, mScanCallback);
+    }
+
+    private void stopScan() {
+        if (DEBUG) Log.d(TAG, "stopScan");
+        mScanner.stopScan(mScanCallback);
+    }
 }
