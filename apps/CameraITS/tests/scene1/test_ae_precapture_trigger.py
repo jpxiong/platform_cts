@@ -17,6 +17,9 @@ import its.caps
 import its.objects
 import its.target
 
+# AE must converge within this number of auto requests under scene1
+THRESH_AE_CONVERGE = 8
+
 def main():
     """Test the AE state machine when using the precapture trigger.
     """
@@ -68,7 +71,7 @@ def main():
 
         # Capture some more auto requests, and AE should converge.
         auto_req['android.control.aePrecaptureTrigger'] = 0
-        caps = cam.do_capture([auto_req]*5, fmt)
+        caps = cam.do_capture([auto_req] * THRESH_AE_CONVERGE, fmt)
         state = caps[-1]['metadata']['android.control.aeState']
         print "AE state after auto request:", state
         assert(state == CONVERGED)
