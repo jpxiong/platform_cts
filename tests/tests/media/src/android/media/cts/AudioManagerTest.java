@@ -42,6 +42,7 @@ import com.android.cts.media.R;
 import android.content.Context;
 import android.content.res.Resources;
 import android.media.AudioManager;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -56,6 +57,7 @@ public class AudioManagerTest extends AndroidTestCase {
     private AudioManager mAudioManager;
     private boolean mHasVibrator;
     private boolean mUseFixedVolume;
+    private boolean mIsTelevision;
 
     @Override
     protected void setUp() throws Exception {
@@ -65,6 +67,10 @@ public class AudioManagerTest extends AndroidTestCase {
         mHasVibrator = (vibrator != null) && vibrator.hasVibrator();
         mUseFixedVolume = mContext.getResources().getBoolean(
                 Resources.getSystem().getIdentifier("config_useFixedVolume", "bool", "android"));
+        PackageManager packageManager = mContext.getPackageManager();
+        mIsTelevision = packageManager != null
+                && (packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+                        || packageManager.hasSystemFeature(PackageManager.FEATURE_TELEVISION));
     }
 
     public void testMicrophoneMute() throws Exception {
@@ -171,7 +177,7 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     public void testVibrateNotification() throws Exception {
-        if (mUseFixedVolume) {
+        if (mUseFixedVolume || !mHasVibrator) {
             return;
         }
         // VIBRATE_SETTING_ON
@@ -232,7 +238,7 @@ public class AudioManagerTest extends AndroidTestCase {
     }
 
     public void testVibrateRinger() throws Exception {
-        if (mUseFixedVolume) {
+        if (mUseFixedVolume || !mHasVibrator) {
             return;
         }
         // VIBRATE_TYPE_RINGER
@@ -298,14 +304,16 @@ public class AudioManagerTest extends AndroidTestCase {
         assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
 
         mAudioManager.setRingerMode(RINGER_MODE_SILENT);
-        if (mUseFixedVolume) {
+        // AudioService#setRingerMode() has:
+        // if (isTelevision) return;
+        if (mUseFixedVolume || mIsTelevision) {
             assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
         } else {
             assertEquals(RINGER_MODE_SILENT, mAudioManager.getRingerMode());
         }
 
         mAudioManager.setRingerMode(RINGER_MODE_VIBRATE);
-        if (mUseFixedVolume) {
+        if (mUseFixedVolume || mIsTelevision) {
             assertEquals(RINGER_MODE_NORMAL, mAudioManager.getRingerMode());
         } else {
             assertEquals(mHasVibrator ? RINGER_MODE_VIBRATE : RINGER_MODE_SILENT,
