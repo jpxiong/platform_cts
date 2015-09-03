@@ -291,6 +291,12 @@ public class StillCaptureTest extends Camera2SurfaceViewTestCase {
             try {
                 Log.i(TAG, "Testing AE compensation for Camera " + id);
                 openDevice(id);
+
+                if (mStaticInfo.isHardwareLevelLegacy()) {
+                    Log.i(TAG, "Skipping test on legacy devices");
+                    continue;
+                }
+
                 aeCompensationTestByCamera();
             } finally {
                 closeDevice();
