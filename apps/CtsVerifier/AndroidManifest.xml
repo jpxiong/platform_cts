@@ -1297,7 +1297,8 @@
                 <category android:name="android.cts.intent.category.MANUAL_TEST" />
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_projection" />
-            <meta-data android:name="test_required_features" android:value="android.hardware.faketouch" />
+            <meta-data android:name="test_required_features"
+                       android:value="android.hardware.faketouch:android.hardware.touchscreen.multitouch" />
         </activity>
 
 
