@@ -249,7 +249,9 @@ public class BluetoothLeScanTest extends AndroidTestCase {
 
         @Override
         public void onBatchScanResults(List<ScanResult> results) {
-            mBatchScanResults = results;
+            // In case onBatchScanResults are called due to buffer full, we want to collect all
+            // scan results.
+            mBatchScanResults.addAll(results);
         }
 
         // Clear regular and batch scan results.
