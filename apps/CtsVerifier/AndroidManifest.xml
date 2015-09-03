@@ -1071,7 +1071,7 @@
             <meta-data android:name="test_category" android:value="@string/test_category_notifications" />
         </activity>
 
-        <activity android:name=".notifications.NotificationAttentionManagementVerifierActivity"
+        <activity android:name=".notifications.AttentionManagementVerifierActivity"
                 android:label="@string/attention_test">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -1089,7 +1089,8 @@
             </intent-filter>
         </service>
 
-        <service  android:name=".notifications.NotificationListenerVerifierActivity$DismissService"/>
+        <service  android:name=".notifications.InteractiveVerifierActivity$DismissService"/>
+
         <activity android:name=".security.CAInstallNotificationVerifierActivity"
                 android:label="@string/cacert_test">
             <intent-filter>
