@@ -138,6 +138,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRendering800x480Locally() throws Throwable {
         Log.i(TAG, "testRendering800x480Locally");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, false, false);
         } else {
@@ -148,6 +150,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRenderingMaxResolutionLocally() throws Throwable {
         Log.i(TAG, "testRenderingMaxResolutionLocally");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
         runTestRenderingInSeparateThread(maxRes.first, maxRes.second, false, false);
     }
@@ -155,6 +159,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRendering800x480Remotely() throws Throwable {
         Log.i(TAG, "testRendering800x480Remotely");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, true, false);
         } else {
@@ -165,6 +171,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRenderingMaxResolutionRemotely() throws Throwable {
         Log.i(TAG, "testRenderingMaxResolutionRemotely");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         Log.w(TAG, "Trying resolution w:" + maxRes.first + " h:" + maxRes.second);
         runTestRenderingInSeparateThread(maxRes.first, maxRes.second, true, false);
     }
@@ -172,6 +180,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRendering800x480RemotelyWith3Windows() throws Throwable {
         Log.i(TAG, "testRendering800x480RemotelyWith3Windows");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, true, true);
         } else {
@@ -182,6 +192,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     public void testRendering800x480LocallyWith3Windows() throws Throwable {
         Log.i(TAG, "testRendering800x480LocallyWith3Windows");
         Pair<Integer, Integer> maxRes = checkMaxConcurrentEncodingDecodingResolution();
+        if(maxRes==null)
+            return;
         if (maxRes.first >= 800 && maxRes.second >= 480) {
             runTestRenderingInSeparateThread(800, 480, false, true);
         } else {
@@ -400,6 +412,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
     private static final int NUM_RENDERING = 10;
     private void doTestVirtualDisplayRecycles(int numDisplays) throws Exception {
         CodecInfo codecInfo = getAvcSupportedFormatInfo();
+        if(codecInfo == null)
+            return;
         VirtualDisplayPresentation[] virtualDisplays = new VirtualDisplayPresentation[numDisplays];
         for (int i = 0; i < NUM_CODEC_CREATION; i++) {
             mCodecConfigReceived = false;
@@ -1410,6 +1424,8 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
      */
     private Pair<Integer, Integer> checkMaxConcurrentEncodingDecodingResolution() {
         CodecInfo codecInfo = getAvcSupportedFormatInfo();
+        if(codecInfo==null)
+            return null;
         int maxW = codecInfo.mMaxW;
         int maxH = codecInfo.mMaxH;
         if (maxW >= 1920 && maxH >= 1080) {
