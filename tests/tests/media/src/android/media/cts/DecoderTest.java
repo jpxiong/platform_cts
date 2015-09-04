@@ -981,7 +981,7 @@ public class DecoderTest extends MediaPlayerTestBase {
         CRC32 crc = new CRC32();
         int pos = buf.position();
         buf.rewind();
-        for (int i = 0; i < buf.capacity(); i++) {
+        for (int i = 0; i < size; i++) {
             crc.update(buf.get());
         }
         buf.position(pos);
