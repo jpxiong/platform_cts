@@ -209,7 +209,7 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
 
             // capture a launch of the app with async tracing
             // content traced by 'view' tag tested below, 'sched' used to ensure tgid printed
-            String atraceArgs = "-a " + TEST_PKG + " -c -b 16000 view sched"; // TODO: zipping
+            String atraceArgs = "-a " + TEST_PKG + " -c -b 16000 view"; // TODO: zipping
             getDevice().executeShellCommand("atrace --async_stop " + atraceArgs);
             getDevice().executeShellCommand("atrace --async_start " + atraceArgs);
             getDevice().executeShellCommand("am start " + TEST_PKG);
@@ -228,13 +228,15 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
         String traceData = atraceOutput.substring(dataStart + MARKER.length());
 
         FtraceEntryCallback callback = new FtraceEntryCallback() {
-            private int matches = 0;
-            private int nextSectionIndex = 0;
-            private int appPid = -1;
+            private int userSpaceMatches = 0;
+            private int beginMatches = 0;
+            private int nextSectionIndex = -1;
+            private int appTid = -1;
 
-            // list of tags expected to be seen on app launch, in order.
+
+            private final String initialSection = "traceable-app-test-section";
+            // list of tags expected to be seen on app launch, in order, after the initial.
             private final String[] requiredSectionList = {
-                    "traceable-app-test-section",
                     "inflate",
                     "Choreographer#doFrame",
                     "traversal",
@@ -252,34 +254,41 @@ public class AtraceHostTest extends DeviceTestCase implements IBuildReceiver {
                     return;
                 }
 
-                matches++;
                 assertNotNull(truncatedThreadName);
                 assertTrue(tid > 0);
-                if (TEST_PKG.endsWith(truncatedThreadName)) {
-                    matches++;
+                userSpaceMatches++;
 
-                    if (pid >= 0) {
-                        // verify pid, if present
-                        if (appPid == -1) {
-                            appPid = pid;
-                        } else {
-                            assertEquals(appPid, pid);
-                        }
-                    }
+                if (details == null || !details.startsWith("B|")) {
+                    // not a begin event
+                    return;
+                }
+                beginMatches++;
 
-                    if (nextSectionIndex < requiredSectionList.length
-                            && details != null
-                            && details.startsWith("B|")
-                            && details.endsWith("|" + requiredSectionList[nextSectionIndex])) {
-                        nextSectionIndex++;
-                    }
+                if (details.endsWith("|" + initialSection)) {
+                    // initial section observed, start looking for others in order
+                    assertEquals(nextSectionIndex, -1);
+                    nextSectionIndex = 0;
+                    appTid = tid;
+                    return;
+                }
+
+                if (nextSectionIndex >= 0
+                        && tid == appTid
+                        && nextSectionIndex < requiredSectionList.length
+                        && details.endsWith("|" + requiredSectionList[nextSectionIndex])) {
+                    // found next required section in sequence
+                    nextSectionIndex++;
                 }
             }
 
             @Override
             public void onFinished() {
                 assertTrue("Unable to parse any userspace sections from atrace output",
-                        matches != 0);
+                        userSpaceMatches != 0);
+                assertTrue("Unable to parse any section begin events from atrace output",
+                        beginMatches != 0);
+                assertTrue("Unable to parse initial userspace sections from test app",
+                        nextSectionIndex >= 0);
                 assertEquals("Didn't see required list of traced sections, in order",
                         requiredSectionList.length, nextSectionIndex);
             }
