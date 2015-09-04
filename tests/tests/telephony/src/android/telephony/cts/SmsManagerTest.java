@@ -79,6 +79,8 @@ public class SmsManagerTest extends AndroidTestCase {
                     "51502",    // Globe Telecoms
                     "51503",    // Smart Communications
                     "51505",    // Sun Cellular
+                    "53001",    // Vodafone New Zealand
+                    "53024",    // NZC
                     "311870",   // Boost Mobile
                     "311220",   // USCC
                     "311225",   // USCC LTE
