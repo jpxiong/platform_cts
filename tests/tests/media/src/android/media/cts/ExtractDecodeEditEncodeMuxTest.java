@@ -29,6 +29,10 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 import android.view.Surface;
 
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecInfo.CodecCapabilities;
+import android.media.MediaCodecInfo.CodecProfileLevel;
+
 import com.android.cts.media.R;
 
 import java.io.File;
@@ -109,28 +113,28 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     private String mOutputFile;
 
     public void testExtractDecodeEditEncodeMuxQCIF() throws Throwable {
-        setSize(176, 144);
+        if(!setSize(176, 144)) return;
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyVideo();
         TestWrapper.runTest(this);
     }
 
     public void testExtractDecodeEditEncodeMuxQVGA() throws Throwable {
-        setSize(320, 240);
+        if(!setSize(320, 240)) return;
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyVideo();
         TestWrapper.runTest(this);
     }
 
     public void testExtractDecodeEditEncodeMux720p() throws Throwable {
-        setSize(1280, 720);
+        if(!setSize(1280, 720)) return;
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyVideo();
         TestWrapper.runTest(this);
     }
 
     public void testExtractDecodeEditEncodeMuxAudio() throws Throwable {
-        setSize(1280, 720);
+        if(!setSize(1280, 720)) return;
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyAudio();
         setVerifyAudioFormat();
@@ -138,7 +142,7 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     }
 
     public void testExtractDecodeEditEncodeMuxAudioVideo() throws Throwable {
-        setSize(1280, 720);
+        if(!setSize(1280, 720)) return;
         setSource(R.raw.video_480x360_mp4_h264_500kbps_30fps_aac_stereo_128kbps_44100hz);
         setCopyAudio();
         setCopyVideo();
@@ -201,14 +205,20 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     }
 
     /**
-     * Sets the desired frame size.
-     */
-    private void setSize(int width, int height) {
+   * Sets the desired frame size and returns whether the given resolution is
+   * supported.
+   *
+   * <p>If decoding/encoding using AVC as the codec, checks that the resolution
+   * is supported. For other codecs, always return {@code true}.
+   */
+    private boolean setSize(int width, int height) {
         if ((width % 16) != 0 || (height % 16) != 0) {
             Log.w(TAG, "WARNING: width or height not multiple of 16");
         }
         mWidth = width;
         mHeight = height;
+
+        return isAvcSupportedSize(width, height);
     }
 
     /**
@@ -1146,4 +1156,63 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
         return null;
     }
 
+  /**
+   * Checks whether the given resolution is supported by the AVC codec.
+   */
+    private static boolean isAvcSupportedSize(int width, int height) {
+        MediaCodecInfo mediaCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE);
+        CodecCapabilities cap = mediaCodecInfo.getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE);
+        if (cap == null) { // not supported
+            return false;
+        }
+        int highestLevel = 0;
+        for (CodecProfileLevel lvl : cap.profileLevels) {
+            if (lvl.level > highestLevel) {
+                highestLevel = lvl.level;
+            }
+        }
+        int maxW = 0;
+        int maxH = 0;
+        int bitRate = 0;
+        int fps = 0; // frame rate for the max resolution
+        switch(highestLevel) {
+            // Do not support Level 1 to 2.
+            case CodecProfileLevel.AVCLevel1:
+            case CodecProfileLevel.AVCLevel11:
+            case CodecProfileLevel.AVCLevel12:
+            case CodecProfileLevel.AVCLevel13:
+            case CodecProfileLevel.AVCLevel1b:
+            case CodecProfileLevel.AVCLevel2:
+                return false;
+            case CodecProfileLevel.AVCLevel21:
+                maxW = 352;
+                maxH = 576;
+                break;
+            case CodecProfileLevel.AVCLevel22:
+                maxW = 720;
+                maxH = 480;
+                break;
+            case CodecProfileLevel.AVCLevel3:
+                maxW = 720;
+                maxH = 480;
+                break;
+            case CodecProfileLevel.AVCLevel31:
+                maxW = 1280;
+                maxH = 720;
+                break;
+            case CodecProfileLevel.AVCLevel32:
+                maxW = 1280;
+                maxH = 720;
+                break;
+            case CodecProfileLevel.AVCLevel4: // only try up to 1080p
+            default:
+                maxW = 1920;
+                maxH = 1080;
+                break;
+        }
+        if(maxW*maxH < width*height)
+            return false;
+        else
+            return true;
+    }
 }
