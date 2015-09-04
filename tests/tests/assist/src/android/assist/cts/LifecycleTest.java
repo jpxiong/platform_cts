@@ -51,6 +51,7 @@ public class LifecycleTest extends AssistTestBase {
     private BroadcastReceiver mLifecycleTestBroadcastReceiver;
     private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
     private CountDownLatch mActivityLifecycleLatch = new CountDownLatch(1);
+    private CountDownLatch mReadyLatch = new CountDownLatch(1);
 
     @Override
     public void setUp() throws Exception {
@@ -98,7 +99,7 @@ public class LifecycleTest extends AssistTestBase {
 
     public void testLayerDoesNotTriggerLifecycleMethods() throws Exception {
         mTestActivity.startTest(Utils.LIFECYCLE);
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
         mTestActivity.start3pApp(Utils.LIFECYCLE);
         waitForOnResume();
         startSession();
@@ -119,8 +120,8 @@ public class LifecycleTest extends AssistTestBase {
             } else if (action.equals(action_onDestroy) && mActivityLifecycleLatch != null) {
                 mActivityLifecycleLatch.countDown();
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
-                if (mAssistantReadyLatch != null) {
-                    mAssistantReadyLatch.countDown();
+                if (mReadyLatch != null) {
+                    mReadyLatch.countDown();
                 }
             }
         }

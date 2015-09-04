@@ -16,37 +16,42 @@
 
 package android.assist.cts;
 
+import android.assist.cts.TestStartActivity;
 import android.assist.common.Utils;
+
+import android.app.Activity;
+import android.app.assist.AssistContent;
+import android.app.assist.AssistStructure;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.cts.util.SystemUtil;
+import android.graphics.Point;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.test.ActivityInstrumentationTestCase2;
 import android.util.Log;
 
+import java.lang.Override;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Test we receive proper assist data (root assistStructure with no children) when the assistant is
- * invoked on an app with FLAG_SECURE set.
- */
-public class FlagSecureTest extends AssistTestBase {
-    static final String TAG = "FlagSecureTest";
-
-    private static final String TEST_CASE_TYPE = Utils.FLAG_SECURE;
-
+/** Test verifying the Content View of the Assistant */
+public class AssistantContentViewTest extends AssistTestBase {
+    private static final String TAG = "ContentViewTest";
     private BroadcastReceiver mReceiver;
-    private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
-    private CountDownLatch mReadyLatch = new CountDownLatch(1);
-    public FlagSecureTest() {
-        super();
-    }
+    private CountDownLatch mContentViewLatch, mReadyLatch;
+    private Intent mIntent;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        mContentViewLatch = new CountDownLatch(1);
+        mReadyLatch = new CountDownLatch(1);
         setUpAndRegisterReceiver();
-        startTestActivity(TEST_CASE_TYPE);
+        startTestActivity(Utils.VERIFY_CONTENT_VIEW);
     }
 
     @Override
@@ -62,39 +67,41 @@ public class FlagSecureTest extends AssistTestBase {
         if (mReceiver != null) {
             mContext.unregisterReceiver(mReceiver);
         }
-        mReceiver = new FlagSecureTestBroadcastReceiver();
+        mReceiver = new AssistantContentViewReceiver();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(Utils.FLAG_SECURE_HASRESUMED);
+        filter.addAction(Utils.BROADCAST_CONTENT_VIEW_HEIGHT);
         filter.addAction(Utils.ASSIST_RECEIVER_REGISTERED);
         mContext.registerReceiver(mReceiver, filter);
+
     }
 
-    private void waitForOnResume() throws Exception {
-        Log.i(TAG, "waiting for onResume() before continuing");
-        if (!mHasResumedLatch.await(Utils.ACTIVITY_ONRESUME_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
-            fail("Activity failed to resume in " + Utils.ACTIVITY_ONRESUME_TIMEOUT_MS + "msec");
+    private void waitForContentView() throws Exception {
+        Log.i(TAG, "waiting for the Assistant's Content View  before continuing");
+        if (!mContentViewLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+            fail("failed to receive content view in " + Utils.TIMEOUT_MS + "msec");
         }
     }
 
-    public void testSecureActivity() throws Exception {
-        mTestActivity.startTest(TEST_CASE_TYPE);
+    public void testAssistantContentViewDimens() throws Exception {
+        mTestActivity.startTest(Utils.VERIFY_CONTENT_VIEW);
         waitForAssistantToBeReady(mReadyLatch);
-        mTestActivity.start3pApp(TEST_CASE_TYPE);
-        waitForOnResume();
         startSession();
-        waitForContext();
-        verifyAssistDataNullness(false, false, false, false);
-        // verify that we have only the root window and not its children.
-        verifyAssistStructure(Utils.getTestAppComponent(TEST_CASE_TYPE), true);
+        waitForContentView();
+        int height = mIntent.getIntExtra(Utils.EXTRA_CONTENT_VIEW_HEIGHT, 0);
+        int width = mIntent.getIntExtra(Utils.EXTRA_CONTENT_VIEW_WIDTH, 0);
+        Point displayPoint = (Point) mIntent.getParcelableExtra(Utils.EXTRA_DISPLAY_POINT);
+        assertEquals(displayPoint.y, height);
+        assertEquals(displayPoint.x, width);
     }
 
-    private class FlagSecureTestBroadcastReceiver extends BroadcastReceiver {
+    private class AssistantContentViewReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Utils.FLAG_SECURE_HASRESUMED)) {
-                if (mHasResumedLatch != null) {
-                    mHasResumedLatch.countDown();
+            if (action.equals(Utils.BROADCAST_CONTENT_VIEW_HEIGHT)) {
+                mIntent = intent;
+                if (mContentViewLatch != null) {
+                    mContentViewLatch.countDown();
                 }
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
                 if (mReadyLatch != null) {

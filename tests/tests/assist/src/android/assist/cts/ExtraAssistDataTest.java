@@ -32,6 +32,7 @@ public class ExtraAssistDataTest extends AssistTestBase {
 
     private BroadcastReceiver mReceiver;
     private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
+    private CountDownLatch mReadyLatch = new CountDownLatch(1);
 
     public ExtraAssistDataTest() {
         super();
@@ -66,7 +67,7 @@ public class ExtraAssistDataTest extends AssistTestBase {
 
     public void testAssistContentAndAssistData() throws Exception {
         mTestActivity.startTest(TEST_CASE_TYPE);
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
         mTestActivity.start3pApp(TEST_CASE_TYPE);
         waitForOnResume();
         startSession();
@@ -105,8 +106,8 @@ public class ExtraAssistDataTest extends AssistTestBase {
                     mHasResumedLatch.countDown();
                 }
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
-                if (mAssistantReadyLatch != null) {
-                    mAssistantReadyLatch.countDown();
+                if (mReadyLatch != null) {
+                    mReadyLatch.countDown();
                 }
             }
         }

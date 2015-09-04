@@ -40,7 +40,7 @@ public class ScreenshotTest extends AssistTestBase {
     private static final String TEST_CASE_TYPE = Utils.SCREENSHOT;
 
     private BroadcastReceiver mScreenshotActivityReceiver;
-    private CountDownLatch mHasResumedLatch;
+    private CountDownLatch mHasResumedLatch, mReadyLatch;
 
     public ScreenshotTest() {
         super();
@@ -49,7 +49,7 @@ public class ScreenshotTest extends AssistTestBase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-
+        mReadyLatch = new CountDownLatch(1);
         // set up receiver
         mScreenshotActivityReceiver = new ScreenshotTestReceiver();
         IntentFilter filter = new IntentFilter();
@@ -73,7 +73,7 @@ public class ScreenshotTest extends AssistTestBase {
         Log.i(TAG, "Starting screenshot test");
         mTestActivity.startTest(TEST_CASE_TYPE);
         Log.i(TAG, "start waitForAssistantToBeReady()");
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
 
         waitForActivityResumeAndAssist(Color.RED);
         verifyAssistDataNullness(false, false, false, false);
@@ -84,7 +84,7 @@ public class ScreenshotTest extends AssistTestBase {
         Log.i(TAG, "Starting screenshot test");
         mTestActivity.startTest(TEST_CASE_TYPE);
         Log.i(TAG, "start waitForAssistantToBeReady()");
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
 
         waitForActivityResumeAndAssist(Color.GREEN);
         verifyAssistDataNullness(false, false, false, false);
@@ -95,7 +95,7 @@ public class ScreenshotTest extends AssistTestBase {
         Log.i(TAG, "Starting screenshot test");
         mTestActivity.startTest(TEST_CASE_TYPE);
         Log.i(TAG, "start waitForAssistantToBeReady()");
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
 
         waitForActivityResumeAndAssist(Color.BLUE);
         verifyAssistDataNullness(false, false, false, false);
@@ -121,7 +121,9 @@ public class ScreenshotTest extends AssistTestBase {
             Log.i(ScreenshotTest.TAG, "Got some broadcast: " + action);
             if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
                 Log.i(ScreenshotTest.TAG, "Received assist receiver is registered.");
-                mAssistantReadyLatch.countDown();
+                if (mReadyLatch != null) {
+                    mReadyLatch.countDown();
+                }
             } else if (action.equals(Utils.APP_3P_HASRESUMED)) {
                 if (mHasResumedLatch != null) {
                     mHasResumedLatch.countDown();

@@ -60,7 +60,7 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     protected BroadcastReceiver mReceiver;
     protected Bundle mAssistBundle;
     protected Context mContext;
-    protected CountDownLatch mLatch, mAssistantReadyLatch, mScreenshotLatch, mHasResumedLatch;
+    protected CountDownLatch mLatch, mScreenshotLatch, mHasResumedLatch;
     protected boolean mScreenshotMatches;
     private Point mDisplaySize;
     private String mTestName;
@@ -73,19 +73,26 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        mAssistantReadyLatch = new CountDownLatch(1);
         mContext = getInstrumentation().getTargetContext();
         SystemUtil.runShellCommand(getInstrumentation(),
                 "settings put secure assist_structure_enabled 1");
         SystemUtil.runShellCommand(getInstrumentation(),
                 "settings put secure assist_screenshot_enabled 1");
         logContextAndScreenshotSetting();
+
         // reset old values
         mScreenshotMatches = false;
         mScreenshot = false;
         mAssistStructure = null;
         mAssistContent = null;
         mAssistBundle = null;
+
+        if (mReceiver != null) {
+            mContext.unregisterReceiver(mReceiver);
+        }
+        mReceiver = new TestResultsReceiver();
+        mContext.registerReceiver(mReceiver,
+            new IntentFilter(Utils.BROADCAST_ASSIST_DATA_INTENT));
     }
 
     @Override
@@ -116,9 +123,9 @@ public class AssistTestBase extends ActivityInstrumentationTestCase2<TestStartAc
     /**
      * Called when waiting for Assistant's Broadcast Receiver to be setup
      */
-    public void waitForAssistantToBeReady() throws Exception {
+    public void waitForAssistantToBeReady(CountDownLatch latch) throws Exception {
         Log.i(TAG, "waiting for assistant to be ready before continuing");
-        if (!mAssistantReadyLatch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+        if (!latch.await(Utils.TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
             fail("Assistant was not ready before timeout of: " + Utils.TIMEOUT_MS + "msec");
         }
     }

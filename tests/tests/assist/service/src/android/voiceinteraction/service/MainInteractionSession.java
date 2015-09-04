@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+
 import android.graphics.Point;
 import android.os.Bundle;
 import android.service.voice.VoiceInteractionSession;
@@ -33,6 +34,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Display;
+import android.view.ViewTreeObserver;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
@@ -55,6 +58,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
     private Bitmap mScreenshot;
     private BroadcastReceiver mReceiver;
     private String mTestName;
+    private View mContentView;
 
     MainInteractionSession(Context context) {
         super(context);
@@ -97,6 +101,22 @@ public class MainInteractionSession extends VoiceInteractionSession {
         mDisplayHeight = args.getInt(Utils.DISPLAY_HEIGHT_KEY);
         mDisplayWidth = args.getInt(Utils.DISPLAY_WIDTH_KEY);
         super.onShow(args, showFlags);
+        mContentView.getViewTreeObserver().addOnPreDrawListener(
+                new ViewTreeObserver.OnPreDrawListener() {
+                @Override
+                public boolean onPreDraw() {
+                    mContentView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    Display d = mContentView.getDisplay();
+                    Point displayPoint = new Point();
+                    d.getRealSize(displayPoint);
+                    Intent intent = new Intent(Utils.BROADCAST_CONTENT_VIEW_HEIGHT);
+                    intent.putExtra(Utils.EXTRA_CONTENT_VIEW_HEIGHT, mContentView.getHeight());
+                    intent.putExtra(Utils.EXTRA_CONTENT_VIEW_WIDTH, mContentView.getWidth());
+                    intent.putExtra(Utils.EXTRA_DISPLAY_POINT, displayPoint);
+                    mContext.sendBroadcast(intent);
+                    return true;
+                }
+            });
     }
 
     @Override
@@ -188,6 +208,7 @@ public class MainInteractionSession extends VoiceInteractionSession {
         if (f == null) {
             Log.wtf(TAG, "layout inflater was null");
         }
-        return f.inflate(R.layout.assist_layer,null);
+        mContentView = f.inflate(R.layout.assist_layer,null);
+        return mContentView;
     }
 }

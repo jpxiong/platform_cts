@@ -32,7 +32,10 @@ public class Utils {
     public static final String BROADCAST_ASSIST_DATA_INTENT = ACTION_PREFIX + "ASSIST_DATA";
     public static final String BROADCAST_INTENT_START_ASSIST = ACTION_PREFIX + "START_ASSIST";
     public static final String ASSIST_RECEIVER_REGISTERED = ACTION_PREFIX + "ASSIST_READY";
+
     public static final String ACTION_INVALIDATE = "invalidate_action";
+    public static final String GET_CONTENT_VIEW_HEIGHT = ACTION_PREFIX + "GET_CONTENT_VIEW_HEIGHT";
+    public static final String BROADCAST_CONTENT_VIEW_HEIGHT = ACTION_PREFIX + "VIEW_HEIGHT";
     public static final String TEST_ERROR = "Error In Test:";
 
     public static final String ASSIST_STRUCTURE_KEY = "assist_structure";
@@ -64,6 +67,11 @@ public class Utils {
 
     public static final String EXTRA_REGISTER_RECEIVER = "register_receiver";
 
+    /** Extras for passing the Assistant's ContentView's dimensions*/
+    public static final String EXTRA_CONTENT_VIEW_HEIGHT = "extra_content_view_height";
+    public static final String EXTRA_CONTENT_VIEW_WIDTH = "extra_content_view_width";
+    public static final String EXTRA_DISPLAY_POINT = "extra_display_point";
+
     /** Test name suffixes */
     public static final String ASSIST_STRUCTURE = "ASSIST_STRUCTURE";
     public static final String DISABLE_CONTEXT = "DISABLE_CONTEXT";
@@ -71,6 +79,7 @@ public class Utils {
     public static final String LIFECYCLE = "LIFECYCLE";
     public static final String SCREENSHOT = "SCREENSHOT";
     public static final String EXTRA_ASSIST = "EXTRA_ASSIST";
+    public static final String VERIFY_CONTENT_VIEW = "VERIFY_CONTENT_VIEW";
 
     /** Session intent constants */
     public static final String HIDE_SESSION = "android.intent.action.hide_session";
@@ -125,6 +134,7 @@ public class Utils {
             case LIFECYCLE:
             case SCREENSHOT:
             case EXTRA_ASSIST:
+            case VERIFY_CONTENT_VIEW:
                 return "service.DelayedAssistantActivity";
             default:
                 return "";

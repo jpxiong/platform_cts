@@ -39,6 +39,7 @@ public class AssistStructureTest extends AssistTestBase {
 
     private BroadcastReceiver mReceiver;
     private CountDownLatch mHasResumedLatch = new CountDownLatch(1);
+    private CountDownLatch mReadyLatch = new CountDownLatch(1);
 
     public AssistStructureTest() {
         super();
@@ -81,7 +82,7 @@ public class AssistStructureTest extends AssistTestBase {
     public void testAssistStructure() throws Exception {
         mTestActivity.start3pApp(TEST_CASE_TYPE);
         mTestActivity.startTest(TEST_CASE_TYPE);
-        waitForAssistantToBeReady();
+        waitForAssistantToBeReady(mReadyLatch);
         waitForOnResume();
         startSession();
         waitForContext();
@@ -100,8 +101,8 @@ public class AssistStructureTest extends AssistTestBase {
                     mHasResumedLatch.countDown();
                 }
             } else if (action.equals(Utils.ASSIST_RECEIVER_REGISTERED)) {
-                if (mAssistantReadyLatch != null) {
-                    mAssistantReadyLatch.countDown();
+                if (mReadyLatch != null) {
+                    mReadyLatch.countDown();
                 }
             }
         }

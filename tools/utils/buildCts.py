@@ -472,6 +472,7 @@ def BuildCtsTemporarilyKnownFailureList():
       ],
       'android.assist' : [
           'android.assist.cts.ExtraAssistDataTest',
+          'android.assist.cts.AssistantContentViewTest',
           'android.assist.cts.ScreenshotTest',
       ],
       'android.calllog' : [

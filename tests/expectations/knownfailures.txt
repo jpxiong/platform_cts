@@ -300,7 +300,8 @@
   description: "New assist tests that do not yet have a track record.",
   names: [
     "android.assist.cts.ScreenshotTest",
-    "android.assist.cts.ExtraAssistDataTest"
+    "android.assist.cts.ExtraAssistDataTest",
+    "android.assist.cts.AssistantContentViewTest"
   ],
   bug: 21668302
 }
