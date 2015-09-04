@@ -16,11 +16,15 @@
 
 package android.dumpsys.cts;
 
-import com.android.ddmlib.Log;
+import com.android.cts.tradefed.build.CtsBuildHelper;
+import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.device.ITestDevice;
 import com.android.tradefed.testtype.DeviceTestCase;
+import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,8 +32,10 @@ import java.util.Set;
 /**
  * Test to check the format of the dumps of various services (currently only procstats is tested).
  */
-public class DumpsysHostTest extends DeviceTestCase {
+public class DumpsysHostTest extends DeviceTestCase implements IBuildReceiver {
     private static final String TAG = "DumpsysHostTest";
+    private static final String TEST_APK = "CtsFramestatsTestApp.apk";
+    private static final String TEST_PKG = "com.android.cts.framestatstestapp";
 
     /**
      * A reference to the device under test.
@@ -815,17 +821,38 @@ public class DumpsysHostTest extends DeviceTestCase {
      */
     public void testGfxinfoFramestats() throws Exception {
         final String MARKER = "---PROFILEDATA---";
-        final int TIMESTAMP_COUNT = 14;
 
-        String frameinfo = mDevice.executeShellCommand("dumpsys gfxinfo com.android.systemui framestats");
-        assertNotNull(frameinfo);
-        assertTrue(frameinfo.length() > 0);
-        int profileStart = frameinfo.indexOf(MARKER);
-        int profileEnd = frameinfo.indexOf(MARKER, profileStart + 1);
-        assertTrue(profileStart >= 0);
-        assertTrue(profileEnd > profileStart);
-        String profileData = frameinfo.substring(profileStart + MARKER.length(), profileEnd);
-        assertTrue(profileData.length() > 0);
+        try {
+            // cleanup test apps that might be installed from previous partial test run
+            getDevice().uninstallPackage(TEST_PKG);
+
+            // install the test app
+            File testAppFile = mCtsBuild.getTestApp(TEST_APK);
+            String installResult = getDevice().installPackage(testAppFile, false);
+            assertNull(
+                    String.format("failed to install atrace test app. Reason: %s", installResult),
+                    installResult);
+
+            getDevice().executeShellCommand("am start -W " + TEST_PKG);
+
+            String frameinfo = mDevice.executeShellCommand("dumpsys gfxinfo " +
+                    TEST_PKG + " framestats");
+            assertNotNull(frameinfo);
+            assertTrue(frameinfo.length() > 0);
+            int profileStart = frameinfo.indexOf(MARKER);
+            int profileEnd = frameinfo.indexOf(MARKER, profileStart + 1);
+            assertTrue(profileStart >= 0);
+            assertTrue(profileEnd > profileStart);
+            String profileData = frameinfo.substring(profileStart + MARKER.length(), profileEnd);
+            assertTrue(profileData.length() > 0);
+            validateProfileData(profileData);
+        } finally {
+            getDevice().uninstallPackage(TEST_PKG);
+        }
+    }
+
+    private void validateProfileData(String profileData) throws IOException {
+        final int TIMESTAMP_COUNT = 14;
         boolean foundAtLeastOneRow = false;
         try (BufferedReader reader = new BufferedReader(
                 new StringReader(profileData))) {
@@ -870,6 +897,16 @@ public class DumpsysHostTest extends DeviceTestCase {
             }
         }
         assertTrue(foundAtLeastOneRow);
+    }
+
+    private CtsBuildHelper mCtsBuild;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setBuild(IBuildInfo buildInfo) {
+        mCtsBuild = CtsBuildHelper.createBuildHelper(buildInfo);
     }
 
     private static long assertInteger(String input) {
