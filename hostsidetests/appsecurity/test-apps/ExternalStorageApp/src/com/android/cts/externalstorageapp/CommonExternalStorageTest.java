@@ -274,8 +274,38 @@ public class CommonExternalStorageTest extends AndroidTestCase {
         }
     }
 
+    private static boolean isWhiteList(File file) {
+        final String[] whiteLists = {
+                "autorun.inf", ".android_secure", "android_secure"
+        };
+        if (file.getParentFile().getAbsolutePath().equals(
+                Environment.getExternalStorageDirectory().getAbsolutePath())) {
+            for (String whiteList : whiteLists) {
+                if (file.getName().equalsIgnoreCase(whiteList)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static File[] removeWhiteList(File[] files) {
+        List<File> fileList = new ArrayList<File>();
+        if (files == null) {
+            return null;
+        }
+
+        for (File file : files) {
+            if (!isWhiteList(file)) {
+                fileList.add(file);
+            }
+        }
+        return fileList.toArray(new File[fileList.size()]);
+    }
+
     public static void deleteContents(File dir) throws IOException {
         File[] files = dir.listFiles();
+        files = removeWhiteList(files);
         if (files != null) {
             for (File file : files) {
                 if (file.isDirectory()) {
@@ -283,7 +313,9 @@ public class CommonExternalStorageTest extends AndroidTestCase {
                 }
                 assertTrue(file.delete());
             }
-            assertEquals(0, dir.listFiles().length);
+
+            File[] dirs = removeWhiteList(dir.listFiles());
+            assertEquals(0, dirs.length);
         }
     }
 
