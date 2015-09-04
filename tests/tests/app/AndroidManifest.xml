@@ -19,6 +19,7 @@
     package="com.android.app.cts">
 
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+    <uses-permission android:name="android.permission.BODY_SENSORS" />
     <application>
         <uses-library android:name="android.test.runner" />
     </application>
