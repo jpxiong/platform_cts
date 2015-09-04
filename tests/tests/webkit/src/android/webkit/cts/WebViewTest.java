@@ -1443,7 +1443,7 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewStubAct
     }
 
     public void testSetInitialScale() throws Throwable {
-        final String p = "<p style=\"height:1000px;width:1000px\">Test setInitialScale.</p>";
+        final String p = "<p style=\"height:2000px;width:2000px\">Test setInitialScale.</p>";
         final float defaultScale =
             getInstrumentation().getTargetContext().getResources().getDisplayMetrics().density;
 
