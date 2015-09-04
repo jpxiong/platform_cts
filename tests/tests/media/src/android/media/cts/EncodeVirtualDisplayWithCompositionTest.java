@@ -210,7 +210,7 @@ public class EncodeVirtualDisplayWithCompositionTest extends AndroidTestCase {
             }
         });
         renderingThread.start();
-        renderingThread.join(20000);
+        renderingThread.join(22000);
         assertTrue(!renderingThread.isAlive());
         if (mTestException != null) {
             throw mTestException;
