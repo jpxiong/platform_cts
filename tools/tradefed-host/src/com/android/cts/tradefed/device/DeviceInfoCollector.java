@@ -17,6 +17,7 @@ package com.android.cts.tradefed.device;
 
 import com.android.cts.util.AbiUtils;
 import com.android.cts.tradefed.result.CtsXmlResultReporter;
+import com.android.ddmlib.IDevice;
 import com.android.ddmlib.Log;
 import com.android.tradefed.build.IBuildInfo;
 import com.android.tradefed.build.IFolderBuildInfo;
@@ -49,7 +50,6 @@ public class DeviceInfoCollector {
     private static final String EXTENDED_INSTRUMENTATION_NAME =
             "com.android.compatibility.common.deviceinfo.DeviceInfoInstrument";
     private static final String DEVICE_INFO_FILES = "device-info-files";
-    private static final String DEVICE_RESULT_DIR = "/sdcard/" + DEVICE_INFO_FILES;
 
     public static final Set<String> IDS = new HashSet<String>();
     public static final Set<String> EXTENDED_IDS = new HashSet<String>();
@@ -87,7 +87,8 @@ public class DeviceInfoCollector {
             ITestInvocationListener listener, IBuildInfo buildInfo)
             throws DeviceNotAvailableException {
         // Clear files in device test result directory
-        device.executeShellCommand(String.format("rm -rf %s", DEVICE_RESULT_DIR));
+        String deviceResultDir = getDeviceResultDir(device);
+        device.executeShellCommand(String.format("rm -rf %s", deviceResultDir));
         runInstrumentation(device, abi, testApkDir, listener, EXTENDED_APK_NAME,
             EXTENDED_APP_PACKAGE_NAME, EXTENDED_INSTRUMENTATION_NAME);
         // Copy files in remote result directory to local directory
@@ -131,9 +132,12 @@ public class DeviceInfoCollector {
         localResultDir = new File(localResultDir, DEVICE_INFO_FILES);
         localResultDir.mkdirs();
 
+
+        String deviceResultDir = getDeviceResultDir(device);
+
         // Pull files from device result directory to local result directory
         String command = String.format("adb -s %s pull %s %s", device.getSerialNumber(),
-                DEVICE_RESULT_DIR, localResultDir.getAbsolutePath());
+                deviceResultDir, localResultDir.getAbsolutePath());
         if (!execute(command)) {
             Log.e(LOG_TAG, String.format("Failed to run %s", command));
         }
@@ -147,5 +151,15 @@ public class DeviceInfoCollector {
             Log.e(LOG_TAG, e);
             return false;
         }
+    }
+
+    private static String getDeviceResultDir(ITestDevice device) {
+        String externalStorePath = device.getMountPoint(IDevice.MNT_EXTERNAL_STORAGE);
+        if (externalStorePath == null) {
+            Log.e(LOG_TAG, String.format(
+                    "Failed to get external storage path on device %s", device.getSerialNumber()));
+            return null;
+        }
+        return String.format("%s/%s", externalStorePath, DEVICE_INFO_FILES);
     }
 }
