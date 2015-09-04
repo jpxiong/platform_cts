@@ -142,12 +142,11 @@ jboolean android_security_cts_AudioPolicy_test_isStreamActive(JNIEnv* env __unus
         return false;
     }
 
-    status_t status = aps->isStreamActive((audio_stream_type_t)(-1), 0);
-    if (status == NO_ERROR) {
+    if (aps->isStreamActive((audio_stream_type_t)(AUDIO_STREAM_MIN -1), 0)) {
         return false;
     }
-    status = aps->isStreamActive((audio_stream_type_t)AUDIO_STREAM_CNT, 0);
-    if (status == NO_ERROR) {
+
+    if (aps->isStreamActive((audio_stream_type_t)AUDIO_STREAM_CNT, 0)) {
         return false;
     }
     return true;
