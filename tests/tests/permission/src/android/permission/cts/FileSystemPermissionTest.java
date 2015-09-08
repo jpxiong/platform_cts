@@ -251,7 +251,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     @MediumTest
     public void testProcSelfOomAdjSane() {
         File f = new File("/proc/self/oom_adj");
-        assertTrue(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
     }
@@ -259,7 +258,6 @@ public class FileSystemPermissionTest extends AndroidTestCase {
     @MediumTest
     public void testProcSelfOomScoreAdjSane() {
         File f = new File("/proc/self/oom_score_adj");
-        assertTrue(f.canRead());
         assertFalse(f.canWrite());
         assertFalse(f.canExecute());
     }
