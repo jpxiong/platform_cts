@@ -17,6 +17,7 @@ package android.uirendering.cts.testinfrastructure;
 
 import android.annotation.Nullable;
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,12 +39,19 @@ public class DrawActivity extends Activity {
 
     private Handler mHandler;
     private View mView;
+    private boolean mOnTv;
 
     public void onCreate(Bundle bundle){
         super.onCreate(bundle);
         getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
         mHandler = new RenderSpecHandler();
+        int uiMode = getResources().getConfiguration().uiMode;
+        mOnTv = (uiMode & Configuration.UI_MODE_TYPE_MASK) == Configuration.UI_MODE_TYPE_TELEVISION;
+    }
+
+    public boolean getOnTv() {
+        return mOnTv;
     }
 
     public Point enqueueRenderSpecAndWait(int layoutId, CanvasClient canvasClient, String webViewUrl,
