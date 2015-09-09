@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 // ----------------------------------------------------------------------
@@ -67,7 +68,7 @@ public class RVCVRecordActivity extends Activity {
     private VideoRecorder           mVideoRecorder;
     private RVSensorLogger          mRVSensorLogger;
     private CoverageManager         mCoverManager;
-    private CameraPreviewer         mPreviewer;
+    private CameraContext mCameraContext;
 
     public static final int AXIS_NONE = 0;
     public static final int AXIS_ALL = SensorManager.AXIS_X +
@@ -99,7 +100,7 @@ public class RVCVRecordActivity extends Activity {
         super.onPause();
         mController.quit();
 
-        mPreviewer.end();
+        mCameraContext.end();
         endSoundPool();
     }
 
@@ -128,8 +129,8 @@ public class RVCVRecordActivity extends Activity {
      *
      */
     private void init() {
-        mPreviewer = new CameraPreviewer();
-        mPreviewer.init();
+        mCameraContext = new CameraContext();
+        mCameraContext.init();
 
         mCoverManager = new CoverageManager();
         mIndicatorView.setDataProvider(
@@ -140,7 +141,7 @@ public class RVCVRecordActivity extends Activity {
         initSoundPool();
         mRVSensorLogger = new RVSensorLogger(this);
 
-        mVideoRecorder = new VideoRecorder(mPreviewer.getCamera());
+        mVideoRecorder = new VideoRecorder(mCameraContext.getCamera(), mCameraContext.getProfile());
 
         if (LOG_RAW_SENSORS) {
             mRawSensorLogger = new RawSensorLogger(mRecordDir);
@@ -173,7 +174,8 @@ public class RVCVRecordActivity extends Activity {
         // X and Y
         final String axisName = "YXZ";
 
-        message("Manipulate the device in " + axisName.charAt(axis-1) + " axis (as illustrated) about the pattern.");
+        message("Manipulate the device in " + axisName.charAt(axis - 1) +
+                " axis (as illustrated) about the pattern.");
     }
 
     /**
@@ -250,20 +252,28 @@ public class RVCVRecordActivity extends Activity {
      * Start the sensor recording
      */
     public void startRecordSensor() {
-        mRVSensorLogger.init();
-        if (LOG_RAW_SENSORS) {
-            mRawSensorLogger.init();
-        }
+        runOnUiThread(new Runnable() {
+            public void run() {
+                mRVSensorLogger.init();
+                if (LOG_RAW_SENSORS) {
+                    mRawSensorLogger.init();
+                }
+            }
+        });
     }
 
     /**
      * Stop the sensor recording
      */
     public void stopRecordSensor() {
-        mRVSensorLogger.end();
-        if (LOG_RAW_SENSORS) {
-            mRawSensorLogger.end();
-        }
+        runOnUiThread(new Runnable() {
+            public void run() {
+                mRVSensorLogger.end();
+                if (LOG_RAW_SENSORS) {
+                    mRawSensorLogger.end();
+                }
+            }
+        });
     }
 
     /**
@@ -365,17 +375,90 @@ public class RVCVRecordActivity extends Activity {
     /**
      * Camera preview control class
      */
-    class CameraPreviewer {
+    class CameraContext {
         private Camera mCamera;
+        private CamcorderProfile mProfile;
+        private Camera.CameraInfo mCameraInfo;
 
-        CameraPreviewer() {
+        private int [] mPreferredProfiles = {
+                CamcorderProfile.QUALITY_480P,  // smaller -> faster
+                CamcorderProfile.QUALITY_720P,
+                CamcorderProfile.QUALITY_1080P,
+                CamcorderProfile.QUALITY_HIGH // existence guaranteed
+        };
+
+        CameraContext() {
             try {
-                mCamera = Camera.open(); // attempt to get a default Camera instance
+                mCamera = Camera.open(); // attempt to get a default Camera instance (0)
+                mProfile = null;
+                if (mCamera != null) {
+                    mCameraInfo = new Camera.CameraInfo();
+                    Camera.getCameraInfo(0, mCameraInfo);
+                    setupCamera();
+                }
             }
-            catch (Exception e) {
+            catch (Exception e){
                 // Camera is not available (in use or does not exist)
                 Log.e(TAG, "Cannot obtain Camera!");
             }
+        }
+
+        /**
+         * Find a preferred camera profile and set preview and picture size property accordingly.
+         */
+        void setupCamera() {
+            CamcorderProfile profile = null;
+            Camera.Parameters param = mCamera.getParameters();
+            List<Camera.Size> pre_sz = param.getSupportedPreviewSizes();
+            List<Camera.Size> pic_sz = param.getSupportedPictureSizes();
+
+            for (int i : mPreferredProfiles) {
+                if (CamcorderProfile.hasProfile(i)) {
+                    profile = CamcorderProfile.get(i);
+
+                    int valid = 0;
+                    for (Camera.Size j : pre_sz) {
+                        if (j.width == profile.videoFrameWidth &&
+                                j.height == profile.videoFrameHeight) {
+                            ++valid;
+                            break;
+                        }
+                    }
+                    for (Camera.Size j : pic_sz) {
+                        if (j.width == profile.videoFrameWidth &&
+                                j.height == profile.videoFrameHeight) {
+                            ++valid;
+                            break;
+                        }
+                    }
+                    if (valid == 2) {
+                        param.setPreviewSize(profile.videoFrameWidth, profile.videoFrameHeight);
+                        param.setPictureSize(profile.videoFrameWidth, profile.videoFrameHeight);
+                        mCamera.setParameters(param);
+                        break;
+                    } else {
+                        profile = null;
+                    }
+                }
+            }
+            if (profile != null) {
+                float fovW = param.getHorizontalViewAngle();
+                float fovH = param.getVerticalViewAngle();
+                writeVideoMetaInfo(profile.videoFrameWidth, profile.videoFrameHeight,
+                        profile.videoFrameRate, fovW, fovH);
+            } else {
+                Log.e(TAG, "Cannot find a proper video profile");
+            }
+            mProfile = profile;
+
+        }
+
+
+        /**
+         * Get sensor information of the camera being used
+         */
+        public Camera.CameraInfo getCameraInfo() {
+            return mCameraInfo;
         }
 
         /**
@@ -387,12 +470,20 @@ public class RVCVRecordActivity extends Activity {
         }
 
         /**
+         * Get the camera profile to be used
+         * @return Reference to Camera profile
+         */
+        public CamcorderProfile getProfile() {
+            return mProfile;
+        }
+
+        /**
          * Setup the camera
          */
         public void init() {
             if (mCamera != null) {
                 double alpha = mCamera.getParameters().getHorizontalViewAngle()*Math.PI/180.0;
-                int width = 1920;
+                int width = mProfile.videoFrameWidth;
                 double fx = width/2/Math.tan(alpha/2.0);
 
                 if (LOCAL_LOGV) Log.v(TAG, "View angle="
@@ -400,7 +491,9 @@ public class RVCVRecordActivity extends Activity {
 
                 RVCVCameraPreview cameraPreview =
                         (RVCVCameraPreview) findViewById(R.id.cam_preview);
-                cameraPreview.init(mCamera);
+                cameraPreview.init(mCamera,
+                        (float)mProfile.videoFrameWidth/mProfile.videoFrameHeight,
+                        mCameraInfo.orientation);
             } else {
                 message("Cannot open camera!");
                 finish();
@@ -466,26 +559,22 @@ public class RVCVRecordActivity extends Activity {
     class VideoRecorder
     {
         private MediaRecorder mRecorder;
+        private CamcorderProfile mProfile;
         private Camera mCamera;
         private boolean mRunning = false;
 
-        private int [] mPreferredProfiles = {   CamcorderProfile.QUALITY_480P,  // smaller -> faster
-                                        CamcorderProfile.QUALITY_720P,
-                                        CamcorderProfile.QUALITY_1080P,
-                                        CamcorderProfile.QUALITY_HIGH // existence guaranteed
-                                    };
-
-
-        VideoRecorder(Camera camera) {
+        VideoRecorder(Camera camera, CamcorderProfile profile){
             mCamera = camera;
+            mProfile = profile;
         }
 
         /**
          * Initialize and start recording
          */
         public void init() {
-            float fovW =  mCamera.getParameters().getHorizontalViewAngle();
-            float fovH =  mCamera.getParameters().getVerticalViewAngle();
+            if (mCamera == null  || mProfile ==null){
+                return;
+            }
 
             mRecorder = new MediaRecorder();
             mCamera.unlock();
@@ -494,17 +583,7 @@ public class RVCVRecordActivity extends Activity {
             mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
 
-            CamcorderProfile profile = null;
-            for (int i: mPreferredProfiles) {
-                if (CamcorderProfile.hasProfile(i)) {
-                    profile = CamcorderProfile.get(i);
-                    mRecorder.setProfile(profile);
-                    break;
-                }
-            }
-
-            writeVideoMetaInfo(profile.videoFrameWidth, profile.videoFrameHeight,
-                    profile.videoFrameRate, fovW, fovH);
+            mRecorder.setProfile(mProfile);
 
             try {
                 mRecorder.setOutputFile(getVideoRecFilePath());
@@ -689,8 +768,20 @@ public class RVCVRecordActivity extends Activity {
          */
         public void init() {
             mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+            if (mSensorManager == null) {
+                Log.e(TAG,"SensorManager is null!");
+            }
             mRVSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-            mSensorManager.registerListener(this, mRVSensor, SENSOR_RATE);
+            if (mRVSensor != null) {
+                if (LOCAL_LOGV) Log.v(TAG, "Got RV Sensor");
+            }else {
+                Log.e(TAG, "Did not get RV sensor");
+            }
+            if(mSensorManager.registerListener(this, mRVSensor, SENSOR_RATE)) {
+                if (LOCAL_LOGV) Log.v(TAG,"Register listener successfull");
+            } else {
+                Log.e(TAG,"Register listener failed");
+            }
 
             try {
                 mLogWriter= new OutputStreamWriter(

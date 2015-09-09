@@ -15,12 +15,12 @@ package com.android.cts.verifier.sensors;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Debug;
 import android.os.Environment;
+import android.os.PowerManager;
 import android.util.JsonWriter;
 import android.util.Log;
 
@@ -777,14 +777,16 @@ public class RVCVXCheckAnalyzer {
         VideoMetaInfo meta = new VideoMetaInfo(new File(mPath, "videometa.json"));
 
         int decimation = 1;
+        boolean use_timestamp = true;
 
+        // roughly determine if decimation is necessary
         if (meta.fps > DECIMATION_FPS_TARGET) {
             decimation = (int)(meta.fps / DECIMATION_FPS_TARGET);
             meta.fps /=decimation;
         }
 
         VideoDecoderForOpenCV videoDecoder = new VideoDecoderForOpenCV(
-                new File(mPath, "video.mp4"), decimation); // every 3 frame process 1 frame
+                new File(mPath, "video.mp4"), decimation);
 
 
         Mat frame;
@@ -820,10 +822,15 @@ public class RVCVXCheckAnalyzer {
         }
 
         long startTime = System.nanoTime();
+        long [] ts = new long[1];
 
-        while ((frame = videoDecoder.getFrame()) !=null) {
+        while ((frame = videoDecoder.getFrame(ts)) !=null) {
             if (LOCAL_LOGV) {
                 Log.v(TAG, "got a frame " + i);
+            }
+
+            if (use_timestamp && ts[0] == -1) {
+                use_timestamp = false;
             }
 
             // has to be in front, as there are cases where execution
@@ -873,8 +880,16 @@ public class RVCVXCheckAnalyzer {
             // if error is reasonable, add it into the results
             if (error < REPROJECTION_THREASHOLD) {
                 double [] rv = new double[3];
+                double timestamp;
+
                 rvec.get(0,0, rv);
-                recs.add(new AttitudeRec((double) i / meta.fps, rodr2rpy(rv)));
+                if (use_timestamp) {
+                    timestamp = (double)ts[0] / 1e6;
+                } else {
+                    timestamp = (double) i / meta.fps;
+                }
+                if (LOCAL_LOGV) Log.v(TAG, String.format("Added frame %d  ts = %f", i, timestamp));
+                recs.add(new AttitudeRec(timestamp, rodr2rpy(rv)));
             }
 
             if (OUTPUT_DEBUG_IMAGE) {
@@ -906,6 +921,8 @@ public class RVCVXCheckAnalyzer {
      * One issue right now is that the glReadPixels is quite slow .. around 6.5ms for a 720p frame
      */
     private class VideoDecoderForOpenCV implements Runnable {
+        static final String TAG = "VideoDecoderForOpenCV";
+
         private MediaExtractor extractor=null;
         private MediaCodec decoder=null;
         private CtsMediaOutputSurface surface=null;
@@ -1031,7 +1048,7 @@ public class RVCVXCheckAnalyzer {
             }
 
             if (decoder == null) {
-                Log.e("VideoDecoderForOpenCV", "Can't find video info!");
+                Log.e(TAG, "Can't find video info!");
                 return;
             }
             valid = true;
@@ -1060,6 +1077,7 @@ public class RVCVXCheckAnalyzer {
             long timeoutUs = 10000;
 
             int iframe = 0;
+            long frameTimestamp = 0;
 
             while (!Thread.interrupted()) {
                 if (!isEOS) {
@@ -1076,8 +1094,12 @@ public class RVCVXCheckAnalyzer {
                                     MediaCodec.BUFFER_FLAG_END_OF_STREAM);
                             isEOS = true;
                         } else {
-                            decoder.queueInputBuffer(inIndex, 0, sampleSize,
-                                    extractor.getSampleTime(), 0);
+                            frameTimestamp = extractor.getSampleTime();
+                            decoder.queueInputBuffer(inIndex, 0, sampleSize, frameTimestamp, 0);
+                            if (LOCAL_LOGD) {
+                                Log.d(TAG, String.format("Frame %d sample time %f s",
+                                            iframe, (double)frameTimestamp/1e6));
+                            }
                             extractor.advance();
                         }
                     }
@@ -1088,19 +1110,19 @@ public class RVCVXCheckAnalyzer {
                 switch (outIndex) {
                     case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
                         if (LOCAL_LOGD) {
-                            Log.d("VideoDecoderForOpenCV", "INFO_OUTPUT_BUFFERS_CHANGED");
+                            Log.d(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                         }
                         outputBuffers = decoder.getOutputBuffers();
                         break;
                     case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
                         outFormat = decoder.getOutputFormat();
                         if (LOCAL_LOGD) {
-                            Log.d("VideoDecoderForOpenCV", "New format " + outFormat);
+                            Log.d(TAG, "New format " + outFormat);
                         }
                         break;
                     case MediaCodec.INFO_TRY_AGAIN_LATER:
                         if (LOCAL_LOGD) {
-                            Log.d("VideoDecoderForOpenCV", "dequeueOutputBuffer timed out!");
+                            Log.d(TAG, "dequeueOutputBuffer timed out!");
                         }
                         break;
                     default:
@@ -1118,12 +1140,12 @@ public class RVCVXCheckAnalyzer {
                         if (doRender) {
                             surface.awaitNewImage();
                             surface.drawImage();
-                            if (LOCAL_LOGD) {
-                                Log.d("VideoDecoderForOpenCV", "Finish drawing a frame!");
+                            if (LOCAL_LOGV) {
+                                Log.v(TAG, "Finish drawing a frame!");
                             }
                             if ((iframe++ % mDecimation) == 0) {
                                 //Send the frame for processing
-                                mMatBuffer.put();
+                                mMatBuffer.put(frameTimestamp);
                             }
                         }
                         break;
@@ -1149,8 +1171,8 @@ public class RVCVXCheckAnalyzer {
          * Get next valid frame
          * @return Frame in OpenCV mat
          */
-        public Mat getFrame() {
-            return mMatBuffer.get();
+        public Mat getFrame(long ts[]) {
+            return mMatBuffer.get(ts);
         }
 
         /**
@@ -1168,6 +1190,7 @@ public class RVCVXCheckAnalyzer {
             private Mat mat;
             private byte[] bytes;
             private ByteBuffer buf;
+            private long timestamp;
             private boolean full;
 
             private int mWidth, mHeight;
@@ -1180,6 +1203,7 @@ public class RVCVXCheckAnalyzer {
                 mat = new Mat(height, width, CvType.CV_8UC4); //RGBA
                 buf = ByteBuffer.allocateDirect(width*height*4);
                 bytes = new byte[width*height*4];
+                timestamp = -1;
 
                 mValid = true;
                 full = false;
@@ -1190,7 +1214,7 @@ public class RVCVXCheckAnalyzer {
                 notifyAll();
             }
 
-            public synchronized Mat get() {
+            public synchronized Mat get(long ts[]) {
 
                 if (!mValid) return null;
                 while (full == false) {
@@ -1204,9 +1228,11 @@ public class RVCVXCheckAnalyzer {
                 mat.put(0,0, bytes);
                 full = false;
                 notifyAll();
+                ts[0] = timestamp;
                 return mat;
             }
-            public synchronized void put() {
+
+            public synchronized void put(long ts) {
                 while (full) {
                     try {
                         wait();
@@ -1219,6 +1245,7 @@ public class RVCVXCheckAnalyzer {
                 buf.get(bytes);
                 buf.rewind();
 
+                timestamp = ts;
                 full = true;
                 notifyAll();
             }

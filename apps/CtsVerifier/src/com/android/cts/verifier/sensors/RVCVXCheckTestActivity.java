@@ -16,9 +16,10 @@
 
 package com.android.cts.verifier.sensors;
 
-
+import android.content.Context;
 import android.hardware.cts.helpers.SensorTestStateNotSupportedException;
 import android.os.Bundle;
+import android.os.PowerManager;
 
 import com.android.cts.verifier.sensors.base.SensorCtsVerifierTestActivity;
 import com.android.cts.verifier.sensors.helpers.OpenCVLibrary;
@@ -82,7 +83,7 @@ public class RVCVXCheckTestActivity
 
         while(retry-->0) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(250);
             } catch (InterruptedException e) {
                 //
             }
@@ -146,7 +147,15 @@ public class RVCVXCheckTestActivity
 
             // Analysis of recorded video and sensor data using RVCXAnalyzer
             RVCVXCheckAnalyzer analyzer = new RVCVXCheckAnalyzer(mRecPath);
+
+            // acquire a partial wake lock just in case CPU fall asleep
+            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+                    "RVCVXCheckAnalyzer");
+
+            wl.acquire();
             mReport = analyzer.processDataSet();
+            wl.release();
 
             playSound();
             vibrate(500);

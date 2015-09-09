@@ -23,9 +23,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.ViewGroup;
 
 import java.io.IOException;
-import java.util.List;
 
 /** Camera preview class */
 public class RVCVCameraPreview extends SurfaceView implements SurfaceHolder.Callback {
@@ -34,15 +34,16 @@ public class RVCVCameraPreview extends SurfaceView implements SurfaceHolder.Call
 
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private float mAspect;
+    private int mRotation;
 
     /**
      * Constructor
      * @param context Activity context
-     * @param camera Camera object to be previewed
      */
-    public RVCVCameraPreview(Context context, Camera camera) {
+    public RVCVCameraPreview(Context context) {
         super(context);
-        mCamera = camera;
+        mCamera = null;
         initSurface();
     }
 
@@ -55,8 +56,10 @@ public class RVCVCameraPreview extends SurfaceView implements SurfaceHolder.Call
         super(context, attrs);
     }
 
-    public void init(Camera camera) {
+    public void init(Camera camera, float aspectRatio, int rotation)  {
         this.mCamera = camera;
+        mAspect = aspectRatio;
+        mRotation = rotation;
         initSurface();
     }
 
@@ -86,6 +89,20 @@ public class RVCVCameraPreview extends SurfaceView implements SurfaceHolder.Call
         try {
             mCamera.setPreviewDisplay(holder);
             mCamera.startPreview();
+            int v_height = getHeight();
+            int v_width = getWidth();
+            ViewGroup.LayoutParams layout = getLayoutParams();
+            if ( (float)v_height/v_width  >
+                    mAspect) {
+                layout.height = (int)(v_width * mAspect);
+                layout.width = v_width;
+            }else {
+                layout.width = (int)(v_height / mAspect);
+                layout.height = v_height;
+            }
+            Log.d(TAG, String.format("Layout (%d, %d) -> (%d, %d)", v_width, v_height,
+                    layout.width, layout.height));
+            setLayoutParams(layout);
         } catch (IOException e) {
             if (LOCAL_LOGD) Log.d(TAG, "Error when starting camera preview: " + e.getMessage());
         }
@@ -111,8 +128,7 @@ public class RVCVCameraPreview extends SurfaceView implements SurfaceHolder.Call
         // stop preview before making changes
         mCamera.stopPreview();
 
-        // the activity using this view is locked to this orientation, so hard code is fine
-        mCamera.setDisplayOrientation(90);
+        mCamera.setDisplayOrientation(mRotation);
 
         //do the same as if it is created again
         surfaceCreated(holder);
