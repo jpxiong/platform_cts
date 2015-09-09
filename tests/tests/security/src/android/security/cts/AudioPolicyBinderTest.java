@@ -56,8 +56,18 @@ public class AudioPolicyBinderTest extends TestCase {
         assertTrue(native_test_isStreamActiveRemotely());
     }
 
+    /**
+     * Checks that IAudioPolicyService::getStreamVolumeIndex() does not leak information
+     * when called with an invalid stream/device type.
+     */
+    public void test_getStreamVolumeLeak() throws Exception {
+        int volume = native_test_getStreamVolumeLeak();
+        assertTrue(String.format("Leaked volume 0x%08X", volume), volume == 0);
+    }
+
     private static native boolean native_test_startOutput();
     private static native boolean native_test_stopOutput();
     private static native boolean native_test_isStreamActive();
     private static native boolean native_test_isStreamActiveRemotely();
+    private static native int native_test_getStreamVolumeLeak();
 }
