@@ -58,8 +58,10 @@ public class SensorTest extends SensorTestCase {
 
     private PowerManager.WakeLock mWakeLock;
     private SensorManager mSensorManager;
+    private TestSensorManager mTestSensorManager;
     private NullTriggerEventListener mNullTriggerEventListener;
     private NullSensorEventListener mNullSensorEventListener;
+    private Sensor mTriggerSensor;
     private List<Sensor> mSensorList;
 
     @Override
@@ -84,7 +86,21 @@ public class SensorTest extends SensorTestCase {
     }
 
     @Override
-    protected void tearDown(){
+    protected void tearDown() {
+        if (mSensorManager != null) {
+           // SensorManager will check listener and status, so just unregister listener
+           mSensorManager.unregisterListener(mNullSensorEventListener);
+           if (mTriggerSensor != null) {
+               mSensorManager.cancelTriggerSensor(mNullTriggerEventListener, mTriggerSensor);
+               mTriggerSensor = null;
+           }
+        }
+
+        if (mTestSensorManager != null) {
+            mTestSensorManager.unregisterListener();
+            mTestSensorManager = null;
+        }
+
         if (mWakeLock != null && mWakeLock.isHeld()) {
             mWakeLock.release();
         }
@@ -234,20 +250,22 @@ public class SensorTest extends SensorTestCase {
     }
 
     public void testRequestTriggerWithNonTriggerSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (sensor == null) {
+        mTriggerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (mTriggerSensor == null) {
             throw new SensorNotSupportedException(Sensor.TYPE_ACCELEROMETER);
         }
-        boolean  result = mSensorManager.requestTriggerSensor(mNullTriggerEventListener, sensor);
+        boolean  result =
+            mSensorManager.requestTriggerSensor(mNullTriggerEventListener, mTriggerSensor);
         assertFalse(result);
     }
 
     public void testCancelTriggerWithNonTriggerSensor() {
-        Sensor sensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (sensor == null) {
+        mTriggerSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        if (mTriggerSensor == null) {
             throw new SensorNotSupportedException(Sensor.TYPE_ACCELEROMETER);
         }
-        boolean result = mSensorManager.cancelTriggerSensor(mNullTriggerEventListener, sensor);
+        boolean result =
+            mSensorManager.cancelTriggerSensor(mNullTriggerEventListener, mTriggerSensor);
         assertFalse(result);
     }
 
@@ -323,16 +341,16 @@ public class SensorTest extends SensorTestCase {
                 sensor,
                 SensorManager.SENSOR_DELAY_FASTEST,
                 (int) TimeUnit.SECONDS.toMicros(5));
-        TestSensorManager sensorManager = new TestSensorManager(environment);
+        mTestSensorManager = new TestSensorManager(environment);
 
         HandlerThread handlerThread = new HandlerThread("sensorThread");
         handlerThread.start();
         Handler handler = new Handler(handlerThread.getLooper());
         TestSensorEventListener listener = new TestSensorEventListener(environment, handler);
 
-        CountDownLatch eventLatch = sensorManager.registerListener(listener, 1);
+        CountDownLatch eventLatch = mTestSensorManager.registerListener(listener, 1);
         listener.waitForEvents(eventLatch, 1);
-        CountDownLatch flushLatch = sensorManager.requestFlush();
+        CountDownLatch flushLatch = mTestSensorManager.requestFlush();
         listener.waitForFlushComplete(flushLatch);
         listener.assertEventsReceivedInHandler();
     }

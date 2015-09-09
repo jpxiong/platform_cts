@@ -49,7 +49,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
     private static final long EVENT_TIMEOUT_US = TimeUnit.SECONDS.toMicros(5);
     private static final long FLUSH_TIMEOUT_US = TimeUnit.SECONDS.toMicros(10);
 
-    private final List<TestSensorEvent> mCollectedEvents = new ArrayList<>();
+    private final ArrayList<TestSensorEvent> mCollectedEvents = new ArrayList<>();
     private final List<CountDownLatch> mEventLatches = new ArrayList<>();
     private final List<CountDownLatch> mFlushLatches = new ArrayList<>();
     private final AtomicInteger mEventsReceivedOutsideHandler = new AtomicInteger();
@@ -155,7 +155,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
      */
     public List<TestSensorEvent> getCollectedEvents() {
         synchronized (mCollectedEvents){
-            return Collections.unmodifiableList(mCollectedEvents);
+            return Collections.unmodifiableList((List<TestSensorEvent>) mCollectedEvents.clone());
         }
     }
 
