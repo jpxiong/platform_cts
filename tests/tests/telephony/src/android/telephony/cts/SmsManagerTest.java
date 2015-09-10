@@ -94,6 +94,7 @@ public class SmsManagerTest extends AndroidTestCase {
                     "310600",    // Cellcom
                     "31000",     // Republic Wireless US
                     "310026",     // T-Mobile US
+                    "330120", // OpenMobile communication
                     // Verizon
                     "310004",
                     "310012",
