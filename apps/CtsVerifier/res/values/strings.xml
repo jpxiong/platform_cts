@@ -1361,4 +1361,17 @@
     <!-- A list of fully-qualified test classes that should not be run. -->
     <string-array name="disabled_tests" />
 
+    <!-- Strings for screen pinning test -->
+    <string name="screen_pinning_test">Screen Pinning Test</string>
+    <string name="screen_pin_instructions">Pressing next will prompt you to enter screen pinning, allow this app to enter screen pinning.</string>
+    <string name="screen_pin_check_pinned">Press Next to verify the app is pinned.</string>
+    <string name="screen_pin_no_exit">Try to leave the app without unpinning the screen. Press next once you have verified you cannot leave.</string>
+    <string name="screen_pin_exit">Use interactions defined by your device to unpin such as long pressing the back and overview button, then press next.</string>
+    <string name="screen_pinning_done">All tests completed successfully.</string>
+
+    <string name="error_screen_no_longer_pinned">The screen was no longer pinned.</string>
+    <string name="error_screen_already_pinned">Cannot start the test with the screen already pinned.</string>
+    <string name="error_screen_pinning_did_not_start">Screen was not pinned.</string>
+    <string name="error_screen_pinning_did_not_exit">Screen was not unpinned.</string>
+    <string name="error_screen_pinning_couldnt_exit">Could not exit screen pinning through API.</string>
 </resources>
