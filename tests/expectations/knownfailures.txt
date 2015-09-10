@@ -166,15 +166,9 @@
     "com.android.cts.devicepolicy.ManagedProfileTest#testWipeData",
     "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileIntentFilters",
     "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileContent",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testNoDebuggingFeaturesRestriction"
-  ]
-},
-{
-  description: "Flaky test which ocassionally fails",
-  names: [
+    "com.android.cts.devicepolicy.ManagedProfileTest#testNoDebuggingFeaturesRestriction",
     "com.android.cts.devicepolicy.DeviceOwnerTest#testLockTask"
-  ],
-  bug: 17890673
+  ]
 },
 {
 
