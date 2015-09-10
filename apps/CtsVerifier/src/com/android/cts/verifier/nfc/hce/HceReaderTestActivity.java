@@ -103,6 +103,10 @@ public class HceReaderTestActivity extends PassFailButtons.TestListActivity {
                     SimpleReaderActivity.class.getName(),
                     DynamicAidEmulatorActivity.buildReaderIntent(this), null));
 
+            adapter.add(TestListItem.newTest(this, R.string.nfc_hce_large_num_aids_reader,
+                    SimpleReaderActivity.class.getName(),
+                    LargeNumAidsEmulatorActivity.buildReaderIntent(this), null));
+
             NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(this);
             CardEmulation cardEmulation = CardEmulation.getInstance(nfcAdapter);
             if (cardEmulation.supportsAidPrefixRegistration()) {

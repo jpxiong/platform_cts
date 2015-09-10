@@ -440,6 +440,10 @@
     <string name="nfc_hce_payment_dynamic_aids_reader">Dynamic payment AIDs (Reader)</string>
     <string name="nfc_hce_payment_dynamic_aids_help">This test tries to register dynamic AIDs for a payment service.</string>
 
+    <string name="nfc_hce_large_num_aids_emulator">Large number of AIDs (Emulator)</string>
+    <string name="nfc_hce_large_num_aids_reader">Large number of AIDs (Reader)</string>
+    <string name="nfc_hce_large_num_aids_help">This test tries to register a large number of different AIDs, to make sure there are no limitations on the maximum amount of HCE apps on the device. Note that this test may take a few seconds to complete; please be patient.</string>
+
     <string name="nfc_hce_payment_prefix_aids_emulator">Payment prefix AIDs (Emulator)</string>
     <string name="nfc_hce_payment_prefix_aids_reader">Payment prefix AIDs (Reader)</string>
     <string name="nfc_hce_payment_prefix_aids_help">This test statically registers prefix AIDs for a payment service.</string>
