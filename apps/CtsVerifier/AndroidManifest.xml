@@ -1354,8 +1354,7 @@
         </activity>
 
 
-        <!-- TODO: enable when the test can be executed without leaving marks -->
-        <!-- activity android:name=".managedprovisioning.ByodFlowTestActivity"
+        <activity android:name=".managedprovisioning.ByodFlowTestActivity"
                 android:launchMode="singleTask"
                 android:label="@string/provisioning_byod">
             <intent-filter>
@@ -1368,7 +1367,7 @@
             </intent-filter>
             <meta-data android:name="test_category" android:value="@string/test_category_managed_provisioning" />
             <meta-data android:name="test_required_features" android:value="android.software.managed_users:android.software.device_admin" />
-        </activity-->
+        </activity>
 
         <activity android:name=".managedprovisioning.ByodHelperActivity">
             <intent-filter>
