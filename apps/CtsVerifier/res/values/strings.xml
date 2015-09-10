@@ -1233,6 +1233,7 @@
         Start by pressing the button on screen and follow instructions to finish the managed provisioning process.
         If your device has not been encrypted before, it will be encrypted and rebooted.
         After the provisioning process completes, return to this page and carry out further verifications.
+        Note: the device will remain encrypted after the test which can only be disabled by factory reset.
     </string>
     <string name="provisioning_byod_start">Start BYOD provisioning flow</string>
     <string name="provisioning_byod_instructions">
@@ -1241,7 +1242,10 @@
         After reboot follow instructions in the notification area to complete the provisioning.\n
         2. After successful provisioning, you should be automatically redirected back to this page.
         Please press through the following verification steps.
-        Allow a few seconds after returning from provisioning, as the profile owner test should automatically pass.
+        Allow a few seconds after returning from provisioning, as the profile owner test should automatically pass.\n
+        \n
+        If the device is being encrypted during step 1, it will remain encrypted After this test.
+        The only way to disable the encryption is to factory reset the device.
     </string>
     <string name="provisioning_byod_profileowner">Profile owner installed</string>
     <string name="provisioning_byod_diskencryption">Full disk encryption enabled</string>
