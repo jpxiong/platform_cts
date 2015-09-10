@@ -31,7 +31,6 @@ LOCAL_SRC_FILES := \
 		android_security_cts_SELinuxTest.cpp \
 		android_security_cts_MMapExecutableTest.cpp \
 		android_security_cts_EncryptionTest.cpp \
-		android_security_cts_NetlinkSocket.cpp \
 		android_security_cts_AudioPolicyBinderTest.cpp \
 		android_security_cts_StagefrightTest.cpp
 
