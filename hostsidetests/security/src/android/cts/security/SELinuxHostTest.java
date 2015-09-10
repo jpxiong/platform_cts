@@ -89,8 +89,8 @@ public class SELinuxHostTest extends DeviceTestCase {
     public void testAllEnforcing() throws Exception {
 
         /* run sepolicy-analyze permissive check on policy file */
-        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(), "-p", "-P",
-                devicePolicyFile.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
+                devicePolicyFile.getAbsolutePath(), "permissive");
         pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -117,8 +117,8 @@ public class SELinuxHostTest extends DeviceTestCase {
 
         /* run sepolicy-analyze neverallow check on policy file using given neverallow rules */
         ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
-                "-n", neverallowRules.getAbsolutePath(), "-P",
-                devicePolicyFile.getAbsolutePath());
+                    devicePolicyFile.getAbsolutePath(), "neverallow", "-f",
+                    neverallowRules.getAbsolutePath());
         pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         pb.redirectErrorStream(true);
         Process p = pb.start();
