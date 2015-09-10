@@ -54,12 +54,9 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
 
     private static final String RUNNER = "android.test.InstrumentationTestRunner";
 
-    private static final String[] REQUIRED_DEVICE_FEATURES = new String[] {
-        "android.software.managed_users",
-        "android.software.device_admin" };
-
     private CtsBuildHelper mCtsBuild;
 
+    private HashSet<String> mAvailableFeatures;
     protected boolean mHasFeature;
 
     @Override
@@ -72,7 +69,7 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         super.setUp();
         assertNotNull(mCtsBuild);  // ensure build has been set before test is run.
         mHasFeature = getDevice().getApiLevel() >= 21 /* Build.VERSION_CODES.L */
-                && hasDeviceFeatures(REQUIRED_DEVICE_FEATURES);
+                && hasDeviceFeature("android.software.device_admin");
     }
 
     protected void installApp(String fileName)
@@ -247,32 +244,30 @@ public class BaseDevicePolicyTest extends DeviceTestCase implements IBuildReceiv
         }
     }
 
-    private boolean hasDeviceFeatures(String[] requiredFeatures)
-            throws DeviceNotAvailableException {
-        // TODO: Move this logic to ITestDevice.
-        String command = "pm list features";
-        String commandOutput = getDevice().executeShellCommand(command);
-        CLog.i("Output for command " + command + ": " + commandOutput);
+    protected boolean hasDeviceFeature(String requiredFeature) throws DeviceNotAvailableException {
+        if (mAvailableFeatures == null) {
+            // TODO: Move this logic to ITestDevice.
+            String command = "pm list features";
+            String commandOutput = getDevice().executeShellCommand(command);
+            CLog.i("Output for command " + command + ": " + commandOutput);
 
-        // Extract the id of the new user.
-        HashSet<String> availableFeatures = new HashSet<String>();
-        for (String feature: commandOutput.split("\\s+")) {
-            // Each line in the output of the command has the format "feature:{FEATURE_VALUE}".
-            String[] tokens = feature.split(":");
-            assertTrue("\"" + feature + "\" expected to have format feature:{FEATURE_VALUE}",
-                    tokens.length > 1);
-            assertEquals(feature, "feature", tokens[0]);
-            availableFeatures.add(tokens[1]);
-        }
-
-        for (String requiredFeature : requiredFeatures) {
-            if(!availableFeatures.contains(requiredFeature)) {
-                CLog.logAndDisplay(LogLevel.INFO, "Device doesn't have required feature "
-                        + requiredFeature + ". Tests won't run.");
-                return false;
+            // Extract the id of the new user.
+            mAvailableFeatures = new HashSet<>();
+            for (String feature: commandOutput.split("\\s+")) {
+                // Each line in the output of the command has the format "feature:{FEATURE_VALUE}".
+                String[] tokens = feature.split(":");
+                assertTrue("\"" + feature + "\" expected to have format feature:{FEATURE_VALUE}",
+                        tokens.length > 1);
+                assertEquals(feature, "feature", tokens[0]);
+                mAvailableFeatures.add(tokens[1]);
             }
         }
-        return true;
+        boolean result = mAvailableFeatures.contains(requiredFeature);
+        if (!result) {
+            CLog.logAndDisplay(LogLevel.INFO, "Device doesn't have required feature "
+            + requiredFeature + ". Test won't run.");
+        }
+        return result;
     }
 
     protected int createUser() throws Exception {
