@@ -75,6 +75,8 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mDeviceAdminVisibleTest;
     private TestItem mWorkAppVisibleTest;
     private TestItem mCrossProfileIntentFiltersTest;
+    private TestItem mDisableNonMarketTest;
+    private TestItem mEnableNonMarketTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +181,16 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
             }
         };
 
+        mDisableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_deny,
+                R.string.provisioning_byod_nonmarket_deny_info,
+                new Intent(ByodHelperActivity.ACTION_INSTALL_APK)
+                        .putExtra(ByodHelperActivity.EXTRA_ALLOW_NON_MARKET_APPS, false));
+
+        mEnableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_allow,
+                R.string.provisioning_byod_nonmarket_allow_info,
+                new Intent(ByodHelperActivity.ACTION_INSTALL_APK)
+                        .putExtra(ByodHelperActivity.EXTRA_ALLOW_NON_MARKET_APPS, true));
+
         Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
         Intent chooser = Intent.createChooser(intent, getResources().getString(R.string.provisioning_cross_profile_chooser));
         mCrossProfileIntentFiltersTest = new TestItem(this,
@@ -191,6 +203,8 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         mTests.add(mDeviceAdminVisibleTest);
         mTests.add(mWorkAppVisibleTest);
         mTests.add(mCrossProfileIntentFiltersTest);
+        mTests.add(mDisableNonMarketTest);
+        mTests.add(mEnableNonMarketTest);
     }
 
     @Override
@@ -389,5 +403,4 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
             return view;
         }
     }
-
 }

@@ -1100,6 +1100,20 @@
     <string name="widget_pass">Pass</string>
     <string name="widget_fail">Fail</string>
 
+    <string name="provisioning_byod_nonmarket_allow">Enable non-market apps</string>
+    <string name="provisioning_byod_nonmarket_allow_info">
+        This test verifies that non-market apps can be installed if permitted.\n
+        1. A package installation UI should appear.\n
+        2. Accept the package and verify that it installs.
+    </string>
+
+    <string name="provisioning_byod_nonmarket_deny">Disable non-market apps</string>
+    <string name="provisioning_byod_nonmarket_deny_info">
+        This test verifies that non-market apps cannot be installed unless permitted.\n
+        1. A package installation UI should appear.\n
+        2. Verify that the installation of the package is refused.
+    </string>
+
     <!-- Strings for DeskClock -->
     <string name="deskclock_tests">Alarms and Timers Tests</string>
     <string name="deskclock_tests_info">

@@ -1374,6 +1374,7 @@
             <intent-filter>
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_QUERY" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_REMOVE" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_INSTALL_APK" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
