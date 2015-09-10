@@ -26,9 +26,10 @@ import com.android.tradefed.testtype.IBuildReceiver;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.FileOutputStream;
 import java.lang.String;
 import java.net.URL;
 import java.util.Scanner;
@@ -42,15 +43,42 @@ import java.util.Scanner;
  */
 public class SELinuxHostTest extends DeviceTestCase {
 
+    private File sepolicyAnalyze;
+    private File devicePolicyFile;
+
     /**
      * A reference to the device under test.
      */
     private ITestDevice mDevice;
 
+    private File copyResourceToTempFile(String resName) throws IOException {
+        InputStream is = this.getClass().getResourceAsStream(resName);
+        File tempFile = File.createTempFile("SELinuxHostTest", ".tmp");
+        FileOutputStream os = new FileOutputStream(tempFile);
+        int rByte = 0;
+        while ((rByte = is.read()) != -1) {
+            os.write(rByte);
+        }
+        os.flush();
+        os.close();
+        tempFile.deleteOnExit();
+        return tempFile;
+    }
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
         mDevice = getDevice();
+
+        /* retrieve the sepolicy-analyze executable from jar */
+        sepolicyAnalyze = copyResourceToTempFile("/sepolicy-analyze");
+        sepolicyAnalyze.setExecutable(true);
+
+        /* obtain sepolicy file from running device */
+        devicePolicyFile = File.createTempFile("sepolicy", ".tmp");
+        devicePolicyFile.deleteOnExit();
+        mDevice.executeAdbCommand("pull", "/sys/fs/selinux/policy",
+                devicePolicyFile.getAbsolutePath());
     }
 
     /**
@@ -60,25 +88,9 @@ public class SELinuxHostTest extends DeviceTestCase {
      */
     public void testAllEnforcing() throws Exception {
 
-        /* retrieve the sepolicy-analyze executable from jar */
-        InputStream is = this.getClass().getResourceAsStream("/sepolicy-analyze");
-        File execFile = File.createTempFile("sepolicy-analyze", ".tmp");
-        FileOutputStream os = new FileOutputStream(execFile);
-        int rByte = 0;
-        while ((rByte = is.read()) != -1) {
-            os.write(rByte);
-        }
-        os.flush();
-        os.close();
-        execFile.setExecutable(true);
-
-        /* obtain sepolicy file from running device */
-        File policyFile = File.createTempFile("sepolicy", ".tmp");
-        mDevice.executeAdbCommand("pull", "/sys/fs/selinux/policy", policyFile.getAbsolutePath());
-
         /* run sepolicy-analyze permissive check on policy file */
-        ProcessBuilder pb = new ProcessBuilder(execFile.getAbsolutePath(), "-p", "-P",
-                policyFile.getAbsolutePath());
+        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(), "-p", "-P",
+                devicePolicyFile.getAbsolutePath());
         pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
         pb.redirectErrorStream(true);
         Process p = pb.start();
@@ -90,11 +102,35 @@ public class SELinuxHostTest extends DeviceTestCase {
             errorString.append(line);
             errorString.append("\n");
         }
-
-        /* clean up and check condition */
-        execFile.delete();
-        policyFile.delete();
         assertTrue("The following SELinux domains were found to be in permissive mode:\n"
                    + errorString, errorString.length() == 0);
+    }
+
+    /**
+     * Checks the policy running on-device against a set of neverallow rules
+     *
+     * @throws Exception
+     */
+    public void testNeverallowRules() throws Exception {
+
+        File neverallowRules = copyResourceToTempFile("/general_sepolicy.conf");
+
+        /* run sepolicy-analyze neverallow check on policy file using given neverallow rules */
+        ProcessBuilder pb = new ProcessBuilder(sepolicyAnalyze.getAbsolutePath(),
+                "-n", neverallowRules.getAbsolutePath(), "-P",
+                devicePolicyFile.getAbsolutePath());
+        pb.redirectOutput(ProcessBuilder.Redirect.PIPE);
+        pb.redirectErrorStream(true);
+        Process p = pb.start();
+        p.waitFor();
+        BufferedReader result = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String line;
+        StringBuilder errorString = new StringBuilder();
+        while ((line = result.readLine()) != null) {
+            errorString.append(line);
+            errorString.append("\n");
+        }
+        assertTrue("The following errors were encountered when validating the SELinux"
+                   + "neverallow rules:\n" + errorString, errorString.length() == 0);
     }
 }
