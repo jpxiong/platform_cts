@@ -155,22 +155,6 @@
   bug: 17508787
 },
 {
-  description: "New tests recently added for Android Enterprise. To be moved out of CTS-staging as soon as they show that they are stable",
-  names: [
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testApplicationRestrictions",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testCaCertManagement",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testDeviceOwnerSetup",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testPersistentIntentResolving",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testScreenCaptureDisabled",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testManagedProfileSetup",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testWipeData",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileIntentFilters",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testCrossProfileContent",
-    "com.android.cts.devicepolicy.ManagedProfileTest#testNoDebuggingFeaturesRestriction",
-    "com.android.cts.devicepolicy.DeviceOwnerTest#testLockTask"
-  ]
-},
-{
 
   description: "These tests fail on some devices.",
   names: [
