@@ -1288,7 +1288,7 @@
         Go to All Apps screen and scroll through it to confirm that:\n
         \n
         - A new set of work apps including CTS Verifier appear in the list.\n
-        - Work badge overlay appears on work app\'s icon.\n
+        - Work badge overlay appears on work app\'s icon (see example icon below).\n
         \n
         Then navigate back to this screen using Recents button.
     </string>

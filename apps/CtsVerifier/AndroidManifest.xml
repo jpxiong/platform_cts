@@ -1365,6 +1365,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".managedprovisioning.ByodIconSamplerActivity">
+            <intent-filter>
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_SAMPLE_ICON" />
+                <category android:name="android.intent.category.DEFAULT"></category>
+            </intent-filter>
+        </activity>
+
         <activity android:name=".managedprovisioning.CrossProfileTestActivity">
             <intent-filter>
                 <action android:name="com.android.cts.verifier.managedprovisioning.CROSS_PROFILE" />

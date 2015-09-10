@@ -29,10 +29,12 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -162,9 +164,20 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 R.string.provisioning_byod_admin_visible_instruction,
                 new Intent(Settings.ACTION_SECURITY_SETTINGS));
 
+        /*
+         * To keep the image in this test up to date, use the instructions in
+         * {@link ByodIconSamplerActivity}.
+         */
         mWorkAppVisibleTest = new TestItem(this, R.string.provisioning_byod_workapps_visible,
-                R.string.provisioning_byod_workapps_visible_instruction,
-                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME));
+                R.string.provisioning_byod_profile_visible_instruction,
+                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)) {
+            @Override
+            public View getCustomView() {
+                LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
+                return layoutInflater.inflate(R.layout.byod_custom_view_badged_icons,
+                        null /* root */);
+            }
+        };
 
         Intent intent = new Intent(CrossProfileTestActivity.ACTION_CROSS_PROFILE);
         Intent chooser = Intent.createChooser(intent, getResources().getString(R.string.provisioning_cross_profile_chooser));
@@ -188,25 +201,31 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     }
 
     private void showManualTestDialog(final TestItem test) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_info)
-                .setMessage(test.getManualTestInstruction())
+                .setTitle(R.string.provisioning_byod)
                 .setNeutralButton(R.string.provisioning_byod_go, null)
-                .setPositiveButton(R.string.pass_button_text, new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.pass_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setTestResult(test, TestResult.Passed);
                     }
                 })
-                .setNegativeButton(R.string.fail_button_text, new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.fail_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setTestResult(test, TestResult.Failed);
                     }
-                })
-                .create();
-        dialog.show();
-
+                });
+        View customView = test.getCustomView();
+        if (customView != null) {
+            dialogBuilder.setView(customView);
+        } else {
+            dialogBuilder.setMessage(test.getManualTestInstruction());
+        }
+        AlertDialog dialog = dialogBuilder.show();
+        // Note: Setting the OnClickListener on the Dialog rather than the Builder, prevents the
+        // dialog being dismissed on onClick.
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -335,6 +354,10 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
         public Intent getManualTestIntent() {
             return mManualIntent;
+        }
+
+        public View getCustomView() {
+            return null;
         }
     }
 
