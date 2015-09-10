@@ -268,6 +268,7 @@ public class CameraVideoActivity extends PassFailButtons.Activity
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     isPlayingBack = false;
+                    mPlaybackView.stopPlayback();
                     captureButton.setEnabled(true);
                     mStatusLabel.setText(getResources().getString(R.string.status_ready));
                 }
