@@ -77,6 +77,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mCrossProfileIntentFiltersTest;
     private TestItem mDisableNonMarketTest;
     private TestItem mEnableNonMarketTest;
+    private TestItem mWorkNotificationBadgedTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,16 +171,17 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
          * To keep the image in this test up to date, use the instructions in
          * {@link ByodIconSamplerActivity}.
          */
-        mWorkAppVisibleTest = new TestItem(this, R.string.provisioning_byod_workapps_visible,
+        mWorkAppVisibleTest = new TestItemWithIcon(this,
+                R.string.provisioning_byod_workapps_visible,
                 R.string.provisioning_byod_profile_visible_instruction,
-                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)) {
-            @Override
-            public View getCustomView() {
-                LayoutInflater layoutInflater = LayoutInflater.from(getApplicationContext());
-                return layoutInflater.inflate(R.layout.byod_custom_view_badged_icons,
-                        null /* root */);
-            }
-        };
+                new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),
+                R.drawable.badged_icon);
+
+        mWorkNotificationBadgedTest = new TestItemWithIcon(this,
+                R.string.provisioning_byod_work_notification,
+                R.string.provisioning_byod_work_notification_instruction,
+                new Intent(WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION),
+                R.drawable.ic_corp_icon);
 
         mDisableNonMarketTest = new TestItem(this, R.string.provisioning_byod_nonmarket_deny,
                 R.string.provisioning_byod_nonmarket_deny_info,
@@ -202,6 +204,7 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         mTests.add(mProfileVisibleTest);
         mTests.add(mDeviceAdminVisibleTest);
         mTests.add(mWorkAppVisibleTest);
+        mTests.add(mWorkNotificationBadgedTest);
         mTests.add(mCrossProfileIntentFiltersTest);
         mTests.add(mDisableNonMarketTest);
         mTests.add(mEnableNonMarketTest);
@@ -222,12 +225,14 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 .setPositiveButton(R.string.pass_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        clearRemainingState(test);
                         setTestResult(test, TestResult.Passed);
                     }
                 })
                 .setNegativeButton(R.string.fail_button_text, new AlertDialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        clearRemainingState(test);
                         setTestResult(test, TestResult.Failed);
                     }
                 });
@@ -246,6 +251,14 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
                 ByodFlowTestActivity.this.startActivity(test.getManualTestIntent());
             }
         });
+    }
+
+    private void clearRemainingState(final TestItem test) {
+        if (WorkNotificationTestActivity.ACTION_WORK_NOTIFICATION.equals(
+                test.getManualTestIntent().getAction())) {
+            ByodFlowTestActivity.this.startActivity(new Intent(
+                    WorkNotificationTestActivity.ACTION_CLEAR_WORK_NOTIFICATION));
+        }
     }
 
     private void setTestResult(TestItem test, TestResult result) {
@@ -304,6 +317,10 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         // can respond (via cross-profile intent filter)
         getPackageManager().setComponentEnabledSetting(new ComponentName(
                 this, ByodHelperActivity.class),
+                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        getPackageManager().setComponentEnabledSetting(new ComponentName(
+                this, WorkNotificationTestActivity.class),
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
     }
@@ -372,6 +389,29 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
 
         public View getCustomView() {
             return null;
+        }
+    }
+
+    static class TestItemWithIcon extends TestItem {
+
+        private int mImageResId;
+        private Context mContext;
+
+        public TestItemWithIcon(Context context, int nameResId, int testInstructionResId,
+                Intent testIntent, int imageResId) {
+            super(context, nameResId, testInstructionResId, testIntent);
+            mContext = context;
+            mImageResId = imageResId;
+        }
+
+        @Override
+        public View getCustomView() {
+            LayoutInflater layoutInflater = LayoutInflater.from(mContext);
+            View view = layoutInflater.inflate(R.layout.byod_custom_view,
+                    null /* root */);
+            ((ImageView) view.findViewById(R.id.sample_icon)).setImageResource(mImageResId);
+            ((TextView) view.findViewById(R.id.message)).setText(getManualTestInstruction());
+            return view;
         }
     }
 

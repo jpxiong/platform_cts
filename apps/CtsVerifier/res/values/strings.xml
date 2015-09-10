@@ -1283,6 +1283,13 @@
         \n
         Verify that you are prompted with the above choices and both options work as intended. Then mark this test accordingly.
     </string>
+    <string name="provisioning_byod_work_notification">Work notification is badged</string>
+    <string name="provisioning_byod_work_notification_instruction">
+        Please press the Go button to trigger a notification.\n
+        \n
+        Verify that the notification is badged (see sample badge below). Then mark this test accordingly.
+    </string>
+    <string name="provisioning_byod_work_notification_title">This is a work notification</string>
     <string name="provisioning_byod_profile_visible_instruction">
         Please press the Go button to open the Settings page.
         Navigate to Accounts and confirm that:\n
