@@ -155,7 +155,24 @@
   bug: 17508787
 },
 {
-
+  description: "New tests recently added for Android Enterprise. To be moved out of CTS-staging as soon as they show that they are stable",
+  names: [
+    "com.android.cts.devicepolicy.LauncherAppsMultiUserTest#testGetActivitiesForNonProfileFails",
+    "com.android.cts.devicepolicy.LauncherAppsMultiUserTest#testNoLauncherCallbackPackageAddedSecondaryUser",
+    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testGetActivitiesWithProfile",
+    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageAddedProfile",
+    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageRemovedProfile",
+    "com.android.cts.devicepolicy.LauncherAppsProfileTest#testLauncherCallbackPackageChangedProfile",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testInstallAppMainUser",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageAddedMainUser",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageRemovedMainUser",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherCallbackPackageChangedMainUser",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLauncherNonExportedAppFails",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLaunchNonExportActivityFails",
+    "com.android.cts.devicepolicy.LauncherAppsSingleUserTest#testLaunchMainActivity"
+  ]
+},
+{
   description: "These tests fail on some devices.",
   names: [
     "android.uirendering.cts.testclasses.ExactCanvasTests#testBlueRect",
