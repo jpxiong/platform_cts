@@ -16,19 +16,16 @@
 
 package android.media.cts;
 
-import android.cts.util.CtsAndroidTestCase;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTimestamp;
 import android.media.AudioTrack;
+import android.test.AndroidTestCase;
 import android.util.Log;
-import com.android.cts.util.ReportLog;
-import com.android.cts.util.ResultType;
-import com.android.cts.util.ResultUnit;
 
 import java.nio.ByteBuffer;
 
-public class AudioTrackTest extends CtsAndroidTestCase {
+public class AudioTrackTest extends AndroidTestCase {
     private String TAG = "AudioTrackTest";
     private final long WAIT_MSEC = 200;
     private final int OFFSET_DEFAULT = 0;
@@ -1372,127 +1369,70 @@ public class AudioTrackTest extends CtsAndroidTestCase {
         // constants for test
         final String TEST_NAME = "testGetTimestamp";
         final int TEST_SR = 22050;
-        final int TEST_CONF = AudioFormat.CHANNEL_OUT_MONO;
+        final int TEST_CONF = AudioFormat.CHANNEL_CONFIGURATION_MONO;
         final int TEST_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
         final int TEST_MODE = AudioTrack.MODE_STREAM;
         final int TEST_STREAM_TYPE = AudioManager.STREAM_MUSIC;
         final int TEST_LOOP_CNT = 10;
-        // For jitter we allow 30 msec in frames.  This is a large margin.
-        // Often this is just 0 or 1 frames, but that can depend on hardware.
-        final int TEST_JITTER_FRAMES_ALLOWED = TEST_SR * 30 / 1000;
+
+        final int MILLIS_PER_SEC = 1000;
+        final int NANOS_PER_MILLI = 1000000;
 
         // -------- initialization --------------
-        final int bytesPerFrame =
-                AudioFormat.getBytesPerSample(TEST_FORMAT)
-                * AudioFormat.channelCountFromOutChannelMask(TEST_CONF);
-        final int minBufferSizeInBytes =
+        final int BYTES_PER_FRAME = 2;
+        final int FRAMES_PER_100_MILLIS =
                 AudioTrack.getMinBufferSize(TEST_SR, TEST_CONF, TEST_FORMAT);
-        final int bufferSizeInBytes = minBufferSizeInBytes * 3;
-        byte[] data = new byte[bufferSizeInBytes];
+        final int FRAMES_PER_SEC = FRAMES_PER_100_MILLIS * 10;
+        byte[] data = new byte[FRAMES_PER_100_MILLIS * BYTES_PER_FRAME];
         AudioTrack track = new AudioTrack(TEST_STREAM_TYPE, TEST_SR, TEST_CONF, TEST_FORMAT,
-                minBufferSizeInBytes, TEST_MODE);
+                 FRAMES_PER_SEC * BYTES_PER_FRAME, TEST_MODE);
         // -------- test --------------
         assertTrue(TEST_NAME, track.getState() == AudioTrack.STATE_INITIALIZED);
 
+        long framesWritten = 0, framesSeen = 0, framesPresented = 0;
+        long lastFramesPresented = 0, lastFrameTime = 0, lastOutputFrequency = FRAMES_PER_SEC;
         AudioTimestamp timestamp = new AudioTimestamp();
-        boolean hasPlayed = false;
 
-        long framesWritten = 0, lastFramesPresented = 0, lastFramesPresentedAt = 0;
-        int cumulativeJitterCount = 0;
-        float cumulativeJitter = 0;
-        float maxJitter = 0;
         for (int i = 0; i < TEST_LOOP_CNT; i++) {
-            final long writeTime = System.nanoTime();
-
-            for (int written = 0; written < data.length;) {
-                int ret = track.write(data, written,
-                        Math.min(data.length - written, minBufferSizeInBytes));
-                assertTrue(TEST_NAME, ret >= 0);
-                written += ret;
-                if (!hasPlayed) {
-                    track.play();
-                    hasPlayed = true;
-                }
-            }
-            framesWritten += data.length / bytesPerFrame;
-
-            // track.getTimestamp may return false if there are no physical HAL outputs.
-            // This may occur on TV devices without connecting an HDMI monitor.
-            // It may also be true immediately after start-up, as the mixing thread could
-            // be idle, but since we've already pushed much more than the minimum buffer size,
-            // that is unlikely.
-            // Nevertheless, we don't want to have unnecessary failures, so we ignore the
-            // first iteration if we don't get a timestamp.
-            final boolean result = track.getTimestamp(timestamp);
-            assertTrue(TEST_NAME, result || i == 0);
-            if (!result) {
-                continue;
+            for (int j = 0; j < FRAMES_PER_SEC; j += FRAMES_PER_100_MILLIS) {
+                track.write(data, 0, data.length);
+                framesWritten += FRAMES_PER_100_MILLIS;
             }
 
-            final long framesPresented = timestamp.framePosition;
-            final long framesPresentedAt = timestamp.nanoTime;
+            track.play();
+            Thread.sleep(MILLIS_PER_SEC);
+            track.pause();
 
-            // We read timestamp here to ensure that seen is greater than presented.
-            // This is an "on-the-fly" read without pausing because pausing may cause the
-            // timestamp to become stale and affect our jitter measurements.
-            final int framesSeen = track.getPlaybackHeadPosition();
+            framesSeen = track.getPlaybackHeadPosition();
             assertTrue(TEST_NAME, framesWritten >= framesSeen);
+
+            assertTrue(TEST_NAME, track.getTimestamp(timestamp));
+            framesPresented = timestamp.framePosition;
             assertTrue(TEST_NAME, framesSeen >= framesPresented);
 
-            if (i > 1) { // need delta info from previous iteration (skipping first)
-                final long deltaFrames = framesPresented - lastFramesPresented;
-                final long deltaTime = framesPresentedAt - lastFramesPresentedAt;
-                final long NANOSECONDS_PER_SECOND = 1000000000;
-                final long expectedFrames = deltaTime * TEST_SR / NANOSECONDS_PER_SECOND;
-                final long jitterFrames = Math.abs(deltaFrames - expectedFrames);
+            // check output frequency
+            long outFrequency = framesPresented - lastFramesPresented;
+            long freqDiff = Math.abs(FRAMES_PER_SEC - outFrequency);
+            assertTrue(TEST_NAME, freqDiff < FRAMES_PER_100_MILLIS);
 
-                //Log.d(TAG, "framesWritten(" + framesWritten
-                //        + ") framesSeen(" + framesSeen
-                //        + ") framesPresented(" + framesPresented
-                //        + ") jitter(" + jitterFrames + ")");
+            // check output frequency jitter
+            freqDiff = Math.abs(outFrequency - lastOutputFrequency);
+            assertTrue(TEST_NAME, freqDiff < FRAMES_PER_100_MILLIS);
 
-                // We check that the timestamp position is reasonably accurate.
-                assertTrue(TEST_NAME, deltaTime >= 0);
-                assertTrue(TEST_NAME, deltaFrames >= 0);
-                if (i > 2) {
-                    // The first two periods may have inherent jitter as the audio pipe
-                    // is filling up. We check jitter only after that.
-                    assertTrue(TEST_NAME, jitterFrames < TEST_JITTER_FRAMES_ALLOWED);
-                    cumulativeJitter += jitterFrames;
-                    cumulativeJitterCount++;
-                    if (jitterFrames > maxJitter) {
-                        maxJitter = jitterFrames;
-                    }
-                }
-
-                //Log.d(TAG, "lastFramesPresentedAt(" + lastFramesPresentedAt
-                //        + ") writeTime(" + writeTime
-                //        + ") framesPresentedAt(" + framesPresentedAt + ")");
-
-                // We check that the timestamp time is reasonably current.
-                assertTrue(TEST_NAME, framesPresentedAt >= writeTime);
-                assertTrue(TEST_NAME, writeTime >= lastFramesPresentedAt);
-            }
             lastFramesPresented = framesPresented;
-            lastFramesPresentedAt = framesPresentedAt;
+            lastOutputFrequency = outFrequency;
+
+            long frameTime = timestamp.nanoTime;
+            assertTrue(TEST_NAME, frameTime >= lastFrameTime);
+            lastFrameTime = frameTime;
+
+            long curTime = System.nanoTime();
+            assertTrue(TEST_NAME, curTime >= frameTime);
+            assertTrue(TEST_NAME, curTime - frameTime < 100 * NANOS_PER_MILLI);
         }
-        // Full drain.
-        Thread.sleep(WAIT_MSEC);
         track.stop();
-        Thread.sleep(WAIT_MSEC);
+        // -------- tear down --------------
         track.release();
-        // Log the average jitter
-        if (cumulativeJitterCount > 0) {
-            ReportLog log = getReportLog();
-            final float averageJitterInFrames = cumulativeJitter / cumulativeJitterCount;
-            final float averageJitterInMs = averageJitterInFrames * 1000 / TEST_SR;
-            final float maxJitterInMs = maxJitter * 1000 / TEST_SR;
-            // ReportLog needs at least one Value and Summary.
-            log.printValue("Maximum Jitter", maxJitterInMs,
-                    ResultType.LOWER_BETTER, ResultUnit.MS);
-            log.printSummary("Average Jitter", averageJitterInMs,
-                    ResultType.LOWER_BETTER, ResultUnit.MS);
-        }
     }
 
 /* Do not run in JB-MR1. will be re-opened in the next platform release.
