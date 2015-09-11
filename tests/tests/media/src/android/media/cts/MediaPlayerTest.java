@@ -99,6 +99,7 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
             public boolean onError(MediaPlayer mp, int what, int extra) {
                 assertTrue(mp == mMediaPlayer);
                 assertTrue("mediaserver process died", what != MediaPlayer.MEDIA_ERROR_SERVER_DIED);
+                Log.w(LOG_TAG, "onError " + what);
                 return false;
             }
         });
@@ -116,7 +117,9 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         afd.close();
         mMediaPlayer.prepare();
         mMediaPlayer.start();
-        mOnCompletionCalled.waitForSignal();
+        if (!mOnCompletionCalled.waitForSignal(5000)) {
+            Log.w(LOG_TAG, "testIfMediaServerDied: Timed out waiting for Error/Completion");
+        }
         mMediaPlayer.release();
     }
 
