@@ -171,16 +171,16 @@ def get_available_output_sizes(fmt, props, max_size=None, match_ar_size=None):
     return out_sizes
 
 def set_filter_off_or_fast_if_possible(props, req, available_modes, filter):
-    """ Check and set controlKey to off or fast in req
+    """Check and set controlKey to off or fast in req.
 
     Args:
         props: the object returned from its.device.get_camera_properties().
-        req: the input request.
+        req: the input request. filter will be set to OFF or FAST if possible.
         available_modes: the key to check available modes.
         filter: the filter key
 
     Returns:
-        None. control_key will be set to OFF or FAST if possible.
+        Nothing.
     """
     if props.has_key(available_modes):
         if 0 in props[available_modes]:
@@ -241,18 +241,7 @@ def get_fastest_manual_capture_settings(props):
     e = min(props['android.sensor.info.exposureTimeRange'])
     req = manual_capture_request(s,e)
 
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.noiseReduction.availableNoiseReductionModes",
-        "android.noiseReduction.mode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.colorCorrection.availableAberrationModes",
-        "android.colorCorrection.aberrationMode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.hotPixel.availableHotPixelModes",
-        "android.hotPixel.mode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.edge.availableEdgeModes",
-        "android.edge.mode")
+    turn_slow_filters_off(props, req)
 
     return req, out_spec
 
