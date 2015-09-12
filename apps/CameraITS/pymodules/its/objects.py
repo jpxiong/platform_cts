@@ -123,21 +123,6 @@ def auto_capture_request():
         "android.tonemap.mode": 1,
         }
 
-def fastest_auto_capture_request(props):
-    """Return an auto capture request for the fastest capture.
-
-    Args:
-        props: the object returned from its.device.get_camera_properties().
-
-    Returns:
-        A capture request with everything set to auto and all filters that
-            may slow down capture set to OFF or FAST if possible
-    """
-    req = auto_capture_request()
-    turn_slow_filters_off(props, req)
-
-    return req
-
 def get_available_output_sizes(fmt, props):
     """Return a sorted list of available output sizes for a given format.
 
@@ -158,49 +143,22 @@ def get_available_output_sizes(fmt, props):
     return out_sizes
 
 def set_filter_off_or_fast_if_possible(props, req, available_modes, filter):
-    """Check and set controlKey to off or fast in req.
+    """ Check and set controlKey to off or fast in req
 
     Args:
         props: the object returned from its.device.get_camera_properties().
-        req: the input request. filter will be set to OFF or FAST if possible.
+        req: the input request.
         available_modes: the key to check available modes.
         filter: the filter key
 
     Returns:
-        Nothing.
+        None. control_key will be set to OFF or FAST if possible.
     """
     if props.has_key(available_modes):
         if 0 in props[available_modes]:
             req[filter] = 0
         elif 1 in props[available_modes]:
             req[filter] = 1
-
-def turn_slow_filters_off(props, req):
-    """Turn filters that may slow FPS down to OFF or FAST in input request.
-
-    This function modifies the request argument, such that filters that may
-    reduce the frames-per-second throughput of the camera device will be set to
-    OFF or FAST if possible.
-
-    Args:
-        props: the object returned from its.device.get_camera_properties().
-        req: the input request.
-
-    Returns:
-        Nothing.
-    """
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.noiseReduction.availableNoiseReductionModes",
-        "android.noiseReduction.mode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.colorCorrection.availableAberrationModes",
-        "android.colorCorrection.aberrationMode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.hotPixel.availableHotPixelModes",
-        "android.hotPixel.mode")
-    set_filter_off_or_fast_if_possible(props, req,
-        "android.edge.availableEdgeModes",
-        "android.edge.mode")
 
 def get_fastest_manual_capture_settings(props):
     """Return a capture request and format spec for the fastest capture.
@@ -220,7 +178,18 @@ def get_fastest_manual_capture_settings(props):
     e = min(props['android.sensor.info.exposureTimeRange'])
     req = manual_capture_request(s,e)
 
-    turn_slow_filters_off(props, req)
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.noiseReduction.availableNoiseReductionModes",
+        "android.noiseReduction.mode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.colorCorrection.availableAberrationModes",
+        "android.colorCorrection.aberrationMode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.hotPixel.availableHotPixelModes",
+        "android.hotPixel.mode")
+    set_filter_off_or_fast_if_possible(props, req,
+        "android.edge.availableEdgeModes",
+        "android.edge.mode")
 
     return req, out_spec
 
