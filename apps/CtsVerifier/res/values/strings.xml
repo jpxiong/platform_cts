@@ -1267,8 +1267,8 @@
     </string>
     <string name="provisioning_byod_profileowner">Profile owner installed</string>
     <string name="provisioning_byod_diskencryption">Full disk encryption enabled</string>
-    <string name="provisioning_byod_profile_visible">Work profile visible in Settings</string>
-    <string name="provisioning_byod_admin_visible">Device administrator visible in Settings</string>
+    <string name="provisioning_byod_profile_visible">Profile-aware accounts settings</string>
+    <string name="provisioning_byod_admin_visible">Profile-aware device administrator settings</string>
     <string name="provisioning_byod_workapps_visible">Badged work apps visible in Launcher</string>
     <string name="provisioning_byod_cross_profile">Open app cross profiles</string>
     <string name="provisioning_byod_cross_profile_app_personal">
@@ -1317,6 +1317,47 @@
         \n
         Then navigate back to this screen using Recents button.
     </string>
+
+    <string name="provisioning_byod_app_settings">Profile-aware app settings</string>
+    <string name="provisioning_byod_app_settings_instruction">
+        Please press the Go button to open Apps page in settings.\n
+        \n
+        Verify that work profile exists in the dropdown list and selecting it will
+        bring up apps setting in the work profile.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
+    <string name="provisioning_byod_location_settings">Profile-aware location settings</string>
+    <string name="provisioning_byod_location_settings_instruction">
+        Please press the Go button to open Location page in settings.\n
+        \n
+        Verify that work profile entry exists in the page.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
+    <string name="provisioning_byod_cred_settings">Profile-aware trusted credential settings</string>
+    <string name="provisioning_byod_cred_settings_instruction">
+        Please press the Go button to open the Security settings.
+        Navigate to "Trusted credentials" and wait for the UI to load.
+        After the list is loaded, confirm that:\n
+        \n
+        The page list credentials for both "Personal" and "Work" profiles.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
+    <string name="provisioning_byod_print_settings">Profile-aware printing settings</string>
+    <string name="provisioning_byod_print_settings_instruction">
+        Please press the Go button to open the Printing settings.
+        \n
+        Verify that work profile exists in the dropdown list and selecting it will
+        bring up printing setting in the work profile.\n
+        \n
+        Then use the Back button to return to this test and mark accordingly.
+    </string>
+
     <string name="provisioning_byod_no_activity">Cannot communicate with activity in the work profile.</string>
     <string name="provisioning_byod_delete_profile">Initiate deletion of work profile.</string>
     <string name="provisioning_byod_profile_deleted">Work profile deleted.</string>
