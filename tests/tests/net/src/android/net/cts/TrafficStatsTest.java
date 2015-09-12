@@ -34,7 +34,6 @@ import java.util.concurrent.TimeUnit;
 
 public class TrafficStatsTest extends AndroidTestCase {
     private static final String LOG_TAG = "TrafficStatsTest";
-
     public void testValidMobileStats() {
         // We can't assume a mobile network is even present in this test, so
         // we simply assert that a valid value is returned.
@@ -206,6 +205,17 @@ public class TrafficStatsTest extends AndroidTestCase {
          */
         final int maxExpectedExtraPackets = 7;
         final int minExpectedExtraPackets = 5;
+
+        // Some other tests don't cleanup connections correctly.
+        // They have the same UID, so we discount their lingering traffic
+        // which happens only on non-localhost, such as TCP FIN retranmission packets
+        long deltaTxOtherPackets = (totalTxPacketsAfter - totalTxPacketsBefore) - uidTxDeltaPackets;
+        long deltaRxOtherPackets = (totalRxPacketsAfter - totalRxPacketsBefore) - uidRxDeltaPackets;
+        if (deltaTxOtherPackets > 0 || deltaRxOtherPackets > 0) {
+            Log.i(LOG_TAG, "lingering traffic data: " + deltaTxOtherPackets + "/" + deltaRxOtherPackets);
+            // Make sure that not too many non-localhost packets are accounted for
+            assertTrue("too many non-localhost packets on the sam UID", deltaTxOtherPackets + deltaTxOtherPackets < 20);
+        }
 
         // Some other tests don't cleanup connections correctly.
         // They have the same UID, so we discount their lingering traffic
