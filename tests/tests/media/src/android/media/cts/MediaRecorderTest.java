@@ -226,10 +226,12 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         camera.unlock();
         mMediaRecorder.setCamera(camera);
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        if (hasMicrophone()) {
+            mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        }
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
         mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.DEFAULT);
-        mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
         mMediaRecorder.setVideoFrameRate(frameRate);
         mMediaRecorder.setVideoSize(mVideoWidth, mVideoHeight);
         mMediaRecorder.setPreviewDisplay(mActivity.getSurfaceHolder().getSurface());
@@ -249,6 +251,9 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         int targetDurMs = timelapse? ((int) (durMs * (captureRate / frameRate))): durMs;
         boolean hasVideo = true;
         boolean hasAudio = timelapse? false: true;
+        if (!hasMicrophone()) {
+            hasAudio = false;
+        }
         checkTracksAndDuration(targetDurMs, hasVideo, hasAudio, fileName);
     }
 
