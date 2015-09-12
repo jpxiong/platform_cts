@@ -118,7 +118,7 @@ public class TestSensorEventListener implements SensorEventListener2 {
     @Override
     public void onFlushCompleted(Sensor sensor) {
         CountDownLatch latch = mFlushLatch;
-        mFlushLatch = new CountDownLatch(1);
+        mFlushLatch = null;
         if(latch != null) {
             latch.countDown();
         }
