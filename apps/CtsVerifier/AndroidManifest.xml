@@ -356,8 +356,7 @@
                        android:value="android.hardware.bluetooth_le"/>
         </activity -->
 
-        <!-- TODO: Enable when test quality issues listed in b/18282549 is resolved -->
-        <!-- activity android:name=".bluetooth.BleScannerTestActivity"
+        <activity android:name=".bluetooth.BleScannerTestActivity"
                 android:label="@string/ble_scanner_test_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
@@ -368,7 +367,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
             <meta-data android:name="test_required_features"
                        android:value="android.hardware.bluetooth_le"/>
-        </activity -->
+        </activity>
 
         <activity android:name=".bluetooth.BleScannerPowerLevelActivity"
                 android:label="@string/ble_power_level_name"
@@ -381,19 +380,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
         </activity>
 
-        <activity android:name=".bluetooth.BleScannerHardwareScanFilterActivity"
-                android:label="@string/ble_scanner_scan_filter_name"
-                android:configChanges="keyboardHidden|orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/bt_le" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
-        </activity>
-
-        <!-- TODO: Enable when test quality issues listed in b/18282549 is resolved -->
-        <!-- activity android:name=".bluetooth.BleAdvertiserTestActivity"
+        <activity android:name=".bluetooth.BleAdvertiserTestActivity"
                 android:label="@string/ble_advertiser_test_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
@@ -404,21 +391,10 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BluetoothTestActivity" />
             <meta-data android:name="test_required_features"
                        android:value="android.hardware.bluetooth_le"/>
-         </activity -->
+         </activity>
 
         <activity android:name=".bluetooth.BleAdvertiserPowerLevelActivity"
                 android:label="@string/ble_power_level_name"
-                android:configChanges="keyboardHidden|orientation|screenSize">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.cts.intent.category.MANUAL_TEST" />
-            </intent-filter>
-            <meta-data android:name="test_category" android:value="@string/bt_le" />
-            <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleAdvertiserTestActivity" />
-        </activity>
-
-        <activity android:name=".bluetooth.BleAdvertiserHardwareScanFilterActivity"
-                android:label="@string/ble_advertiser_scan_filter_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
