@@ -53,7 +53,9 @@ class ItsSession(object):
     PACKAGE = 'com.android.cts.verifier.camera.its'
     INTENT_START = 'com.android.cts.verifier.camera.its.START'
     ACTION_ITS_RESULT = 'com.android.cts.verifier.camera.its.ACTION_ITS_RESULT'
+    EXTRA_CAMERA_ID = 'camera.its.extra.CAMERA_ID'
     EXTRA_SUCCESS = 'camera.its.extra.SUCCESS'
+    EXTRA_SUMMARY = 'camera.its.extra.SUMMARY'
 
     # TODO: Handle multiple connected devices.
     ADB = "adb -d"
@@ -240,6 +242,20 @@ class ItsSession(object):
         if data['tag'] != 'sensorEvents':
             raise its.error.Error('Invalid command response')
         return data['objValue']
+
+    def get_camera_ids(self):
+        """Get a list of camera device Ids that can be opened.
+
+        Returns:
+            a list of camera ID string
+        """
+        cmd = {}
+        cmd["cmdName"] = "getCameraIds"
+        self.sock.send(json.dumps(cmd) + "\n")
+        data,_ = self.__read_response_from_socket()
+        if data['tag'] != 'cameraIds':
+            raise its.error.Error('Invalid command response')
+        return data['objValue']['cameraIdArray']
 
     def get_camera_properties(self):
         """Get the camera properties object for the device.
@@ -510,21 +526,32 @@ class ItsSession(object):
             rets.append(objs if ncap>1 else objs[0])
         return rets if len(rets)>1 else rets[0]
 
-def report_result(camera_id, success):
+def report_result(camera_id, success, summary_path=None):
     """Send a pass/fail result to the device, via an intent.
 
     Args:
         camera_id: The ID string of the camera for which to report pass/fail.
         success: Boolean, indicating if the result was pass or fail.
+        summary_path: (Optional) path to ITS summary file on host PC
 
     Returns:
         Nothing.
     """
-    resultstr = "%s=%s" % (camera_id, 'True' if success else 'False')
-    _run(('%s shell am broadcast '
-          '-a %s --es %s %s') % (ItsSession.ADB, ItsSession.ACTION_ITS_RESULT,
-          ItsSession.EXTRA_SUCCESS, resultstr))
-
+    device_summary_path = "/sdcard/camera_" + camera_id + "_its_summary.txt"
+    if summary_path is not None:
+        _run("%s push %s %s" % (
+                ItsSession.ADB, summary_path, device_summary_path))
+        _run("%s shell am broadcast -a %s --es %s %s --es %s %s --es %s %s" % (
+                ItsSession.ADB, ItsSession.ACTION_ITS_RESULT,
+                ItsSession.EXTRA_CAMERA_ID, camera_id,
+                ItsSession.EXTRA_SUCCESS, 'True' if success else 'False',
+                ItsSession.EXTRA_SUMMARY, device_summary_path))
+    else:
+        _run("%s shell am broadcast -a %s --es %s %s --es %s %s --es %s %s" % (
+                ItsSession.ADB, ItsSession.ACTION_ITS_RESULT,
+                ItsSession.EXTRA_CAMERA_ID, camera_id,
+                ItsSession.EXTRA_SUCCESS, 'True' if success else 'False',
+                ItsSession.EXTRA_SUMMARY, "null"))
 
 def _run(cmd):
     """Replacement for os.system, with hiding of stdout+stderr messages.
