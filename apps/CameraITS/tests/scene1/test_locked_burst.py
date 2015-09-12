@@ -43,7 +43,7 @@ def main():
         cam.do_3a(do_af=True, lock_ae=True, lock_awb=True)
 
         # After 3A has converged, lock AE+AWB for the duration of the test.
-        req = its.objects.fastest_auto_capture_request(props)
+        req = its.objects.auto_capture_request()
         req["android.control.awbLock"] = True
         req["android.control.aeLock"] = True
 
