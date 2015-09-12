@@ -137,8 +137,11 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             Log.i(TAG, "Encoder " + mimeType + " with " + w + "," + h + " not supported");
             return;
         }
-        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false /* encoder */);
-        assertNotNull(infoDec);
+        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false);
+        if (infoDec == null) {
+            Log.i(TAG, "Codec " + mimeType + "with " + w + "," + h + " not supported");
+            return;
+        }
         mVideoWidth = w;
         mVideoHeight = h;
         initYUVPlane(w + YUV_PLANE_ADDITIONAL_LENGTH, h + YUV_PLANE_ADDITIONAL_LENGTH,
