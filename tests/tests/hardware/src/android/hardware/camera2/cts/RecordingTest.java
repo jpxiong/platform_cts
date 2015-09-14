@@ -59,7 +59,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final boolean DEBUG_DUMP = Log.isLoggable(TAG, Log.DEBUG);
     private static final int RECORDING_DURATION_MS = 3000;
     private static final int DURATION_MARGIN_MS = 600;
-    private static final int FRAME_DURATION_ERROR_TOLERANCE_MS = 3;
+    private static final double FRAME_DURATION_ERROR_TOLERANCE_MS = 3.0;
     private static final int BIT_RATE_1080P = 16000000;
     private static final int BIT_RATE_MIN = 64000;
     private static final int BIT_RATE_MAX = 40000000;
@@ -79,6 +79,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
     private static final int MAX_VIDEO_SNAPSHOT_IMAGES = 5;
     private static final int BURST_VIDEO_SNAPSHOT_NUM = 3;
     private static final int SLOWMO_SLOW_FACTOR = 4;
+    private static final int MAX_NUM_FRAME_DROP_INTERVAL_ALLOWED = 4;
     private List<Size> mSupportedVideoSizes;
     private Surface mRecordingSurface;
     private MediaRecorder mMediaRecorder;
@@ -899,7 +900,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      */
     private int validateFrameDropAroundVideoSnapshot(
             SimpleCaptureCallback resultListener, long imageTimeStamp) {
-        int expectedDurationMs = 1000 / mVideoFrameRate;
+        double expectedDurationMs = 1000.0 / mVideoFrameRate;
         CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
         while (!resultListener.hasMoreResults()) {
@@ -911,23 +912,41 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                 CaptureResult nextResult =
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
                 long nextTS = getValueNotNull(nextResult, CaptureResult.SENSOR_TIMESTAMP);
-                int durationMs = (int) (currentTS - prevTS) / 1000000;
+                double durationMs = (currentTS - prevTS) / 1000000.0;
                 int totalFramesDropped = 0;
 
                 // Snapshots in legacy mode pause the preview briefly.  Skip the duration
                 // requirements for legacy mode unless this is fixed.
                 if (!mStaticInfo.isHardwareLevelLegacy()) {
+                    mCollector.expectTrue(
+                            String.format(
+                                    "Video %dx%d Frame drop detected before video snapshot: " +
+                                            "duration %.2fms (expected %.2fms)",
+                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                    durationMs, expectedDurationMs
+                            ),
+                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_INTERVAL_ALLOWED)
+                    );
                     // Log a warning is there is any frame drop detected.
                     if (durationMs >= expectedDurationMs * 2) {
                         Log.w(TAG, String.format(
                                 "Video %dx%d Frame drop detected before video snapshot: " +
-                                        "duration %dms (expected %dms)",
+                                        "duration %.2fms (expected %.2fms)",
                                 mVideoSize.getWidth(), mVideoSize.getHeight(),
                                 durationMs, expectedDurationMs
                         ));
                     }
 
                     durationMs = (int) (nextTS - currentTS) / 1000000;
+                    mCollector.expectTrue(
+                            String.format(
+                                    "Video %dx%d Frame drop detected after video snapshot: " +
+                                            "duration %.2fms (expected %.2fms)",
+                                    mVideoSize.getWidth(), mVideoSize.getHeight(),
+                                    durationMs, expectedDurationMs
+                            ),
+                            durationMs <= (expectedDurationMs * MAX_NUM_FRAME_DROP_INTERVAL_ALLOWED)
+                    );
                     // Log a warning is there is any frame drop detected.
                     if (durationMs >= expectedDurationMs * 2) {
                         Log.w(TAG, String.format(
@@ -938,10 +957,9 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         ));
                     }
 
-                    int totalDurationMs = (int) (nextTS - prevTS) / 1000000;
-                    // Rounding and minus 2 for the expected 2 frames interval
-                    totalFramesDropped =
-                            (totalDurationMs + expectedDurationMs / 2) /expectedDurationMs - 2;
+                    double totalDurationMs = (nextTS - prevTS) / 1000000.0;
+                    // Minus 2 for the expected 2 frames interval
+                    totalFramesDropped = (int) (totalDurationMs / expectedDurationMs) - 2;
                     if (totalFramesDropped < 0) {
                         Log.w(TAG, "totalFrameDropped is " + totalFramesDropped +
                                 ". Video frame rate might be too fast.");
@@ -960,19 +978,19 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * Validate frame jittering from the input simple listener's buffered results
      */
     private void validateJittering(SimpleCaptureCallback resultListener) {
-        int expectedDurationMs = 1000 / mVideoFrameRate;
+        double expectedDurationMs = 1000.0 / mVideoFrameRate;
         CaptureResult prevResult = resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
         long prevTS = getValueNotNull(prevResult, CaptureResult.SENSOR_TIMESTAMP);
         while (!resultListener.hasMoreResults()) {
             CaptureResult currentResult =
                     resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
             long currentTS = getValueNotNull(currentResult, CaptureResult.SENSOR_TIMESTAMP);
-            int durationMs = (int) (currentTS - prevTS) / 1000000;
-            int durationError = Math.abs(durationMs - expectedDurationMs);
+            double durationMs = (currentTS - prevTS) / 1000000.0;
+            double durationError = Math.abs(durationMs - expectedDurationMs);
             long frameNumber = currentResult.getFrameNumber();
             mCollector.expectTrue(
                     String.format(
-                            "Resolution %dx%d Frame %d: jittering (%dms) exceeds bound [%dms,%dms]",
+                            "Resolution %dx%d Frame %d: jittering (%.2fms) exceeds bound [%.2fms,%.2fms]",
                             mVideoSize.getWidth(), mVideoSize.getHeight(),
                             frameNumber, durationMs,
                             expectedDurationMs - FRAME_DURATION_ERROR_TOLERANCE_MS,
