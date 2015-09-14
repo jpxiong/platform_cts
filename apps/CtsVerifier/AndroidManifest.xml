@@ -380,7 +380,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
         </activity>
 
-        <!-- Uncomment until we have a better way to validate the hardware scan filter
+        <!-- Comment out until we have a better way to validate the hardware scan filter
         <activity android:name=".bluetooth.BleScannerHardwareScanFilterActivity"
                 android:label="@string/ble_scanner_scan_filter_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
@@ -417,6 +417,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleAdvertiserTestActivity" />
         </activity>
 
+        <!-- Comment out until we have a better way to validate the hardware scan filter
         <activity android:name=".bluetooth.BleAdvertiserHardwareScanFilterActivity"
                 android:label="@string/ble_advertiser_scan_filter_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
@@ -427,6 +428,7 @@
             <meta-data android:name="test_category" android:value="@string/bt_le" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleAdvertiserTestActivity" />
         </activity>
+        -->
 
         <activity android:name=".suid.SuidFilesActivity"
                 android:label="@string/suid_files"
