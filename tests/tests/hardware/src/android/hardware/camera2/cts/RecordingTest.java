@@ -385,6 +385,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
      * given camera. preview size is set to the video size.
      */
     private void basicRecordingTestByCamera() throws Exception {
+        Size maxPreviewSize = mOrderedPreviewSizes.get(0);
         for (int profileId : mCamcorderProfileList) {
             int cameraId = Integer.valueOf(mCamera.getId());
             if (!CamcorderProfile.hasProfile(cameraId, profileId) ||
@@ -394,6 +395,12 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             CamcorderProfile profile = CamcorderProfile.get(cameraId, profileId);
             Size videoSz = new Size(profile.videoFrameWidth, profile.videoFrameHeight);
+            if (mStaticInfo.isHardwareLevelLegacy() &&
+                    (videoSz.getWidth() > maxPreviewSize.getWidth() ||
+                     videoSz.getHeight() > maxPreviewSize.getHeight())) {
+                // Skip. Legacy mode can only do recording up to max preview size
+                continue;
+            }
             assertTrue("Video size " + videoSz.toString() + " for profile ID " + profileId +
                             " must be one of the camera device supported video size!",
                             mSupportedVideoSizes.contains(videoSz));
