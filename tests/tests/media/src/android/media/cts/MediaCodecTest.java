@@ -19,6 +19,7 @@ package android.media.cts;
 import com.android.cts.media.R;
 
 import android.content.res.AssetFileDescriptor;
+import android.cts.util.MediaUtils;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -80,27 +81,28 @@ public class MediaCodecTest extends AndroidTestCase {
      * methods when called in incorrect operational states.
      */
     public void testException() throws Exception {
-        String mimeType = MediaFormat.MIMETYPE_AUDIO_AMR_WB;
-        if (!supportsCodec(mimeType, false)) {
-            Log.i(TAG, "No decoder found for mimeType= " + mimeType);
-            return;
-        }
+        boolean tested = false;
+        // audio decoder (MP3 should be present on all Android devices)
+        MediaFormat format = MediaFormat.createAudioFormat(
+                MediaFormat.MIMETYPE_AUDIO_MPEG, 44100 /* sampleRate */, 2 /* channelCount */);
+        tested = verifyException(format, false /* isEncoder */) || tested;
 
-        MediaFormat[] formatList = new MediaFormat[2];
+        // audio encoder (AMR-WB may not be present on some Android devices)
+        format = MediaFormat.createAudioFormat(
+                MediaFormat.MIMETYPE_AUDIO_AMR_WB, 16000 /* sampleRate */, 1 /* channelCount */);
+        format.setInteger(MediaFormat.KEY_BIT_RATE, 19850);
+        tested = verifyException(format, true /* isEncoder */) || tested;
 
-        // use audio format
-        formatList[0] = new MediaFormat();
-        formatList[0].setString(MediaFormat.KEY_MIME, mimeType);
-        formatList[0].setInteger(MediaFormat.KEY_SAMPLE_RATE, 16000);
-        formatList[0].setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
-        formatList[0].setInteger(MediaFormat.KEY_BIT_RATE, 19850);
+        // video decoder (H.264/AVC may not be present on some Android devices)
+        format = createMediaFormat();
+        tested = verifyException(format, false /* isEncoder */) || tested;
 
-        // use video format
-        formatList[1] = createMediaFormat();
+        // video encoder (H.264/AVC may not be present on some Android devices)
+        tested = verifyException(format, true /* isEncoder */) || tested;
 
-        for (MediaFormat format : formatList) {
-            verifyIllegalStateException(format, false);
-            verifyIllegalStateException(format, true);
+        // signal test is skipped due to no device media codecs.
+        if (!tested) {
+            MediaUtils.skipTest(TAG, "cannot find any compatible device codecs");
         }
     }
 
@@ -123,11 +125,17 @@ public class MediaCodecTest extends AndroidTestCase {
         }
     }
 
-    private static void verifyIllegalStateException(MediaFormat format, boolean isEncoder)
+    private static boolean verifyException(MediaFormat format, boolean isEncoder)
             throws IOException {
-        MediaCodec codec;
+        String mimeType = format.getString(MediaFormat.KEY_MIME);
+        if (!supportsCodec(mimeType, isEncoder)) {
+            Log.i(TAG, "No " + (isEncoder ? "encoder" : "decoder")
+                    + " found for mimeType= " + mimeType);
+            return false;
+        }
 
         // create codec (enter Initialized State)
+        MediaCodec codec;
 
         // create improperly
         final String methodName = isEncoder ? "createEncoderByType" : "createDecoderByType";
@@ -270,6 +278,7 @@ public class MediaCodecTest extends AndroidTestCase {
             fail("stop should not return MediaCodec.CodecException on wrong state");
         } catch (IllegalStateException e) { // expected
         }
+        return true;
     }
 
     /**
