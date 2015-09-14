@@ -859,7 +859,7 @@ public class ItsService extends Service implements SensorEventListener {
             Float minFocusDistance = mCameraCharacteristics.get(
                     CameraCharacteristics.LENS_INFO_MINIMUM_FOCUS_DISTANCE);
             boolean isFixedFocusLens = minFocusDistance != null && minFocusDistance == 0.0;
-            if (doAF && !isFixedFocusLens) {
+            if (doAF && isFixedFocusLens) {
                 // Send a dummy result back for the code that is waiting for this message to see
                 // that AF has converged.
                 Logt.i(TAG, "Ignoring request for AF on fixed-focus camera");
