@@ -187,14 +187,16 @@
     <!-- BLE client side strings -->
     <string name="ble_client_service_name">Bluetooth LE GATT Client Handler Service</string>
     <string name="ble_client_test_name">BLE Client Test</string>
-    <string name="ble_client_connect_name">1. BLE Client Connect</string>
-    <string name="ble_discover_service_name">2. BLE Discover Service</string>
-    <string name="ble_client_characteristic_name">3. BLE Read/Write Characteristic</string>
-    <string name="ble_reliable_write_name">4. BLE Reliable Write</string>
-    <string name="ble_notify_characteristic_name">5. BLE Notify Characteristic</string>
-    <string name="ble_client_descriptor_name">6. BLE Read/Write Descriptor</string>
-    <string name="ble_read_rssi_name">7. BLE Read RSSI</string>
-    <string name="ble_client_disconnect_name">8. BLE Client Disconnect</string>
+    <string name="ble_client_connect_name">BLE Client Connect</string>
+    <string name="ble_discover_service_name">BLE Discover Service</string>
+    <string name="ble_read_characteristic_name">BLE Read Characteristic</string>
+    <string name="ble_write_characteristic_name">BLE Write Characteristic</string>
+    <string name="ble_reliable_write_name">BLE Reliable Write</string>
+    <string name="ble_notify_characteristic_name">BLE Notify Characteristic</string>
+    <string name="ble_read_descriptor_name">BLE Read Descriptor</string>
+    <string name="ble_write_descriptor_name">BLE Write Descriptor</string>
+    <string name="ble_read_rssi_name">BLE Read RSSI</string>
+    <string name="ble_client_disconnect_name">BLE Client Disconnect</string>
     <string name="ble_client_test_info">The BLE test must be done simultaneously on two devices. This device is the client. All tests listed here must be done in order.</string>
     <string name="ble_client_send_connect_info">Type in the Bluetooth address of the remote device to connect to, and verify that the devices are connected.</string>
     <string name="ble_discover_service_info">Verify that the service is discovered when you press the "Discover Service" button.</string>
