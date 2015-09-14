@@ -25,6 +25,7 @@ extern int register_android_security_cts_LoadEffectLibraryTest(JNIEnv*);
 extern int register_android_security_cts_AudioPolicyBinderTest(JNIEnv* env);
 extern int register_android_security_cts_AudioFlingerBinderTest(JNIEnv* env);
 extern int register_android_security_cts_MediaPlayerInfoLeakTest(JNIEnv* env);
+extern int register_android_security_cts_AudioEffectBinderTest(JNIEnv* env);
 
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env = NULL;
@@ -62,6 +63,10 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     }
 
     if (register_android_security_cts_MediaPlayerInfoLeakTest(env)) {
+        return JNI_ERR;
+    }
+
+    if (register_android_security_cts_AudioEffectBinderTest(env)) {
         return JNI_ERR;
     }
 
