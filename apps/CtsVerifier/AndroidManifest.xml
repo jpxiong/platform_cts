@@ -380,6 +380,7 @@
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
         </activity>
 
+        <!-- Uncomment until we have a better way to validate the hardware scan filter
         <activity android:name=".bluetooth.BleScannerHardwareScanFilterActivity"
                 android:label="@string/ble_scanner_scan_filter_name"
                 android:configChanges="keyboardHidden|orientation|screenSize">
@@ -390,6 +391,7 @@
             <meta-data android:name="test_category" android:value="@string/bt_le" />
             <meta-data android:name="test_parent" android:value="com.android.cts.verifier.bluetooth.BleScannerTestActivity" />
         </activity>
+        -->
 
         <activity android:name=".bluetooth.BleAdvertiserTestActivity"
                 android:label="@string/ble_advertiser_test_name"
