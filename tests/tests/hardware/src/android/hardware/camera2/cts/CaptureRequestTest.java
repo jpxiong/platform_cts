@@ -2069,6 +2069,16 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
      */
     private void verifyFpsNotSlowDown(CaptureRequest.Builder requestBuilder,
             int numFramesVerified)  throws Exception {
+        boolean frameDurationAvailable = true;
+        // Allow a few frames for AE to settle on target FPS range
+        final int NUM_FRAME_TO_SKIP = 6;
+        float frameDurationErrorMargin = FRAME_DURATION_ERROR_MARGIN;
+        if (!mStaticInfo.areKeysAvailable(CaptureResult.SENSOR_FRAME_DURATION)) {
+            frameDurationAvailable = false;
+            // Allow a larger error margin (1.5%) for timestamps
+            frameDurationErrorMargin = 0.015f;
+        }
+
         Range<Integer>[] fpsRanges = mStaticInfo.getAeAvailableTargetFpsRangesChecked();
         boolean antiBandingOffIsSupported = mStaticInfo.isAntiBandingOffModeSupported();
         Range<Integer> fpsRange;
@@ -2108,18 +2118,33 @@ public class CaptureRequestTest extends Camera2SurfaceViewTestCase {
 
             resultListener = new SimpleCaptureCallback();
             startPreview(requestBuilder, previewSz, resultListener);
-            long[] frameDurationRange =
-                    new long[]{(long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
+            waitForSettingsApplied(resultListener, NUM_FRAMES_WAITED_FOR_UNKNOWN_LATENCY);
+            // Wait several more frames for AE to settle on target FPS range
+            waitForNumResults(resultListener, NUM_FRAME_TO_SKIP);
+
+            long[] frameDurationRange = new long[]{
+                    (long) (1e9 / fpsRange.getUpper()), (long) (1e9 / fpsRange.getLower())};
+            long captureTime = 0, prevCaptureTime = 0;
             for (int j = 0; j < numFramesVerified; j++) {
+                long frameDuration = frameDurationRange[0];
                 CaptureResult result =
                         resultListener.getCaptureResult(WAIT_FOR_RESULT_TIMEOUT_MS);
                 validatePipelineDepth(result);
-                long frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+                if (frameDurationAvailable) {
+                    frameDuration = getValueNotNull(result, CaptureResult.SENSOR_FRAME_DURATION);
+                } else {
+                    // if frame duration is not available, check timestamp instead
+                    captureTime = getValueNotNull(result, CaptureResult.SENSOR_TIMESTAMP);
+                    if (j > 0) {
+                        frameDuration = captureTime - prevCaptureTime;
+                    }
+                    prevCaptureTime = captureTime;
+                }
                 mCollector.expectInRange(
                         "Frame duration must be in the range of " + Arrays.toString(frameDurationRange),
                         frameDuration,
-                        (long) (frameDurationRange[0] * (1 - FRAME_DURATION_ERROR_MARGIN)),
-                        (long) (frameDurationRange[1] * (1 + FRAME_DURATION_ERROR_MARGIN)));
+                        (long) (frameDurationRange[0] * (1 - frameDurationErrorMargin)),
+                        (long) (frameDurationRange[1] * (1 + frameDurationErrorMargin)));
             }
         }
 
