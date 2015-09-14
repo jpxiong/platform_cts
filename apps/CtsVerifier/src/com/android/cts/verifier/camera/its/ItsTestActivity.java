@@ -138,6 +138,33 @@ public class ItsTestActivity extends PassFailButtons.Activity {
         setContentView(R.layout.its_main);
         setInfoResources(R.string.camera_its_test, R.string.camera_its_test_info, -1);
         setPassFailButtonClickListeners();
+
+        // Hide the test if all camera devices are legacy
+        CameraManager manager = (CameraManager) this.getSystemService(Context.CAMERA_SERVICE);
+        try {
+            String[] cameraIds = manager.getCameraIdList();
+            mNonLegacyCameraIds = new ArrayList<String>();
+            boolean allCamerasAreLegacy = true;
+            for (String id : cameraIds) {
+                CameraCharacteristics characteristics = manager.getCameraCharacteristics(id);
+                if (characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
+                        != CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
+                    mNonLegacyCameraIds.add(id);
+                    allCamerasAreLegacy = false;
+                }
+            }
+            if (allCamerasAreLegacy) {
+                showToast(R.string.all_legacy_devices);
+                ItsTestActivity.this.getReportLog().setSummary(
+                        "PASS: all cameras on this device are LEGACY"
+                        , 1.0, ResultType.NEUTRAL, ResultUnit.NONE);
+                setTestResultAndFinish(true);
+            }
+        } catch (CameraAccessException e) {
+            Toast.makeText(ItsTestActivity.this,
+                    "Received error from camera service while checking device capabilities: "
+                            + e, Toast.LENGTH_SHORT).show();
+        }
         getPassButton().setEnabled(false);
     }
 
@@ -148,27 +175,6 @@ public class ItsTestActivity extends PassFailButtons.Activity {
         if (manager == null) {
             showToast(R.string.no_camera_manager);
         } else {
-            try {
-                String[] cameraIds = manager.getCameraIdList();
-                mNonLegacyCameraIds = new ArrayList<String>();
-                boolean allCamerasAreLegacy = true;
-                for (String id : cameraIds) {
-                    CameraCharacteristics characteristics = manager.getCameraCharacteristics(id);
-                    if (characteristics.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL)
-                            != CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                        mNonLegacyCameraIds.add(id);
-                        allCamerasAreLegacy = false;
-                    }
-                }
-                if (allCamerasAreLegacy) {
-                    showToast(R.string.all_legacy_devices);
-                    getPassButton().setEnabled(true);
-                }
-            } catch (CameraAccessException e) {
-                Toast.makeText(ItsTestActivity.this,
-                        "Received error from camera service while checking device capabilities: "
-                                + e, Toast.LENGTH_SHORT).show();
-            }
             Log.d(TAG, "register ITS result receiver");
             IntentFilter filter = new IntentFilter(ACTION_ITS_RESULT);
             registerReceiver(mSuccessReceiver, filter);
