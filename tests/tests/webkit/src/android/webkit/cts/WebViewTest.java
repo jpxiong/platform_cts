@@ -1553,6 +1553,37 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         assertEquals(1, handler.getMsgArg1());
     }
 
+    private static void waitForFlingDone(WebViewOnUiThread webview) {
+        class ScrollDiffPollingCheck extends PollingCheck {
+            private static final long TIME_SLICE = 50;
+            WebViewOnUiThread mWebView;
+            private int mScrollX;
+            private int mScrollY;
+
+            ScrollDiffPollingCheck(WebViewOnUiThread webview) {
+                mWebView = webview;
+                mScrollX = mWebView.getScrollX();
+                mScrollY = mWebView.getScrollY();
+            }
+
+            @Override
+            protected boolean check() {
+                try {
+                    Thread.sleep(TIME_SLICE);
+                } catch (InterruptedException e) {
+                    // Intentionally ignored.
+                }
+                int newScrollX = mWebView.getScrollX();
+                int newScrollY = mWebView.getScrollY();
+                boolean flingDone = newScrollX == mScrollX && newScrollY == mScrollY;
+                mScrollX = newScrollX;
+                mScrollY = newScrollY;
+                return flingDone;
+            }
+        }
+        new ScrollDiffPollingCheck(webview).run();
+    }
+
     public void testPageScroll() throws Throwable {
         if (!NullWebViewUtils.isWebViewAvailable()) {
             return;
@@ -1574,29 +1605,29 @@ public class WebViewTest extends ActivityInstrumentationTestCase2<WebViewCtsActi
         }.run();
 
         do {
-            getInstrumentation().waitForIdleSync();
+            waitForFlingDone(mOnUiThread);
         } while (mOnUiThread.pageDown(false));
 
-        getInstrumentation().waitForIdleSync();
+        waitForFlingDone(mOnUiThread);
         int bottomScrollY = mOnUiThread.getScrollY();
 
         assertTrue(mOnUiThread.pageUp(false));
 
         do {
-            getInstrumentation().waitForIdleSync();
+            waitForFlingDone(mOnUiThread);
         } while (mOnUiThread.pageUp(false));
 
-        getInstrumentation().waitForIdleSync();
+        waitForFlingDone(mOnUiThread);
         int topScrollY = mOnUiThread.getScrollY();
 
         // jump to the bottom
         assertTrue(mOnUiThread.pageDown(true));
-        getInstrumentation().waitForIdleSync();
+        waitForFlingDone(mOnUiThread);
         assertEquals(bottomScrollY, mOnUiThread.getScrollY());
 
         // jump to the top
         assertTrue(mOnUiThread.pageUp(true));
-        getInstrumentation().waitForIdleSync();
+        waitForFlingDone(mOnUiThread);
         assertEquals(topScrollY, mOnUiThread.getScrollY());
     }
 
