@@ -220,6 +220,13 @@ public class CollectAllTests extends DescriptionGenerator {
                 continue;
             }
 
+            // Avoid inner classes: they should not have tests and often they can have dependencies
+            // on test frameworks that need to be resolved and would need to be on the classpath.
+            // e.g. Mockito.
+            if (className.contains("$")) {
+                continue;
+            }
+
             try {
                 Class<?> klass = Class.forName(className,
                                                false,
