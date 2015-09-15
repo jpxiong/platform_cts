@@ -1428,6 +1428,14 @@
     Overlay view must be shown. Verify that there is a text view displaying \"Overlay View Dummy Text\"
     when you tune to the \"Dummy\" channel.
     </string>
+    <string name="tv_input_discover_test_go_to_epg">
+    Press the \"Launch EPG\" button, and locate the channel named \"Dummy\".
+    </string>
+    <string name="tv_input_discover_test_verify_epg">
+    Do you see the programs named \"Dummy Program\" and its description
+    "Dummy Program Description" in the EPG?
+    </string>
+    <string name="tv_input_discover_test_yes">Yes</string>
 
     <string name="tv_parental_control_test">Live Channels app parental control test</string>
     <string name="tv_parental_control_test_info">
@@ -1455,6 +1463,7 @@
     </string>
 
     <string name="tv_launch_tv_app">Launch Live Channels</string>
+    <string name="tv_launch_epg">Launch EPG</string>
     <string name="tv_channel_not_found">
     CtsVerifier channel is not set up. Please set up before proceeding.
     </string>
