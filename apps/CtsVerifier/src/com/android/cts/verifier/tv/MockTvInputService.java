@@ -33,14 +33,10 @@ import android.media.tv.TvInputService;
 import android.media.tv.TvTrackInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.Surface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-
-import com.android.cts.verifier.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,9 +74,9 @@ public class MockTvInputService extends TvInputService {
             new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle_eng")
             .setLanguage("eng")
             .build();
-    static final TvTrackInfo sSpaSubtitleTrack =
-            new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle_spa")
-            .setLanguage("spa")
+    static final TvTrackInfo sKorSubtitleTrack =
+            new TvTrackInfo.Builder(TvTrackInfo.TYPE_SUBTITLE, "subtitle_kor")
+            .setLanguage("kor")
             .build();
 
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -179,7 +175,7 @@ public class MockTvInputService extends TvInputService {
             mTracks.add(sEngAudioTrack);
             mTracks.add(sSpaAudioTrack);
             mTracks.add(sEngSubtitleTrack);
-            mTracks.add(sSpaSubtitleTrack);
+            mTracks.add(sKorSubtitleTrack);
         }
 
         @Override
