@@ -20,6 +20,8 @@ import android.cts.util.PollingCheck;
 import android.media.browse.MediaBrowser;
 import android.test.InstrumentationTestCase;
 
+import java.util.List;
+
 /**
  * Test {@link android.media.browse.MediaBrowser}.
  */
@@ -28,12 +30,15 @@ public class MediaBrowserTest extends InstrumentationTestCase {
     private static final long TIME_OUT_MS = 1000L;
     private static final ComponentName TEST_BROWSER_SERVICE = new ComponentName(
             "com.android.cts.media", "android.media.cts.StubMediaBrowserService");
+    private static final ComponentName TEST_INVALID_BROWSER_SERVICE = new ComponentName(
+            "invalid.package", "invalid.ServiceClassName");
     private final StubConnectionCallback mConnectionCallback = new StubConnectionCallback();
+    private final StubSubscriptionCallback mSubscriptionCallback = new StubSubscriptionCallback();
 
     private MediaBrowser mMediaBrowser;
 
     public void testMediaBrowser() {
-        mConnectionCallback.resetCounts();
+        resetCallbacks();
         createMediaBrowser(TEST_BROWSER_SERVICE);
         assertEquals(false, mMediaBrowser.isConnected());
 
@@ -52,7 +57,7 @@ public class MediaBrowserTest extends InstrumentationTestCase {
     }
 
     public void testConnectTwice() {
-        mConnectionCallback.resetCounts();
+        resetCallbacks();
         createMediaBrowser(TEST_BROWSER_SERVICE);
         connectMediaBrowserService();
         try {
@@ -63,14 +68,50 @@ public class MediaBrowserTest extends InstrumentationTestCase {
         }
     }
 
+    public void testConnectionFailed() {
+        resetCallbacks();
+        createMediaBrowser(TEST_INVALID_BROWSER_SERVICE);
+
+        mMediaBrowser.connect();
+        new PollingCheck(TIME_OUT_MS) {
+            @Override
+            protected boolean check() {
+                return mConnectionCallback.mConnectionFailedCount > 0
+                        && mConnectionCallback.mConnectedCount == 0
+                        && mConnectionCallback.mConnectionSuspendedCount == 0;
+            }
+        }.run();
+    }
+
     public void testGetServiceComponentBeforeConnection() {
-        mConnectionCallback.resetCounts();
+        resetCallbacks();
         createMediaBrowser(TEST_BROWSER_SERVICE);
         try {
             ComponentName serviceComponent = mMediaBrowser.getServiceComponent();
             fail();
         } catch (IllegalStateException e) {
             // expected
+        }
+    }
+
+    public void testSubscribe() {
+        resetCallbacks();
+        createMediaBrowser(TEST_BROWSER_SERVICE);
+        connectMediaBrowserService();
+        mMediaBrowser.subscribe(StubMediaBrowserService.MEDIA_ID_ROOT, mSubscriptionCallback);
+        new PollingCheck(TIME_OUT_MS) {
+            @Override
+            protected boolean check() {
+                return mSubscriptionCallback.mChildrenLoadedCount > 0;
+            }
+        }.run();
+
+        assertEquals(StubMediaBrowserService.MEDIA_ID_ROOT, mSubscriptionCallback.mLastParentId);
+        assertEquals(StubMediaBrowserService.MEDIA_ID_CHILDREN.length,
+                mSubscriptionCallback.mLastChildMediaItems.size());
+        for (int i = 0; i < StubMediaBrowserService.MEDIA_ID_CHILDREN.length; i++) {
+            assertEquals(StubMediaBrowserService.MEDIA_ID_CHILDREN[i],
+                    mSubscriptionCallback.mLastChildMediaItems.get(i).getMediaId());
         }
     }
 
@@ -94,12 +135,17 @@ public class MediaBrowserTest extends InstrumentationTestCase {
         }.run();
     }
 
+    private void resetCallbacks() {
+        mConnectionCallback.reset();
+        mSubscriptionCallback.reset();
+    }
+
     private static class StubConnectionCallback extends MediaBrowser.ConnectionCallback {
         volatile int mConnectedCount;
         volatile int mConnectionFailedCount;
         volatile int mConnectionSuspendedCount;
 
-        public void resetCounts() {
+        public void reset() {
             mConnectedCount = 0;
             mConnectionFailedCount = 0;
             mConnectionSuspendedCount = 0;
@@ -118,6 +164,34 @@ public class MediaBrowserTest extends InstrumentationTestCase {
         @Override
         public void onConnectionSuspended() {
             mConnectionSuspendedCount++;
+        }
+    }
+
+    private static class StubSubscriptionCallback extends MediaBrowser.SubscriptionCallback {
+        private volatile int mChildrenLoadedCount;
+        private volatile int mErrorCount;
+        private volatile String mLastErrorId;
+        private volatile String mLastParentId;
+        private volatile List<MediaBrowser.MediaItem> mLastChildMediaItems;
+
+        public void reset() {
+            mChildrenLoadedCount = 0;
+            mErrorCount = 0;
+            mLastErrorId = null;
+            mLastParentId = null;
+            mLastChildMediaItems = null;
+        }
+
+        @Override
+        public void onChildrenLoaded(String parentId, List<MediaBrowser.MediaItem> children) {
+            mChildrenLoadedCount++;
+            mLastParentId = parentId;
+            mLastChildMediaItems = children;
+        }
+
+        @Override
+        public void onError(String id) {
+            mLastErrorId = id;
         }
     }
 }
