@@ -15,13 +15,16 @@
  */
 package android.media.cts;
 
+import android.media.AudioManager;
 import android.media.Rating;
+import android.media.VolumeProvider;
 import android.media.session.MediaController;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState.CustomAction;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.test.AndroidTestCase;
 
 /**
@@ -29,129 +32,233 @@ import android.test.AndroidTestCase;
  */
 public class MediaControllerTest extends AndroidTestCase {
     // The maximum time to wait for an operation.
-    private static final long TIME_OUT_MS = 5000L;
+    private static final long TIME_OUT_MS = 3000L;
     private static final String SESSION_TAG = "test-session";
     private static final String EXTRAS_KEY = "test-key";
     private static final String EXTRAS_VALUE = "test-val";
 
+    private final Object mWaitLock = new Object();
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private MediaSession mSession;
+    private MediaSessionCallback mCallback = new MediaSessionCallback();
+    private MediaController mController;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        mSession = new MediaSession(getContext(), SESSION_TAG);
+        mSession.setCallback(mCallback, mHandler);
+        mController = mSession.getController();
+    }
+
+    public void testSendCommand() throws Exception {
+        synchronized (mWaitLock) {
+            mCallback.reset();
+            final String command = "test-command";
+            final Bundle extras = new Bundle();
+            extras.putString(EXTRAS_KEY, EXTRAS_VALUE);
+            mController.sendCommand(command, extras, new ResultReceiver(null));
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnCommandCalled);
+            assertNotNull(mCallback.mCommandCallback);
+            assertEquals(command, mCallback.mCommand);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
+        }
+    }
+
+    public void testVolumeControl() throws Exception {
+        VolumeProvider vp = new VolumeProvider(VolumeProvider.VOLUME_CONTROL_ABSOLUTE, 11, 5) {
+            @Override
+            public void onSetVolumeTo(int volume) {
+                synchronized (mWaitLock) {
+                    setCurrentVolume(volume);
+                    mWaitLock.notify();
+                }
+            }
+
+            @Override
+            public void onAdjustVolume(int direction) {
+                synchronized (mWaitLock) {
+                    switch (direction) {
+                        case AudioManager.ADJUST_LOWER:
+                            setCurrentVolume(getCurrentVolume() - 1);
+                            break;
+                        case AudioManager.ADJUST_RAISE:
+                            setCurrentVolume(getCurrentVolume() + 1);
+                            break;
+                    }
+                    mWaitLock.notify();
+                }
+            }
+        };
+        mSession.setPlaybackToRemote(vp);
+
+        synchronized (mWaitLock) {
+            // test setVolumeTo
+            mController.setVolumeTo(7, 0);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertEquals(7, vp.getCurrentVolume());
+
+            // test adjustVolume
+            mController.adjustVolume(AudioManager.ADJUST_LOWER, 0);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertEquals(6, vp.getCurrentVolume());
+
+            mController.adjustVolume(AudioManager.ADJUST_RAISE, 0);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertEquals(7, vp.getCurrentVolume());
+        }
+    }
 
     public void testTransportControlsAndMediaSessionCallback() throws Exception {
-        Object waitLock = new Object();
-        MediaSession session = new MediaSession(getContext(), SESSION_TAG);
-        MediaSessionCallback callback = new MediaSessionCallback(waitLock);
-        session.setCallback(callback, mHandler);
-
-        MediaController.TransportControls controls =
-                session.getController().getTransportControls();
-        synchronized (waitLock) {
+        MediaController.TransportControls controls = mController.getTransportControls();
+        synchronized (mWaitLock) {
+            mCallback.reset();
             controls.play();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnPlayCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnPlayCalled);
 
+            mCallback.reset();
             controls.pause();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnPauseCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnPauseCalled);
 
+            mCallback.reset();
             controls.stop();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnStopCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnStopCalled);
 
+            mCallback.reset();
             controls.fastForward();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnFastForwardCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnFastForwardCalled);
 
+            mCallback.reset();
             controls.rewind();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnRewindCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnRewindCalled);
 
+            mCallback.reset();
             controls.skipToPrevious();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnSkipToPreviousCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnSkipToPreviousCalled);
 
+            mCallback.reset();
             controls.skipToNext();
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnSkipToNextCalled);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnSkipToNextCalled);
 
+            mCallback.reset();
             final long seekPosition = 1000;
             controls.seekTo(seekPosition);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnSeekToCalled);
-            assertEquals(seekPosition, callback.mSeekPosition);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnSeekToCalled);
+            assertEquals(seekPosition, mCallback.mSeekPosition);
 
+            mCallback.reset();
             final Rating rating = Rating.newStarRating(Rating.RATING_5_STARS, 3f);
             controls.setRating(rating);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnSetRatingCalled);
-            assertEquals(rating.getRatingStyle(), callback.mRating.getRatingStyle());
-            assertEquals(rating.getStarRating(), callback.mRating.getStarRating());
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnSetRatingCalled);
+            assertEquals(rating.getRatingStyle(), mCallback.mRating.getRatingStyle());
+            assertEquals(rating.getStarRating(), mCallback.mRating.getStarRating());
 
+            mCallback.reset();
             final String mediaId = "test-media-id";
             final Bundle extras = new Bundle();
             extras.putString(EXTRAS_KEY, EXTRAS_VALUE);
             controls.playFromMediaId(mediaId, extras);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnPlayFromMediaIdCalled);
-            assertEquals(mediaId, callback.mMediaId);
-            assertEquals(EXTRAS_VALUE, callback.mExtras.getString(EXTRAS_KEY));
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnPlayFromMediaIdCalled);
+            assertEquals(mediaId, mCallback.mMediaId);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
 
+            mCallback.reset();
             final String query = "test-query";
             controls.playFromSearch(query, extras);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnPlayFromSearchCalled);
-            assertEquals(query, callback.mQuery);
-            assertEquals(EXTRAS_VALUE, callback.mExtras.getString(EXTRAS_KEY));
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnPlayFromSearchCalled);
+            assertEquals(query, mCallback.mQuery);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
 
+            mCallback.reset();
             final String action = "test-action";
             controls.sendCustomAction(action, extras);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnCustomActionCalled);
-            assertEquals(action, callback.mAction);
-            assertEquals(EXTRAS_VALUE, callback.mExtras.getString(EXTRAS_KEY));
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnCustomActionCalled);
+            assertEquals(action, mCallback.mAction);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
 
-            callback.mOnCustomActionCalled = false;
+            mCallback.reset();
+            mCallback.mOnCustomActionCalled = false;
             final CustomAction customAction =
                     new CustomAction.Builder(action, action, -1).setExtras(extras).build();
             controls.sendCustomAction(customAction, extras);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnCustomActionCalled);
-            assertEquals(action, callback.mAction);
-            assertEquals(EXTRAS_VALUE, callback.mExtras.getString(EXTRAS_KEY));
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnCustomActionCalled);
+            assertEquals(action, mCallback.mAction);
+            assertEquals(EXTRAS_VALUE, mCallback.mExtras.getString(EXTRAS_KEY));
 
+            mCallback.reset();
             final long queueItemId = 1000;
             controls.skipToQueueItem(queueItemId);
-            waitLock.wait(TIME_OUT_MS);
-            assertTrue(callback.mOnSkipToQueueItemCalled);
-            assertEquals(queueItemId, callback.mQueueItemId);
+            mWaitLock.wait(TIME_OUT_MS);
+            assertTrue(mCallback.mOnSkipToQueueItemCalled);
+            assertEquals(queueItemId, mCallback.mQueueItemId);
         }
     }
 
     private class MediaSessionCallback extends MediaSession.Callback {
-        private Object mWaitLock;
-        private long mSeekPosition;
-        private long mQueueItemId;
-        private Rating mRating;
-        private String mMediaId;
-        private String mQuery;
-        private String mAction;
-        private Bundle mExtras;
+        private volatile long mSeekPosition;
+        private volatile long mQueueItemId;
+        private volatile Rating mRating;
+        private volatile String mMediaId;
+        private volatile String mQuery;
+        private volatile String mAction;
+        private volatile String mCommand;
+        private volatile Bundle mExtras;
+        private volatile ResultReceiver mCommandCallback;
 
-        private boolean mOnPlayCalled;
-        private boolean mOnPauseCalled;
-        private boolean mOnStopCalled;
-        private boolean mOnFastForwardCalled;
-        private boolean mOnRewindCalled;
-        private boolean mOnSkipToPreviousCalled;
-        private boolean mOnSkipToNextCalled;
-        private boolean mOnSeekToCalled;
-        private boolean mOnSetRatingCalled;
-        private boolean mOnPlayFromMediaIdCalled;
-        private boolean mOnPlayFromSearchCalled;
-        private boolean mOnCustomActionCalled;
-        private boolean mOnSkipToQueueItemCalled;
+        private volatile boolean mOnPlayCalled;
+        private volatile boolean mOnPauseCalled;
+        private volatile boolean mOnStopCalled;
+        private volatile boolean mOnFastForwardCalled;
+        private volatile boolean mOnRewindCalled;
+        private volatile boolean mOnSkipToPreviousCalled;
+        private volatile boolean mOnSkipToNextCalled;
+        private volatile boolean mOnSeekToCalled;
+        private volatile boolean mOnSkipToQueueItemCalled;
+        private volatile boolean mOnSetRatingCalled;
+        private volatile boolean mOnPlayFromMediaIdCalled;
+        private volatile boolean mOnPlayFromSearchCalled;
+        private volatile boolean mOnCustomActionCalled;
+        private volatile boolean mOnCommandCalled;
 
-        public MediaSessionCallback(Object lock) {
-            mWaitLock = lock;
+        public void reset() {
+            mSeekPosition = -1;
+            mQueueItemId = -1;
+            mRating = null;
+            mMediaId = null;
+            mQuery = null;
+            mAction = null;
+            mExtras = null;
+            mCommand = null;
+            mCommandCallback = null;
+
+            mOnPlayCalled = false;
+            mOnPauseCalled = false;
+            mOnStopCalled = false;
+            mOnFastForwardCalled = false;
+            mOnRewindCalled = false;
+            mOnSkipToPreviousCalled = false;
+            mOnSkipToNextCalled = false;
+            mOnSkipToQueueItemCalled = false;
+            mOnSeekToCalled = false;
+            mOnSetRatingCalled = false;
+            mOnPlayFromMediaIdCalled = false;
+            mOnPlayFromSearchCalled = false;
+            mOnCustomActionCalled = false;
+            mOnCommandCalled = false;
         }
 
         @Override
@@ -263,6 +370,17 @@ public class MediaControllerTest extends AndroidTestCase {
             synchronized (mWaitLock) {
                 mOnSkipToQueueItemCalled = true;
                 mQueueItemId = id;
+                mWaitLock.notify();
+            }
+        }
+
+        @Override
+        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
+            synchronized (mWaitLock) {
+                mOnCommandCalled = true;
+                mCommand = command;
+                mExtras = extras;
+                mCommandCallback = cb;
                 mWaitLock.notify();
             }
         }
