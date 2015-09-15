@@ -47,7 +47,7 @@ import java.util.Map;
  */
 public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActivity> {
     /** The maximum time to wait for an operation. */
-    private static final long TIME_OUT = 15000L;
+    private static final long TIME_OUT_MS = 15000L;
 
     private TvView mTvView;
     private Activity mActivity;
@@ -61,6 +61,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         private final Map<String, SparseIntArray> mSelectedTrackGenerationMap = new ArrayMap<>();
         private final Map<String, Integer> mTracksGenerationMap = new ArrayMap<>();
         private final Object mLock = new Object();
+        private volatile int mConnectionFailedCount;
 
         public boolean isVideoAvailable(String inputId) {
             synchronized (mLock) {
@@ -78,6 +79,19 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 }
                 return selectedTrackGenerationMap.get(type, 0);
             }
+        }
+
+        public void resetConnectionFailedCount() {
+            mConnectionFailedCount = 0;
+        }
+
+        public int getConnectionFailedCount() {
+            return mConnectionFailedCount;
+        }
+
+        @Override
+        public void onConnectionFailed(String inputId) {
+            mConnectionFailedCount++;
         }
 
         @Override
@@ -201,7 +215,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
                 Uri channelUri = TvContract.buildChannelUri(channelId);
                 mTvView.tune(mStubInfo.getId(), channelUri);
                 mInstrumentation.waitForIdleSync();
-                new PollingCheck(TIME_OUT) {
+                new PollingCheck(TIME_OUT_MS) {
                     @Override
                     protected boolean check() {
                         return mCallback.isVideoAvailable(mStubInfo.getId());
@@ -232,7 +246,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         if ((track == null && selectedTrackId != null)
                 || (track != null && !track.getId().equals(selectedTrackId))) {
             // Check generation change only if we're actually changing track.
-            new PollingCheck(TIME_OUT) {
+            new PollingCheck(TIME_OUT_MS) {
                 @Override
                 protected boolean check() {
                     return mCallback.getSelectedTrackGeneration(
@@ -303,7 +317,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         tryTuneAllChannels(new Runnable() {
             @Override
             public void run() {
-                new PollingCheck(TIME_OUT) {
+                new PollingCheck(TIME_OUT_MS) {
                     @Override
                     protected boolean check() {
                         return mTvView.getTracks(TvTrackInfo.TYPE_AUDIO) != null;
@@ -325,7 +339,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
         unhandledEvent[0] = null;
         mInstrumentation.sendKeySync(keyEvent);
         mInstrumentation.waitForIdleSync();
-        new PollingCheck(TIME_OUT) {
+        new PollingCheck(TIME_OUT_MS) {
             @Override
             protected boolean check() {
                 return unhandledEvent[0] != null;
@@ -362,7 +376,7 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
             Uri channelUri = TvContract.buildChannelUri(channelId);
             mTvView.tune(mStubInfo.getId(), channelUri);
             mInstrumentation.waitForIdleSync();
-            new PollingCheck(TIME_OUT) {
+            new PollingCheck(TIME_OUT_MS) {
                 @Override
                 protected boolean check() {
                     return mCallback.isVideoAvailable(mStubInfo.getId());
@@ -381,5 +395,20 @@ public class TvViewTest extends ActivityInstrumentationTestCase2<TvViewStubActiv
 
         verifyKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_GUIDE), unhandledEvent);
         verifyKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_GUIDE), unhandledEvent);
+    }
+
+    public void testConnectionFailed() throws Throwable {
+        if (!Utils.hasTvInputFramework(getActivity())) {
+            return;
+        }
+        mCallback.resetConnectionFailedCount();
+        mTvView.tune("invalid_input_id", TvContract.Channels.CONTENT_URI);
+        mInstrumentation.waitForIdleSync();
+        new PollingCheck(TIME_OUT_MS) {
+            @Override
+            protected boolean check() {
+                return mCallback.getConnectionFailedCount() > 0;
+            }
+        }.run();
     }
 }
