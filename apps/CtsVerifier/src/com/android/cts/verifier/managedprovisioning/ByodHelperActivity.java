@@ -18,6 +18,7 @@ package com.android.cts.verifier.managedprovisioning;
 
 import android.app.Activity;
 import android.app.admin.DevicePolicyManager;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,24 +27,31 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
 import static android.provider.Settings.Secure.INSTALL_NON_MARKET_APPS;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import com.android.cts.verifier.R;
 import com.android.cts.verifier.managedprovisioning.ByodFlowTestActivity.TestResult;
+import com.android.cts.verifier.managedprovisioning.ByodPresentMediaDialog.DialogCallback;
 
 /**
  * A helper activity from the managed profile side that responds to requests from CTS verifier in
  * primary user. Profile owner APIs are accessible inside this activity (given this activity is
  * started within the work profile). Its current functionalities include making sure the profile
- * owner is setup correctly, and removing the work profile upon request.
+ * owner is setup correctly, removing the work profile upon request, and verifying the image and
+ * video capture functionality.
  *
  * Note: We have to use a dummy activity because cross-profile intents only work for activities.
  */
-public class ByodHelperActivity extends Activity {
+public class ByodHelperActivity extends Activity implements DialogCallback {
     static final String TAG = "ByodHelperActivity";
 
     // Primary -> managed intent: query if the profile owner has been set up.
@@ -54,6 +62,12 @@ public class ByodHelperActivity extends Activity {
     public static final String ACTION_REMOVE_PROFILE_OWNER = "com.android.cts.verifier.managedprovisioning.BYOD_REMOVE";
     // Managed -> managed intent: provisioning completed successfully
     public static final String ACTION_PROFILE_PROVISIONED = "com.android.cts.verifier.managedprovisioning.BYOD_PROVISIONED";
+    // Primage -> managed intent: request to capture and check an image
+    public static final String ACTION_CAPTURE_AND_CHECK_IMAGE = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_IMAGE";
+    // Primage -> managed intent: request to capture and check a video
+    public static final String ACTION_CAPTURE_AND_CHECK_VIDEO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO";
+    // Primage -> managed intent: request to capture and check an audio recording
+    public static final String ACTION_CAPTURE_AND_CHECK_AUDIO = "com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO";
 
     public static final String EXTRA_PROVISIONED = "extra_provisioned";
 
@@ -62,12 +76,20 @@ public class ByodHelperActivity extends Activity {
     public static final String EXTRA_ALLOW_NON_MARKET_APPS = INSTALL_NON_MARKET_APPS;
 
     private static final int REQUEST_INSTALL_PACKAGE = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 2;
+    private static final int REQUEST_VIDEO_CAPTURE = 3;
+    private static final int REQUEST_AUDIO_CAPTURE = 4;
 
     private static final String ORIGINAL_SETTINGS_NAME = "original settings";
     private Bundle mOriginalSettings;
 
     private ComponentName mAdminReceiverComponent;
     private DevicePolicyManager mDevicePolicyManager;
+
+    private Uri mImageUri;
+    private Uri mVideoUri;
+
+    private ArrayList<File> mTempFiles = new ArrayList<File>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +142,40 @@ public class ByodHelperActivity extends Activity {
 
             // Not yet ready to finish- wait until the result comes back
             return;
+        } else if (action.equals(ACTION_CAPTURE_AND_CHECK_IMAGE)) {
+            Intent captureImageIntent = getCaptureImageIntent();
+            mImageUri = getTempUri("image.jpg");
+            captureImageIntent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
+            if (captureImageIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(captureImageIntent, REQUEST_IMAGE_CAPTURE);
+            } else {
+                Log.e(TAG, "Capture image intent could not be resolved in managed profile.");
+                showToast(R.string.provisioning_byod_capture_media_error);
+                finish();
+            }
+            return;
+        } else if (action.equals(ACTION_CAPTURE_AND_CHECK_VIDEO)) {
+            Intent captureVideoIntent = getCaptureVideoIntent();
+            mVideoUri = getTempUri("video.mp4");
+            captureVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, mVideoUri);
+            if (captureVideoIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(captureVideoIntent, REQUEST_VIDEO_CAPTURE);
+            } else {
+                Log.e(TAG, "Capture video intent could not be resolved in managed profile.");
+                showToast(R.string.provisioning_byod_capture_media_error);
+                finish();
+            }
+            return;
+        } else if (action.equals(ACTION_CAPTURE_AND_CHECK_AUDIO)) {
+            Intent captureAudioIntent = getCaptureAudioIntent();
+            if (captureAudioIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(captureAudioIntent, REQUEST_AUDIO_CAPTURE);
+            } else {
+                Log.e(TAG, "Capture audio intent could not be resolved in managed profile.");
+                showToast(R.string.provisioning_byod_capture_media_error);
+                finish();
+            }
+            return;
         }
         // This activity has no UI and is only used to respond to CtsVerifier in the primary side.
         finish();
@@ -145,10 +201,73 @@ public class ByodHelperActivity extends Activity {
                 finish();
                 break;
             }
+            case REQUEST_IMAGE_CAPTURE: {
+                if (resultCode == RESULT_OK) {
+                    ByodPresentMediaDialog.newImageInstance(mImageUri)
+                            .show(getFragmentManager(), "ViewImageDialogFragment");
+                } else {
+                    // Failed capturing image.
+                    finish();
+                }
+                break;
+            }
+            case REQUEST_VIDEO_CAPTURE: {
+                if (resultCode == RESULT_OK) {
+                    ByodPresentMediaDialog.newVideoInstance(mVideoUri)
+                            .show(getFragmentManager(), "PlayVideoDialogFragment");
+                } else {
+                    // Failed capturing video.
+                    finish();
+                }
+                break;
+            }
+            case REQUEST_AUDIO_CAPTURE: {
+                if (resultCode == RESULT_OK) {
+                    ByodPresentMediaDialog.newAudioInstance(data.getData())
+                            .show(getFragmentManager(), "PlayAudioDialogFragment");
+                } else {
+                    // Failed capturing audio.
+                    finish();
+                }
+                break;
+            }
             default: {
                 Log.wtf(TAG, "Unknown requestCode " + requestCode + "; data = " + data);
                 break;
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        cleanUpTempUris();
+        super.onDestroy();
+    }
+
+    public static Intent getCaptureImageIntent() {
+        return new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    }
+
+    public static Intent getCaptureVideoIntent() {
+        return new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+    }
+
+    public static Intent getCaptureAudioIntent() {
+        return new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
+    }
+
+    private Uri getTempUri(String fileName) {
+        final File file = new File(getFilesDir() + File.separator + "images"
+                + File.separator + fileName);
+        file.getParentFile().mkdirs(); //if the folder doesn't exists it is created
+        mTempFiles.add(file);
+        return FileProvider.getUriForFile(this,
+                    "com.android.cts.verifier.managedprovisioning.fileprovider", file);
+    }
+
+    private void cleanUpTempUris() {
+        for (File file : mTempFiles) {
+            file.delete();
         }
     }
 
@@ -180,5 +299,10 @@ public class ByodHelperActivity extends Activity {
     private void showToast(int messageId) {
         String message = getString(messageId);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onDialogClose() {
+        finish();
     }
 }
