@@ -575,6 +575,13 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
 
             Size maxPreviewSize = mOrderedPreviewSizes.get(0);
 
+            if (mStaticInfo.isHardwareLevelLegacy() &&
+                    (videoSz.getWidth() > maxPreviewSize.getWidth() ||
+                     videoSz.getHeight() > maxPreviewSize.getHeight())) {
+                // Skip. Legacy mode can only do recording up to max preview size
+                continue;
+            }
+
             // For LEGACY, find closest supported smaller or equal JPEG size to the current video
             // size; if no size is smaller than the video, pick the smallest JPEG size.  The assert
             // for video size above guarantees that for LIMITED or FULL, we select videoSz here.
