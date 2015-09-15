@@ -44,7 +44,7 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         super.setUp();
 
         // We need multi user to be supported in order to create a profile of the user owner.
-        mHasFeature = mHasFeature && (getMaxNumberOfUsersSupported() > 1) && hasDeviceFeature(
+        mHasFeature = mHasFeature && hasDeviceFeature(
                 "android.software.managed_users");
 
         if (mHasFeature) {
@@ -86,14 +86,6 @@ public class ManagedProfileTest extends BaseDevicePolicyTest {
         // Note: the managed profile is removed by this test, which will make removeUserCommand in
         // tearDown() to complain, but that should be OK since its result is not asserted.
         assertFalse(listUsers().contains(mUserId));
-    }
-
-    public void testMaxUsersStrictlyMoreThanOne() throws Exception {
-        if (hasDeviceFeature("android.software.managed_users")) {
-            assertTrue("Device must support more than 1 user "
-                    + "if android.software.managed_users feature is available",
-            getMaxNumberOfUsersSupported() > 1);
-        }
     }
 
     public void testCrossProfileIntentFilters() throws Exception {
