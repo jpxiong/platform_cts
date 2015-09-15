@@ -1130,4 +1130,87 @@ public class ExtractDecodeEditEncodeMuxTest extends AndroidTestCase {
     private static String getMimeTypeFor(MediaFormat format) {
         return format.getString(MediaFormat.KEY_MIME);
     }
+
+    /**
+     * Returns the first codec capable of encoding the specified MIME type, or null if no match was
+     * found.
+     */
+    private static MediaCodecInfo selectCodec(String mimeType) {
+        int numCodecs = MediaCodecList.getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+            MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
+
+            if (!codecInfo.isEncoder()) {
+                continue;
+            }
+
+            String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+                if (types[j].equalsIgnoreCase(mimeType)) {
+                    return codecInfo;
+                }
+            }
+        }
+        return null;
+    }
+
+  /**
+   * Checks whether the given resolution is supported by the AVC codec.
+   */
+    private static boolean isAvcSupportedSize(int width, int height) {
+        MediaCodecInfo mediaCodecInfo = selectCodec(OUTPUT_VIDEO_MIME_TYPE);
+        CodecCapabilities cap = mediaCodecInfo.getCapabilitiesForType(OUTPUT_VIDEO_MIME_TYPE);
+        if (cap == null) { // not supported
+            return false;
+        }
+        int highestLevel = 0;
+        for (CodecProfileLevel lvl : cap.profileLevels) {
+            if (lvl.level > highestLevel) {
+                highestLevel = lvl.level;
+            }
+        }
+        int maxW = 0;
+        int maxH = 0;
+        int bitRate = 0;
+        int fps = 0; // frame rate for the max resolution
+        switch(highestLevel) {
+            // Do not support Level 1 to 2.
+            case CodecProfileLevel.AVCLevel1:
+            case CodecProfileLevel.AVCLevel11:
+            case CodecProfileLevel.AVCLevel12:
+            case CodecProfileLevel.AVCLevel13:
+            case CodecProfileLevel.AVCLevel1b:
+            case CodecProfileLevel.AVCLevel2:
+                return false;
+            case CodecProfileLevel.AVCLevel21:
+                maxW = 352;
+                maxH = 576;
+                break;
+            case CodecProfileLevel.AVCLevel22:
+                maxW = 720;
+                maxH = 480;
+                break;
+            case CodecProfileLevel.AVCLevel3:
+                maxW = 720;
+                maxH = 480;
+                break;
+            case CodecProfileLevel.AVCLevel31:
+                maxW = 1280;
+                maxH = 720;
+                break;
+            case CodecProfileLevel.AVCLevel32:
+                maxW = 1280;
+                maxH = 720;
+                break;
+            case CodecProfileLevel.AVCLevel4: // only try up to 1080p
+            default:
+                maxW = 1920;
+                maxH = 1080;
+                break;
+        }
+        if(maxW*maxH < width*height)
+            return false;
+        else
+            return true;
+    }
 }
