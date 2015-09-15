@@ -317,7 +317,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
         Range<Integer> maxRange = availableFpsRanges[0];
         boolean foundRange = false;
         for (Range<Integer> range : availableFpsRanges) {
-            if (range.getLower() == range.getUpper() && range.getLower() >= maxRange.getLower()) {
+            if (range.getLower().equals(range.getUpper()) && range.getLower() >= maxRange.getLower()) {
                 foundRange = true;
                 maxRange = range;
             }
