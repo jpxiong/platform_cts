@@ -30,7 +30,9 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
     private static final String TAG = "TvInputDiscoveryTestActivity";
 
     private static final Intent TV_APP_INTENT = new Intent(Intent.ACTION_VIEW,
-            TvContract.buildChannelUri(0));
+            TvContract.Channels.CONTENT_URI);
+    private static final Intent EPG_INTENT = new Intent(Intent.ACTION_VIEW,
+            TvContract.Programs.CONTENT_URI);
 
     private static final long TIMEOUT_MS = 5l * 60l * 1000l;  // 5 mins.
 
@@ -39,6 +41,8 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
     private View mTuneToChannelItem;
     private View mVerifyTuneItem;
     private View mVerifyOverlayViewItem;
+    private View mGoToEpgItem;
+    private View mVerifyEpgItem;
     private boolean mTuneVerified;
     private boolean mOverlayViewVerified;
 
@@ -63,6 +67,7 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
                     setButtonEnabled(mTuneToChannelItem, true);
                 }
             });
+            startActivity(TV_APP_INTENT);
         } else if (containsButton(mTuneToChannelItem, v)) {
             final Runnable failCallback = new Runnable() {
                 @Override
@@ -78,7 +83,7 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
                     setPassState(mVerifyTuneItem, true);
 
                     mTuneVerified = true;
-                    updatePassState(postTarget, failCallback);
+                    goToNextState(postTarget, failCallback);
                 }
             });
             MockTvInputService.expectOverlayView(postTarget, new Runnable() {
@@ -88,11 +93,18 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
                     setPassState(mVerifyOverlayViewItem, true);
 
                     mOverlayViewVerified = true;
-                    updatePassState(postTarget, failCallback);
+                    goToNextState(postTarget, failCallback);
                 }
             });
+            startActivity(TV_APP_INTENT);
+        } else if (containsButton(mGoToEpgItem, v)) {
+            startActivity(EPG_INTENT);
+            setPassState(mGoToEpgItem, true);
+            setButtonEnabled(mVerifyEpgItem, true);
+        } else if (containsButton(mVerifyEpgItem, v)) {
+            setPassState(mVerifyEpgItem, true);
+            getPassButton().setEnabled(true);
         }
-        startActivity(TV_APP_INTENT);
     }
 
     @Override
@@ -106,12 +118,16 @@ public class TvInputDiscoveryTestActivity extends TvAppVerifierActivity
         mVerifyTuneItem = createAutoItem(R.string.tv_input_discover_test_verify_tune);
         mVerifyOverlayViewItem = createAutoItem(
                 R.string.tv_input_discover_test_verify_overlay_view);
+        mGoToEpgItem = createUserItem(R.string.tv_input_discover_test_go_to_epg,
+                R.string.tv_launch_epg, this);
+        mVerifyEpgItem = createUserItem(R.string.tv_input_discover_test_verify_epg,
+                R.string.tv_input_discover_test_yes, this);
     }
 
-    private void updatePassState(View postTarget, Runnable failCallback) {
+    private void goToNextState(View postTarget, Runnable failCallback) {
         if (mTuneVerified && mOverlayViewVerified) {
             postTarget.removeCallbacks(failCallback);
-            getPassButton().setEnabled(true);
+            setButtonEnabled(mGoToEpgItem, true);
         }
     }
 
