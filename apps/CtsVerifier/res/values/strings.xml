@@ -1459,10 +1459,10 @@
     CtsVerifier channel is not set up. Please set up before proceeding.
     </string>
 
-    <string name="tv_multiple_tracks_test">Live Channels app multiple tracks / subtitle test</string>
+    <string name="tv_multiple_tracks_test">Live Channels app closed captions and multi-audio test</string>
     <string name="tv_multiple_tracks_test_info">
-    This test verifies that the default Live Channels app invokes proper mulitple tracks / subtitle
-    APIs in the framework.
+    This test verifies that the default Live Channels app invokes proper mulitple tracks APIs in the
+    framework.
     </string>
     <string name="tv_multiple_tracks_test_select_subtitle">
     Press the \"Launch Live Channels\" button. Verify that the closed caption is off by default.
