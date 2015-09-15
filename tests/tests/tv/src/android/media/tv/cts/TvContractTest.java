@@ -26,6 +26,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.tv.TvContentRating;
 import android.media.tv.TvContract;
+import android.media.tv.TvContract.Channels;
+import android.media.tv.TvContract.Programs.Genres;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
@@ -33,6 +35,8 @@ import com.android.cts.tv.R;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Test for {@link android.media.tv.TvContract}.
@@ -79,6 +83,11 @@ public class TvContractTest extends AndroidTestCase {
     };
 
     private static long OPERATION_TIME = 1000l;
+
+    private static final String ENCODED_GENRE_STRING = Genres.ANIMAL_WILDLIFE + "," + Genres.COMEDY
+            + "," + Genres.DRAMA + "," + Genres.EDUCATION + "," + Genres.FAMILY_KIDS + ","
+            + Genres.GAMING + "," + Genres.MOVIES + "," + Genres.NEWS + "," + Genres.SHOPPING + ","
+            + Genres.SPORTS + "," + Genres.TRAVEL;
 
     private String mInputId;
     private ContentResolver mContentResolver;
@@ -394,5 +403,59 @@ public class TvContractTest extends AndroidTestCase {
         // Non-overlap 2: starts too late
         verifyOverlap(programEndMillis + hour, programEndMillis + hour * 2, 0,
                 channelId, channelUri);
+    }
+
+    public void testChannelsGetVideoResolution() {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
+        assertEquals(Channels.VIDEO_RESOLUTION_SD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_480I));
+        assertEquals(Channels.VIDEO_RESOLUTION_ED, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_480P));
+        assertEquals(Channels.VIDEO_RESOLUTION_SD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_576I));
+        assertEquals(Channels.VIDEO_RESOLUTION_ED, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_576P));
+        assertEquals(Channels.VIDEO_RESOLUTION_HD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_720P));
+        assertEquals(Channels.VIDEO_RESOLUTION_HD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_1080I));
+        assertEquals(Channels.VIDEO_RESOLUTION_FHD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_1080P));
+        assertEquals(Channels.VIDEO_RESOLUTION_UHD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_2160P));
+        assertEquals(Channels.VIDEO_RESOLUTION_UHD, Channels.getVideoResolution(
+                Channels.VIDEO_FORMAT_4320P));
+        assertEquals(null, Channels.getVideoResolution("Unknown format"));
+    }
+
+    public void testProgramsGenresDecode() {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
+        List genres = Arrays.asList(Genres.decode(ENCODED_GENRE_STRING));
+        assertEquals(11, genres.size());
+        assertTrue(genres.contains(Genres.ANIMAL_WILDLIFE));
+        assertTrue(genres.contains(Genres.COMEDY));
+        assertTrue(genres.contains(Genres.DRAMA));
+        assertTrue(genres.contains(Genres.EDUCATION));
+        assertTrue(genres.contains(Genres.FAMILY_KIDS));
+        assertTrue(genres.contains(Genres.GAMING));
+        assertTrue(genres.contains(Genres.MOVIES));
+        assertTrue(genres.contains(Genres.NEWS));
+        assertTrue(genres.contains(Genres.SHOPPING));
+        assertTrue(genres.contains(Genres.SPORTS));
+        assertTrue(genres.contains(Genres.TRAVEL));
+        assertFalse(genres.contains(","));
+    }
+
+    public void testProgramsGenresEncode() {
+        if (!Utils.hasTvInputFramework(getContext())) {
+            return;
+        }
+        assertEquals(ENCODED_GENRE_STRING, Genres.encode(Genres.ANIMAL_WILDLIFE,
+                Genres.COMEDY, Genres.DRAMA, Genres.EDUCATION, Genres.FAMILY_KIDS, Genres.GAMING,
+                Genres.MOVIES, Genres.NEWS, Genres.SHOPPING, Genres.SPORTS, Genres.TRAVEL));
     }
 }
