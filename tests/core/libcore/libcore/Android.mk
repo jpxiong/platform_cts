@@ -16,5 +16,5 @@ LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_PACKAGE_NAME := android.core.tests.libcore.package.libcore
-LOCAL_STATIC_JAVA_LIBRARIES := core-tests
+LOCAL_STATIC_JAVA_LIBRARIES := core-tests mockito-target
 include $(BUILD_CTSCORE_PACKAGE)
