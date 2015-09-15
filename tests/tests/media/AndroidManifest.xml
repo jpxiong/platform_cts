@@ -64,6 +64,11 @@
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </service>
+        <service android:name="android.media.cts.StubMediaBrowserService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
     </application>
 
     <instrumentation android:name="android.support.test.runner.AndroidJUnitRunner"
