@@ -81,9 +81,11 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 mListener = new PhoneStateListener() {
                     @Override
                     public void onCellLocationChanged(CellLocation location) {
-                        synchronized (mLock) {
-                            mOnCellLocationChangedCalled = true;
-                            mLock.notify();
+                        if(!mOnCellLocationChangedCalled) {
+                            synchronized (mLock) {
+                                mOnCellLocationChangedCalled = true;
+                                mLock.notify();
+                            }
                         }
                     }
                 };
