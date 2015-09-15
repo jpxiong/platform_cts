@@ -19,6 +19,7 @@ package android.hardware.camera2.cts;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.ConditionVariable;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -57,7 +58,7 @@ public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHo
         int waitTimeMs = timeOutMs;
         boolean changeSucceeded = false;
         while (!changeSucceeded && waitTimeMs > 0) {
-            long startTimeMs = System.currentTimeMillis();
+            long startTimeMs = SystemClock.elapsedRealtime();
             changeSucceeded = surfaceChangedDone.block(waitTimeMs);
             if (!changeSucceeded) {
                 Log.e(TAG, "Wait for surface change timed out after " + timeOutMs + " ms");
@@ -72,7 +73,7 @@ public class Camera2SurfaceViewCtsActivity extends Activity implements SurfaceHo
                 // again.
                 changeSucceeded = false;
             }
-            waitTimeMs -= (System.currentTimeMillis() - startTimeMs);
+            waitTimeMs -= (SystemClock.elapsedRealtime() - startTimeMs);
         }
 
         // Couldn't get expected surface size change.

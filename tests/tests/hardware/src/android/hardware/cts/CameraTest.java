@@ -37,6 +37,7 @@ import android.os.Build;
 import android.os.ConditionVariable;
 import android.os.Environment;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.MoreAsserts;
 import android.test.UiThreadTest;
@@ -1975,7 +1976,7 @@ public class CameraTest extends ActivityInstrumentationTestCase2<CameraCtsActivi
         // This method tests if the actual fps is between minimum and maximum.
         // It also tests if the frame interval is too long.
         public void onPreviewFrame(byte[] data, android.hardware.Camera camera) {
-            long arrivalTime = System.currentTimeMillis();
+            long arrivalTime = SystemClock.elapsedRealtime();
             camera.addCallbackBuffer(data);
             if (firstFrameArrivalTime == 0) firstFrameArrivalTime = arrivalTime;
 
