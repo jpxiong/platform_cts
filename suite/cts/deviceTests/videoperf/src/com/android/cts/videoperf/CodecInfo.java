@@ -86,6 +86,20 @@ public class CodecInfo {
         if (mimeType.equals(VIDEO_AVC)) {
             info.mFps = vidCap.getSupportedFrameRatesFor(w, h).getUpper().intValue();
             info.mBitRate = vidCap.getBitrateRange().getUpper();
+
+            // we don't parse bitrate-range on L, so need to adjust bitrate to supported
+            // baseline or main profiles only.
+            int maxBitRate = 0;
+            for (CodecProfileLevel pl : cap.profileLevels) {
+                if (pl.profile == pl.AVCProfileBaseline || pl.profile == pl.AVCProfileMain) {
+                    VideoCapabilities vidCapPL =
+                        CodecCapabilities.createFromProfileLevel(mimeType, pl.profile, pl.level)
+                                .getVideoCapabilities();
+                    maxBitRate = Math.max(maxBitRate, vidCapPL.getBitrateRange().getUpper());
+                }
+            }
+            info.mBitRate = Math.min(info.mBitRate, maxBitRate);
+
             Log.i(TAG, "AVC bit rate " + info.mBitRate + " fps " + info.mFps);
         }
         return info;
