@@ -80,6 +80,9 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
     private TestItem mLocationSettingsVisibleTest;
     private TestItem mCredSettingsVisibleTest;
     private TestItem mPrintSettingsVisibleTest;
+    private TestItem mCrossProfileImageCaptureSupportTest;
+    private TestItem mCrossProfileVideoCaptureSupportTest;
+    private TestItem mCrossProfileAudioCaptureSupportTest;
 
     private int mCurrentTestPosition;
 
@@ -241,6 +244,50 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         mTests.add(mCrossProfileIntentFiltersTest);
         mTests.add(mDisableNonMarketTest);
         mTests.add(mEnableNonMarketTest);
+
+        if (canResolveIntent(ByodHelperActivity.getCaptureImageIntent())) {
+            // Capture image intent can be resolved in primary profile, so test.
+            mCrossProfileImageCaptureSupportTest = new TestItem(this,
+                    R.string.provisioning_byod_capture_image_support,
+                    R.string.provisioning_byod_capture_image_support_info,
+                    new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_IMAGE));
+            mTests.add(mCrossProfileImageCaptureSupportTest);
+        } else {
+            // Capture image intent cannot be resolved in primary profile, so skip test.
+            Toast.makeText(ByodFlowTestActivity.this,
+                    R.string.provisioning_byod_no_image_capture_resolver, Toast.LENGTH_SHORT)
+                    .show();
+        }
+
+        if (canResolveIntent(ByodHelperActivity.getCaptureVideoIntent())) {
+            // Capture video intent can be resolved in primary profile, so test.
+            mCrossProfileVideoCaptureSupportTest = new TestItem(this,
+                    R.string.provisioning_byod_capture_video_support,
+                    R.string.provisioning_byod_capture_video_support_info,
+                    new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_VIDEO));
+            mTests.add(mCrossProfileVideoCaptureSupportTest);
+        } else {
+            // Capture video intent cannot be resolved in primary profile, so skip test.
+            Toast.makeText(ByodFlowTestActivity.this,
+                    R.string.provisioning_byod_no_video_capture_resolver, Toast.LENGTH_SHORT)
+                    .show();
+        }
+
+        /* TODO: reinstate when bug b/20131958 is fixed
+        if (canResolveIntent(ByodHelperActivity.getCaptureAudioIntent())) {
+            // Capture audio intent can be resolved in primary profile, so test.
+            mCrossProfileAudioCaptureSupportTest = new TestItem(this,
+                    R.string.provisioning_byod_capture_audio_support,
+                    R.string.provisioning_byod_capture_audio_support_info,
+                    new Intent(ByodHelperActivity.ACTION_CAPTURE_AND_CHECK_AUDIO));
+            mTests.add(mCrossProfileAudioCaptureSupportTest);
+        } else {
+            // Capture audio intent cannot be resolved in primary profile, so skip test.
+            Toast.makeText(ByodFlowTestActivity.this,
+                    R.string.provisioning_byod_no_audio_capture_resolver, Toast.LENGTH_SHORT)
+                    .show();
+        }
+        */
     }
 
     @Override
@@ -249,6 +296,11 @@ public class ByodFlowTestActivity extends PassFailButtons.ListActivity {
         mCurrentTestPosition = position;
         TestItem test = (TestItem) getListAdapter().getItem(position);
         test.performTest(this);
+    }
+
+    // Return whether the intent can be resolved in the current profile
+    private boolean canResolveIntent(Intent intent) {
+        return intent.resolveActivity(getPackageManager()) != null;
     }
 
     private void showManualTestDialog(final TestItem test) {

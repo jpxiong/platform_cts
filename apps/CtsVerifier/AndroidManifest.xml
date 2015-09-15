@@ -1289,9 +1289,22 @@
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_QUERY" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_REMOVE" />
                 <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_INSTALL_APK" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_IMAGE" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_VIDEO" />
+                <action android:name="com.android.cts.verifier.managedprovisioning.BYOD_CAPTURE_AND_CHECK_AUDIO" />
                 <category android:name="android.intent.category.DEFAULT"></category>
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.android.cts.verifier.managedprovisioning.fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/filepaths" />
+        </provider>
 
         <activity android:name=".managedprovisioning.ByodIconSamplerActivity">
             <intent-filter>
