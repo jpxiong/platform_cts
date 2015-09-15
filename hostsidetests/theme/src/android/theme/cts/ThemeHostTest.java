@@ -52,8 +52,6 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
 
     private static final String TAG = ThemeHostTest.class.getSimpleName();
 
-    private static final int CAPTURE_TIMEOUT = 500;//0.5sec in ms
-
     private static final int ADB_TIMEOUT = 60 * 60 * 1000;//60mins in ms
 
     /** The package name of the APK. */
@@ -68,6 +66,8 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
     /** The command to launch the main activity. */
     private static final String START_CMD = String.format(
             "am start -W -a android.intent.action.MAIN -n %s/%s.%s", PACKAGE, PACKAGE, CLASS);
+
+    private static final String CLEAR_GENERATED_CMD = "rm -rf /sdcard/cts-holo-assets/*.png";
 
     private static final String STOP_CMD = String.format("am force-stop %s", PACKAGE);
 
@@ -86,10 +86,6 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
 
     // Intent extra keys
     private static final String EXTRA_THEME = "holo_theme_extra";
-
-    private static final String EXTRA_LAYOUT = "holo_layout_extra";
-
-    private static final String EXTRA_TIMEOUT = "holo_timeout_extra";
 
     private static final String[] THEMES = {
             "holo",
@@ -211,7 +207,8 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
         String[] options = {AbiUtils.createAbiFlag(mAbi.getName())};
         // Install the APK on the device.
         mDevice.installPackage(app, false, options);
-
+        // Remove previously generated images.
+        mDevice.executeShellCommand(CLEAR_GENERATED_CMD);
         final String densityProp;
 
         if (mDevice.getSerialNumber().startsWith("emulator-")) {
@@ -261,6 +258,8 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
         mExecutionService.shutdown();
         // Remove the APK.
         mDevice.uninstallPackage(PACKAGE);
+        // Remove generated images.
+        mDevice.executeShellCommand(CLEAR_GENERATED_CMD);
         super.tearDown();
     }
 
@@ -272,7 +271,6 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
             return;
         }
 
-
         if (mReferences.isEmpty()) {
             Log.logAndDisplay(LogLevel.INFO, TAG,
                     "Skipped HoloThemes test due to no reference images");
@@ -282,20 +280,18 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
         int numTasks = 0;
         for (int i = 0; i < NUM_THEMES; i++) {
             final String themeName = THEMES[i];
+            runCapture(i, themeName);
             for (int j = 0; j < NUM_LAYOUTS; j++) {
                 final String name = String.format("%s_%s", themeName, LAYOUTS[j]);
-                if (runCapture(i, j, name)) {
-                    final File ref = mReferences.get(name + ".png");
-                    if (!ref.exists()) {
-                        Log.logAndDisplay(LogLevel.INFO, TAG,
-                                "Skipping theme test due to missing reference for reference image " + name);
-                        continue;
-                    }
-                    mCompletionService.submit(new ComparisonTask(mDevice, ref, name));
-                    numTasks++;
-                } else {
-                    Log.logAndDisplay(LogLevel.ERROR, TAG, "Capture failed: " + name);
+                final File ref = mReferences.get(name + ".png");
+                if (!ref.exists()) {
+                    Log.logAndDisplay(LogLevel.INFO, TAG,
+                            "Skipping theme test due to missing reference for reference image " +
+                            name);
+                    continue;
                 }
+                mCompletionService.submit(new ComparisonTask(mDevice, ref, name));
+                numTasks++;
             }
         }
         int failures = 0;
@@ -305,11 +301,9 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
         assertTrue(failures + " failures in theme test", failures == 0);
     }
 
-    private boolean runCapture(int themeId, int layoutId, String imageName) throws Exception {
+    private void runCapture(int themeId, String themeName) throws Exception {
         final StringBuilder sb = new StringBuilder(START_CMD);
         sb.append(String.format(INTENT_INTEGER_EXTRA, EXTRA_THEME, themeId));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, EXTRA_LAYOUT, layoutId));
-        sb.append(String.format(INTENT_INTEGER_EXTRA, EXTRA_TIMEOUT, CAPTURE_TIMEOUT));
         final String startCommand = sb.toString();
         // Clear logcat
         mDevice.executeAdbCommand("logcat", "-c");
@@ -318,9 +312,8 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
         // Start activity
         mDevice.executeShellCommand(startCommand);
 
-        boolean success = false;
         boolean waiting = true;
-        while (waiting) {
+        do {
             // Dump logcat.
             final String logs = mDevice.executeAdbCommand(
                     "logcat", "-v", "brief", "-d", CLASS + ":I", "*:S");
@@ -331,20 +324,14 @@ public class ThemeHostTest extends DeviceTestCase implements IAbiReceiver, IBuil
                 if (line.startsWith("I/" + CLASS)) {
                     final String[] lineSplit = line.split(":");
                     final String s = lineSplit[1].trim();
-                    final String imageNameGenerated = lineSplit[2].trim();
-                    if (s.equals("OKAY") && imageNameGenerated.equals(imageName)) {
-                        success = true;
-                        waiting = false;
-                    } else if (s.equals("ERROR") && imageNameGenerated.equals(imageName)) {
-                        success = false;
+                    final String themeNameGenerated = lineSplit[2].trim();
+                    if (s.equals("OKAY") && themeNameGenerated.equals(themeName)) {
                         waiting = false;
                     }
                 }
             }
             in.close();
-        }
-
-        return success;
+        } while (waiting);
     }
 
     private static String getDensityBucket(int density) {

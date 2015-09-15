@@ -36,6 +36,7 @@ import android.theme.app.ReferenceViewGroup;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 
 import java.io.File;
@@ -50,65 +51,88 @@ public class HoloDeviceActivity extends Activity {
 
     public static final String EXTRA_THEME = "holo_theme_extra";
 
-    public static final String EXTRA_LAYOUT = "holo_layout_extra";
-
-    public static final String EXTRA_TIMEOUT = "holo_timeout_extra";
-
     private static final String TAG = HoloDeviceActivity.class.getSimpleName();
 
-    private static final int TIMEOUT = 1 * 1000;//1 sec
+    /**
+     * The duration of the CalendarView adjustement to settle to its final position.
+     */
+    private static final long CALENDAR_VIEW_ADJUSTMENT_DURATION = 540;
 
-    private View mView;
-
-    private String mName;
-
-    private Bitmap mBitmap;
+    private Theme mTheme;
 
     private ReferenceViewGroup mViewGroup;
 
+    private int mLayoutIndex;
+
     @Override
-    public void onCreate(Bundle icicle) {
+    protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        setUpUi(getIntent());
+
+        mTheme = THEMES[getIntent().getIntExtra(EXTRA_THEME, 0)];
+        setTheme(mTheme.mId);
+        setContentView(R.layout.holo_test);
+        mViewGroup = (ReferenceViewGroup) findViewById(R.id.reference_view_group);
     }
 
     @Override
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setUpUi(intent);
+    protected void onResume() {
+        super.onResume();
+        setNextLayout();
+    }
+
+    @Override
+    protected void onPause() {
+        if (!isFinishing()) {
+            // The Activity got paused for some reasons, for finish it as the host won't move on to
+            // the next theme otherwise.
+            Log.w(TAG, "onPause called without a call to finish().");
+            finish();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mLayoutIndex != LAYOUTS.length) {
+            Log.w(TAG, "Not all layouts got rendered: " + mLayoutIndex);
+        }
+        Log.i(TAG, "OKAY:" + mTheme.mName);
+        super.onDestroy();
     }
 
     /**
-     * Configures the UI with the given intent
+     * Sets the next layout in the UI.
      */
-    private void setUpUi(Intent intent) {
-        final Theme theme = themes[intent.getIntExtra(EXTRA_THEME, 0)];
-        final Layout layout = layouts[intent.getIntExtra(EXTRA_LAYOUT, 0)];
-        final int timeout = intent.getIntExtra(EXTRA_TIMEOUT, TIMEOUT);
-
-        setTheme(theme.mId);
-        setContentView(R.layout.holo_test);
-
-        mViewGroup = (ReferenceViewGroup) findViewById(R.id.reference_view_group);
-
-        mView = getLayoutInflater().inflate(layout.mId, mViewGroup, false);
-        mViewGroup.addView(mView);
-        if (layout.mModifier != null) {
-            layout.mModifier.modifyView(mView);
+    private void setNextLayout() {
+        if (mLayoutIndex >= LAYOUTS.length) {
+            finish();
+            return;
         }
-        mViewGroup.measure(0, 0);
-        mViewGroup.layout(0, 0, mViewGroup.getMeasuredWidth(), mViewGroup.getMeasuredHeight());
-        mView.setFocusable(false);
-        mName = String.format("%s_%s", theme.mName, layout.mName);
+        final Layout layout = LAYOUTS[mLayoutIndex++];
+        final String layoutName = String.format("%s_%s", mTheme.mName, layout.mName);
 
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
+        mViewGroup.removeAllViews();
+        final View view = getLayoutInflater().inflate(layout.mId, mViewGroup, false);
+        if (layout.mModifier != null) {
+            layout.mModifier.modifyView(view);
+        }
+        mViewGroup.addView(view);
+        view.setFocusable(false);
+
+        final Runnable generateBitmapRunnable = new Runnable() {
             @Override
             public void run() {
-                new GenerateBitmapTask().execute();
+                new GenerateBitmapTask(view, layoutName).execute();
             }
-        }, timeout);
-        setResult(RESULT_CANCELED);//On success will be changed to OK
+        };
+
+        if (view instanceof DatePicker) {
+            // DatePicker uses a CalendarView that has a non-configurable adjustment duration of
+            // 540ms
+            view.postDelayed(generateBitmapRunnable, CALENDAR_VIEW_ADJUSTMENT_DURATION);
+        } else {
+            view.post(generateBitmapRunnable);
+        }
     }
 
     /**
@@ -117,12 +141,14 @@ public class HoloDeviceActivity extends Activity {
      */
     private class GenerateBitmapTask extends AsyncTask<Void, Void, Boolean> {
 
-        @Override
-        protected void onPreExecute() {
-            final View v = mView;
-            mBitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
-            final Canvas canvas = new Canvas(mBitmap);
-            v.draw(canvas);
+        private final View mView;
+
+        private final String mName;
+
+        public GenerateBitmapTask(final View view, final String name) {
+            super();
+            mView = view;
+            mName = name;
         }
 
         @Override
@@ -131,6 +157,16 @@ public class HoloDeviceActivity extends Activity {
                 Log.i(TAG, "External storage for saving bitmaps is not mounted");
                 return false;
             }
+            if (mView.getWidth() == 0 || mView.getHeight() == 0) {
+                Log.w(TAG, "Unable to draw View due to incorrect size: " + mName);
+                return false;
+            }
+
+            final Bitmap bitmap = Bitmap.createBitmap(
+                    mView.getWidth(), mView.getHeight(), Bitmap.Config.ARGB_8888);
+            final Canvas canvas = new Canvas(bitmap);
+
+            mView.draw(canvas);
             final File dir = new File(Environment.getExternalStorageDirectory(), "cts-holo-assets");
             dir.mkdirs();
             boolean success = false;
@@ -139,27 +175,23 @@ public class HoloDeviceActivity extends Activity {
                 FileOutputStream stream = null;
                 try {
                     stream = new FileOutputStream(file);
-                    mBitmap.compress(CompressFormat.PNG, 100, stream);
+                    success = bitmap.compress(CompressFormat.PNG, 100, stream);
                 } finally {
                     if (stream != null) {
                         stream.close();
                     }
                 }
-                success = true;
             } catch (Exception e) {
                 Log.e(TAG, e.getMessage());
             } finally {
-                mBitmap.recycle();
-                mBitmap = null;
+                bitmap.recycle();
             }
             return success;
         }
 
         @Override
         protected void onPostExecute(Boolean success) {
-            Log.i(TAG, (success ? "OKAY" : "ERROR") + ":" + mName);
-            setResult(RESULT_OK);
-            finish();
+            setNextLayout();
         }
     }
 
@@ -178,7 +210,7 @@ public class HoloDeviceActivity extends Activity {
         }
     }
 
-    private static final Theme[] themes = {
+    private static final Theme[] THEMES = {
             new Theme(android.R.style.Theme_Holo,
                     "holo"),
             new Theme(android.R.style.Theme_Holo_Dialog,
@@ -247,7 +279,7 @@ public class HoloDeviceActivity extends Activity {
         }
     }
 
-    private static final Layout[] layouts = {
+    private static final Layout[] LAYOUTS = {
             new Layout(R.layout.button, "button", null),
             new Layout(R.layout.button, "button_pressed", new ViewPressedModifier()),
             new Layout(R.layout.checkbox, "checkbox", null),
