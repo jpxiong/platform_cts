@@ -76,22 +76,11 @@
   bug: 16720689
 },
 {
-  description: "A few WebGL tests are known to fail in WebView",
+  description: "Disable WebGL conformance tests in CTS",
   names: [
-    "android.webgl.cts.WebGLTest#test_conformance_extensions_oes_texture_float_with_video_html",
-    "android.webgl.cts.WebGLTest#test_conformance_renderbuffers_framebuffer_object_attachment_html",
-    "android.webgl.cts.WebGLTest#test_conformance_rendering_multisample_corruption_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_rgb565_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_rgba4444_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_tex_image_and_sub_image_2d_with_video_rgba5551_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_texture_npot_html",
-    "android.webgl.cts.WebGLTest#test_conformance_textures_texture_npot_video_html",
-    "android.webgl.cts.WebGLTest#test_conformance_glsl_misc_empty_main_vert_html",
-    "android.webgl.cts.WebGLTest#test_conformance_glsl_misc_gl_position_unset_vert_html",
-    "android.webgl.cts.WebGLTest#test_conformance_misc_webgl_specific_html"
+    "android.webgl.cts.WebGLTest"
   ],
-  bug: 17748398
+  bug: 20937460
 },
 {
   description: "permissions for the API previously used in the test has changed, making it impossible to pass",
