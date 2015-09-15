@@ -944,7 +944,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                         ));
                     }
 
-                    durationMs = (int) (nextTS - currentTS) / 1000000;
+                    durationMs = (nextTS - currentTS) / 1000000.0;
                     mCollector.expectTrue(
                             String.format(
                                     "Video %dx%d Frame drop detected after video snapshot: " +
@@ -958,7 +958,7 @@ public class RecordingTest extends Camera2SurfaceViewTestCase {
                     if (durationMs >= expectedDurationMs * 2) {
                         Log.w(TAG, String.format(
                                 "Video %dx%d Frame drop detected after video snapshot: " +
-                                        "duration %dms (expected %dms)",
+                                        "duration %fms (expected %fms)",
                                 mVideoSize.getWidth(), mVideoSize.getHeight(),
                                 durationMs, expectedDurationMs
                         ));
