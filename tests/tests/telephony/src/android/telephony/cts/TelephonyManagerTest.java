@@ -186,10 +186,7 @@ public class TelephonyManagerTest extends AndroidTestCase {
                 break;
 
             case TelephonyManager.PHONE_TYPE_NONE:
-                boolean nwSupported = mCm.isNetworkSupported(mCm.TYPE_WIFI);
-                PackageManager packageManager = getContext().getPackageManager();
-                // only check serial number & MAC address if device report wifi feature
-                if (packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI)) {
+                if (mCm.getNetworkInfo(ConnectivityManager.TYPE_WIFI) != null) {
                     assertSerialNumber();
                     assertMacAddress(getWifiMacAddress());
                 } else if (mCm.getNetworkInfo(ConnectivityManager.TYPE_BLUETOOTH) != null) {
