@@ -69,8 +69,6 @@ public class EventLogTest extends TestCase {
         EventLog.writeEvent(ANSWER_TAG, 12345L, longString.toString());
         EventLog.writeEvent(ANSWER_TAG, longString.toString(), longString.toString());
         EventLog.writeEvent(ANSWER_TAG, longArray);
-        // Give the message some time to show up in the log
-        Thread.sleep(10);
         List<Event> events = getEventsAfterMarker(markerData, ANSWER_TAG);
         assertEquals(6, events.size());
 
@@ -156,8 +154,11 @@ public class EventLogTest extends TestCase {
     }
 
     /** Return elements after and the event that has the marker data and matching tag. */
-    private List<Event> getEventsAfterMarker(Object marker, int... tags) throws IOException {
+    private List<Event> getEventsAfterMarker(Object marker, int... tags)
+            throws IOException, InterruptedException {
         List<Event> events = new ArrayList<Event>();
+        // Give the message some time to show up in the log
+        Thread.sleep(20);
         EventLog.readEvents(tags, events);
 
         for (Iterator<Event> itr = events.iterator(); itr.hasNext(); ) {
