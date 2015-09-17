@@ -1,12 +1,5 @@
 [
 {
-  description: "testWindowContentFrameStats is flaky without 75b55d0846159543aafc1b7420915497fce9b3f1",
-  names: [
-    "android.app.uiautomation.cts.UiAutomationTest#testWindowContentFrameStats"
-  ],
-  bug: 18039218
-},
-{
   description: "the UsageStats is not yet stable enough",
   names: [
     "android.app.usage.cts.UsageStatsTest"
