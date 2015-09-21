@@ -219,8 +219,7 @@ public class ActivityManagerTest extends InstrumentationTestCase {
                 hasTestProcess = true;
             }
         }
-        // For security reasons the system process is not exposed.
-        assertTrue(!hasSystemProcess && hasTestProcess);
+        assertTrue(hasSystemProcess && hasTestProcess);
 
         for (RunningAppProcessInfo ra : list) {
             if (ra.processName.equals("com.android.cts.app.stub:remote")) {
