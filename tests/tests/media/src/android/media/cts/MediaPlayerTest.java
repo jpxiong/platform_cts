@@ -82,6 +82,10 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         }
     }
 
+    public void testonInputBufferFilledSigsegv() throws Exception {
+        testIfMediaServerDied(R.raw.on_input_buffer_filled_sigsegv);
+    }
+
     public void testFlacHeapOverflow() throws Exception {
         testIfMediaServerDied(R.raw.heap_oob_flac);
     }
@@ -108,12 +112,17 @@ public class MediaPlayerTest extends MediaPlayerTestBase {
         AssetFileDescriptor afd = mResources.openRawResourceFd(res);
         mMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
         afd.close();
-        mMediaPlayer.prepare();
-        mMediaPlayer.start();
-        if (!mOnCompletionCalled.waitForSignal(5000)) {
-            Log.w(LOG_TAG, "testIfMediaServerDied: Timed out waiting for Error/Completion");
+        try {
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+            if (!mOnCompletionCalled.waitForSignal(5000)) {
+                Log.w(LOG_TAG, "testIfMediaServerDied: Timed out waiting for Error/Completion");
+            }
+        } catch (Exception e) {
+            Log.w(LOG_TAG, "playback failed", e);
+        } finally {
+            mMediaPlayer.release();
         }
-        mMediaPlayer.release();
     }
 
     // Bug 13652927
