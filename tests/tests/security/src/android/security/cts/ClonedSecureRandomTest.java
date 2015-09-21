@@ -26,7 +26,8 @@ import android.os.IBinder;
 import android.security.cts.activity.ISecureRandomService;
 import android.security.cts.activity.SecureRandomService;
 import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.LargeTest;
+
+import com.android.cts.util.TimeoutReq;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
@@ -37,7 +38,6 @@ import java.util.BitSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-@LargeTest
 public class ClonedSecureRandomTest extends AndroidTestCase {
     private static final int MAX_SHUTDOWN_TRIES = 50;
 
@@ -93,6 +93,7 @@ public class ClonedSecureRandomTest extends AndroidTestCase {
      * sees two newly started processes with the same PID and compares their
      * output.
      */
+    @TimeoutReq(minutes=15)
     public void testCheckForDuplicateOutput() throws Exception {
         assertEquals("Only supports up to " + MAX_PID + " because of memory requirements",
                 Integer.toString(MAX_PID), getFirstLineFromFile("/proc/sys/kernel/pid_max"));
