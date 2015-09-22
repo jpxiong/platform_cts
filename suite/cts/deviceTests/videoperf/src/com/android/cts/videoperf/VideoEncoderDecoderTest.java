@@ -169,6 +169,13 @@ public class VideoEncoderDecoderTest extends CtsAndroidTestCase {
             Log.i(TAG, "Encoder " + mimeType + " with " + w + "," + h + " not supported");
             return;
         }
+
+        CodecInfo infoDec = CodecInfo.getSupportedFormatInfo(mimeType, w, h, false);
+        if (infoDec == null) {
+            Log.i(TAG, "Codec " + mimeType + "with " + w + "," + h + " not supported");
+            return;
+        }
+
         mVideoWidth = w;
         mVideoHeight = h;
 
