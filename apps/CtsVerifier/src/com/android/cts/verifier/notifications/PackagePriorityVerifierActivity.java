@@ -233,6 +233,7 @@ public class PackagePriorityVerifierActivity
         postIntent.setPackage(NOTIFICATION_BOT_PACKAGE);
         postIntent.putExtra(EXTRA_ID, 0);
         postIntent.putExtra(EXTRA_NOTIFICATION, bob.build());
+        postIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         sendBroadcast(postIntent);
     }
 
@@ -243,6 +244,7 @@ public class PackagePriorityVerifierActivity
         Intent cancelIntent = new Intent(ACTION_CANCEL);
         cancelIntent.setPackage(NOTIFICATION_BOT_PACKAGE);
         cancelIntent.putExtra(EXTRA_ID, 0);
+        cancelIntent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         sendBroadcast(cancelIntent);
     }
 
