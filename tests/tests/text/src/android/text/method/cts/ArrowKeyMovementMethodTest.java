@@ -255,7 +255,7 @@ public class ArrowKeyMovementMethodTest extends ActivityInstrumentationTestCase2
 
         assertFalse(mArrowKeyMovementMethod.onKeyDown(mTextView, mEditable,
                 KeyEvent.KEYCODE_DPAD_UP, noMetaEvent));
-        // |first line
+        // first lin|e
         // second line
         // last line
         assertSelection(0);
