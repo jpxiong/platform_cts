@@ -281,7 +281,7 @@ public class MediaUtils {
                 ex.release();
             }
         }
-        return false;
+        return true;
     }
 
     public static boolean checkCodecsForPath(Context context, String path) {
