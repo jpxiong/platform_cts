@@ -61,7 +61,7 @@ public class LauncherAppsTests extends InstrumentationTestCase {
     public static final int MSG_CHECK_PACKAGE_ADDED = 1;
     public static final int MSG_CHECK_PACKAGE_REMOVED = 2;
     public static final int MSG_CHECK_PACKAGE_CHANGED = 3;
-    public static final int MSG_CHECK_NO_CALLBACK = 4;
+    public static final int MSG_CHECK_NO_PACKAGE_ADDED = 4;
 
     public static final int RESULT_PASS = 1;
     public static final int RESULT_FAIL = 2;
@@ -139,8 +139,8 @@ public class LauncherAppsTests extends InstrumentationTestCase {
         assertEquals(RESULT_PASS, result);
     }
 
-    public void testNoCallbackForUser() throws Throwable {
-        int result = sendMessageToCallbacksService(MSG_CHECK_NO_CALLBACK,
+    public void testNoPackageAddedCallbackForUser() throws Throwable {
+        int result = sendMessageToCallbacksService(MSG_CHECK_NO_PACKAGE_ADDED,
                 mUser, SIMPLE_APP_PACKAGE);
         assertEquals(RESULT_PASS, result);
     }
@@ -238,8 +238,8 @@ public class LauncherAppsTests extends InstrumentationTestCase {
 
         public int waitForResult() {
             try {
-                if (mSemaphore.tryAcquire(5, TimeUnit.SECONDS)) {
-                    return result;
+                if (mSemaphore.tryAcquire(120, TimeUnit.SECONDS)) {
+                     return result;
                 }
             } catch (InterruptedException e) {
             }
