@@ -18,6 +18,7 @@ package android.media.cts;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.OnErrorListener;
@@ -166,18 +167,16 @@ public class MediaRecorderTest extends ActivityInstrumentationTestCase2<MediaStu
         if (!hasCamera()) {
             return;
         }
-        // Try to get camera first supported resolution.
-        // If we fail for any reason, set the video size to default value.
-        try {
-            camera = Camera.open();
-            width = camera.getParameters().getSupportedPreviewSizes().get(0).width;
-            height = camera.getParameters().getSupportedPreviewSizes().get(0).height;
-        } catch (Exception e) {
+        // Try to get camera profile for QUALITY_LOW; if unavailable,
+        // set the video size to default value.
+        CamcorderProfile profile = CamcorderProfile.get(
+                0 /* cameraId */, CamcorderProfile.QUALITY_LOW);
+        if (profile != null) {
+            width = profile.videoFrameWidth;
+            height = profile.videoFrameHeight;
+        } else {
             width = VIDEO_WIDTH;
             height = VIDEO_HEIGHT;
-        }
-        if (camera != null) {
-            camera.release();
         }
         mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.DEFAULT);
