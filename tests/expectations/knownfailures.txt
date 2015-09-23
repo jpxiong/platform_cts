@@ -327,5 +327,12 @@
     "com.android.org.conscrypt.SignatureTest#test_getInstance_OpenSSL_ENGINE"
   ],
   bug: 18030049
+},
+{
+  description: "EventOrderingVerificationTest not working.",
+  names: [
+    "android.hardware.cts.helpers.sensorverification.EventOrderingVerificationTest#testSameTimestamp",
+  ],
+  bug: 23792027
 }
 ]
