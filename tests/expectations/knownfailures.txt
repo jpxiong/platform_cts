@@ -39,6 +39,10 @@
   bug: 17046287
 },
 {
+  name: "android.text.cts.MyanmarTest#testCompositionSemantics",
+  bug: 23911934
+},
+{
   name: "libcore.javax.net.ssl.SSLSocketTest#test_SSLSocket_getSupportedCipherSuites_connect",
   bug: 18033537
 },
