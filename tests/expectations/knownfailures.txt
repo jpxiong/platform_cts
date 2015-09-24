@@ -338,7 +338,7 @@
 {
   description: "EventOrderingVerificationTest not working.",
   names: [
-    "android.hardware.cts.helpers.sensorverification.EventOrderingVerificationTest#testSameTimestamp",
+    "android.hardware.cts.helpers.sensorverification.EventOrderingVerificationTest#testSameTimestamp"
   ],
   bug: 23792027
 }
