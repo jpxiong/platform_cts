@@ -31,10 +31,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
-
+import android.view.Display;
+import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.content.ContentResolver;
 import com.android.cts.verifier.R;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * This dialog shows/plays an image, video or audio uri.
@@ -46,6 +50,7 @@ public class ByodPresentMediaDialog extends DialogFragment {
     private static final String KEY_IMAGE_URI = "image";
     private static final String KEY_AUDIO_URI = "audio";
 
+    private Bitmap scaled = null;
     /**
      * Get a dialogFragment showing an image.
      */
@@ -77,6 +82,16 @@ public class ByodPresentMediaDialog extends DialogFragment {
         args.putParcelable(KEY_AUDIO_URI, uri);
         dialog.setArguments(args);
         return dialog;
+    }
+
+    private int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight){
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        if(reqWidth <= 0 || reqHeight <= 0) {
+           return 1;
+        }
+        return Math.max(height/reqHeight, width/reqWidth) + 1;
     }
 
     @Override
@@ -114,11 +129,36 @@ public class ByodPresentMediaDialog extends DialogFragment {
         } else if (arguments.containsKey(KEY_IMAGE_URI)) {
             // Show image UI.
             dialog.setTitle(getString(R.string.provisioning_byod_verify_image_title));
-
-            Uri uri = (Uri) getArguments().getParcelable(KEY_IMAGE_URI);
+            Uri uri = (Uri)getArguments().getParcelable(KEY_IMAGE_URI);
             ImageView imageView = (ImageView) dialog.findViewById(R.id.imageView);
             imageView.setVisibility(View.VISIBLE);
-            imageView.setImageURI(uri);
+
+            try{
+                InputStream input = getActivity().getContentResolver().openInputStream(uri);
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inJustDecodeBounds = true;
+                BitmapFactory.decodeStream(input, null, options);
+                //scale the picture
+                Display display = getActivity().getWindowManager().getDefaultDisplay();
+                Point size = new Point();
+                display.getSize(size);
+                int reqWidth = size.x;
+                int reqHeight = size.y;
+                options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+                options.inJustDecodeBounds = false;
+                input.close();
+                input = getActivity().getContentResolver().openInputStream(uri);
+                scaled = BitmapFactory.decodeStream(input, null, options);
+                input.close();
+                imageView.setImageBitmap(scaled);
+            }catch(IOException e){
+                Log.e(TAG, "Cannot get image.", e);
+                Toast.makeText(getActivity(),R.string.provisioning_byod_capture_image_error,
+                        Toast.LENGTH_SHORT).show();
+                getActivity().finish();
+            }
+
         } else if (arguments.containsKey(KEY_AUDIO_URI)) {
             // Show audio playback UI.
             dialog.setTitle(getString(R.string.provisioning_byod_verify_audio_title));
@@ -161,6 +201,13 @@ public class ByodPresentMediaDialog extends DialogFragment {
         ((DialogCallback) getActivity()).onDialogClose();
     }
 
+    @Override
+    public void onDestroyView() {
+        if(scaled!=null){
+            scaled.recycle();
+        }
+        super.onDestroyView();
+    }
     public interface DialogCallback {
         public abstract void onDialogClose();
     }

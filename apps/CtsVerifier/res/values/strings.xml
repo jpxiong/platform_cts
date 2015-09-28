@@ -1149,6 +1149,7 @@
     <string name="provisioning_byod_no_video_capture_resolver">No video capture app present. Skip test.</string>
     <string name="provisioning_byod_no_audio_capture_resolver">No audio capture app present. Skip test.</string>
     <string name="provisioning_byod_capture_media_error">Error while capturing media from managed profile.</string>
+    <string name="provisioning_byod_capture_image_error">Error while capturing image from managed profile.</string>
 
     <!-- Strings for DeskClock -->
     <string name="deskclock_tests">Alarms and Timers Tests</string>
