@@ -90,6 +90,23 @@ public class ComparisonTask implements Callable<Boolean> {
         return success;
     }
 
+    private static int getAlphaScaledBlue(final int color) {
+        return (color & 0x000000FF) * getAlpha(color) / 255;
+    }
+
+    private static int getAlphaScaledGreen(final int color) {
+        return ((color & 0x0000FF00) >> 8) * getAlpha(color) / 255;
+    }
+
+    private static int getAlphaScaledRed(final int color) {
+        return ((color & 0x00FF0000) >> 16) * getAlpha(color) / 255;
+    }
+
+    private static int getAlpha(final int color) {
+        // use logical shift for keeping an unsigned value
+        return (color & 0xFF000000) >>> 24;
+    }
+
     private static boolean compare(BufferedImage reference, BufferedImage generated, int threshold) {
         final int w = generated.getWidth();
         final int h = generated.getHeight();
@@ -101,15 +118,14 @@ public class ComparisonTask implements Callable<Boolean> {
             for (int j = 0; j < h; j++) {
                 final int p1 = reference.getRGB(i, j);
                 final int p2 = generated.getRGB(i, j);
-                final int dr = (p1 & 0x000000FF) - (p2 & 0x000000FF);
-                final int dg = ((p1 & 0x0000FF00) - (p2 & 0x0000FF00)) >> 8;
-                final int db = ((p1 & 0x00FF0000) - (p2 & 0x00FF0000)) >> 16;
-                final int da = ((p1 & 0xFF000000) - (p2 & 0xFF000000)) >> 24;
+
+                final int dr = getAlphaScaledRed(p1) - getAlphaScaledRed(p2);
+                final int dg = getAlphaScaledGreen(p1) - getAlphaScaledGreen(p2);
+                final int db = getAlphaScaledBlue(p1) - getAlphaScaledBlue(p2);
 
                 if (Math.abs(db) > threshold ||
                         Math.abs(dg) > threshold ||
-                        Math.abs(dr) > threshold ||
-                        Math.abs(da) > threshold) {
+                        Math.abs(dr) > threshold) {
                     return false;
                 }
             }
