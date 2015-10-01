@@ -18,14 +18,11 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := libctsopengl_jni
 
-LOCAL_MODULE_TAGS := optional
-
 # Needed in order to use fences for synchronization
 LOCAL_CFLAGS += -DEGL_EGLEXT_PROTOTYPES -funsigned-char
 
 # Get all cpp files but not hidden files
-LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
-		  find . -name "*.cpp" -and -not -name ".*"))
+LOCAL_SRC_FILES := $(call all-subdir-cpp-files)
 
 LOCAL_C_INCLUDES := $(JNI_H_INCLUDE)
 
