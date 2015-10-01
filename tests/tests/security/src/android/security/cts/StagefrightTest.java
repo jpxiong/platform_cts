@@ -22,19 +22,18 @@
  */
 package android.security.cts;
 
+import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
+import android.os.Looper;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.android.cts.security.R;
-
-import android.content.Context;
-import android.os.Environment;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.android.cts.security.R;
 
 
 /**
@@ -44,7 +43,8 @@ import java.lang.reflect.Field;
 public class StagefrightTest extends AndroidTestCase {
     static final String TAG = "StagefrightTest";
 
-    public StagefrightTest() { }
+    public StagefrightTest() {
+    }
 
     public void testStagefright_cve_2015_1538_1() throws Exception {
         doStagefrightTest(R.raw.cve_2015_1538_1);
@@ -70,6 +70,10 @@ public class StagefrightTest extends AndroidTestCase {
         doStagefrightTest(R.raw.cve_2015_3824);
     }
 
+    public void testStagefright_cve_2015_3826() throws Exception {
+        doStagefrightTest(R.raw.cve_2015_3826);
+    }
+
     public void testStagefright_cve_2015_3827() throws Exception {
         doStagefrightTest(R.raw.cve_2015_3827);
     }
@@ -86,41 +90,61 @@ public class StagefrightTest extends AndroidTestCase {
         doStagefrightTest(R.raw.cve_2015_3864);
     }
 
-    private void doStagefrightTest(int rid) throws Exception {
-        Context ctx = getContext();
-        File pocdir = new File(ctx.getFilesDir(), "pocs");
-        pocdir.mkdir();
+    private void doStagefrightTest(final int rid) throws Exception {
+        class MediaPlayerCrashListener implements MediaPlayer.OnErrorListener {
+            @Override
+            public boolean onError(MediaPlayer mp, int newWhat, int extra) {
+                what = newWhat;
+                lock.lock();
+                condition.signal();
+                lock.unlock();
 
-        String name = ctx.getResources().getResourceEntryName(rid);
-        File pocfile = new File(pocdir, name + ".mp4");
-        extractRaw(ctx, rid, pocfile);
+                return false;
+            }
 
-        boolean safe = stagefrightTest(pocfile.getPath());
+            public int waitForError() throws InterruptedException {
+                lock.lock();
+                condition.await();
+                lock.unlock();
+                return what;
+            }
 
-        // Unlikely to return if failed, but check just in case
+            ReentrantLock lock = new ReentrantLock();
+            Condition condition = lock.newCondition();
+            int what;
+        }
+
+        final MediaPlayerCrashListener mpcl = new MediaPlayerCrashListener();
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+
+                MediaPlayer mp = new MediaPlayer();
+                mp.setOnErrorListener(mpcl);
+                try {
+                    AssetFileDescriptor fd = getContext().getResources()
+                        .openRawResourceFd(rid);
+
+                    mp.setDataSource(fd.getFileDescriptor(),
+                                     fd.getStartOffset(),
+                                     fd.getLength());
+
+                    mp.prepareAsync();
+                } catch (Exception e) {
+                }
+
+                Looper.loop();
+                mp.release();
+            }
+        });
+
+        t.start();
+        String name = getContext().getResources().getResourceEntryName(rid);
         String cve = name.replace("_", "-").toUpperCase();
-        assertTrue("Device *IS* vulnerable to " + cve, safe);
-
-        pocfile.delete();
-    }
-
-    /**
-     * Attempts to process a file with libstagefright.
-     * Returns true if successful false otherwise.
-     */
-    public static final native boolean stagefrightTest(String filename);
-
-    private void extractRaw(Context ctx, int rid, File file) throws Exception {
-        InputStream input = ctx.getResources().openRawResource(rid);
-        byte[] buffer = new byte[input.available()];
-        input.read(buffer);
-        input.close();
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(buffer, 0, buffer.length);
-        fos.close();
-   }
-
-    static {
-        System.loadLibrary("ctssecurity_jni");
+        assertFalse("Device *IS* vulnerable to " + cve,
+                    mpcl.waitForError() == MediaPlayer.MEDIA_ERROR_SERVER_DIED);
+        t.interrupt();
     }
 }
