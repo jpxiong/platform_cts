@@ -316,18 +316,24 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                         session, previewBuilder.build(), mHandler);
 
                 // Check if all timestamps are the same
+                Image prevImage = prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateTimestamps("Result 1", result.first,
-                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result.second);
+                        prevImage, result.second);
+                prevImage.close();
 
                 // Capture targeting both jpeg and preview
                 Pair<TotalCaptureResult, Long> result2 = captureAndVerifyResult(mockCaptureCallback,
                         session, multiBuilder.build(), mHandler);
 
                 // Check if all timestamps are the same
+                prevImage = prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
+                Image jpegImage = jpegListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateTimestamps("Result 2 Preview", result2.first,
-                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result2.second);
+                        prevImage, result2.second);
                 validateTimestamps("Result 2 Jpeg", result2.first,
-                        jpegListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result2.second);
+                        jpegImage, result2.second);
+                prevImage.close();
+                jpegImage.close();
 
                 // Check if timestamps are increasing
                 mCollector.expectGreater("Timestamps must be increasing.", result.second,
@@ -343,10 +349,14 @@ public class CaptureResultTest extends Camera2AndroidTestCase {
                 long resultDiff = result4.second - result3.second;
 
                 // Check if all timestamps are the same
+                prevImage = prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateTimestamps("Result 3", result3.first,
-                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result3.second);
+                        prevImage, result3.second);
+                prevImage.close();
+                prevImage = prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS);
                 validateTimestamps("Result 4", result4.first,
-                        prevListener.getImage(CAPTURE_IMAGE_TIMEOUT_MS), result4.second);
+                        prevImage, result4.second);
+                prevImage.close();
 
                 // Check that the timestamps monotonically increase at a reasonable rate
                 mCollector.expectGreaterOrEqual("Timestamps increase faster than system clock.",

@@ -78,7 +78,7 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
             Exception prior = null;
 
             ImageVerifierListener yuvListener;
-            ImageReader yuvReader;
+            ImageReader yuvReader = null;
 
             try {
                 openCamera(cameraId);
@@ -102,6 +102,9 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
                 prior = e;
             } finally {
                 try {
+                    if (yuvReader != null) {
+                        yuvReader.close();
+                    }
                     closeCamera(cameraId);
                 } catch (Exception e) {
                     if (prior != null) {
@@ -151,7 +154,7 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
             Exception prior = null;
 
             ImageVerifierListener yuvListener;
-            ImageReader yuvReader;
+            ImageReader yuvReader = null;
 
             try {
                 openCamera(cameraId);
@@ -175,6 +178,9 @@ public class MultiViewTest extends Camera2MultiViewTestCase {
                 prior = e;
             } finally {
                 try {
+                    if (yuvReader != null) {
+                        yuvReader.close();
+                    }
                     closeCamera(cameraId);
                 } catch (Exception e) {
                     if (prior != null) {

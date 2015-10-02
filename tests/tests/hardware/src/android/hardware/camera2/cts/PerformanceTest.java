@@ -71,8 +71,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
     private final int MAX_INPUT_IMAGES = MAX_REPROCESS_IMAGES;
     // ZSL queue depth should be bigger than the max simultaneous reprocessing capture request
     // count to maintain reasonable number of candidate image for the worse-case.
-    // Here we want to make sure we at most dequeue half of the queue max images for the worst-case.
-    private final int MAX_ZSL_IMAGES = MAX_REPROCESS_IMAGES * 2;
+    private final int MAX_ZSL_IMAGES = MAX_REPROCESS_IMAGES * 3 / 2;
     private final double REPROCESS_STALL_MARGIN = 0.1;
 
     private DeviceReportLog mReportLog;
@@ -434,7 +433,7 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
             // Wait for reprocess output jpeg and result come back.
             reprocessResultListener.getCaptureResultForRequest(reprocessRequest,
                     CameraTestUtils.CAPTURE_RESULT_TIMEOUT_MS);
-            mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
+            mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS).close();
             long numFramesMaybeStalled = mZslResultListener.getTotalNumFrames();
             assertTrue("Reprocess capture result should be returned in "
                     + MAX_REPROCESS_RETURN_FRAME_COUNT + " frames",
@@ -474,6 +473,8 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
 
             maxCaptureGapsMs[i] = maxTimestampGapMs;
         }
+
+        stopZslStreaming();
 
         String reprocessType = " YUV reprocessing ";
         if (reprocessInputFormat == ImageFormat.PRIVATE) {
@@ -539,23 +540,33 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
 
             // Get images
             startTimeMs = SystemClock.elapsedRealtime();
+            Image jpegImages[] = new Image[MAX_REPROCESS_IMAGES];
             for (int i = 0; i < MAX_REPROCESS_IMAGES; i++) {
-                mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
+                jpegImages[i] = mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
                 getImageLatenciesMs[i] = SystemClock.elapsedRealtime() - startTimeMs;
                 startTimeMs = SystemClock.elapsedRealtime();
+            }
+            for (Image i : jpegImages) {
+                i.close();
             }
         } else {
             // sync capture: issue reprocess request one by one, only submit next one when
             // the previous capture image is returned. This is to test the back to back capture
             // performance.
+            Image jpegImages[] = new Image[MAX_REPROCESS_IMAGES];
             for (int i = 0; i < MAX_REPROCESS_IMAGES; i++) {
                 startTimeMs = SystemClock.elapsedRealtime();
                 mWriter.queueInputImage(inputImages[i]);
                 mSession.capture(reprocessReqs[i].build(), null, null);
-                mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
+                jpegImages[i] = mJpegListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS);
                 getImageLatenciesMs[i] = SystemClock.elapsedRealtime() - startTimeMs;
             }
+            for (Image i : jpegImages) {
+                i.close();
+            }
         }
+
+        stopZslStreaming();
 
         String reprocessType = " YUV reprocessing ";
         if (reprocessInputFormat == ImageFormat.PRIVATE) {
@@ -591,6 +602,12 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
         mSession.setRepeatingRequest(zslBuilder.build(), mZslResultListener, mHandler);
     }
 
+    private void stopZslStreaming() throws Exception {
+        mSession.stopRepeating();
+        mSessionListener.getStateWaiter().waitForState(
+            BlockingSessionCallback.SESSION_READY, CameraTestUtils.CAMERA_IDLE_TIMEOUT_MS);
+    }
+
     /**
      * Wait for a certain number of frames, the images and results will be drained from the
      * listeners to make sure that next reprocessing can get matched results and images.
@@ -598,24 +615,22 @@ public class PerformanceTest extends Camera2SurfaceViewTestCase {
      * @param numFrameWait The number of frames to wait before return, 0 means that
      *      this call returns immediately after streaming on.
      */
-    private void waitForFrames(int numFrameWait) {
+    private void waitForFrames(int numFrameWait) throws Exception {
         if (numFrameWait < 0) {
             throw new IllegalArgumentException("numFrameWait " + numFrameWait +
                     " should be non-negative");
         }
 
-        if (numFrameWait == 0) {
-            // Let is stream out for a while
-            waitForNumResults(mZslResultListener, numFrameWait);
-            // Drain the pending images, to ensure that all future images have an associated
-            // capture result available.
-            mCameraZslImageListener.drain();
+        for (int i = 0; i < numFrameWait; i++) {
+            mCameraZslImageListener.getImage(CameraTestUtils.CAPTURE_IMAGE_TIMEOUT_MS).close();
         }
     }
 
     private void closeReaderWriters() {
+        mCameraZslImageListener.drain();
         CameraTestUtils.closeImageReader(mCameraZslReader);
         mCameraZslReader = null;
+        mJpegListener.drain();
         CameraTestUtils.closeImageReader(mJpegReader);
         mJpegReader = null;
         CameraTestUtils.closeImageWriter(mWriter);

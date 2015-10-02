@@ -714,6 +714,7 @@ public class BurstCaptureRawTest extends Camera2SurfaceViewTestCase {
 
                     // clear out the surface and camera session
                     stopPreviewAndClearSurface(previewBuilder, rawBurstBuilder);
+                    rawReaderListener.drain();
                     closeImageReader();
                 }
             } finally {
