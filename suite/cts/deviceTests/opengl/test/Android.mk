@@ -13,23 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# build only for linux
-ifeq ($(HOST_OS),linux)
-
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
-LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/Android.mk
-
-LOCAL_MODULE_TAGS := optional
-LOCAL_SRC_FILES := $(patsubst ./%,%, $(shell cd $(LOCAL_PATH); \
-  find . -name "*.cpp" -and -not -name ".*"))
+LOCAL_SRC_FILES := $(call all-subdir-cpp-files)
 LOCAL_SRC_FILES += ../jni/graphics/Matrix.cpp
 
-#$(info $(LOCAL_SRC_FILES))
 LOCAL_C_INCLUDES += external/gtest/include $(LOCAL_PATH)/../jni/graphics/
 LOCAL_STATIC_LIBRARIES := libgtest_host libgtest_main_host liblog
 LOCAL_LDFLAGS:= -g -lpthread
+LOCAL_MODULE_HOST_OS := linux
 LOCAL_MODULE:= cts_device_opengl_test
 include $(BUILD_HOST_EXECUTABLE)
-
-endif # linux
