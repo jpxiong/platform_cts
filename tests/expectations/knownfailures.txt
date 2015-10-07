@@ -35,6 +35,10 @@
   bug: 11352697
 },
 {
+  names:"android.security.cts.AudioPolicyBinderTest",
+  bug: 18461670
+},
+{
   name: "android.os.cts.MemoryFileTest#testLength",
   bug: 17046287
 },
