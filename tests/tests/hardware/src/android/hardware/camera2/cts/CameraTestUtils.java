@@ -337,7 +337,7 @@ public class CameraTestUtils extends Assert {
          *
          */
         public void drain() {
-            for (int i = 0; i < mQueue.size(); i++) {
+            while (!mQueue.isEmpty()) {
                 Image image = mQueue.poll();
                 assertNotNull("Unable to get an image", image);
                 image.close();
